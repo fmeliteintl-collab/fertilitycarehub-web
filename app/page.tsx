@@ -1,157 +1,289 @@
 export default function Home() {
   return (
-    <main style={{ 
-      fontFamily: "Georgia, serif",
-      backgroundColor: "#f8f6f2",
-      color: "#2b2b2b",
-      lineHeight: 1.6
-    }}>
-      
-      {/* Hero Section */}
-      <section style={{ 
-        padding: "120px 20px",
-        textAlign: "center",
-        maxWidth: "900px",
-        margin: "0 auto"
-      }}>
-        <h1 style={{ 
-          fontSize: "42px",
-          fontWeight: 500,
-          marginBottom: "20px"
-        }}>
+    <main
+      style={{
+        fontFamily: "Georgia, serif",
+        backgroundColor: "#f8f6f2",
+        color: "#2b2b2b",
+        lineHeight: 1.6,
+      }}
+    >
+      {/* HERO */}
+      <section
+        style={{
+          padding: "120px 20px 70px",
+          textAlign: "center",
+          maxWidth: "980px",
+          margin: "0 auto",
+        }}
+      >
+        <h1
+          style={{
+            fontSize: "42px",
+            fontWeight: 500,
+            marginBottom: "20px",
+            letterSpacing: "0.2px",
+          }}
+        >
           Private Global Fertility Strategy Advisory.
           <br />
           Clarity Across Borders.
         </h1>
 
-        <p style={{ 
-          fontSize: "18px",
-          color: "#5a5a5a",
-          maxWidth: "600px",
-          margin: "0 auto 40px"
-        }}>
-          Navigate IVF pathways, legal frameworks, international cost structures, and
-          clinic standards with structured, confidential global guidance
+        <p
+          style={{
+            fontSize: "18px",
+            color: "#5a5a5a",
+            maxWidth: "720px",
+            margin: "0 auto 34px",
+          }}
+        >
+          Navigate international IVF pathways, jurisdictional legal frameworks,
+          donor policies, and cross-border cost structures with structured,
+          confidential global guidance.
         </p>
 
-        <div>
-          <button style={{
-            padding: "12px 28px",
-            backgroundColor: "#b8a77a",
-            color: "#ffffff",
-            border: "none",
-            borderRadius: "4px",
-            marginRight: "15px",
-            cursor: "pointer"
-          }}>
+        <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
+          <button
+            style={{
+              padding: "12px 26px",
+              backgroundColor: "#b8a77a",
+              color: "#ffffff",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
             Request Private Strategy Consultation
           </button>
 
-          <button style={{
-            padding: "12px 28px",
-            backgroundColor: "transparent",
-            border: "1px solid #b8a77a",
-            color: "#b8a77a",
-            borderRadius: "4px",
-            cursor: "pointer"
-          }}>
+          <button
+            style={{
+              padding: "12px 26px",
+              backgroundColor: "transparent",
+              border: "1px solid #b8a77a",
+              color: "#b8a77a",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
             Explore International Pathways
           </button>
         </div>
+
+        {/* Credibility strip */}
+        <div
+          style={{
+            marginTop: "36px",
+            fontSize: "12px",
+            letterSpacing: "0.14em",
+            textTransform: "uppercase",
+            color: "#7a7a7a",
+          }}
+        >
+          Structured Analysis Across 30+ Jurisdictions • Legal &amp; Clinical Intelligence • Cross-Border Strategic Advisory
+        </div>
       </section>
 
-      {/* Positioning Section */}
-      <section style={{
-        padding: "100px 20px",
-        backgroundColor: "#ffffff",
-        textAlign: "center"
-      }}>
-        <div style={{ maxWidth: "800px", margin: "0 auto" }}>
-          <h2 style={{ fontSize: "28px", marginBottom: "20px" }}>
+      {/* POSITIONING */}
+      <section
+        style={{
+          padding: "90px 20px",
+          backgroundColor: "#ffffff",
+          textAlign: "center",
+        }}
+      >
+        <div style={{ maxWidth: "860px", margin: "0 auto" }}>
+          <h2 style={{ fontSize: "28px", marginBottom: "18px" }}>
             High-Stakes Decisions Require Structured Guidance
           </h2>
 
+          <p style={{ color: "#555", marginBottom: 14 }}>
+            Fertility treatment is one of the most emotionally and financially significant decisions a family will make.
+            Legal environments differ. Donor anonymity regulations vary. Cost transparency is inconsistent. Success
+            reporting standards are not universal.
+          </p>
+
           <p style={{ color: "#555" }}>
-            Fertility treatment is one of the most emotionally and financially
-            significant decisions a family makes. Legal environments differ.
-            Donor anonymity policies vary. Cost structures lack transparency.
-            We bring order to complexity through data-driven global analysis.
+            FertilityCareHub provides structured, independent global analysis — allowing families to make informed
+            decisions across jurisdictions with clarity and confidence.
           </p>
         </div>
       </section>
 
-      {/* Services Section */}
-      <section style={{
-        padding: "100px 20px",
-        textAlign: "center"
-      }}>
-        <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
-          <h2 style={{ fontSize: "28px", marginBottom: "60px" }}>
-            Our Advisory Framework
+      {/* FRAMEWORK */}
+      <section style={{ padding: "100px 20px", textAlign: "center" }}>
+        <div style={{ maxWidth: "1050px", margin: "0 auto" }}>
+          <h2 style={{ fontSize: "28px", marginBottom: "58px" }}>
+            Our Global Advisory Framework
           </h2>
 
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-            gap: "40px"
-          }}>
-            <div>
-              <h3>Country Intelligence</h3>
-              <p style={{ color: "#555" }}>
-                Legal frameworks, cost bands, storage regulations,
-                donor policies, and eligibility requirements.
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+              gap: "42px",
+              textAlign: "left",
+            }}
+          >
+            <div style={{ background: "#ffffff", padding: 26, borderRadius: 6 }}>
+              <h3 style={{ marginTop: 0 }}>Country Intelligence</h3>
+              <p style={{ color: "#555", marginBottom: 0 }}>
+                Legal frameworks, storage regulations, donor eligibility policies,
+                treatment access rules, and citizenship implications.
               </p>
             </div>
 
-            <div>
-              <h3>Clinic Standards Insight</h3>
-              <p style={{ color: "#555" }}>
-                Accreditation clarity, lab standards, reporting methodology,
-                and transparency benchmarks.
+            <div style={{ background: "#ffffff", padding: 26, borderRadius: 6 }}>
+              <h3 style={{ marginTop: 0 }}>Clinic Standards Insight</h3>
+              <p style={{ color: "#555", marginBottom: 0 }}>
+                Accreditation clarity, laboratory benchmarks, embryology standards,
+                and transparency in outcome reporting.
               </p>
             </div>
 
-            <div>
-              <h3>Strategic Fertility Advisory</h3>
-              <p style={{ color: "#555" }}>
-                Structured cross-border treatment planning for families
-                navigating international fertility pathways.
+            <div style={{ background: "#ffffff", padding: 26, borderRadius: 6 }}>
+              <h3 style={{ marginTop: 0 }}>Strategic Fertility Planning</h3>
+              <p style={{ color: "#555", marginBottom: 0 }}>
+                Cross-border pathway mapping, jurisdictional risk assessment,
+                cost structure evaluation, and confidential advisory planning.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section style={{
-        padding: "100px 20px",
-        backgroundColor: "#2b2b2b",
-        color: "#ffffff",
-        textAlign: "center"
-      }}>
-        <div style={{ maxWidth: "700px", margin: "0 auto" }}>
-          <h2 style={{ marginBottom: "20px" }}>
-            Private Fertility Strategy Advisory
+      {/* WHO WE SERVE */}
+      <section style={{ padding: "90px 20px", backgroundColor: "#ffffff" }}>
+        <div style={{ maxWidth: "980px", margin: "0 auto" }}>
+          <h2 style={{ fontSize: "28px", marginBottom: 18, textAlign: "center" }}>
+            Who We Serve
           </h2>
 
-          <p style={{ marginBottom: "40px", color: "#d4d4d4" }}>
-            For families requiring structured, confidential global fertility
-            guidance across jurisdictions.
+          <div style={{ maxWidth: 760, margin: "0 auto", color: "#555" }}>
+            <ul style={{ margin: 0, paddingLeft: 18, lineHeight: 1.9 }}>
+              <li>Families navigating international IVF</li>
+              <li>Intended parents exploring donor or surrogacy pathways</li>
+              <li>Professionals requiring structured cross-border clarity</li>
+              <li>Individuals comparing treatment jurisdictions globally</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* DIFFERENTIATION */}
+      <section style={{ padding: "100px 20px" }}>
+        <div style={{ maxWidth: "900px", margin: "0 auto", textAlign: "center" }}>
+          <h2 style={{ fontSize: "28px", marginBottom: 18 }}>
+            Independent. Structured. Confidential.
+          </h2>
+
+          <p style={{ color: "#555", marginBottom: 14 }}>
+            Unlike promotional clinic directories or commission-driven ranking platforms, FertilityCareHub provides
+            structured global fertility strategy grounded in regulatory, clinical, and cost intelligence.
           </p>
 
-          <button style={{
-            padding: "14px 30px",
-            backgroundColor: "#b8a77a",
-            border: "none",
-            color: "#ffffff",
-            borderRadius: "4px",
-            cursor: "pointer"
-          }}>
-            Apply for Early Advisory Access
+          <p style={{ color: "#555", marginBottom: 0 }}>
+            No bias. No rankings. No hidden incentives.
+          </p>
+        </div>
+      </section>
+
+      {/* PRIVATE STRATEGY CTA */}
+      <section
+        style={{
+          padding: "95px 20px",
+          backgroundColor: "#2b2b2b",
+          color: "#ffffff",
+          textAlign: "center",
+        }}
+      >
+        <div style={{ maxWidth: "760px", margin: "0 auto" }}>
+          <h2 style={{ marginBottom: "16px" }}>
+            Private Fertility Strategy Consultation
+          </h2>
+
+          <p style={{ marginBottom: "14px", color: "#d4d4d4" }}>
+            For families requiring structured, confidential global fertility guidance across jurisdictions.
+          </p>
+
+          <p style={{ marginBottom: "34px", color: "#d4d4d4", fontSize: 14 }}>
+            Initial consultations available by application.
+          </p>
+
+          <button
+            style={{
+              padding: "14px 30px",
+              backgroundColor: "#b8a77a",
+              border: "none",
+              color: "#ffffff",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
+            Request Consultation
           </button>
         </div>
       </section>
 
+      {/* EMAIL CAPTURE (placeholder UI only for now) */}
+      <section style={{ padding: "95px 20px", backgroundColor: "#ffffff" }}>
+        <div style={{ maxWidth: "820px", margin: "0 auto", textAlign: "center" }}>
+          <h2 style={{ fontSize: "28px", marginBottom: 14 }}>
+            Join the Global Fertility Insight List
+          </h2>
+
+          <p style={{ color: "#555", marginBottom: 26 }}>
+            Receive structured country intelligence updates, regulatory changes, and strategic fertility analysis.
+          </p>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: 10,
+              flexWrap: "wrap",
+            }}
+          >
+            <input
+              type="email"
+              placeholder="Email address"
+              style={{
+                padding: "12px 14px",
+                width: 320,
+                maxWidth: "90vw",
+                borderRadius: 4,
+                border: "1px solid #ddd",
+                fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Arial",
+              }}
+            />
+
+            <button
+              style={{
+                padding: "12px 22px",
+                backgroundColor: "#b8a77a",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              Join the List
+            </button>
+          </div>
+
+          <p style={{ marginTop: 14, fontSize: 12, color: "#777" }}>
+            (Email capture will be wired to the database in a later step.)
+          </p>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer style={{ padding: "34px 20px", textAlign: "center", color: "#777" }}>
+        <div style={{ fontSize: 12 }}>
+          © {new Date().getFullYear()} FertilityCareHub • Privacy • Terms • Disclaimer
+        </div>
+      </footer>
     </main>
   );
 }
