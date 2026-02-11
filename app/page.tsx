@@ -19,7 +19,7 @@ export default function Home() {
           fontWeight: 500,
           marginBottom: "20px"
         }}>
-          Global Fertility Advisory.
+          Private Global Fertility Strategy Advisory.
           <br />
           Clarity Across Borders.
         </h1>
@@ -30,8 +30,8 @@ export default function Home() {
           maxWidth: "600px",
           margin: "0 auto 40px"
         }}>
-          Navigate IVF, legal frameworks, international cost structures,
-          and clinic standards with structured, transparent global guidance.
+          Navigate IVF pathways, legal frameworks, international cost structures, and
+          clinic standards with structured, confidential global guidance
         </p>
 
         <div>
@@ -44,7 +44,7 @@ export default function Home() {
             marginRight: "15px",
             cursor: "pointer"
           }}>
-            Explore Countries
+            Request Private Strategy Consultation
           </button>
 
           <button style={{
@@ -55,7 +55,7 @@ export default function Home() {
             borderRadius: "4px",
             cursor: "pointer"
           }}>
-            Request Advisory Consultation
+            Explore International Pathways
           </button>
         </div>
       </section>
