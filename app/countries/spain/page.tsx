@@ -1,231 +1,333 @@
 import Link from "next/link";
 
-export default function GreeceDossierPage() {
+export default function SpainDossierPage() {
   return (
-    <main className="bg-[#F5F1E8] text-[#1A1A1A]">
-      {/* Top helper nav */}
-      <section className="max-w-6xl mx-auto px-6 pt-10">
+    <main
+      style={{
+        backgroundColor: "#F5F1E8",
+        color: "#1A1A1A",
+        minHeight: "100vh",
+        fontFamily:
+          'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif',
+      }}
+    >
+      {/* Top utility row */}
+      <section
+        style={{
+          maxWidth: 1120,
+          margin: "0 auto",
+          padding: "28px 20px 0",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 16,
+        }}
+      >
         <Link
           href="/countries"
-          className="inline-flex items-center gap-2 text-sm tracking-wide text-[#6B5A2B] hover:opacity-80"
+          style={{
+            color: "#7B6A3A",
+            textDecoration: "none",
+            fontSize: 14,
+            letterSpacing: "0.04em",
+          }}
         >
           ← Back to countries
+        </Link>
+
+        {/* Soft CTA (outlined, understated) */}
+        <Link
+          href="/consultation"
+          style={{
+            border: "1px solid #B89B5E",
+            color: "#7B6A3A",
+            padding: "10px 16px",
+            borderRadius: 999,
+            textDecoration: "none",
+            fontSize: 13,
+            letterSpacing: "0.06em",
+            whiteSpace: "nowrap",
+          }}
+        >
+          Review Spain Strategy Privately
         </Link>
       </section>
 
       {/* Hero */}
-      <section className="max-w-6xl mx-auto px-6 pt-10 pb-10">
-        <div className="text-center max-w-3xl mx-auto">
-          <div className="text-xs tracking-[0.28em] uppercase text-[#6B6B6B]">
+      <section style={{ maxWidth: 1120, margin: "0 auto", padding: "56px 20px" }}>
+        <div style={{ textAlign: "center" }}>
+          <div
+            style={{
+              fontSize: 12,
+              letterSpacing: "0.22em",
+              color: "#7B6A3A",
+              textTransform: "uppercase",
+              marginBottom: 14,
+            }}
+          >
             Strategic Advisory Dossier
           </div>
 
-          <h1 className="mt-4 text-4xl md:text-6xl leading-tight font-medium">
-            Greece
+          <h1
+            style={{
+              fontSize: 64,
+              lineHeight: 1.02,
+              margin: "0 0 18px",
+              fontWeight: 500,
+              letterSpacing: "-0.02em",
+            }}
+          >
+            Spain
           </h1>
 
-          <p className="mt-5 text-base md:text-lg leading-relaxed text-[#2C2C2C]">
-            Greece is often the “high-value” European option: accessible timelines,
-            comparatively efficient logistics, and a clinic ecosystem that can work
-            well for select donor and treatment pathways. The strategic question is
-            not “Is Greece good?”—it’s whether Greece is the right match for your
-            governance needs, donor preferences, and risk tolerance.
+          <p
+            style={{
+              maxWidth: 820,
+              margin: "0 auto",
+              fontSize: 18,
+              lineHeight: 1.7,
+              color: "#2A2A2A",
+            }}
+          >
+            Spain occupies a unique position in European fertility care. Unlike
+            neighbors who restrict, Spain permits — and this permissiveness,
+            combined with world-class clinical standards, creates strategic
+            advantages for specific patient profiles. This dossier outlines when
+            Spain should be your primary option, when it should not, and how to
+            navigate its landscape with precision.
           </p>
-
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link
-              href="/consultation"
-              className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide hover:bg-[#EFE6D4] transition"
-            >
-              Request Advisory Consultation
-            </Link>
-            <Link
-              href="#framework"
-              className="inline-flex items-center justify-center rounded-full border border-[#D9CBAA] px-6 py-3 text-sm tracking-wide hover:bg-[#F0E8D8] transition"
-            >
-              Read the dossier framework
-            </Link>
-          </div>
         </div>
       </section>
 
       {/* Two-column decision cards */}
-      <section className="max-w-6xl mx-auto px-6 pb-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FBF8F2] p-7">
-            <h2 className="text-lg font-medium">When Greece is the right choice</h2>
-            <ul className="mt-4 space-y-3 text-sm leading-relaxed text-[#2C2C2C] list-disc pl-5">
+      <section style={{ maxWidth: 1120, margin: "0 auto", padding: "0 20px 44px" }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(12, 1fr)",
+            gap: 18,
+          }}
+        >
+          <div
+            style={{
+              gridColumn: "span 7",
+              background: "#FBF8F1",
+              border: "1px solid #E7DEC9",
+              borderRadius: 18,
+              padding: "26px 24px",
+            }}
+          >
+            <h2 style={{ fontSize: 22, margin: "0 0 14px", fontWeight: 600 }}>
+              When Spain is the right choice
+            </h2>
+
+            <ul
+              style={{
+                margin: 0,
+                paddingLeft: 18,
+                display: "grid",
+                gap: 12,
+                lineHeight: 1.7,
+                color: "#2A2A2A",
+                fontSize: 16,
+              }}
+            >
               <li>
-                You want a <strong>value + access</strong> option inside Europe and
-                prefer a relatively efficient pathway compared to higher-demand hubs.
+                You want a permissive European framework with mature clinical
+                depth and internationally experienced teams.
               </li>
               <li>
-                You are open to an advisor-led selection of <strong>4–5 vetted clinics</strong>{" "}
-                rather than a long public list.
+                Donor pathways matter. Spain’s ecosystem often supports donor
+                availability and streamlined donor processes.
               </li>
               <li>
-                You prioritize <strong>predictable planning</strong> (travel windows,
-                scheduling, and structured next steps) over “maximum permissiveness.”
+                You value a predictable “clinic cadence” (coordination,
+                scheduling, standardized workflows) and want reduced friction
+                across the journey.
               </li>
               <li>
-                You’re navigating a donor pathway and need <strong>clear execution</strong>{" "}
-                with a clinic that can document standards and processes consistently.
+                You prefer a strong balance of quality + access, without the
+                strict governance constraints seen in more regulated systems.
               </li>
             </ul>
           </div>
 
-          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FBF8F2] p-7">
-            <h2 className="text-lg font-medium">When it’s not</h2>
-            <ul className="mt-4 space-y-3 text-sm leading-relaxed text-[#2C2C2C] list-disc pl-5">
+          <div
+            style={{
+              gridColumn: "span 5",
+              background: "#FBF8F1",
+              border: "1px solid #E7DEC9",
+              borderRadius: 18,
+              padding: "26px 24px",
+            }}
+          >
+            <h2 style={{ fontSize: 22, margin: "0 0 14px", fontWeight: 600 }}>
+              When it’s not
+            </h2>
+
+            <ul
+              style={{
+                margin: 0,
+                paddingLeft: 18,
+                display: "grid",
+                gap: 12,
+                lineHeight: 1.7,
+                color: "#2A2A2A",
+                fontSize: 16,
+              }}
+            >
               <li>
-                You require the strongest possible <strong>public reporting regime</strong>{" "}
-                and a governance-first environment above all else.
+                You require the strongest “public reporting” governance signals
+                and highly standardized national oversight.
               </li>
               <li>
-                You need the broadest permissive access profile for a very niche pathway
-                where <strong>one jurisdictional constraint breaks the plan</strong>.
+                Your pathway depends on a very specific legal structure where a
+                different jurisdiction is clearly more aligned.
               </li>
               <li>
-                You are uncomfortable unless every step is backed by{" "}
-                <strong>high-visibility institutional signals</strong> (e.g., large,
-                internationally branded hospital systems).
+                You want a fully DIY approach with exhaustive lists — Spain is
+                best used with curation, not database browsing.
+              </li>
+              <li>
+                You need the broadest possible menu of edge-case options; Spain
+                is strong, but not always the most permissive for every scenario.
               </li>
             </ul>
           </div>
         </div>
       </section>
 
-      {/* Framework */}
-      <section id="framework" className="max-w-6xl mx-auto px-6 pb-14">
-        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FBF8F2] p-8">
-          <h3 className="text-xl font-medium">Advisory framework</h3>
-          <p className="mt-3 text-sm leading-relaxed text-[#2C2C2C]">
-            This dossier is intentionally curated. We exclude exhaustive clinic lists and
-            “DIY travel instructions.” The goal is decision clarity: when Greece should be
-            considered, what risks to watch, and how to execute with control.
+      {/* Advisory Framework */}
+      <section style={{ maxWidth: 1120, margin: "0 auto", padding: "0 20px 64px" }}>
+        <div style={{ textAlign: "center", marginBottom: 22 }}>
+          <h2 style={{ fontSize: 28, margin: 0, fontWeight: 600 }}>
+            Advisory Framework
+          </h2>
+          <p style={{ margin: "10px auto 0", maxWidth: 760, color: "#3A3A3A", lineHeight: 1.7 }}>
+            This is intentionally not a public database. We focus on strategic
+            decision points, the signals that matter, and what to exclude.
           </p>
+        </div>
 
-          <div className="mt-7 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="rounded-xl border border-[#EFE6D4] bg-white p-6">
-              <div className="text-xs tracking-[0.22em] uppercase text-[#6B6B6B]">
-                Country intelligence
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-[#2C2C2C]">
-                Eligibility constraints, donor-policy realities, and the “gotchas” that
-                matter in practice.
-              </p>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(12, 1fr)",
+            gap: 18,
+          }}
+        >
+          <div
+            style={{
+              gridColumn: "span 4",
+              background: "#FFFFFF",
+              border: "1px solid #E7DEC9",
+              borderRadius: 18,
+              padding: "22px 20px",
+            }}
+          >
+            <div style={{ fontSize: 14, letterSpacing: "0.18em", textTransform: "uppercase", color: "#7B6A3A" }}>
+              Country Intelligence
             </div>
+            <p style={{ margin: "12px 0 0", lineHeight: 1.7, color: "#2A2A2A" }}>
+              Legal environment, donor policy posture, cross-border eligibility
+              friction, and timeline realism.
+            </p>
+          </div>
 
-            <div className="rounded-xl border border-[#EFE6D4] bg-white p-6">
-              <div className="text-xs tracking-[0.22em] uppercase text-[#6B6B6B]">
-                Clinic standards insight
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-[#2C2C2C]">
-                What signals to demand: lab standards, documentation discipline, reporting
-                behavior, and process transparency.
-              </p>
+          <div
+            style={{
+              gridColumn: "span 4",
+              background: "#FFFFFF",
+              border: "1px solid #E7DEC9",
+              borderRadius: 18,
+              padding: "22px 20px",
+            }}
+          >
+            <div style={{ fontSize: 14, letterSpacing: "0.18em", textTransform: "uppercase", color: "#7B6A3A" }}>
+              Clinic Standards Insight
             </div>
+            <p style={{ margin: "12px 0 0", lineHeight: 1.7, color: "#2A2A2A" }}>
+              Accreditation signals, lab quality indicators, process maturity,
+              and how to avoid “pretty marketing.”
+            </p>
+          </div>
 
-            <div className="rounded-xl border border-[#EFE6D4] bg-white p-6">
-              <div className="text-xs tracking-[0.22em] uppercase text-[#6B6B6B]">
-                Strategic execution
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-[#2C2C2C]">
-                A controlled plan: timeline framing, travel + accommodation planning,
-                and decision checkpoints.
-              </p>
+          <div
+            style={{
+              gridColumn: "span 4",
+              background: "#FFFFFF",
+              border: "1px solid #E7DEC9",
+              borderRadius: 18,
+              padding: "22px 20px",
+            }}
+          >
+            <div style={{ fontSize: 14, letterSpacing: "0.18em", textTransform: "uppercase", color: "#7B6A3A" }}>
+              Strategic Advisory
+            </div>
+            <p style={{ margin: "12px 0 0", lineHeight: 1.7, color: "#2A2A2A" }}>
+              What to choose, what to exclude, and when Spain should be
+              primary vs. secondary in your plan.
+            </p>
+          </div>
+        </div>
+
+        {/* Private filter / what we exclude */}
+        <div
+          style={{
+            marginTop: 18,
+            background: "#FBF8F1",
+            border: "1px solid #E7DEC9",
+            borderRadius: 18,
+            padding: "22px 20px",
+          }}
+        >
+          <h3 style={{ margin: 0, fontSize: 20, fontWeight: 600 }}>
+            The “Private” filter — what we deliberately exclude
+          </h3>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(12, 1fr)",
+              gap: 12,
+              marginTop: 14,
+              color: "#2A2A2A",
+              lineHeight: 1.7,
+            }}
+          >
+            <div style={{ gridColumn: "span 6" }}>
+              <div>❌ Exhaustive clinic lists (we curate, not index)</div>
+              <div>❌ Step-by-step visa instructions (we guide strategically)</div>
+            </div>
+            <div style={{ gridColumn: "span 6" }}>
+              <div>❌ Hotel price comparisons (we recommend vetted options)</div>
+              <div>❌ Every treatment detail (we focus on decision points)</div>
             </div>
           </div>
         </div>
-      </section>
 
-      {/* What we exclude */}
-      <section className="max-w-6xl mx-auto px-6 pb-14">
-        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FBF8F2] p-8">
-          <h3 className="text-xl font-medium">What we deliberately exclude</h3>
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-[#2C2C2C]">
-            <div className="rounded-xl border border-[#EFE6D4] bg-white p-5">
-              ❌ Exhaustive clinic directories (we curate 4–5)
-            </div>
-            <div className="rounded-xl border border-[#EFE6D4] bg-white p-5">
-              ❌ Step-by-step visa walkthroughs (we coordinate, not DIY)
-            </div>
-            <div className="rounded-xl border border-[#EFE6D4] bg-white p-5">
-              ❌ Hotel price scraping (we recommend vetted accommodations)
-            </div>
-            <div className="rounded-xl border border-[#EFE6D4] bg-white p-5">
-              ❌ Every treatment detail (we focus on strategic decision points)
-            </div>
-          </div>
-        </div>
-      </section>
+        {/* Bottom CTA */}
+        <div style={{ textAlign: "center", marginTop: 26 }}>
+          <Link
+            href="/consultation"
+            style={{
+              display: "inline-block",
+              border: "1px solid #B89B5E",
+              color: "#7B6A3A",
+              padding: "12px 18px",
+              borderRadius: 999,
+              textDecoration: "none",
+              fontSize: 13,
+              letterSpacing: "0.06em",
+            }}
+          >
+            Review Spain Strategy Privately
+          </Link>
 
-      {/* Next actions */}
-      <section className="max-w-6xl mx-auto px-6 pb-16">
-        <div className="rounded-2xl border border-[#E5DDC8] bg-[#111111] text-[#F7F2E6] p-8">
-          <h3 className="text-xl font-medium">If you’re considering Greece</h3>
-          <p className="mt-3 text-sm leading-relaxed text-[#EDE6D6] max-w-3xl">
-            The fastest way to reduce risk is to align the jurisdiction to your pathway,
-            then shortlist clinics based on standards signals—not marketing. If you want,
-            we’ll map your profile to the correct pathway, then curate options and a plan.
-          </p>
-
-          <div className="mt-6 flex flex-col sm:flex-row gap-3">
-            <Link
-              href="/consultation"
-              className="inline-flex items-center justify-center rounded-full bg-[#F5EAD2] text-[#1A1A1A] px-6 py-3 text-sm tracking-wide hover:opacity-90 transition"
-            >
-              Request Advisory Consultation
-            </Link>
-
-            <Link
-              href="/countries"
-              className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide hover:bg-[#1A1A1A] hover:text-[#F7F2E6] transition"
-            >
-              Back to countries
-            </Link>
+          <div style={{ marginTop: 10, fontSize: 13, color: "#6A6A6A" }}>
+            Discreet, structured guidance aligned to your profile and pathway.
           </div>
         </div>
       </section>
     </main>
   );
 }
-<section
-  style={{
-    marginTop: 60,
-    paddingTop: 40,
-    borderTop: "1px solid rgba(0,0,0,0.08)",
-  }}
->
-  <h2 style={{ fontSize: 24, marginBottom: 12 }}>
-    Strategic Fit Requires Context
-  </h2>
-
-  <p style={{ color: "rgba(0,0,0,0.70)", lineHeight: 1.7, maxWidth: 760 }}>
-    Jurisdictional selection is rarely about cost alone. It is about legal comfort,
-    donor preferences, timeline tolerance, and long-term family structure.
-    A structured advisory review ensures Spain aligns with your broader objectives.
-  </p>
-
-  <div style={{ marginTop: 24 }}>
-    <a
-      href="/consultation#request"
-      style={{
-        display: "inline-block",
-        padding: "12px 20px",
-        borderRadius: 999,
-        border: "1px solid #B89B5E",
-        textDecoration: "none",
-        color: "#2B2B2B",
-        fontWeight: 500,
-        letterSpacing: "0.02em",
-      }}
-    >
-      Review Spain Strategy Privately
-    </a>
-
-    <p style={{ marginTop: 10, fontSize: 14, color: "rgba(0,0,0,0.55)" }}>
-      Discreet, structured guidance aligned to your profile and timeline.
-    </p>
-  </div>
-</section>
