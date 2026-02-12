@@ -1,142 +1,124 @@
-export default function CountriesPage() {
-  const countries = [
-    {
-      name: "Spain",
-      href: "/countries/spain",
-      summary:
-        "Permissive legal framework, high clinical standards, and strong donor availability—ideal for many international profiles.",
-      tag: "Featured dossier",
-    },
-    // Add more countries here later
-    // { name: "Greece", href: "/countries/greece", summary: "...", tag: "Next" },
-  ];
+import Link from "next/link";
 
+type CountryCard = {
+  name: string;
+  status: "Live dossier" | "Dossier in preparation";
+  href?: string;
+  note: string;
+};
+
+const countries: CountryCard[] = [
+  {
+    name: "Spain",
+    status: "Live dossier",
+    href: "/countries/spain",
+    note: "Permissive legal framework + world-class clinical standards — best for specific patient profiles.",
+  },
+  {
+    name: "Greece",
+    status: "Dossier in preparation",
+    note: "Strong donor frameworks and competitive cost structures — often a top alternative within the EU.",
+  },
+  {
+    name: "Czech Republic",
+    status: "Dossier in preparation",
+    note: "A high value destination with established clinics — ideal when budgets matter without compromising standards.",
+  },
+  {
+    name: "Portugal",
+    status: "Dossier in preparation",
+    note: "Modern frameworks and growing cross-border demand — best evaluated with careful strategy mapping.",
+  },
+  {
+    name: "Mexico",
+    status: "Dossier in preparation",
+    note: "Proximity advantages for North America + varied clinic models — requires strong curation and planning.",
+  },
+  {
+    name: "United States",
+    status: "Dossier in preparation",
+    note: "Top-tier outcomes and options — higher costs make strategic selection and pathway design essential.",
+  },
+];
+
+export default function CountriesIndexPage() {
   return (
-    <main style={{ background: "#ffffff" }}>
+    <main
+      className="max-w-6xl mx-auto px-6 py-14"
+      style={{ fontFamily: "Georgia, serif" }}
+    >
       {/* Header */}
-      <section
-        style={{
-          padding: "72px 20px 28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-          textAlign: "center",
-        }}
-      >
-        <h1
-          style={{
-            fontSize: "44px",
-            lineHeight: 1.1,
-            margin: 0,
-            fontWeight: 600,
-            letterSpacing: "-0.02em",
-          }}
-        >
+      <section className="text-center mb-12">
+        <h1 className="text-3xl md:text-4xl tracking-wide">
           Global Fertility Destinations
         </h1>
-        <p
-          style={{
-            margin: "14px auto 0",
-            maxWidth: "720px",
-            fontSize: "18px",
-            lineHeight: 1.6,
-            color: "#444",
-          }}
-        >
-          Explore structured strategic fertility intelligence by country — curated
-          as private advisory dossiers (not an overwhelming database).
+        <p className="mt-4 text-base md:text-lg text-[#4A4A4A] max-w-2xl mx-auto leading-relaxed">
+          Explore structured strategic fertility intelligence by country — curated as
+          private advisory dossiers, not a database.
         </p>
       </section>
 
-      {/* List */}
-      <section
-        style={{
-          padding: "24px 20px 80px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: "18px",
-          }}
-        >
-          {countries.map((c) => (
-            <a
-              key={c.href}
-              href={c.href}
-              style={{
-                textDecoration: "none",
-                color: "inherit",
-                border: "1px solid #e6e6e6",
-                borderRadius: "14px",
-                padding: "18px 18px 16px",
-                background: "#fff",
-                boxShadow: "0 8px 24px rgba(0,0,0,0.05)",
-              }}
+      {/* Grid */}
+      <section className="grid gap-6 md:grid-cols-2">
+        {countries.map((c) => {
+          const isLive = c.status === "Live dossier" && c.href;
+
+          return (
+            <div
+              key={c.name}
+              className="rounded-2xl border border-[#E5DDC8] bg-[#FBF7EC] p-7"
             >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: "12px",
-                  marginBottom: "10px",
-                }}
-              >
-                <h2
-                  style={{
-                    fontSize: "22px",
-                    margin: 0,
-                    fontWeight: 600,
-                    letterSpacing: "-0.01em",
-                  }}
-                >
-                  {c.name}
-                </h2>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h2 className="text-xl tracking-wide">{c.name}</h2>
+                  <p className="mt-2 text-sm text-[#5A5A5A] leading-relaxed">
+                    {c.note}
+                  </p>
+                </div>
 
                 <span
+                  className="text-xs tracking-widest uppercase px-3 py-1 rounded-full border"
                   style={{
-                    fontSize: "12px",
-                    padding: "6px 10px",
-                    borderRadius: "999px",
-                    border: "1px solid #d9d2c3",
-                    background: "#f7f3ea",
-                    color: "#5a4b2b",
+                    borderColor: isLive ? "#B89B5E" : "#D7C9A6",
+                    color: isLive ? "#7A5C1F" : "#7A6A3A",
+                    background: "#FFFDF7",
                     whiteSpace: "nowrap",
                   }}
                 >
-                  {c.tag}
+                  {c.status}
                 </span>
               </div>
 
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: "14.5px",
-                  lineHeight: 1.6,
-                  color: "#4b4b4b",
-                }}
-              >
-                {c.summary}
-              </p>
+              <div className="mt-6 flex items-center gap-3">
+                {isLive ? (
+                  <Link
+                    href={c.href!}
+                    className="inline-flex items-center justify-center rounded-lg px-5 py-2 text-sm tracking-wide"
+                    style={{
+                      background: "#B89B5E",
+                      color: "#fff",
+                    }}
+                  >
+                    View dossier →
+                  </Link>
+                ) : (
+                  <span
+                    className="inline-flex items-center justify-center rounded-lg px-5 py-2 text-sm tracking-wide border border-[#D7C9A6] text-[#6A5A2A] bg-[#FFFDF7]"
+                  >
+                    Dossier in preparation
+                  </span>
+                )}
 
-              <div style={{ marginTop: "14px" }}>
-                <span
-                  style={{
-                    display: "inline-block",
-                    fontSize: "13px",
-                    fontWeight: 600,
-                    color: "#111",
-                  }}
+                <Link
+                  href="/consultation#request"
+                  className="text-sm tracking-wide underline underline-offset-4 text-[#6A5A2A]"
                 >
-                  View dossier →
-                </span>
+                  Request advisory consultation
+                </Link>
               </div>
-            </a>
-          ))}
-        </div>
+            </div>
+          );
+        })}
       </section>
     </main>
   );

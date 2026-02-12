@@ -27,7 +27,7 @@ export default function RootLayout({
             </Link>
 
             <Link
-              href="/consultation"
+              href="/consultation#request"
               className="border border-[#B89B5E] px-5 py-2 text-sm tracking-wide hover:bg-[#B89B5E] hover:text-white transition"
             >
               Request Advisory Consultation
