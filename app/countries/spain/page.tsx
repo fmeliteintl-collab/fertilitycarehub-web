@@ -3,136 +3,156 @@ export default function SpainPage() {
     <main
       style={{
         fontFamily: "Georgia, serif",
-        backgroundColor: "#f8f6f2",
-        color: "#2b2b2b",
-        lineHeight: 1.7,
+        backgroundColor: "#f5f4f1",
+        color: "#1e1e1e",
+        lineHeight: 1.8,
       }}
     >
-      {/* HERO */}
-      <section style={{ padding: "120px 20px 70px", textAlign: "center" }}>
-        <h1 style={{ fontSize: "40px", fontWeight: 500 }}>
-          IVF & Fertility Treatment in Spain
+      {/* CONFIDENTIAL HEADER */}
+      <section style={{ padding: "120px 20px 80px", textAlign: "center" }}>
+        <h1 style={{ fontSize: "42px", fontWeight: 500 }}>
+          Spain — Fertility Jurisdiction Dossier
         </h1>
-        <p style={{ marginTop: 20, color: "#5a5a5a", maxWidth: 700, marginInline: "auto" }}>
-          Strategic Overview for International Patients Navigating Cross-Border Fertility Pathways.
+        <p style={{ marginTop: 20, color: "#555", maxWidth: 720, marginInline: "auto" }}>
+          A strategic intelligence briefing for families evaluating Spain as a
+          cross-border reproductive jurisdiction.
         </p>
       </section>
 
-      {/* EXECUTIVE SUMMARY */}
+      {/* EXECUTIVE POSITIONING */}
       <section style={{ padding: "80px 20px", backgroundColor: "#ffffff" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <h2>Strategic Overview</h2>
+        <div style={{ maxWidth: 880, margin: "0 auto" }}>
+          <h2>Executive Positioning</h2>
           <p>
-            Spain is one of Europe’s most established fertility destinations, known for
-            liberal donor anonymity laws, advanced laboratory standards, and strong
-            infrastructure for international patients. It consistently attracts cross-border
-            fertility seekers from across Europe, the Middle East, and North America.
+            Spain occupies a structurally distinct position within European
+            fertility regulation. Unlike neighboring jurisdictions that impose
+            restrictions on donor frameworks, Spain permits anonymous egg and
+            sperm donation under nationally regulated standards.
+          </p>
+          <p>
+            This regulatory permissiveness — combined with advanced laboratory
+            infrastructure and established cross-border patient pathways —
+            creates measurable strategic advantages for specific patient
+            profiles.
           </p>
         </div>
       </section>
 
-      {/* LEGAL FRAMEWORK */}
+      {/* REGULATORY CONTEXT */}
       <section style={{ padding: "80px 20px" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <h2>Legal & Regulatory Environment</h2>
+        <div style={{ maxWidth: 880, margin: "0 auto" }}>
+          <h2>Regulatory Context Within Europe</h2>
           <p>
-            Spain permits anonymous egg and sperm donation under national regulation.
-            Surrogacy, however, is not legally recognized within Spain, requiring intended
-            parents to explore international alternatives if surrogacy is required.
+            Spain permits anonymous gamete donation, a position increasingly
+            uncommon within the European Union. For intended parents prioritizing
+            confidentiality or desiring broad donor availability, this
+            asymmetry significantly reduces scarcity risk.
           </p>
           <p>
-            Age limits, marital status requirements, and eligibility policies are defined
-            under Spanish reproductive legislation, with access extended to single women
-            and same-sex female couples.
+            Surrogacy, however, is not legally recognized within Spain. Families
+            requiring gestational pathways must structure arrangements in
+            alternative jurisdictions.
           </p>
         </div>
       </section>
 
-      {/* COST STRUCTURE */}
+      {/* DONOR FRAMEWORK */}
       <section style={{ padding: "80px 20px", backgroundColor: "#ffffff" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <h2>Cost Positioning</h2>
+        <div style={{ maxWidth: 880, margin: "0 auto" }}>
+          <h2>Donor Framework Implications</h2>
           <p>
-            IVF cycles in Spain generally range from €4,000–€7,000 depending on clinic,
-            medication protocols, and add-on procedures.
-          </p>
-          <p>
-            Donor egg cycles typically range between €6,000–€10,000. Medication,
-            storage, genetic screening, and additional laboratory services may increase
-            overall expenditure.
+            Anonymous donation materially affects long-term considerations
+            related to identity disclosure, genetic history access, and
+            cross-border recognition frameworks. While Spain’s model enhances
+            operational efficiency and donor availability, families should
+            evaluate future disclosure philosophies within their home
+            jurisdiction.
           </p>
         </div>
       </section>
 
-      {/* CLINIC STANDARDS */}
+      {/* COST INTERPRETATION */}
       <section style={{ padding: "80px 20px" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <h2>Clinical & Laboratory Standards</h2>
+        <div style={{ maxWidth: 880, margin: "0 auto" }}>
+          <h2>Cost Structure in Strategic Context</h2>
           <p>
-            Spain maintains strong embryology standards, with many clinics operating
-            advanced laboratory technology including blastocyst culture and genetic
-            screening services. Accreditation norms are well established, though
-            reporting transparency varies by institution.
+            Spain typically presents a mid-tier cost profile within global
+            fertility markets. IVF cycles commonly range between €4,000–€7,000,
+            with donor cycles extending higher depending on laboratory and
+            genetic protocols.
+          </p>
+          <p>
+            Relative to the United States, Spain may represent material cost
+            efficiency. Relative to lower-cost jurisdictions such as India or
+            Turkey, Spain trades price advantage for European regulatory
+            stability and infrastructure consistency.
           </p>
         </div>
       </section>
 
-      {/* LOGISTICS */}
+      {/* IDEAL PROFILE */}
       <section style={{ padding: "80px 20px", backgroundColor: "#ffffff" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <h2>International Access & Treatment Logistics</h2>
+        <div style={{ maxWidth: 880, margin: "0 auto" }}>
+          <h2>Ideal Candidate Profiles</h2>
           <p>
-            Spain offers accessible visa pathways for short-term medical stays within
-            the Schengen zone. Most IVF treatments require a stay of 7–14 days per
-            treatment cycle.
+            Spain is particularly suitable for:
           </p>
-          <p>
-            Accommodation costs vary significantly by city, with Barcelona and Madrid
-            reflecting higher premium pricing bands. Patients should evaluate proximity
-            to clinics, post-transfer rest requirements, and follow-up coordination
-            before travel planning.
-          </p>
+          <ul>
+            <li>Intended parents requiring anonymous donor frameworks</li>
+            <li>Patients prioritizing European regulatory standards</li>
+            <li>Lesbian couples seeking ROPA treatment structures</li>
+            <li>Families desiring reduced donor waiting periods</li>
+          </ul>
         </div>
       </section>
 
-      {/* STRATEGIC CONSIDERATIONS */}
+      {/* LIMITATIONS */}
       <section style={{ padding: "80px 20px" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <h2>Strategic Considerations</h2>
+        <div style={{ maxWidth: 880, margin: "0 auto" }}>
+          <h2>Jurisdictional Limitations</h2>
           <p>
-            Intended parents should evaluate long-term donor anonymity implications,
-            embryo storage policies, and cross-border legal recognition of treatment
-            outcomes within their home jurisdiction.
+            Spain is not suitable for intended parents requiring gestational
+            surrogacy within the same jurisdiction. Additionally, families who
+            prioritize open donor identity models may find regulatory
+            misalignment.
           </p>
         </div>
       </section>
 
-      {/* CTA */}
+      {/* OPERATIONAL CONSIDERATIONS */}
+      <section style={{ padding: "80px 20px", backgroundColor: "#ffffff" }}>
+        <div style={{ maxWidth: 880, margin: "0 auto" }}>
+          <h2>Operational Considerations</h2>
+          <p>
+            Most IVF treatment cycles require a 7–14 day presence during
+            stimulation and transfer phases. Major clinical hubs — including
+            Barcelona and Madrid — offer strong transport connectivity and
+            established medical accommodation infrastructure.
+          </p>
+          <p>
+            Strategic planning should consider transfer timing, embryo storage
+            frameworks, and post-transfer follow-up within the patient’s home
+            jurisdiction.
+          </p>
+        </div>
+      </section>
+
+      {/* ADVISORY INVITATION */}
       <section
         style={{
-          padding: "90px 20px",
-          backgroundColor: "#2b2b2b",
+          padding: "100px 20px",
+          backgroundColor: "#1e1e1e",
           color: "#ffffff",
           textAlign: "center",
         }}
       >
-        <h2>Private Spain Fertility Strategy Consultation</h2>
-        <p style={{ color: "#d4d4d4" }}>
-          For families requiring structured cross-border fertility clarity in Spain.
+        <h2 style={{ fontWeight: 500 }}>
+          Schedule Private Advisory Review
+        </h2>
+        <p style={{ marginTop: 15, color: "#c9c9c9", maxWidth: 600, marginInline: "auto" }}>
+          For families requiring structured cross-border fertility
+          strategy in Spain.
         </p>
-        <button
-          style={{
-            marginTop: 20,
-            padding: "12px 28px",
-            backgroundColor: "#b8a77a",
-            border: "none",
-            color: "#ffffff",
-            borderRadius: 4,
-            cursor: "pointer",
-          }}
-        >
-          Request Confidential Consultation
-        </button>
       </section>
     </main>
   );
