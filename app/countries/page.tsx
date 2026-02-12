@@ -17,7 +17,7 @@ const COUNTRIES: Country[] = [
   {
   slug: "united-kingdom",
   name: "United Kingdom",
-  status: "In build",
+  status: "Live",
   oneLiner: "Highly regulated (HFEA) with clear donor/surrogacy rules—strong when governance matters most.",
 },
   {
