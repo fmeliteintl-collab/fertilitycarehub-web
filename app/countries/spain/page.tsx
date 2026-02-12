@@ -48,10 +48,16 @@ const P: React.CSSProperties = {
 
 const UL: React.CSSProperties = {
   margin: "12px 0 0 0",
-  paddingLeft: 18,
+  paddingLeft: 22,
   color: COLORS.muted,
   fontSize: 16.5,
   lineHeight: 1.9,
+  listStyleType: "disc",
+  listStylePosition: "outside",
+};
+
+const LI: React.CSSProperties = {
+  marginBottom: 8,
 };
 
 const DIVIDER: React.CSSProperties = {
@@ -87,21 +93,14 @@ export default function SpainPage() {
             Spain — Fertility Strategy Dossier
           </h1>
 
-          <p
-            style={{
-              ...P,
-              maxWidth: 720,
-              margin: "22px auto 0",
-            }}
-          >
+          <p style={{ ...P, maxWidth: 720, margin: "22px auto 0" }}>
             Strategic intelligence for families evaluating Spain as a
             cross-border reproductive jurisdiction.
           </p>
         </div>
       </section>
 
-      {/* SECTION TEMPLATE */}
-
+      {/* SECTION I */}
       <section style={CARD_SECTION}>
         <div style={CONTAINER}>
           <div style={LABEL}>Section I</div>
@@ -122,13 +121,14 @@ export default function SpainPage() {
         </div>
       </section>
 
+      {/* SECTION II */}
       <section style={SECTION}>
         <div style={CONTAINER}>
           <div style={LABEL}>Section II</div>
           <h2 style={H2}>Regulatory Context Within Europe</h2>
           <p style={P}>
-            Anonymous donation materially reduces donor scarcity risk within
-            the European framework. Spain’s legislative posture contrasts with
+            Anonymous donation materially reduces donor scarcity risk within the
+            European framework. Spain’s legislative posture contrasts with
             jurisdictions that have transitioned toward identity disclosure.
           </p>
           <p style={{ ...P, marginBottom: 0 }}>
@@ -139,6 +139,7 @@ export default function SpainPage() {
         </div>
       </section>
 
+      {/* SECTION III */}
       <section style={CARD_SECTION}>
         <div style={CONTAINER}>
           <div style={LABEL}>Section III</div>
@@ -146,21 +147,22 @@ export default function SpainPage() {
           <p style={{ ...P, marginBottom: 0 }}>
             Spain’s anonymity model affects long-term disclosure philosophy,
             genetic traceability, and future identity access considerations.
-            While operationally efficient, it requires deliberate alignment
-            with family governance perspectives.
+            While operationally efficient, it requires deliberate alignment with
+            family governance perspectives.
           </p>
           <div style={DIVIDER} />
         </div>
       </section>
 
+      {/* SECTION IV */}
       <section style={SECTION}>
         <div style={CONTAINER}>
           <div style={LABEL}>Section IV</div>
           <h2 style={H2}>Cost Structure in Strategic Context</h2>
           <p style={P}>
             Spain presents a mid-tier global cost profile. IVF cycles typically
-            range between €4,000–€7,000. Donor cycles extend higher depending
-            on laboratory protocol.
+            range between €4,000–€7,000. Donor cycles extend higher depending on
+            laboratory protocol.
           </p>
           <p style={{ ...P, marginBottom: 0 }}>
             Relative to the United States, Spain may represent cost efficiency.
@@ -171,20 +173,22 @@ export default function SpainPage() {
         </div>
       </section>
 
+      {/* SECTION V */}
       <section style={CARD_SECTION}>
         <div style={CONTAINER}>
           <div style={LABEL}>Section V</div>
           <h2 style={H2}>Ideal Candidate Profiles</h2>
           <ul style={UL}>
-            <li>Families requiring anonymous donor frameworks</li>
-            <li>Patients prioritizing European regulatory standards</li>
-            <li>Lesbian couples utilizing ROPA structures</li>
-            <li>Families seeking reduced donor waiting periods</li>
+            <li style={LI}>Families requiring anonymous donor frameworks</li>
+            <li style={LI}>Patients prioritizing European regulatory standards</li>
+            <li style={LI}>Lesbian couples utilizing ROPA structures</li>
+            <li style={LI}>Families seeking reduced donor waiting periods</li>
           </ul>
           <div style={DIVIDER} />
         </div>
       </section>
 
+      {/* SECTION VI */}
       <section style={SECTION}>
         <div style={CONTAINER}>
           <div style={LABEL}>Section VI</div>
