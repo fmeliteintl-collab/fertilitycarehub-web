@@ -15,6 +15,12 @@ const COUNTRIES: Country[] = [
     oneLiner: "A permissive, high-standard European option with strong donor and clinic depth.",
   },
   {
+  slug: "united-kingdom",
+  name: "United Kingdom",
+  status: "In build",
+  oneLiner: "Highly regulated (HFEA) with clear donor/surrogacy rules—strong when governance matters most.",
+},
+  {
     slug: "greece",
     name: "Greece",
     status: "Live",
