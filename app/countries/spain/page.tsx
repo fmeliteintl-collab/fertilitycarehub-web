@@ -1,247 +1,231 @@
-const COLORS = {
-  bg: "#f6f5f2",
-  card: "#ffffff",
-  text: "#1c1c1c",
-  muted: "#545454",
-  soft: "#8e8e8e",
-  ink: "#121212",
-  divider: "rgba(0,0,0,0.06)",
-  accent: "#b7a46a",
-  dark: "#171717",
-  darkMuted: "#cfcfcf",
-};
+import Link from "next/link";
 
-const CONTAINER: React.CSSProperties = {
-  maxWidth: 860,
-  margin: "0 auto",
-};
-
-const SECTION: React.CSSProperties = {
-  padding: "68px 20px",
-};
-
-const CARD_SECTION: React.CSSProperties = {
-  ...SECTION,
-  backgroundColor: COLORS.card,
-};
-
-const LABEL: React.CSSProperties = {
-  fontSize: 11,
-  letterSpacing: "0.22em",
-  textTransform: "uppercase",
-  color: COLORS.soft,
-  marginBottom: 16,
-};
-
-const H2: React.CSSProperties = {
-  fontSize: 24,
-  fontWeight: 500,
-  margin: "0 0 14px 0",
-  color: COLORS.ink,
-};
-
-const P: React.CSSProperties = {
-  color: COLORS.muted,
-  fontSize: 16.5,
-  margin: "0 0 18px 0",
-};
-
-const UL: React.CSSProperties = {
-  margin: "12px 0 0 0",
-  paddingLeft: 22,
-  color: COLORS.muted,
-  fontSize: 16.5,
-  lineHeight: 1.9,
-  listStyleType: "disc",
-  listStylePosition: "outside",
-};
-
-const LI: React.CSSProperties = {
-  marginBottom: 8,
-};
-
-const DIVIDER: React.CSSProperties = {
-  height: 1,
-  backgroundColor: COLORS.divider,
-  marginTop: 48,
-};
-
-export default function SpainPage() {
+export default function GreeceDossierPage() {
   return (
-    <main
-      style={{
-        fontFamily: "Georgia, serif",
-        backgroundColor: COLORS.bg,
-        color: COLORS.text,
-        lineHeight: 1.9,
-      }}
-    >
-      {/* HEADER */}
-      <section style={{ padding: "130px 20px 80px", textAlign: "center" }}>
-        <div style={CONTAINER}>
-          <div style={LABEL}>Confidential Jurisdiction Brief</div>
-
-          <h1
-            style={{
-              fontSize: 48,
-              fontWeight: 500,
-              margin: 0,
-              color: COLORS.ink,
-              letterSpacing: "-0.01em",
-            }}
-          >
-            Spain — Fertility Strategy Dossier
-          </h1>
-
-          <p style={{ ...P, maxWidth: 720, margin: "22px auto 0" }}>
-            Strategic intelligence for families evaluating Spain as a
-            cross-border reproductive jurisdiction.
-          </p>
-        </div>
+    <main className="bg-[#F5F1E8] text-[#1A1A1A]">
+      {/* Top helper nav */}
+      <section className="max-w-6xl mx-auto px-6 pt-10">
+        <Link
+          href="/countries"
+          className="inline-flex items-center gap-2 text-sm tracking-wide text-[#6B5A2B] hover:opacity-80"
+        >
+          ← Back to countries
+        </Link>
       </section>
 
-      {/* SECTION I */}
-      <section style={CARD_SECTION}>
-        <div style={CONTAINER}>
-          <div style={LABEL}>Section I</div>
-          <h2 style={H2}>Executive Positioning</h2>
-          <p style={P}>
-            Spain occupies a structurally distinct position within European
-            fertility regulation. Unlike neighboring jurisdictions that impose
-            restrictions on donor frameworks, Spain permits anonymous gamete
-            donation under nationally regulated standards.
-          </p>
-          <p style={{ ...P, marginBottom: 0 }}>
-            This regulatory permissiveness — combined with advanced laboratory
-            infrastructure and established cross-border patient pathways —
-            creates measurable strategic advantages for specific patient
-            profiles.
-          </p>
-          <div style={DIVIDER} />
-        </div>
-      </section>
-
-      {/* SECTION II */}
-      <section style={SECTION}>
-        <div style={CONTAINER}>
-          <div style={LABEL}>Section II</div>
-          <h2 style={H2}>Regulatory Context Within Europe</h2>
-          <p style={P}>
-            Anonymous donation materially reduces donor scarcity risk within the
-            European framework. Spain’s legislative posture contrasts with
-            jurisdictions that have transitioned toward identity disclosure.
-          </p>
-          <p style={{ ...P, marginBottom: 0 }}>
-            Surrogacy is not legally recognized. Families requiring gestational
-            pathways must structure arrangements externally.
-          </p>
-          <div style={DIVIDER} />
-        </div>
-      </section>
-
-      {/* SECTION III */}
-      <section style={CARD_SECTION}>
-        <div style={CONTAINER}>
-          <div style={LABEL}>Section III</div>
-          <h2 style={H2}>Donor Framework Implications</h2>
-          <p style={{ ...P, marginBottom: 0 }}>
-            Spain’s anonymity model affects long-term disclosure philosophy,
-            genetic traceability, and future identity access considerations.
-            While operationally efficient, it requires deliberate alignment with
-            family governance perspectives.
-          </p>
-          <div style={DIVIDER} />
-        </div>
-      </section>
-
-      {/* SECTION IV */}
-      <section style={SECTION}>
-        <div style={CONTAINER}>
-          <div style={LABEL}>Section IV</div>
-          <h2 style={H2}>Cost Structure in Strategic Context</h2>
-          <p style={P}>
-            Spain presents a mid-tier global cost profile. IVF cycles typically
-            range between €4,000–€7,000. Donor cycles extend higher depending on
-            laboratory protocol.
-          </p>
-          <p style={{ ...P, marginBottom: 0 }}>
-            Relative to the United States, Spain may represent cost efficiency.
-            Relative to lower-cost jurisdictions, it trades price for European
-            regulatory stability.
-          </p>
-          <div style={DIVIDER} />
-        </div>
-      </section>
-
-      {/* SECTION V */}
-      <section style={CARD_SECTION}>
-        <div style={CONTAINER}>
-          <div style={LABEL}>Section V</div>
-          <h2 style={H2}>Ideal Candidate Profiles</h2>
-          <ul style={UL}>
-            <li style={LI}>Families requiring anonymous donor frameworks</li>
-            <li style={LI}>Patients prioritizing European regulatory standards</li>
-            <li style={LI}>Lesbian couples utilizing ROPA structures</li>
-            <li style={LI}>Families seeking reduced donor waiting periods</li>
-          </ul>
-          <div style={DIVIDER} />
-        </div>
-      </section>
-
-      {/* SECTION VI */}
-      <section style={SECTION}>
-        <div style={CONTAINER}>
-          <div style={LABEL}>Section VI</div>
-          <h2 style={H2}>Jurisdictional Limitations</h2>
-          <p style={{ ...P, marginBottom: 0 }}>
-            Spain is unsuitable for intended parents requiring gestational
-            surrogacy within the same jurisdiction. Additionally, open donor
-            identity frameworks may require alternative strategy.
-          </p>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section
-        style={{
-          padding: "90px 20px",
-          backgroundColor: COLORS.dark,
-          textAlign: "center",
-        }}
-      >
-        <div style={CONTAINER}>
-          <div style={{ ...LABEL, color: "rgba(255,255,255,0.5)" }}>
-            Advisory Engagement
+      {/* Hero */}
+      <section className="max-w-6xl mx-auto px-6 pt-10 pb-10">
+        <div className="text-center max-w-3xl mx-auto">
+          <div className="text-xs tracking-[0.28em] uppercase text-[#6B6B6B]">
+            Strategic Advisory Dossier
           </div>
 
-          <h2
-            style={{
-              fontSize: 28,
-              fontWeight: 500,
-              color: "#ffffff",
-              margin: "0 0 14px 0",
-            }}
-          >
-            Schedule Private Advisory Review
-          </h2>
+          <h1 className="mt-4 text-4xl md:text-6xl leading-tight font-medium">
+            Greece
+          </h1>
 
-          <a
-            href="/"
-            style={{
-              display: "inline-block",
-              marginTop: 18,
-              padding: "11px 20px",
-              borderRadius: 3,
-              textDecoration: "none",
-              backgroundColor: COLORS.accent,
-              color: "#ffffff",
-              fontSize: 15,
-            }}
-          >
-            Schedule Private Advisory Review
-          </a>
+          <p className="mt-5 text-base md:text-lg leading-relaxed text-[#2C2C2C]">
+            Greece is often the “high-value” European option: accessible timelines,
+            comparatively efficient logistics, and a clinic ecosystem that can work
+            well for select donor and treatment pathways. The strategic question is
+            not “Is Greece good?”—it’s whether Greece is the right match for your
+            governance needs, donor preferences, and risk tolerance.
+          </p>
+
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link
+              href="/consultation"
+              className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide hover:bg-[#EFE6D4] transition"
+            >
+              Request Advisory Consultation
+            </Link>
+            <Link
+              href="#framework"
+              className="inline-flex items-center justify-center rounded-full border border-[#D9CBAA] px-6 py-3 text-sm tracking-wide hover:bg-[#F0E8D8] transition"
+            >
+              Read the dossier framework
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Two-column decision cards */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FBF8F2] p-7">
+            <h2 className="text-lg font-medium">When Greece is the right choice</h2>
+            <ul className="mt-4 space-y-3 text-sm leading-relaxed text-[#2C2C2C] list-disc pl-5">
+              <li>
+                You want a <strong>value + access</strong> option inside Europe and
+                prefer a relatively efficient pathway compared to higher-demand hubs.
+              </li>
+              <li>
+                You are open to an advisor-led selection of <strong>4–5 vetted clinics</strong>{" "}
+                rather than a long public list.
+              </li>
+              <li>
+                You prioritize <strong>predictable planning</strong> (travel windows,
+                scheduling, and structured next steps) over “maximum permissiveness.”
+              </li>
+              <li>
+                You’re navigating a donor pathway and need <strong>clear execution</strong>{" "}
+                with a clinic that can document standards and processes consistently.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FBF8F2] p-7">
+            <h2 className="text-lg font-medium">When it’s not</h2>
+            <ul className="mt-4 space-y-3 text-sm leading-relaxed text-[#2C2C2C] list-disc pl-5">
+              <li>
+                You require the strongest possible <strong>public reporting regime</strong>{" "}
+                and a governance-first environment above all else.
+              </li>
+              <li>
+                You need the broadest permissive access profile for a very niche pathway
+                where <strong>one jurisdictional constraint breaks the plan</strong>.
+              </li>
+              <li>
+                You are uncomfortable unless every step is backed by{" "}
+                <strong>high-visibility institutional signals</strong> (e.g., large,
+                internationally branded hospital systems).
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Framework */}
+      <section id="framework" className="max-w-6xl mx-auto px-6 pb-14">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FBF8F2] p-8">
+          <h3 className="text-xl font-medium">Advisory framework</h3>
+          <p className="mt-3 text-sm leading-relaxed text-[#2C2C2C]">
+            This dossier is intentionally curated. We exclude exhaustive clinic lists and
+            “DIY travel instructions.” The goal is decision clarity: when Greece should be
+            considered, what risks to watch, and how to execute with control.
+          </p>
+
+          <div className="mt-7 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="rounded-xl border border-[#EFE6D4] bg-white p-6">
+              <div className="text-xs tracking-[0.22em] uppercase text-[#6B6B6B]">
+                Country intelligence
+              </div>
+              <p className="mt-3 text-sm leading-relaxed text-[#2C2C2C]">
+                Eligibility constraints, donor-policy realities, and the “gotchas” that
+                matter in practice.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-[#EFE6D4] bg-white p-6">
+              <div className="text-xs tracking-[0.22em] uppercase text-[#6B6B6B]">
+                Clinic standards insight
+              </div>
+              <p className="mt-3 text-sm leading-relaxed text-[#2C2C2C]">
+                What signals to demand: lab standards, documentation discipline, reporting
+                behavior, and process transparency.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-[#EFE6D4] bg-white p-6">
+              <div className="text-xs tracking-[0.22em] uppercase text-[#6B6B6B]">
+                Strategic execution
+              </div>
+              <p className="mt-3 text-sm leading-relaxed text-[#2C2C2C]">
+                A controlled plan: timeline framing, travel + accommodation planning,
+                and decision checkpoints.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* What we exclude */}
+      <section className="max-w-6xl mx-auto px-6 pb-14">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FBF8F2] p-8">
+          <h3 className="text-xl font-medium">What we deliberately exclude</h3>
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-[#2C2C2C]">
+            <div className="rounded-xl border border-[#EFE6D4] bg-white p-5">
+              ❌ Exhaustive clinic directories (we curate 4–5)
+            </div>
+            <div className="rounded-xl border border-[#EFE6D4] bg-white p-5">
+              ❌ Step-by-step visa walkthroughs (we coordinate, not DIY)
+            </div>
+            <div className="rounded-xl border border-[#EFE6D4] bg-white p-5">
+              ❌ Hotel price scraping (we recommend vetted accommodations)
+            </div>
+            <div className="rounded-xl border border-[#EFE6D4] bg-white p-5">
+              ❌ Every treatment detail (we focus on strategic decision points)
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Next actions */}
+      <section className="max-w-6xl mx-auto px-6 pb-16">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#111111] text-[#F7F2E6] p-8">
+          <h3 className="text-xl font-medium">If you’re considering Greece</h3>
+          <p className="mt-3 text-sm leading-relaxed text-[#EDE6D6] max-w-3xl">
+            The fastest way to reduce risk is to align the jurisdiction to your pathway,
+            then shortlist clinics based on standards signals—not marketing. If you want,
+            we’ll map your profile to the correct pathway, then curate options and a plan.
+          </p>
+
+          <div className="mt-6 flex flex-col sm:flex-row gap-3">
+            <Link
+              href="/consultation"
+              className="inline-flex items-center justify-center rounded-full bg-[#F5EAD2] text-[#1A1A1A] px-6 py-3 text-sm tracking-wide hover:opacity-90 transition"
+            >
+              Request Advisory Consultation
+            </Link>
+
+            <Link
+              href="/countries"
+              className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide hover:bg-[#1A1A1A] hover:text-[#F7F2E6] transition"
+            >
+              Back to countries
+            </Link>
+          </div>
         </div>
       </section>
     </main>
   );
 }
+<section
+  style={{
+    marginTop: 60,
+    paddingTop: 40,
+    borderTop: "1px solid rgba(0,0,0,0.08)",
+  }}
+>
+  <h2 style={{ fontSize: 24, marginBottom: 12 }}>
+    Strategic Fit Requires Context
+  </h2>
+
+  <p style={{ color: "rgba(0,0,0,0.70)", lineHeight: 1.7, maxWidth: 760 }}>
+    Jurisdictional selection is rarely about cost alone. It is about legal comfort,
+    donor preferences, timeline tolerance, and long-term family structure.
+    A structured advisory review ensures Spain aligns with your broader objectives.
+  </p>
+
+  <div style={{ marginTop: 24 }}>
+    <a
+      href="/consultation#request"
+      style={{
+        display: "inline-block",
+        padding: "12px 20px",
+        borderRadius: 999,
+        border: "1px solid #B89B5E",
+        textDecoration: "none",
+        color: "#2B2B2B",
+        fontWeight: 500,
+        letterSpacing: "0.02em",
+      }}
+    >
+      Review Spain Strategy Privately
+    </a>
+
+    <p style={{ marginTop: 10, fontSize: 14, color: "rgba(0,0,0,0.55)" }}>
+      Discreet, structured guidance aligned to your profile and timeline.
+    </p>
+  </div>
+</section>

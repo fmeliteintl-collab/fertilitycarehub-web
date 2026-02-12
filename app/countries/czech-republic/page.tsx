@@ -55,3 +55,42 @@ export default function GreeceDossier() {
     </main>
   );
 }
+<section
+  style={{
+    marginTop: 60,
+    paddingTop: 40,
+    borderTop: "1px solid rgba(0,0,0,0.08)",
+  }}
+>
+  <h2 style={{ fontSize: 24, marginBottom: 12 }}>
+    Strategic Fit Requires Context
+  </h2>
+
+  <p style={{ color: "rgba(0,0,0,0.70)", lineHeight: 1.7, maxWidth: 760 }}>
+    Jurisdictional selection is rarely about cost alone. It is about legal comfort,
+    donor preferences, timeline tolerance, and long-term family structure.
+    A structured advisory review ensures Spain aligns with your broader objectives.
+  </p>
+
+  <div style={{ marginTop: 24 }}>
+    <a
+      href="/consultation#request"
+      style={{
+        display: "inline-block",
+        padding: "12px 20px",
+        borderRadius: 999,
+        border: "1px solid #B89B5E",
+        textDecoration: "none",
+        color: "#2B2B2B",
+        fontWeight: 500,
+        letterSpacing: "0.02em",
+      }}
+    >
+      Review Czech-Republic Strategy Privately
+    </a>
+
+    <p style={{ marginTop: 10, fontSize: 14, color: "rgba(0,0,0,0.55)" }}>
+      Discreet, structured guidance aligned to your profile and timeline.
+    </p>
+  </div>
+</section>
