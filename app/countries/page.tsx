@@ -1,124 +1,212 @@
 import Link from "next/link";
 
-type CountryCard = {
+type Country = {
+  slug: string;
   name: string;
-  status: "Live dossier" | "Dossier in preparation";
-  href?: string;
-  note: string;
+  status: "Live" | "In build";
+  oneLiner: string;
 };
 
-const countries: CountryCard[] = [
+const COUNTRIES: Country[] = [
   {
+    slug: "spain",
     name: "Spain",
-    status: "Live dossier",
-    href: "/countries/spain",
-    note: "Permissive legal framework + world-class clinical standards — best for specific patient profiles.",
+    status: "Live",
+    oneLiner: "A permissive, high-standard European option with strong donor and clinic depth.",
   },
   {
+    slug: "greece",
     name: "Greece",
-    status: "Dossier in preparation",
-    note: "Strong donor frameworks and competitive cost structures — often a top alternative within the EU.",
+    status: "Live",
+    oneLiner: "Value + accessibility in Europe, often strong for donor pathways and planning.",
   },
   {
+    slug: "czech-republic",
     name: "Czech Republic",
-    status: "Dossier in preparation",
-    note: "A high value destination with established clinics — ideal when budgets matter without compromising standards.",
+    status: "Live",
+    oneLiner: "A structured Central Europe choice with clear clinic models and predictable logistics.",
   },
   {
+    slug: "portugal",
     name: "Portugal",
-    status: "Dossier in preparation",
-    note: "Modern frameworks and growing cross-border demand — best evaluated with careful strategy mapping.",
+    status: "Live",
+    oneLiner: "A modern regulatory environment with growing clinic maturity and strong patient experience.",
   },
   {
+    slug: "mexico",
     name: "Mexico",
-    status: "Dossier in preparation",
-    note: "Proximity advantages for North America + varied clinic models — requires strong curation and planning.",
+    status: "Live",
+    oneLiner: "A proximity and cost-structure option where vetting and standards selection are key.",
   },
   {
+    slug: "united-states",
     name: "United States",
-    status: "Dossier in preparation",
-    note: "Top-tier outcomes and options — higher costs make strategic selection and pathway design essential.",
+    status: "Live",
+    oneLiner: "The premium benchmark for breadth—best when complexity requires top-tier capabilities.",
   },
 ];
 
-export default function CountriesIndexPage() {
+export default function CountriesPage() {
   return (
     <main
-      className="max-w-6xl mx-auto px-6 py-14"
-      style={{ fontFamily: "Georgia, serif" }}
+      style={{
+        maxWidth: 1100,
+        margin: "0 auto",
+        padding: "64px 20px",
+      }}
     >
-      {/* Header */}
-      <section className="text-center mb-12">
-        <h1 className="text-3xl md:text-4xl tracking-wide">
+      <header style={{ textAlign: "center", marginBottom: 40 }}>
+        <h1
+          style={{
+            fontSize: 40,
+            lineHeight: 1.15,
+            margin: 0,
+            letterSpacing: "-0.02em",
+          }}
+        >
           Global Fertility Destinations
         </h1>
-        <p className="mt-4 text-base md:text-lg text-[#4A4A4A] max-w-2xl mx-auto leading-relaxed">
-          Explore structured strategic fertility intelligence by country — curated as
-          private advisory dossiers, not a database.
+        <p
+          style={{
+            marginTop: 12,
+            marginBottom: 0,
+            fontSize: 18,
+            lineHeight: 1.6,
+            maxWidth: 720,
+            marginLeft: "auto",
+            marginRight: "auto",
+            color: "rgba(0,0,0,0.70)",
+          }}
+        >
+          Explore structured, strategic fertility intelligence by country — curated as
+          advisor-style dossiers, not a public database.
         </p>
+      </header>
+
+      <section
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+          gap: 18,
+        }}
+      >
+        {COUNTRIES.map((c) => (
+          <Link
+            key={c.slug}
+            href={`/countries/${c.slug}`}
+            style={{
+              textDecoration: "none",
+              color: "inherit",
+              borderRadius: 18,
+              border: "1px solid rgba(0,0,0,0.10)",
+              background: "rgba(255,255,255,0.55)",
+              padding: 18,
+              display: "block",
+              transition: "transform 120ms ease, box-shadow 120ms ease",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+                marginBottom: 10,
+              }}
+            >
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: 22,
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                {c.name}
+              </h2>
+
+              <span
+                style={{
+                  fontSize: 12,
+                  padding: "6px 10px",
+                  borderRadius: 999,
+                  border: "1px solid rgba(0,0,0,0.12)",
+                  background: c.status === "Live" ? "rgba(184,155,94,0.18)" : "rgba(0,0,0,0.06)",
+                  color: "rgba(0,0,0,0.75)",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {c.status}
+              </span>
+            </div>
+
+            <div
+              style={{
+                fontSize: 12,
+                textTransform: "uppercase",
+                letterSpacing: "0.12em",
+                color: "rgba(0,0,0,0.55)",
+                marginBottom: 10,
+              }}
+            >
+              Strategic Advisory Dossier
+            </div>
+
+            <p
+              style={{
+                margin: 0,
+                fontSize: 15,
+                lineHeight: 1.6,
+                color: "rgba(0,0,0,0.72)",
+              }}
+            >
+              {c.oneLiner}
+            </p>
+
+            <div
+              style={{
+                marginTop: 14,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                fontSize: 14,
+                color: "rgba(0,0,0,0.78)",
+              }}
+            >
+              View dossier <span aria-hidden="true">→</span>
+            </div>
+          </Link>
+        ))}
       </section>
 
-      {/* Grid */}
-      <section className="grid gap-6 md:grid-cols-2">
-        {countries.map((c) => {
-          const isLive = c.status === "Live dossier" && c.href;
+      <section
+        style={{
+          marginTop: 34,
+          paddingTop: 22,
+          borderTop: "1px solid rgba(0,0,0,0.10)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+          flexWrap: "wrap",
+        }}
+      >
+        <p style={{ margin: 0, color: "rgba(0,0,0,0.70)" }}>
+          Want help choosing the right country path for your profile?
+        </p>
 
-          return (
-            <div
-              key={c.name}
-              className="rounded-2xl border border-[#E5DDC8] bg-[#FBF7EC] p-7"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h2 className="text-xl tracking-wide">{c.name}</h2>
-                  <p className="mt-2 text-sm text-[#5A5A5A] leading-relaxed">
-                    {c.note}
-                  </p>
-                </div>
-
-                <span
-                  className="text-xs tracking-widest uppercase px-3 py-1 rounded-full border"
-                  style={{
-                    borderColor: isLive ? "#B89B5E" : "#D7C9A6",
-                    color: isLive ? "#7A5C1F" : "#7A6A3A",
-                    background: "#FFFDF7",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {c.status}
-                </span>
-              </div>
-
-              <div className="mt-6 flex items-center gap-3">
-                {isLive ? (
-                  <Link
-                    href={c.href!}
-                    className="inline-flex items-center justify-center rounded-lg px-5 py-2 text-sm tracking-wide"
-                    style={{
-                      background: "#B89B5E",
-                      color: "#fff",
-                    }}
-                  >
-                    View dossier →
-                  </Link>
-                ) : (
-                  <span
-                    className="inline-flex items-center justify-center rounded-lg px-5 py-2 text-sm tracking-wide border border-[#D7C9A6] text-[#6A5A2A] bg-[#FFFDF7]"
-                  >
-                    Dossier in preparation
-                  </span>
-                )}
-
-                <Link
-                  href="/consultation#request"
-                  className="text-sm tracking-wide underline underline-offset-4 text-[#6A5A2A]"
-                >
-                  Request advisory consultation
-                </Link>
-              </div>
-            </div>
-          );
-        })}
+        <Link
+          href="/consultation"
+          style={{
+            textDecoration: "none",
+            border: "1px solid #B89B5E",
+            padding: "10px 14px",
+            borderRadius: 12,
+            color: "rgba(0,0,0,0.85)",
+            background: "rgba(184,155,94,0.10)",
+          }}
+        >
+          Request Advisory Consultation
+        </Link>
       </section>
     </main>
   );
