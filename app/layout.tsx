@@ -20,13 +20,7 @@ export default function RootLayout({
           <div className="max-w-6xl mx-auto flex items-center justify-between px-6">
             
             <Link href="/" className="flex items-center gap-4">
-              <Image
-                src="/logo.png"
-                alt="FertilityCareHub"
-                width={50}
-                height={50}
-                priority
-              />
+              
               <span className="text-xl tracking-wide">
                 FertilityCareHub
               </span>
