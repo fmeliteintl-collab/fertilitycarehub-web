@@ -213,7 +213,7 @@ export default function Home() {
           <p style={{ marginBottom: "34px", color: "#d4d4d4", fontSize: 14 }}>
             Initial consultations available by application.
           </p>
-import Link from "next/link";
+
 <Link
   href="/consultation"
   style={{
