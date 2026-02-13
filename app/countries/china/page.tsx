@@ -1,247 +1,232 @@
 import Link from "next/link";
 
-export default function ChinaDossierPage() {
-  const COUNTRY = "China";
-  const SLUG = "china";
-
-  const PAGE_BG = "#F5F1E8";
-  const INK = "#1A1A1A";
-  const MUTED = "#6A6256";
-  const GOLD = "#B89B5E";
-  const BORDER = "#E5DDC8";
-  const CARD_BG = "#FBFAF7";
-
+export default function ChinaPage() {
   return (
-    <main
-      style={{
-        background: PAGE_BG,
-        color: INK,
-        minHeight: "100vh",
-        fontFamily:
-          'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif',
-      }}
-    >
-      {/* Header */}
-      <header
-        style={{
-          width: "100%",
-          borderBottom: `1px solid ${BORDER}`,
-          background: PAGE_BG,
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1120,
-            margin: "0 auto",
-            padding: "18px 20px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
+    <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
+      {/* Top utility bar */}
+      <div className="max-w-6xl mx-auto px-6 pt-10">
+        <div className="flex items-center justify-between">
           <Link
             href="/countries"
-            style={{
-              textDecoration: "none",
-              color: INK,
-              fontSize: 18,
-              letterSpacing: 0.5,
-            }}
-          >
-            FertilityCareHub
-          </Link>
-
-          <Link
-            href={`/countries/${SLUG}#consultation`}
-            style={{
-              textDecoration: "none",
-              border: `1px solid ${GOLD}`,
-              color: INK,
-              padding: "10px 14px",
-              borderRadius: 999,
-              fontSize: 13,
-              letterSpacing: 0.8,
-              textTransform: "uppercase",
-              background: "transparent",
-            }}
-          >
-            Request Private Advisory Review
-          </Link>
-        </div>
-      </header>
-
-      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "28px 20px 80px" }}>
-        {/* Back */}
-        <div>
-          <Link
-            href="/countries"
-            style={{ textDecoration: "none", color: MUTED, fontSize: 13 }}
+            className="text-sm tracking-wide text-[#6A6256] hover:text-[#1A1A1A]"
           >
             ← Back to countries
           </Link>
-        </div>
-
-        {/* Hero */}
-        <section style={{ paddingTop: 34, paddingBottom: 28, textAlign: "center" }}>
-          <div
-            style={{
-              fontSize: 12,
-              letterSpacing: 2.8,
-              textTransform: "uppercase",
-              color: MUTED,
-              marginBottom: 16,
-            }}
-          >
-            Strategic advisory dossier
-          </div>
-
-          <h1 style={{ margin: 0, fontSize: 56 }}>
-            {COUNTRY}
-          </h1>
-
-          <p
-            style={{
-              margin: "18px auto 0",
-              maxWidth: 880,
-              fontSize: 18,
-              lineHeight: 1.7,
-              color: "#3A342C",
-            }}
-          >
-            China is a tightly regulated fertility environment where access, eligibility,
-            and permitted pathways must be confirmed upfront.
-            The strategic question is not clinical capability — it is regulatory fit,
-            documentation, and realistic access planning.
-          </p>
-        </section>
-
-        {/* 2 Column */}
-        <section
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 18,
-          }}
-        >
-          <div
-            style={{
-              background: CARD_BG,
-              border: `1px solid ${BORDER}`,
-              borderRadius: 18,
-              padding: 22,
-            }}
-          >
-            <h2>When China is the right choice</h2>
-            <ul style={{ paddingLeft: 18, lineHeight: 1.8 }}>
-              <li>You are eligible under local requirements and can meet documentation standards.</li>
-              <li>You want a domestic pathway with strong institutional capacity in major cities.</li>
-              <li>Regulatory strictness is acceptable in exchange for structured governance.</li>
-              <li>You prioritize local continuity over international flexibility.</li>
-            </ul>
-          </div>
-
-          <div
-            style={{
-              background: CARD_BG,
-              border: `1px solid ${BORDER}`,
-              borderRadius: 18,
-              padding: 22,
-            }}
-          >
-            <h2>When it’s not</h2>
-            <ul style={{ paddingLeft: 18, lineHeight: 1.8 }}>
-              <li>If you require donor/surrogacy flexibility beyond permitted pathways.</li>
-              <li>If your profile requires permissive eligibility rules or broad access models.</li>
-              <li>If cross-border execution is the goal — China is structurally domestic-first.</li>
-              <li>If speed and ease of access matters more than governance constraints.</li>
-            </ul>
-          </div>
-        </section>
-
-        {/* Framework */}
-        <section style={{ marginTop: 40 }}>
-          <h2 style={{ textAlign: "center" }}>
-            Advisory framework for {COUNTRY}
-          </h2>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: 14,
-              marginTop: 20,
-            }}
-          >
-            {[
-              {
-                title: "Eligibility confirmation",
-                text: "Strategy begins by confirming what is permitted for your profile and ensuring documentation is clean before planning.",
-              },
-              {
-                title: "City + institution selection",
-                text: "Major centers can be strong; choose where institutional depth aligns with your case complexity and access needs.",
-              },
-              {
-                title: "Access realism",
-                text: "Assume more process steps, more paperwork, and potentially longer scheduling — plan travel and timelines accordingly.",
-              },
-            ].map((card) => (
-              <div
-                key={card.title}
-                style={{
-                  background: CARD_BG,
-                  border: `1px solid ${BORDER}`,
-                  borderRadius: 16,
-                  padding: 18,
-                }}
-              >
-                <div style={{ fontWeight: 500 }}>{card.title}</div>
-                <div style={{ marginTop: 8, lineHeight: 1.7 }}>
-                  {card.text}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* CTA */}
-        <section id="consultation" style={{ marginTop: 60, textAlign: "center" }}>
-          <h2>Private advisory review</h2>
-          <p style={{ maxWidth: 820, margin: "12px auto", color: MUTED }}>
-            We assess China against your profile — eligibility, pathway constraints,
-            documentation readiness, and timeline planning.
-          </p>
 
           <Link
             href="/consultation"
-            style={{
-              display: "inline-block",
-              border: `1px solid ${GOLD}`,
-              padding: "12px 16px",
-              borderRadius: 999,
-              textDecoration: "none",
-              color: INK,
-              fontSize: 13,
-              letterSpacing: 1,
-              textTransform: "uppercase",
-            }}
+            className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-5 py-2 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
           >
             Review China Strategy Privately
           </Link>
-        </section>
+        </div>
       </div>
 
-      <style>{`
-        @media (max-width: 900px) {
-          section[style*="grid-template-columns: 1fr 1fr"] {
-            grid-template-columns: 1fr !important;
-          }
-          section[style*="repeat(3, 1fr)"] {
-            grid-template-columns: 1fr !important;
-          }
-          h1 { font-size: 40px !important; }
-        }
-      `}</style>
+      {/* Hero */}
+      <section className="max-w-6xl mx-auto px-6 pt-14 pb-10">
+        <div className="text-center">
+          <div className="text-xs tracking-[0.28em] text-[#6A6256]">
+            STRATEGIC ADVISORY DOSSIER
+          </div>
+
+          <h1 className="mt-5 text-5xl md:text-6xl leading-tight font-medium">
+            China
+          </h1>
+
+          <p className="mt-6 max-w-3xl mx-auto text-lg leading-relaxed text-[#2A2A2A]">
+            China is a highly regulated fertility market where access, eligibility, and approved
+            pathways require careful navigation. The strategic advantage can be strong clinical
+            capacity inside major centers, but international pathways are not “medical tourism by default.”
+            This dossier focuses on governance and execution: when China is appropriate, when it isn’t,
+            and how to approach it with precision if it is on your shortlist.
+          </p>
+        </div>
+      </section>
+
+      {/* Two-column decision block */}
+      <section className="max-w-6xl mx-auto px-6 pb-10">
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h2 className="text-xl font-medium">When China is the right choice</h2>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                You are eligible within the local regulatory model and can meet documentation requirements.
+              </li>
+              <li>
+                You are prioritizing care inside a tightly governed system rather than a medical tourism marketplace.
+              </li>
+              <li>
+                You value large-center capability and institutional structure.
+              </li>
+              <li>
+                Your planning includes structured coordination and clearly defined treatment scope.
+              </li>
+              <li>
+                You prefer a conservative pathway that aligns with local approvals.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h2 className="text-xl font-medium">When it’s not</h2>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                You want an open-access international medical tourism model.
+              </li>
+              <li>
+                Your pathway requires frameworks that are restricted or not supported locally.
+              </li>
+              <li>
+                You need maximum flexibility in family structure pathways.
+              </li>
+              <li>
+                You want minimal documentation and fast cross-border logistics.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Framework */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+          <h2 className="text-2xl font-medium">Advisor framework: how to evaluate China</h2>
+
+          <div className="mt-6 grid md:grid-cols-3 gap-6">
+            <div>
+              <div className="text-xs tracking-[0.25em] text-[#6A6256]">ELIGIBILITY</div>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
+                Strategy starts with eligibility. We confirm what is permitted, what is restricted, and what
+                documentation is required before any clinical planning.
+              </p>
+            </div>
+
+            <div>
+              <div className="text-xs tracking-[0.25em] text-[#6A6256]">INSTITUTION MODEL</div>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
+                China is not “clinic shopping.” The right question is which institutional model
+                matches your needs — and whether access is feasible.
+              </p>
+            </div>
+
+            <div>
+              <div className="text-xs tracking-[0.25em] text-[#6A6256]">EXECUTION</div>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
+                Execution requires disciplined coordination: record readiness, scheduling, local follow-up,
+                and clarity on what must occur on-site versus remotely.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Core sections */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Governance and constraints</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                China operates with tight governance; pathway scope must align with local approvals.
+              </li>
+              <li>
+                Documentation, marital/eligibility rules, and clinic access norms should be clarified early.
+              </li>
+              <li>
+                We identify what can be done outside the country versus what must be executed on-site.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Clinic selection approach</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                We shortlist selectively (typically 4–5), focusing on institutional stability and planning discipline.
+              </li>
+              <li>
+                We prioritize written planning, clear scheduling, and consistent patient communication cadence.
+              </li>
+              <li>
+                We avoid “directory browsing” and structure selection around eligibility and execution.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Cost structure (strategic view)</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                Cost is not the primary variable — access and pathway eligibility often are.
+              </li>
+              <li>
+                We model total cost only after feasibility is confirmed: clinical + monitoring + travel + time.
+              </li>
+              <li>
+                We avoid publishing static pricing without verification and context.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Logistics and travel (including accommodation)</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                China is not optimized for casual medical tourism; travel planning must be structured.
+              </li>
+              <li>
+                We include <strong>accommodation</strong> as execution support: calm, proximity-based options chosen for stability.
+              </li>
+              <li>
+                The priority is minimizing friction during monitoring and procedure windows.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* What we exclude */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+          <h3 className="text-xl font-medium">What we deliberately exclude (the private filter)</h3>
+          <div className="mt-5 grid md:grid-cols-2 gap-6">
+            <ul className="space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>Exhaustive clinic directories.</li>
+              <li>DIY bureaucracy playbooks.</li>
+              <li>Generic “best clinic” rankings without feasibility analysis.</li>
+            </ul>
+            <ul className="space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>Hotel price comparison tables.</li>
+              <li>Static pricing without verification.</li>
+              <li>One-size-fits-all pathway templates.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="max-w-6xl mx-auto px-6 pb-16">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-10 text-center">
+          <h3 className="text-2xl font-medium">Private advisory, not a public database.</h3>
+          <p className="mt-4 max-w-2xl mx-auto text-[15px] leading-relaxed text-[#2A2A2A]">
+            If China is on your shortlist, the decisive step is confirming eligibility and feasibility before planning.
+            We structure the pathway around governance, access, and execution — not marketing claims.
+          </p>
+
+          <div className="mt-7 flex items-center justify-center">
+            <Link
+              href="/consultation"
+              className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+            >
+              Request Private Advisory Review
+            </Link>
+          </div>
+
+          <div className="mt-3 text-xs tracking-wide text-[#6A6256]">
+            Discreet, structured guidance aligned to your profile and jurisdictional constraints.
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
