@@ -1,359 +1,235 @@
 import Link from "next/link";
 
-export default function UnitedKingdomDossierPage() {
-  const COUNTRY = "United Kingdom";
-  const SLUG = "united-kingdom";
-
-  const PAGE_BG = "#F5F1E8";
-  const INK = "#1A1A1A";
-  const MUTED = "#6A6256";
-  const GOLD = "#B89B5E";
-  const BORDER = "#E5DDC8";
-  const CARD_BG = "#FBFAF7";
-
+export default function UnitedKingdomPage() {
   return (
-    <main
-      style={{
-        background: PAGE_BG,
-        color: INK,
-        minHeight: "100vh",
-        fontFamily:
-          'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif',
-      }}
-    >
-      {/* Header */}
-      <header
-        style={{
-          width: "100%",
-          borderBottom: `1px solid ${BORDER}`,
-          background: PAGE_BG,
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1120,
-            margin: "0 auto",
-            padding: "18px 20px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 16,
-          }}
-        >
+    <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
+      {/* Top utility bar */}
+      <div className="max-w-6xl mx-auto px-6 pt-10">
+        <div className="flex items-center justify-between">
           <Link
             href="/countries"
-            style={{
-              textDecoration: "none",
-              color: INK,
-              fontSize: 18,
-              letterSpacing: 0.5,
-            }}
-          >
-            FertilityCareHub
-          </Link>
-
-          <Link
-            href={`/countries/${SLUG}#consultation`}
-            style={{
-              textDecoration: "none",
-              border: `1px solid ${GOLD}`,
-              color: INK,
-              padding: "10px 14px",
-              borderRadius: 999,
-              fontSize: 13,
-              letterSpacing: 0.8,
-              textTransform: "uppercase",
-              whiteSpace: "nowrap",
-              background: "transparent",
-            }}
-          >
-            Request Private Advisory Review
-          </Link>
-        </div>
-      </header>
-
-      {/* Body */}
-      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "28px 20px 80px" }}>
-        {/* Back link */}
-        <div style={{ marginTop: 6 }}>
-          <Link
-            href="/countries"
-            style={{
-              textDecoration: "none",
-              color: MUTED,
-              fontSize: 13,
-              letterSpacing: 0.4,
-            }}
+            className="text-sm tracking-wide text-[#6A6256] hover:text-[#1A1A1A]"
           >
             ← Back to countries
           </Link>
+
+          <Link
+            href="/consultation"
+            className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-5 py-2 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+          >
+            Review United Kingdom Strategy Privately
+          </Link>
         </div>
-
-        {/* Hero */}
-        <section style={{ paddingTop: 34, paddingBottom: 28, textAlign: "center" }}>
-          <div
-            style={{
-              fontSize: 12,
-              letterSpacing: 2.8,
-              textTransform: "uppercase",
-              color: MUTED,
-              marginBottom: 16,
-            }}
-          >
-            Strategic advisory dossier
-          </div>
-
-          <h1
-            style={{
-              margin: 0,
-              fontSize: 56,
-              lineHeight: 1.05,
-              letterSpacing: -0.6,
-            }}
-          >
-            {COUNTRY}
-          </h1>
-
-          <p
-            style={{
-              margin: "18px auto 0",
-              maxWidth: 880,
-              fontSize: 18,
-              lineHeight: 1.7,
-              color: "#3A342C",
-            }}
-          >
-            The UK is a regulation-forward environment with a strong patient safety culture and a
-            centralized quality signal through the HFEA. Its strategic strength is governance and
-            structured oversight — the tradeoff is variability in access and timing depending on pathway.
-          </p>
-        </section>
-
-        {/* 2-up decision boxes */}
-        <section
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 18,
-            marginTop: 18,
-          }}
-        >
-          {/* Right choice */}
-          <div
-            style={{
-              background: CARD_BG,
-              border: `1px solid ${BORDER}`,
-              borderRadius: 18,
-              padding: "22px 22px",
-              boxShadow: "0 1px 0 rgba(0,0,0,0.02)",
-            }}
-          >
-            <h2 style={{ margin: 0, fontSize: 20, letterSpacing: -0.2 }}>
-              When the UK is the right choice
-            </h2>
-
-            <ul style={{ margin: "16px 0 0", paddingLeft: 18, color: "#3A342C", lineHeight: 1.75 }}>
-              <li>
-                You want a jurisdiction where <b>regulatory structure</b> is a major trust signal (HFEA oversight).
-              </li>
-              <li>
-                You value a <b>patient safety-forward</b> culture and clear clinic accountability standards.
-              </li>
-              <li>
-                You prefer a pathway that feels <b>methodical and governed</b>, even if it’s not the fastest option.
-              </li>
-              <li>
-                You want strong clinical capability and an English-first environment, with broad access to private clinics.
-              </li>
-            </ul>
-          </div>
-
-          {/* Not */}
-          <div
-            style={{
-              background: CARD_BG,
-              border: `1px solid ${BORDER}`,
-              borderRadius: 18,
-              padding: "22px 22px",
-              boxShadow: "0 1px 0 rgba(0,0,0,0.02)",
-            }}
-          >
-            <h2 style={{ margin: 0, fontSize: 20, letterSpacing: -0.2 }}>When it’s not</h2>
-
-            <ul style={{ margin: "16px 0 0", paddingLeft: 18, color: "#3A342C", lineHeight: 1.75 }}>
-              <li>
-                Your top priority is fastest access with minimal waiting time — UK timelines can vary.
-              </li>
-              <li>
-                You want a “most permissive in Europe” posture; some profiles may find better fit elsewhere.
-              </li>
-              <li>
-                Cost sensitivity is dominant — the UK is often mid-to-high priced relative to some European alternatives.
-              </li>
-              <li>
-                You want an advisory experience without friction; the UK’s strength is structure, which can feel procedural.
-              </li>
-            </ul>
-          </div>
-        </section>
-
-        {/* Advisory framework */}
-        <section style={{ marginTop: 34 }}>
-          <div style={{ textAlign: "center", marginBottom: 16 }}>
-            <h2 style={{ margin: 0, fontSize: 30, letterSpacing: -0.3 }}>
-              Advisory framework for {COUNTRY}
-            </h2>
-            <p
-              style={{
-                margin: "10px auto 0",
-                maxWidth: 860,
-                color: MUTED,
-                lineHeight: 1.7,
-                fontSize: 15,
-              }}
-            >
-              In the UK, the main question isn’t “is it good?” — it’s “is it the correct regulatory-and-access tradeoff for your profile?”
-            </p>
-          </div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: 14,
-            }}
-          >
-            {[
-              {
-                title: "Governance advantage",
-                text: "Use the UK’s regulatory posture as a trust anchor — but interpret clinic-level differences carefully.",
-              },
-              {
-                title: "Access & timing reality",
-                text: "Plan for timeline variability and choose pathways that match urgency and travel cadence.",
-              },
-              {
-                title: "Clinic selection criteria",
-                text: "Prioritize communication clarity, lab capability, and process maturity for international coordination.",
-              },
-            ].map((c) => (
-              <div
-                key={c.title}
-                style={{
-                  background: CARD_BG,
-                  border: `1px solid ${BORDER}`,
-                  borderRadius: 16,
-                  padding: 18,
-                }}
-              >
-                <div style={{ fontSize: 16, marginBottom: 8, letterSpacing: -0.2 }}>{c.title}</div>
-                <div style={{ color: "#3A342C", lineHeight: 1.7, fontSize: 14 }}>{c.text}</div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* What we exclude */}
-        <section style={{ marginTop: 34 }}>
-          <div style={{ textAlign: "center", marginBottom: 16 }}>
-            <h2 style={{ margin: 0, fontSize: 30, letterSpacing: -0.3 }}>
-              The “private” filter — what we deliberately exclude
-            </h2>
-            <p
-              style={{
-                margin: "10px auto 0",
-                maxWidth: 860,
-                color: MUTED,
-                lineHeight: 1.7,
-                fontSize: 15,
-              }}
-            >
-              We don’t replicate public directories. We interpret and curate.
-            </p>
-          </div>
-
-          <div
-            style={{
-              background: CARD_BG,
-              border: `1px solid ${BORDER}`,
-              borderRadius: 18,
-              padding: 22,
-            }}
-          >
-            <ul style={{ margin: 0, paddingLeft: 18, color: "#3A342C", lineHeight: 1.85 }}>
-              <li>❌ Full HFEA tables (we interpret what matters for your profile instead of overwhelming).</li>
-              <li>❌ Every clinic in every city (we shortlist based on fit, not geography).</li>
-              <li>❌ “Best clinic” claims (we align strategy to your case, timeline, and risk profile).</li>
-              <li>❌ Mass-market booking language (this is discreet advisory, not a marketplace pitch).</li>
-            </ul>
-          </div>
-        </section>
-
-        {/* Consultation anchor */}
-        <section
-          id="consultation"
-          style={{
-            marginTop: 44,
-            paddingTop: 22,
-            borderTop: `1px solid ${BORDER}`,
-          }}
-        >
-          <div
-            style={{
-              background: CARD_BG,
-              border: `1px solid ${BORDER}`,
-              borderRadius: 18,
-              padding: 24,
-              textAlign: "center",
-            }}
-          >
-            <h2 style={{ margin: 0, fontSize: 28, letterSpacing: -0.2 }}>
-              Private advisory review
-            </h2>
-            <p style={{ margin: "12px auto 0", maxWidth: 860, color: MUTED, lineHeight: 1.7 }}>
-              If the UK is on your shortlist, we’ll assess fit against your profile (timing, pathway, clinic selection,
-              and governance tradeoffs) and propose a structured plan.
-            </p>
-
-            <div style={{ marginTop: 18 }}>
-              <Link
-                href="/consultation"
-                style={{
-                  display: "inline-block",
-                  textDecoration: "none",
-                  border: `1px solid ${GOLD}`,
-                  padding: "12px 16px",
-                  borderRadius: 999,
-                  color: INK,
-                  fontSize: 13,
-                  letterSpacing: 0.9,
-                  textTransform: "uppercase",
-                  background: "transparent",
-                }}
-              >
-                Review {COUNTRY} Strategy Privately
-              </Link>
-
-              <div style={{ marginTop: 10, fontSize: 13, color: MUTED }}>
-                Discreet, structured guidance aligned to your profile and priorities.
-              </div>
-            </div>
-          </div>
-        </section>
       </div>
 
-      {/* Responsive */}
-      <style>{`
-        @media (max-width: 900px) {
-          section[style*="grid-template-columns: 1fr 1fr"] {
-            grid-template-columns: 1fr !important;
-          }
-          section div[style*="grid-template-columns: repeat(3, 1fr)"] {
-            grid-template-columns: 1fr !important;
-          }
-          h1 { font-size: 40px !important; }
-        }
-      `}</style>
+      {/* Hero */}
+      <section className="max-w-6xl mx-auto px-6 pt-14 pb-10">
+        <div className="text-center">
+          <div className="text-xs tracking-[0.28em] text-[#6A6256]">
+            STRATEGIC ADVISORY DOSSIER
+          </div>
+
+          <h1 className="mt-5 text-5xl md:text-6xl leading-tight font-medium">
+            United Kingdom
+          </h1>
+
+          <p className="mt-6 max-w-3xl mx-auto text-lg leading-relaxed text-[#2A2A2A]">
+            The United Kingdom is governance-forward and highly regulated under the HFEA framework.
+            The strategic advantage is clarity — licensing, donor rules, and structured reporting.
+            This market works best when oversight and regulatory transparency are your primary decision variables.
+            This dossier explains when the UK is the right strategic fit — and when it may not be.
+          </p>
+        </div>
+      </section>
+
+      {/* Two-column decision block */}
+      <section className="max-w-6xl mx-auto px-6 pb-10">
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h2 className="text-xl font-medium">When the UK is the right choice</h2>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                You value <strong>strong regulatory oversight</strong> and transparent reporting structures.
+              </li>
+              <li>
+                Governance and ethical framework are central to your decision model.
+              </li>
+              <li>
+                You want a market with clearly defined donor and licensing rules.
+              </li>
+              <li>
+                You prefer operating within a tightly regulated national system rather than a variable private market.
+              </li>
+              <li>
+                You want predictability in documentation and compliance processes.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h2 className="text-xl font-medium">When it’s not</h2>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                You are optimizing primarily for lowest cost.
+              </li>
+              <li>
+                You want highly flexible donor or pathway structures beyond UK regulatory scope.
+              </li>
+              <li>
+                You require rapid scheduling without waiting periods.
+              </li>
+              <li>
+                You prefer a market with broader commercial variability.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Framework */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+          <h2 className="text-2xl font-medium">Advisor framework: how to evaluate the UK</h2>
+
+          <div className="mt-6 grid md:grid-cols-3 gap-6">
+            <div>
+              <div className="text-xs tracking-[0.25em] text-[#6A6256]">REGULATION</div>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
+                The UK’s HFEA structure creates transparency. The strategic question is whether
+                that structure aligns with your specific pathway and flexibility needs.
+              </p>
+            </div>
+
+            <div>
+              <div className="text-xs tracking-[0.25em] text-[#6A6256]">CLINIC MODEL</div>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
+                We evaluate clinics based on operational discipline, lab quality, and communication cadence —
+                not marketing reputation alone.
+              </p>
+            </div>
+
+            <div>
+              <div className="text-xs tracking-[0.25em] text-[#6A6256]">PATHWAY FIT</div>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
+                The UK works best when your pathway aligns cleanly with regulatory and donor constraints.
+                Fit is more important than headline success metrics.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Core sections */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Governance and legal clarity</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                The UK’s regulatory oversight reduces ambiguity.
+              </li>
+              <li>
+                Documentation and licensing are structured and transparent.
+              </li>
+              <li>
+                Governance strength can reduce long-term uncertainty in certain pathways.
+              </li>
+            </ul>
+            <p className="mt-5 text-sm text-[#6A6256]">
+              Note: Specific pathway implications depend on individual circumstances.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Cost structure (strategic view)</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                The UK is typically a mid-to-premium cost market within Europe.
+              </li>
+              <li>
+                Costs should be evaluated as a full pathway: base cycle, lab add-ons, medications, and logistics.
+              </li>
+              <li>
+                We provide bounded ranges within advisory, not public price lists.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Logistics and travel (including accommodation)</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                International coordination is straightforward but requires structured planning.
+              </li>
+              <li>
+                We include <strong>accommodation</strong> recommendations near clinic access —
+                typically 2–3 vetted options focused on comfort and predictability.
+              </li>
+              <li>
+                The goal is minimal friction during a medically and emotionally significant process.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Clinic selection approach</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                We shortlist selectively (typically 4–5), not exhaustively.
+              </li>
+              <li>
+                We prioritize operational discipline and lab capability.
+              </li>
+              <li>
+                Decision support is structured around your personal constraints and jurisdiction.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* What we exclude */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+          <h3 className="text-xl font-medium">What we deliberately exclude (the private filter)</h3>
+          <div className="mt-5 grid md:grid-cols-2 gap-6">
+            <ul className="space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>Exhaustive clinic directories.</li>
+              <li>Generic marketing claims without fit analysis.</li>
+              <li>DIY regulatory navigation instructions.</li>
+            </ul>
+            <ul className="space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>Hotel comparison grids.</li>
+              <li>Static pricing tables without verification.</li>
+              <li>One-size-fits-all pathway templates.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="max-w-6xl mx-auto px-6 pb-16">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-10 text-center">
+          <h3 className="text-2xl font-medium">Private advisory, not a public database.</h3>
+          <p className="mt-4 max-w-2xl mx-auto text-[15px] leading-relaxed text-[#2A2A2A]">
+            If the United Kingdom is on your shortlist, the decisive step is verifying pathway fit
+            and clinic alignment within its regulatory structure. We curate, structure, and guide the execution.
+          </p>
+
+          <div className="mt-7 flex items-center justify-center">
+            <Link
+              href="/consultation"
+              className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+            >
+              Request Private Advisory Review
+            </Link>
+          </div>
+
+          <div className="mt-3 text-xs tracking-wide text-[#6A6256]">
+            Discreet, structured guidance aligned to your profile and jurisdictional constraints.
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
