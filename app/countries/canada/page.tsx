@@ -1,246 +1,236 @@
 import Link from "next/link";
 
-export default function CanadaDossierPage() {
-  const COUNTRY = "Canada";
-  const SLUG = "canada";
-
-  const PAGE_BG = "#F5F1E8";
-  const INK = "#1A1A1A";
-  const MUTED = "#6A6256";
-  const GOLD = "#B89B5E";
-  const BORDER = "#E5DDC8";
-  const CARD_BG = "#FBFAF7";
-
+export default function CanadaPage() {
   return (
-    <main
-      style={{
-        background: PAGE_BG,
-        color: INK,
-        minHeight: "100vh",
-        fontFamily:
-          'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif',
-      }}
-    >
-      {/* Header */}
-      <header
-        style={{
-          width: "100%",
-          borderBottom: `1px solid ${BORDER}`,
-          background: PAGE_BG,
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1120,
-            margin: "0 auto",
-            padding: "18px 20px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
+    <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
+      {/* Top utility bar */}
+      <div className="max-w-6xl mx-auto px-6 pt-10">
+        <div className="flex items-center justify-between">
           <Link
             href="/countries"
-            style={{
-              textDecoration: "none",
-              color: INK,
-              fontSize: 18,
-              letterSpacing: 0.5,
-            }}
-          >
-            FertilityCareHub
-          </Link>
-
-          <Link
-            href={`/countries/${SLUG}#consultation`}
-            style={{
-              textDecoration: "none",
-              border: `1px solid ${GOLD}`,
-              color: INK,
-              padding: "10px 14px",
-              borderRadius: 999,
-              fontSize: 13,
-              letterSpacing: 0.8,
-              textTransform: "uppercase",
-              background: "transparent",
-            }}
-          >
-            Request Private Advisory Review
-          </Link>
-        </div>
-      </header>
-
-      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "28px 20px 80px" }}>
-        {/* Back */}
-        <div>
-          <Link
-            href="/countries"
-            style={{ textDecoration: "none", color: MUTED, fontSize: 13 }}
+            className="text-sm tracking-wide text-[#6A6256] hover:text-[#1A1A1A]"
           >
             ← Back to countries
           </Link>
-        </div>
-
-        {/* Hero */}
-        <section style={{ paddingTop: 34, paddingBottom: 28, textAlign: "center" }}>
-          <div
-            style={{
-              fontSize: 12,
-              letterSpacing: 2.8,
-              textTransform: "uppercase",
-              color: MUTED,
-              marginBottom: 16,
-            }}
-          >
-            Strategic advisory dossier
-          </div>
-
-          <h1 style={{ margin: 0, fontSize: 56 }}>
-            {COUNTRY}
-          </h1>
-
-          <p
-            style={{
-              margin: "18px auto 0",
-              maxWidth: 860,
-              fontSize: 18,
-              lineHeight: 1.7,
-              color: "#3A342C",
-            }}
-          >
-            Canada is governance-driven, ethically structured, and medically strong.
-            It offers stability and inclusivity — but with regulatory boundaries
-            that require strategic clarity.
-          </p>
-        </section>
-
-        {/* 2 Column */}
-        <section
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 18,
-          }}
-        >
-          <div
-            style={{
-              background: CARD_BG,
-              border: `1px solid ${BORDER}`,
-              borderRadius: 18,
-              padding: 22,
-            }}
-          >
-            <h2>When Canada is the right choice</h2>
-            <ul style={{ paddingLeft: 18, lineHeight: 1.8 }}>
-              <li>Strong patient protections and transparent regulatory environment.</li>
-              <li>Inclusive access across diverse family structures.</li>
-              <li>High clinical standards with consistent lab quality.</li>
-              <li>Preference for structured, ethical frameworks over aggressive expansion.</li>
-            </ul>
-          </div>
-
-          <div
-            style={{
-              background: CARD_BG,
-              border: `1px solid ${BORDER}`,
-              borderRadius: 18,
-              padding: 22,
-            }}
-          >
-            <h2>When it’s not</h2>
-            <ul style={{ paddingLeft: 18, lineHeight: 1.8 }}>
-              <li>If you require commercial surrogacy frameworks.</li>
-              <li>If speed is your highest priority — timelines can vary by province.</li>
-              <li>If you prefer markets with highly flexible donor structures.</li>
-              <li>If cost sensitivity is extreme compared to emerging markets.</li>
-            </ul>
-          </div>
-        </section>
-
-        {/* Framework */}
-        <section style={{ marginTop: 40 }}>
-          <h2 style={{ textAlign: "center" }}>
-            Advisory framework for {COUNTRY}
-          </h2>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: 14,
-              marginTop: 20,
-            }}
-          >
-            {[
-              {
-                title: "Provincial structure",
-                text: "Each province operates differently; strategy must account for funding eligibility and access timelines.",
-              },
-              {
-                title: "Ethical alignment",
-                text: "Canada’s strength lies in stable ethical frameworks; align your goals with those guardrails.",
-              },
-              {
-                title: "Access planning",
-                text: "Plan for travel cadence and clinic communication carefully if coming internationally.",
-              },
-            ].map((card) => (
-              <div
-                key={card.title}
-                style={{
-                  background: CARD_BG,
-                  border: `1px solid ${BORDER}`,
-                  borderRadius: 16,
-                  padding: 18,
-                }}
-              >
-                <div style={{ fontWeight: 500 }}>{card.title}</div>
-                <div style={{ marginTop: 8, lineHeight: 1.7 }}>
-                  {card.text}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* CTA */}
-        <section id="consultation" style={{ marginTop: 60, textAlign: "center" }}>
-          <h2>Private advisory review</h2>
-          <p style={{ maxWidth: 800, margin: "12px auto", color: MUTED }}>
-            We assess Canada against your profile — regulatory fit,
-            timeline realities, and cross-border coordination.
-          </p>
 
           <Link
             href="/consultation"
-            style={{
-              display: "inline-block",
-              border: `1px solid ${GOLD}`,
-              padding: "12px 16px",
-              borderRadius: 999,
-              textDecoration: "none",
-              color: INK,
-              fontSize: 13,
-              letterSpacing: 1,
-              textTransform: "uppercase",
-            }}
+            className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-5 py-2 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
           >
             Review Canada Strategy Privately
           </Link>
-        </section>
+        </div>
       </div>
 
-      <style>{`
-        @media (max-width: 900px) {
-          section[style*="grid-template-columns: 1fr 1fr"] {
-            grid-template-columns: 1fr !important;
-          }
-          section[style*="repeat(3, 1fr)"] {
-            grid-template-columns: 1fr !important;
-          }
-          h1 { font-size: 40px !important; }
-        }
-      `}</style>
+      {/* Hero */}
+      <section className="max-w-6xl mx-auto px-6 pt-14 pb-10">
+        <div className="text-center">
+          <div className="text-xs tracking-[0.28em] text-[#6A6256]">
+            STRATEGIC ADVISORY DOSSIER
+          </div>
+
+          <h1 className="mt-5 text-5xl md:text-6xl leading-tight font-medium">
+            Canada
+          </h1>
+
+          <p className="mt-6 max-w-3xl mx-auto text-lg leading-relaxed text-[#2A2A2A]">
+            Canada is a governance-forward fertility market inside a clearly bounded ethical and
+            regulatory environment. The strategic advantage is trust — strict constraints, strong
+            clinical standards, and a predictable care culture. The tradeoff is that certain pathways
+            are deliberately limited by law and policy. This dossier outlines when Canada is the right
+            strategic fit and how to approach it with precision.
+          </p>
+        </div>
+      </section>
+
+      {/* Two-column decision block */}
+      <section className="max-w-6xl mx-auto px-6 pb-10">
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h2 className="text-xl font-medium">When Canada is the right choice</h2>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                You want a <strong>high-trust</strong> market with a conservative ethical framework.
+              </li>
+              <li>
+                Governance and transparency matter more than maximum pathway flexibility.
+              </li>
+              <li>
+                You prefer a structured process, clear patient communication, and stable clinical operations.
+              </li>
+              <li>
+                You value predictable post-treatment follow-up and continuity of care.
+              </li>
+              <li>
+                You want an “inside-the-system” approach with low reputational and regulatory risk.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h2 className="text-xl font-medium">When it’s not</h2>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                You require pathways that are restricted by Canada’s intentionally bounded framework.
+              </li>
+              <li>
+                You want the fastest timelines without variability (wait times can differ by province and clinic).
+              </li>
+              <li>
+                You are optimizing purely for lowest cost (Canada is not a low-cost medical tourism market).
+              </li>
+              <li>
+                You want a highly commercial marketplace model; Canada is deliberately not that.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Framework */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+          <h2 className="text-2xl font-medium">Advisor framework: how to evaluate Canada</h2>
+
+          <div className="mt-6 grid md:grid-cols-3 gap-6">
+            <div>
+              <div className="text-xs tracking-[0.25em] text-[#6A6256]">GOVERNANCE</div>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
+                Canada’s strength is a bounded, ethics-forward system. The strategic question is
+                whether those constraints align with your pathway needs.
+              </p>
+            </div>
+
+            <div>
+              <div className="text-xs tracking-[0.25em] text-[#6A6256]">CLINIC MODEL</div>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
+                We evaluate operations: lab stability, monitoring cadence, written planning, and how
+                the clinic handles complexity — not just brand recognition.
+              </p>
+            </div>
+
+            <div>
+              <div className="text-xs tracking-[0.25em] text-[#6A6256]">EXECUTION</div>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
+                Canada works best when you treat your pathway like a structured plan: documentation,
+                timing, travel cadence (if any), and follow-up mapped in advance.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Core sections */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Ethical boundaries (strategic implication)</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                Canada’s system is designed to reduce commercial exploitation and protect patient interests.
+              </li>
+              <li>
+                Some pathways are constrained by design; clarity is a feature, not a bug.
+              </li>
+              <li>
+                We map what the framework permits, what it restricts, and what your alternatives are.
+              </li>
+            </ul>
+            <p className="mt-5 text-sm text-[#6A6256]">
+              Note: the right market is the one that aligns with your pathway and risk profile.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Cost structure (strategic view)</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                Canada is typically a mid-to-premium market; it is not chosen primarily for low cost.
+              </li>
+              <li>
+                The correct evaluation is total cost: cycle + lab add-ons + meds/monitoring + storage + logistics.
+              </li>
+              <li>
+                We avoid public price tables; advisory provides bounded ranges and decision logic.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Logistics and travel (including accommodation)</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                Many clients prefer Canada for continuity and calm logistics.
+              </li>
+              <li>
+                If travel is required, we include <strong>accommodation</strong> as part of execution:
+                2–3 vetted options chosen for comfort and predictability.
+              </li>
+              <li>
+                The priority is reducing friction during treatment — not optimizing for “cheap stays.”
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Clinic selection approach</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                We shortlist selectively (typically 4–5), not exhaustively.
+              </li>
+              <li>
+                We prioritize lab stability, protocol clarity, and predictable communication cadence.
+              </li>
+              <li>
+                We structure the decision around your constraints, not generic “rankings.”
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* What we exclude */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+          <h3 className="text-xl font-medium">What we deliberately exclude (the private filter)</h3>
+          <div className="mt-5 grid md:grid-cols-2 gap-6">
+            <ul className="space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>Exhaustive clinic directories.</li>
+              <li>Hotel price comparison grids.</li>
+              <li>Generic claims without pathway fit analysis.</li>
+            </ul>
+            <ul className="space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>Static pricing tables without verification.</li>
+              <li>DIY bureaucracy playbooks (we coordinate with trusted partners).</li>
+              <li>One-size-fits-all templates.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="max-w-6xl mx-auto px-6 pb-16">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-10 text-center">
+          <h3 className="text-2xl font-medium">Private advisory, not a public database.</h3>
+          <p className="mt-4 max-w-2xl mx-auto text-[15px] leading-relaxed text-[#2A2A2A]">
+            If Canada is on your shortlist, the decisive step is aligning your pathway to the right clinic model
+            inside a bounded ethical framework — then mapping execution into a calm, predictable plan.
+          </p>
+
+          <div className="mt-7 flex items-center justify-center">
+            <Link
+              href="/consultation"
+              className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+            >
+              Request Private Advisory Review
+            </Link>
+          </div>
+
+          <div className="mt-3 text-xs tracking-wide text-[#6A6256]">
+            Discreet, structured guidance aligned to your profile and jurisdictional constraints.
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
