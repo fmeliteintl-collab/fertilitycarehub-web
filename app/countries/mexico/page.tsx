@@ -1,359 +1,239 @@
 import Link from "next/link";
 
-export default function MexicoDossierPage() {
-  const COUNTRY = "Mexico";
-  const SLUG = "mexico";
-
-  const PAGE_BG = "#F5F1E8";
-  const INK = "#1A1A1A";
-  const MUTED = "#6A6256";
-  const GOLD = "#B89B5E";
-  const BORDER = "#E5DDC8";
-  const CARD_BG = "#FBFAF7";
-
+export default function MexicoPage() {
   return (
-    <main
-      style={{
-        background: PAGE_BG,
-        color: INK,
-        minHeight: "100vh",
-        fontFamily:
-          'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif',
-      }}
-    >
-      {/* Header */}
-      <header
-        style={{
-          width: "100%",
-          borderBottom: `1px solid ${BORDER}`,
-          background: PAGE_BG,
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1120,
-            margin: "0 auto",
-            padding: "18px 20px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 16,
-          }}
-        >
+    <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
+      {/* Top utility bar */}
+      <div className="max-w-6xl mx-auto px-6 pt-10">
+        <div className="flex items-center justify-between">
           <Link
             href="/countries"
-            style={{
-              textDecoration: "none",
-              color: INK,
-              fontSize: 18,
-              letterSpacing: 0.5,
-            }}
-          >
-            FertilityCareHub
-          </Link>
-
-          <Link
-            href={`/countries/${SLUG}#consultation`}
-            style={{
-              textDecoration: "none",
-              border: `1px solid ${GOLD}`,
-              color: INK,
-              padding: "10px 14px",
-              borderRadius: 999,
-              fontSize: 13,
-              letterSpacing: 0.8,
-              textTransform: "uppercase",
-              whiteSpace: "nowrap",
-              background: "transparent",
-            }}
-          >
-            Request Private Advisory Review
-          </Link>
-        </div>
-      </header>
-
-      {/* Body */}
-      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "28px 20px 80px" }}>
-        {/* Back link */}
-        <div style={{ marginTop: 6 }}>
-          <Link
-            href="/countries"
-            style={{
-              textDecoration: "none",
-              color: MUTED,
-              fontSize: 13,
-              letterSpacing: 0.4,
-            }}
+            className="text-sm tracking-wide text-[#6A6256] hover:text-[#1A1A1A]"
           >
             ← Back to countries
           </Link>
+
+          <Link
+            href="/consultation"
+            className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-5 py-2 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+          >
+            Review Mexico Strategy Privately
+          </Link>
         </div>
-
-        {/* Hero */}
-        <section style={{ paddingTop: 34, paddingBottom: 28, textAlign: "center" }}>
-          <div
-            style={{
-              fontSize: 12,
-              letterSpacing: 2.8,
-              textTransform: "uppercase",
-              color: MUTED,
-              marginBottom: 16,
-            }}
-          >
-            Strategic advisory dossier
-          </div>
-
-          <h1
-            style={{
-              margin: 0,
-              fontSize: 56,
-              lineHeight: 1.05,
-              letterSpacing: -0.6,
-            }}
-          >
-            {COUNTRY}
-          </h1>
-
-          <p
-            style={{
-              margin: "18px auto 0",
-              maxWidth: 860,
-              fontSize: 18,
-              lineHeight: 1.7,
-              color: "#3A342C",
-            }}
-          >
-            Mexico is often a high-value option when you want proximity to North America, a broad
-            range of clinic offerings, and a faster operational cadence — but outcomes depend on
-            clinic selection discipline. The strategic edge is speed and access; the risk is variability.
-          </p>
-        </section>
-
-        {/* 2-up decision boxes */}
-        <section
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 18,
-            marginTop: 18,
-          }}
-        >
-          {/* Right choice */}
-          <div
-            style={{
-              background: CARD_BG,
-              border: `1px solid ${BORDER}`,
-              borderRadius: 18,
-              padding: "22px 22px",
-              boxShadow: "0 1px 0 rgba(0,0,0,0.02)",
-            }}
-          >
-            <h2 style={{ margin: 0, fontSize: 20, letterSpacing: -0.2 }}>
-              When Mexico is the right choice
-            </h2>
-
-            <ul style={{ margin: "16px 0 0", paddingLeft: 18, color: "#3A342C", lineHeight: 1.75 }}>
-              <li>
-                You want a <b>North America-adjacent</b> destination that reduces travel friction and supports faster scheduling.
-              </li>
-              <li>
-                You value <b>speed and access</b> and you’re willing to vet clinics carefully for lab quality and process integrity.
-              </li>
-              <li>
-                You want a pathway that can be <b>cost-efficient</b> while still maintaining high standards in top-tier centres.
-              </li>
-              <li>
-                You prefer practical coordination and are open to selecting a city based on clinic fit (not tourism).
-              </li>
-            </ul>
-          </div>
-
-          {/* Not */}
-          <div
-            style={{
-              background: CARD_BG,
-              border: `1px solid ${BORDER}`,
-              borderRadius: 18,
-              padding: "22px 22px",
-              boxShadow: "0 1px 0 rgba(0,0,0,0.02)",
-            }}
-          >
-            <h2 style={{ margin: 0, fontSize: 20, letterSpacing: -0.2 }}>When it’s not</h2>
-
-            <ul style={{ margin: "16px 0 0", paddingLeft: 18, color: "#3A342C", lineHeight: 1.75 }}>
-              <li>
-                You want the highest possible concentration of publicly reported outcome metrics as your main confidence signal.
-              </li>
-              <li>
-                You prefer a jurisdiction where regulation and governance are the dominant trust driver rather than clinic-level verification.
-              </li>
-              <li>
-                You want a “set-and-forget” path with no diligence — Mexico rewards selection discipline.
-              </li>
-              <li>
-                You are extremely risk-averse to variability in operational standards between clinics.
-              </li>
-            </ul>
-          </div>
-        </section>
-
-        {/* Advisory framework */}
-        <section style={{ marginTop: 34 }}>
-          <div style={{ textAlign: "center", marginBottom: 16 }}>
-            <h2 style={{ margin: 0, fontSize: 30, letterSpacing: -0.3 }}>
-              Advisory framework for {COUNTRY}
-            </h2>
-            <p
-              style={{
-                margin: "10px auto 0",
-                maxWidth: 820,
-                color: MUTED,
-                lineHeight: 1.7,
-                fontSize: 15,
-              }}
-            >
-              Mexico’s upside is operational momentum. Your job is to keep that momentum while controlling clinic selection risk.
-            </p>
-          </div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: 14,
-            }}
-          >
-            {[
-              {
-                title: "Clinic selection discipline",
-                text: "Lab quality, embryology leadership, and international workflow maturity matter more here than “brand” alone.",
-              },
-              {
-                title: "Cost structure transparency",
-                text: "Clarify what’s bundled vs. variable: monitoring, medications, lab add-ons, and re-visit costs.",
-              },
-              {
-                title: "Logistics realism",
-                text: "Plan time-in-country and travel cadence carefully to avoid delays and avoid compressing critical monitoring windows.",
-              },
-            ].map((c) => (
-              <div
-                key={c.title}
-                style={{
-                  background: CARD_BG,
-                  border: `1px solid ${BORDER}`,
-                  borderRadius: 16,
-                  padding: 18,
-                }}
-              >
-                <div style={{ fontSize: 16, marginBottom: 8, letterSpacing: -0.2 }}>{c.title}</div>
-                <div style={{ color: "#3A342C", lineHeight: 1.7, fontSize: 14 }}>{c.text}</div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* What we exclude */}
-        <section style={{ marginTop: 34 }}>
-          <div style={{ textAlign: "center", marginBottom: 16 }}>
-            <h2 style={{ margin: 0, fontSize: 30, letterSpacing: -0.3 }}>
-              The “private” filter — what we deliberately exclude
-            </h2>
-            <p
-              style={{
-                margin: "10px auto 0",
-                maxWidth: 860,
-                color: MUTED,
-                lineHeight: 1.7,
-                fontSize: 15,
-              }}
-            >
-              We keep this advisory-first. Data is backend intelligence — not front-end overwhelm.
-            </p>
-          </div>
-
-          <div
-            style={{
-              background: CARD_BG,
-              border: `1px solid ${BORDER}`,
-              borderRadius: 18,
-              padding: 22,
-            }}
-          >
-            <ul style={{ margin: 0, paddingLeft: 18, color: "#3A342C", lineHeight: 1.85 }}>
-              <li>❌ Exhaustive clinic lists (we curate a shortlist based on fit).</li>
-              <li>❌ DIY legal/visa instructions (we guide strategically and connect vetted support if needed).</li>
-              <li>❌ Hotel price spreadsheets (we recommend 2–3 stays that fit the medical traveler profile).</li>
-              <li>❌ Every procedure detail (we focus on the decision architecture and risk control).</li>
-            </ul>
-          </div>
-        </section>
-
-        {/* Consultation anchor */}
-        <section
-          id="consultation"
-          style={{
-            marginTop: 44,
-            paddingTop: 22,
-            borderTop: `1px solid ${BORDER}`,
-          }}
-        >
-          <div
-            style={{
-              background: CARD_BG,
-              border: `1px solid ${BORDER}`,
-              borderRadius: 18,
-              padding: 24,
-              textAlign: "center",
-            }}
-          >
-            <h2 style={{ margin: 0, fontSize: 28, letterSpacing: -0.2 }}>
-              Private advisory review
-            </h2>
-            <p style={{ margin: "12px auto 0", maxWidth: 820, color: MUTED, lineHeight: 1.7 }}>
-              If Mexico is on your shortlist, we’ll assess pathway fit against your profile (timeline,
-              eligibility, complexity, donor needs) and propose a structured plan.
-            </p>
-
-            <div style={{ marginTop: 18 }}>
-              <Link
-                href="/consultation"
-                style={{
-                  display: "inline-block",
-                  textDecoration: "none",
-                  border: `1px solid ${GOLD}`,
-                  padding: "12px 16px",
-                  borderRadius: 999,
-                  color: INK,
-                  fontSize: 13,
-                  letterSpacing: 0.9,
-                  textTransform: "uppercase",
-                  background: "transparent",
-                }}
-              >
-                Review {COUNTRY} Strategy Privately
-              </Link>
-
-              <div style={{ marginTop: 10, fontSize: 13, color: MUTED }}>
-                Discreet, structured guidance aligned to your profile and priorities.
-              </div>
-            </div>
-          </div>
-        </section>
       </div>
 
-      {/* Responsive */}
-      <style>{`
-        @media (max-width: 900px) {
-          section[style*="grid-template-columns: 1fr 1fr"] {
-            grid-template-columns: 1fr !important;
-          }
-          section div[style*="grid-template-columns: repeat(3, 1fr)"] {
-            grid-template-columns: 1fr !important;
-          }
-          h1 { font-size: 40px !important; }
-        }
-      `}</style>
+      {/* Hero */}
+      <section className="max-w-6xl mx-auto px-6 pt-14 pb-10">
+        <div className="text-center">
+          <div className="text-xs tracking-[0.28em] text-[#6A6256]">
+            STRATEGIC ADVISORY DOSSIER
+          </div>
+
+          <h1 className="mt-5 text-5xl md:text-6xl leading-tight font-medium">
+            Mexico
+          </h1>
+
+          <p className="mt-6 max-w-3xl mx-auto text-lg leading-relaxed text-[#2A2A2A]">
+            Mexico is often a strategic option because of proximity and cost structure — especially
+            for North American patients. The advantage is not “Mexico in general.” The advantage is a
+            carefully vetted clinic model and a pathway designed to avoid variability. This dossier
+            outlines when Mexico is the right call, when it isn’t, and how to evaluate it with precision.
+          </p>
+        </div>
+      </section>
+
+      {/* Two-column decision block */}
+      <section className="max-w-6xl mx-auto px-6 pb-10">
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h2 className="text-xl font-medium">When Mexico is the right choice</h2>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                You want a pathway where <strong>proximity</strong> reduces travel friction (US/Canada patients).
+              </li>
+              <li>
+                You’re optimizing for <strong>cost structure</strong>, but you still want strong standards and clean execution.
+              </li>
+              <li>
+                You want a clinic that supports <strong>compressed travel</strong> and remote coordination where possible.
+              </li>
+              <li>
+                You are comfortable with private-pay medicine and want a curated shortlist rather than a mass directory.
+              </li>
+              <li>
+                You want a plan that is structured like a project: milestones, documentation, timing, and accountability.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h2 className="text-xl font-medium">When it’s not</h2>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                You need the deepest possible multidisciplinary “top-of-stack” capability for a highly complex case.
+              </li>
+              <li>
+                You prefer a market where reporting, governance, and public outcomes data are your primary decision filter.
+              </li>
+              <li>
+                You are unwilling to do vetting; Mexico works when you select the right clinic model and avoid variability.
+              </li>
+              <li>
+                You want a one-size-fits-all pathway; Mexico requires <strong>precision clinic selection</strong>.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Framework */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+          <h2 className="text-2xl font-medium">Advisor framework: how to evaluate Mexico</h2>
+
+          <div className="mt-6 grid md:grid-cols-3 gap-6">
+            <div>
+              <div className="text-xs tracking-[0.25em] text-[#6A6256]">VETTING</div>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
+                Mexico is not “pick any clinic.” The value is unlocked only when clinic standards,
+                lab practice, and workflow quality are confirmed. We curate a shortlist and explain why.
+              </p>
+            </div>
+
+            <div>
+              <div className="text-xs tracking-[0.25em] text-[#6A6256]">EXECUTION</div>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
+                Your plan should be built like a project: remote coordination, monitoring cadence,
+                procedure timing, recovery, and a clean follow-up plan to reduce avoidable trips.
+              </p>
+            </div>
+
+            <div>
+              <div className="text-xs tracking-[0.25em] text-[#6A6256]">RISK MODEL</div>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
+                Your job is not to find the cheapest number. Your job is to minimize risk while achieving
+                a bounded, decision-grade cost range.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Core sections */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Clinic model and quality signals</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                Prefer clinics with clear lab leadership, consistent embryology staffing, and a disciplined process map.
+              </li>
+              <li>
+                Confirm communication cadence: who manages you, how fast results are returned, and what escalation looks like.
+              </li>
+              <li>
+                Ask for inclusion clarity (what’s included, what’s optional, and what’s priced separately).
+              </li>
+              <li>
+                Prioritize clinics that handle international patients regularly and have structured coordination.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Cost structure (strategic view)</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                Mexico can offer attractive cost structure — but only after you map the full pathway:
+                base cycle, lab add-ons, meds/monitoring, and travel cadence.
+              </li>
+              <li>
+                The objective is a <strong>bounded all-in range</strong> you can commit to.
+              </li>
+              <li>
+                We do not publish numbers unless verified and updated; advisory provides the clean band and logic.
+              </li>
+            </ul>
+            <p className="mt-5 text-sm text-[#6A6256]">
+              Note: “lowest price” is rarely the best decision in high-stakes medicine. We optimize for quality and execution.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Governance and documentation</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                Treat documentation as part of the plan: records, tests, and timelines should be set before travel.
+              </li>
+              <li>
+                Confirm what can be done remotely vs what requires on-site presence to avoid wasted trips.
+              </li>
+              <li>
+                If privacy matters, structure the pathway to minimize unnecessary data handling and third-party exposure.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Logistics and travel (including accommodation)</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                Mexico can be very efficient for short trips if the clinic supports compressed scheduling.
+              </li>
+              <li>
+                We include <strong>accommodation</strong> as part of execution: 2–3 vetted options near clinic access,
+                chosen for comfort, predictability, and low friction.
+              </li>
+              <li>
+                We avoid hotel price grids. The objective is calm, predictable logistics during a high-stakes process.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* What we exclude */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+          <h3 className="text-xl font-medium">What we deliberately exclude (the private filter)</h3>
+          <div className="mt-5 grid md:grid-cols-2 gap-6">
+            <ul className="space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>Exhaustive clinic lists (we curate a shortlist, not a directory).</li>
+              <li>DIY travel bureaucracy instructions (we coordinate with trusted partners).</li>
+              <li>Public encyclopedias and broad claims (we focus on decision-grade guidance).</li>
+            </ul>
+            <ul className="space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>Hotel price comparison tables (we recommend a small vetted shortlist).</li>
+              <li>Static numbers without verification (we prioritize accuracy and updates).</li>
+              <li>One-size-fits-all pathways (clinic selection + pathway fit is everything).</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="max-w-6xl mx-auto px-6 pb-16">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-10 text-center">
+          <h3 className="text-2xl font-medium">Private advisory, not a public database.</h3>
+          <p className="mt-4 max-w-2xl mx-auto text-[15px] leading-relaxed text-[#2A2A2A]">
+            If Mexico is on your shortlist, the decisive step is clinic vetting and a pathway that removes variability.
+            We’ll curate the shortlist, map the plan, and provide a clean execution route.
+          </p>
+
+          <div className="mt-7 flex items-center justify-center">
+            <Link
+              href="/consultation"
+              className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+            >
+              Request Private Advisory Review
+            </Link>
+          </div>
+
+          <div className="mt-3 text-xs tracking-wide text-[#6A6256]">
+            Discreet, structured guidance aligned to your profile and jurisdictional constraints.
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
