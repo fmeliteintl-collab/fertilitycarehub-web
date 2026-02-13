@@ -7,71 +7,82 @@ type Country = {
 };
 const COUNTRIES: Country[] = [
   {
-    slug: "spain",
-    name: "Spain",
-    status: "Live",
-    oneLiner: "A permissive, high-standard European option with strong donor and clinic depth.",
-  },
-  {
-    slug: "greece",
-    name: "Greece",
-    status: "Live",
-    oneLiner: "Value + accessibility in Europe, often strong for donor pathways and planning.",
-  },
-  {
-    slug: "portugal",
-    name: "Portugal",
-    status: "Live",
-    oneLiner: "A modern regulatory environment with growing clinic maturity and strong patient experience.",
-  },
-  {
-    slug: "czech-republic",
-    name: "Czech Republic",
-    status: "Live",
-    oneLiner: "A structured Central Europe choice with clear clinic models and predictable logistics.",
-  },
-  {
+  slug: "spain",
+  name: "Spain",
+  status: "Live",
+  oneLiner:
+    "A permissive, high-standard European option with strong donor and clinic depth.",
+},
+{
+  slug: "greece",
+  name: "Greece",
+  status: "Live",
+  oneLiner:
+    "Value + accessibility in Europe, often strong for donor pathways and planning.",
+},
+{
+  slug: "portugal",
+  name: "Portugal",
+  status: "Live",
+  oneLiner:
+    "A modern regulatory environment with growing clinic maturity and strong patient experience.",
+},
+{
+  slug: "czech-republic",
+  name: "Czech Republic",
+  status: "Live",
+  oneLiner:
+    "A structured Central Europe choice with clear clinic models and predictable logistics.",
+},
+{
   slug: "united-kingdom",
   name: "United Kingdom",
   status: "Live",
-  oneLiner: "Highly regulated (HFEA) with clear donor/surrogacy rules—strong when governance matters most.",
+  oneLiner:
+    "Highly regulated (HFEA) with clear donor rules—strong when governance matters most.",
 },
-  {
-    slug: "canada",
-    name: "Canada",
-    status: "Live",
-    oneLiner: "Governance-forward care within a structured, ethically bounded framework",
-  }
-  {
-    slug: "united-states",
-    name: "United States",
-    status: "Live",
-    oneLiner: "The premium benchmark for breadth—best when complexity requires top-tier capabilities.",
-  },
-  {
-    slug: "india",
-    name: "India",
-    status: "Live",
-    oneLiner: "Cost-differntiated, high-volume market where clinic selection is decisive.",
-  },
-  {
-    slug: "turkey",
-    name: "Turkey",
-    status: "Live",
-    oneLiner: "A cross-continental medical hub combiningt affordability with advanced private hospital infrastructure.",
-  },
-  {
-    slug: "mexico",
-    name: "Mexico",
-    status: "Live",
-    oneLiner: "A proximity and cost-structure option where vetting and standards selection are key.",
-  },
-  {
-    slug: "china",
-    name: "China",
-    status: "Live",
-    oneLiner: "A highly regulated domestic market wheer access and eligibility require careful navigation.",
-  },
+{
+  slug: "canada",
+  name: "Canada",
+  status: "Live",
+  oneLiner:
+    "Governance-forward care within a structured, ethically bounded framework.",
+},
+{
+  slug: "united-states",
+  name: "United States",
+  status: "Live",
+  oneLiner:
+    "The premium benchmark for breadth—best when complexity requires top-tier capabilities.",
+},
+{
+  slug: "india",
+  name: "India",
+  status: "Live",
+  oneLiner:
+    "Cost-differentiated, high-volume market where clinic selection is decisive.",
+},
+{
+  slug: "turkey",
+  name: "Turkey",
+  status: "Live",
+  oneLiner:
+    "A cross-continental medical hub combining affordability with advanced private hospital infrastructure.",
+},
+{
+  slug: "mexico",
+  name: "Mexico",
+  status: "Live",
+  oneLiner:
+    "A proximity and cost-structure option where vetting and standards selection are key.",
+},
+{
+  slug: "china",
+  name: "China",
+  status: "Live",
+  oneLiner:
+    "A highly regulated market where access and eligibility require careful navigation.",
+},
 ];
 export default function CountriesPage() {
   return (
