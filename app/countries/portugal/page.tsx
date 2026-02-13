@@ -1,362 +1,247 @@
 import Link from "next/link";
 
-export default function PortugalDossierPage() {
-  const COUNTRY = "Portugal";
-  const SLUG = "portugal";
-
-  const PAGE_BG = "#F5F1E8";
-  const INK = "#1A1A1A";
-  const MUTED = "#6A6256";
-  const GOLD = "#B89B5E";
-  const BORDER = "#E5DDC8";
-  const CARD_BG = "#FBFAF7";
-
+export default function PortugalPage() {
   return (
-    <main
-      style={{
-        background: PAGE_BG,
-        color: INK,
-        minHeight: "100vh",
-        fontFamily:
-          'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif',
-      }}
-    >
-      {/* Header */}
-      <header
-        style={{
-          width: "100%",
-          borderBottom: `1px solid ${BORDER}`,
-          background: PAGE_BG,
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1120,
-            margin: "0 auto",
-            padding: "18px 20px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 16,
-          }}
-        >
+    <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
+      {/* Top utility bar */}
+      <div className="max-w-6xl mx-auto px-6 pt-10">
+        <div className="flex items-center justify-between">
           <Link
             href="/countries"
-            style={{
-              textDecoration: "none",
-              color: INK,
-              fontSize: 18,
-              letterSpacing: 0.5,
-            }}
-          >
-            FertilityCareHub
-          </Link>
-
-          <Link
-            href={`/countries/${SLUG}#consultation`}
-            style={{
-              textDecoration: "none",
-              border: `1px solid ${GOLD}`,
-              color: INK,
-              padding: "10px 14px",
-              borderRadius: 999,
-              fontSize: 13,
-              letterSpacing: 0.8,
-              textTransform: "uppercase",
-              whiteSpace: "nowrap",
-              background: "transparent",
-            }}
-          >
-            Request Private Advisory Review
-          </Link>
-        </div>
-      </header>
-
-      {/* Body */}
-      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "28px 20px 80px" }}>
-        {/* Back link */}
-        <div style={{ marginTop: 6 }}>
-          <Link
-            href="/countries"
-            style={{
-              textDecoration: "none",
-              color: MUTED,
-              fontSize: 13,
-              letterSpacing: 0.4,
-            }}
+            className="text-sm tracking-wide text-[#6A6256] hover:text-[#1A1A1A]"
           >
             ← Back to countries
           </Link>
+
+          <Link
+            href="/consultation"
+            className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-5 py-2 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+          >
+            Review Portugal Strategy Privately
+          </Link>
         </div>
-
-        {/* Hero */}
-        <section style={{ paddingTop: 34, paddingBottom: 28, textAlign: "center" }}>
-          <div
-            style={{
-              fontSize: 12,
-              letterSpacing: 2.8,
-              textTransform: "uppercase",
-              color: MUTED,
-              marginBottom: 16,
-            }}
-          >
-            Strategic advisory dossier
-          </div>
-
-          <h1
-            style={{
-              margin: 0,
-              fontSize: 56,
-              lineHeight: 1.05,
-              letterSpacing: -0.6,
-            }}
-          >
-            {COUNTRY}
-          </h1>
-
-          <p
-            style={{
-              margin: "18px auto 0",
-              maxWidth: 860,
-              fontSize: 18,
-              lineHeight: 1.7,
-              color: "#3A342C",
-            }}
-          >
-            Portugal can be a disciplined European option when you want a calm operational
-            environment and clear planning. Its advantage is often a balanced “quality-to-friction”
-            profile — but success depends on choosing clinics that communicate well and run
-            predictable international workflows.
-          </p>
-        </section>
-
-        {/* 2-up decision boxes */}
-        <section
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 18,
-            marginTop: 18,
-          }}
-        >
-          {/* Right choice */}
-          <div
-            style={{
-              background: CARD_BG,
-              border: `1px solid ${BORDER}`,
-              borderRadius: 18,
-              padding: "22px 22px",
-              boxShadow: "0 1px 0 rgba(0,0,0,0.02)",
-            }}
-          >
-            <h2 style={{ margin: 0, fontSize: 20, letterSpacing: -0.2 }}>
-              When Portugal is the right choice
-            </h2>
-
-            <ul style={{ margin: "16px 0 0", paddingLeft: 18, color: "#3A342C", lineHeight: 1.75 }}>
-              <li>
-                You want a European pathway with <b>balanced planning</b> — good clinical standards without
-                aggressive bureaucracy.
-              </li>
-              <li>
-                You value a <b>calmer, more coordinated experience</b> and prefer a “measured” pace.
-              </li>
-              <li>
-                You’re comparing within Europe and want a destination that can be <b>high value when clinic-selected carefully</b>.
-              </li>
-              <li>
-                You want reasonable access and a destination that supports a <b>comfortable recovery environment</b>.
-              </li>
-            </ul>
-          </div>
-
-          {/* Not */}
-          <div
-            style={{
-              background: CARD_BG,
-              border: `1px solid ${BORDER}`,
-              borderRadius: 18,
-              padding: "22px 22px",
-              boxShadow: "0 1px 0 rgba(0,0,0,0.02)",
-            }}
-          >
-            <h2 style={{ margin: 0, fontSize: 20, letterSpacing: -0.2 }}>When it’s not</h2>
-
-            <ul style={{ margin: "16px 0 0", paddingLeft: 18, color: "#3A342C", lineHeight: 1.75 }}>
-              <li>
-                You need the most “industrial-scale” donor ecosystem and want the largest possible system maturity signals (Spain may lead).
-              </li>
-              <li>
-                Your case is highly complex and you want the broadest subspecialist bench and research depth (U.S. top hubs may fit).
-              </li>
-              <li>
-                You want a highly standardized government-level reporting environment as your primary confidence signal.
-              </li>
-              <li>
-                You need maximum speed regardless of clinic load — Portugal can be strong, but timelines vary by clinic.
-              </li>
-            </ul>
-          </div>
-        </section>
-
-        {/* Advisory framework */}
-        <section style={{ marginTop: 34 }}>
-          <div style={{ textAlign: "center", marginBottom: 16 }}>
-            <h2 style={{ margin: 0, fontSize: 30, letterSpacing: -0.3 }}>
-              Advisory framework for {COUNTRY}
-            </h2>
-            <p
-              style={{
-                margin: "10px auto 0",
-                maxWidth: 820,
-                color: MUTED,
-                lineHeight: 1.7,
-                fontSize: 15,
-              }}
-            >
-              This page is a decision structure. We curate what matters, remove noise, and
-              prevent expensive missteps.
-            </p>
-          </div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: 14,
-            }}
-          >
-            {[
-              {
-                title: "Eligibility & pathway fit",
-                text: "Clarify who qualifies, what is realistic for your profile, and where friction typically emerges.",
-              },
-              {
-                title: "Clinic selection signals",
-                text: "Assess international workflow maturity, communication quality, and operational reliability.",
-              },
-              {
-                title: "Planning & logistics realism",
-                text: "Travel cadence, time-in-country expectations, and practical sequencing to reduce delays.",
-              },
-            ].map((c) => (
-              <div
-                key={c.title}
-                style={{
-                  background: CARD_BG,
-                  border: `1px solid ${BORDER}`,
-                  borderRadius: 16,
-                  padding: 18,
-                }}
-              >
-                <div style={{ fontSize: 16, marginBottom: 8, letterSpacing: -0.2 }}>{c.title}</div>
-                <div style={{ color: "#3A342C", lineHeight: 1.7, fontSize: 14 }}>{c.text}</div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* What we exclude */}
-        <section style={{ marginTop: 34 }}>
-          <div style={{ textAlign: "center", marginBottom: 16 }}>
-            <h2 style={{ margin: 0, fontSize: 30, letterSpacing: -0.3 }}>
-              The “private” filter — what we deliberately exclude
-            </h2>
-            <p
-              style={{
-                margin: "10px auto 0",
-                maxWidth: 860,
-                color: MUTED,
-                lineHeight: 1.7,
-                fontSize: 15,
-              }}
-            >
-              You are not here for a database. You’re here for clarity.
-            </p>
-          </div>
-
-          <div
-            style={{
-              background: CARD_BG,
-              border: `1px solid ${BORDER}`,
-              borderRadius: 18,
-              padding: 22,
-            }}
-          >
-            <ul style={{ margin: 0, paddingLeft: 18, color: "#3A342C", lineHeight: 1.85 }}>
-              <li>❌ Exhaustive clinic lists (we curate 4–5, not 400).</li>
-              <li>❌ DIY visa/legal step-by-step (we guide strategically, and connect vetted partners where needed).</li>
-              <li>❌ Hotel price tables (we recommend a small set of reliable stays when relevant).</li>
-              <li>❌ Every treatment detail (we focus on decision points and risk control).</li>
-            </ul>
-          </div>
-        </section>
-
-        {/* Consultation anchor */}
-        <section
-          id="consultation"
-          style={{
-            marginTop: 44,
-            paddingTop: 22,
-            borderTop: `1px solid ${BORDER}`,
-          }}
-        >
-          <div
-            style={{
-              background: CARD_BG,
-              border: `1px solid ${BORDER}`,
-              borderRadius: 18,
-              padding: 24,
-              textAlign: "center",
-            }}
-          >
-            <h2 style={{ margin: 0, fontSize: 28, letterSpacing: -0.2 }}>
-              Private advisory review
-            </h2>
-            <p style={{ margin: "12px auto 0", maxWidth: 820, color: MUTED, lineHeight: 1.7 }}>
-              If Portugal is on your shortlist, we’ll assess fit against your profile (timeline, eligibility,
-              donor pathway, complexity) and propose a structured next-step plan.
-            </p>
-
-            <div style={{ marginTop: 18 }}>
-              <Link
-                href="/consultation"
-                style={{
-                  display: "inline-block",
-                  textDecoration: "none",
-                  border: `1px solid ${GOLD}`,
-                  padding: "12px 16px",
-                  borderRadius: 999,
-                  color: INK,
-                  fontSize: 13,
-                  letterSpacing: 0.9,
-                  textTransform: "uppercase",
-                  background: "transparent",
-                }}
-              >
-                Review {COUNTRY} Strategy Privately
-              </Link>
-
-              <div style={{ marginTop: 10, fontSize: 13, color: MUTED }}>
-                Discreet, structured guidance aligned to your profile and priorities.
-              </div>
-            </div>
-          </div>
-        </section>
       </div>
 
-      {/* Responsive */}
-      <style>{`
-        @media (max-width: 900px) {
-          section[style*="grid-template-columns: 1fr 1fr"] {
-            grid-template-columns: 1fr !important;
-          }
-          section div[style*="grid-template-columns: repeat(3, 1fr)"] {
-            grid-template-columns: 1fr !important;
-          }
-          h1 { font-size: 40px !important; }
-        }
-      `}</style>
+      {/* Hero */}
+      <section className="max-w-6xl mx-auto px-6 pt-14 pb-10">
+        <div className="text-center">
+          <div className="text-xs tracking-[0.28em] text-[#6A6256]">
+            STRATEGIC ADVISORY DOSSIER
+          </div>
+
+          <h1 className="mt-5 text-5xl md:text-6xl leading-tight font-medium">
+            Portugal
+          </h1>
+
+          <p className="mt-6 max-w-3xl mx-auto text-lg leading-relaxed text-[#2A2A2A]">
+            Portugal is a modern, regulation-forward European option with a growing clinic ecosystem.
+            The advantage is often “balanced execution”: a structured environment, improving maturity,
+            and a patient experience that can be excellent when you select the right clinic model.
+            This dossier outlines when Portugal is strategically strong — and when another country is
+            the cleaner choice.
+          </p>
+        </div>
+      </section>
+
+      {/* Two-column decision block */}
+      <section className="max-w-6xl mx-auto px-6 pb-10">
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h2 className="text-xl font-medium">When Portugal is the right choice</h2>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                You want a European option that feels <strong>modern and structured</strong>, with
+                improving clinic maturity.
+              </li>
+              <li>
+                You value a pathway where <strong>governance and documentation</strong> are handled clearly,
+                and you want fewer “grey areas.”
+              </li>
+              <li>
+                You want a strong <strong>patient experience</strong> and a clinic that communicates well and
+                plans proactively.
+              </li>
+              <li>
+                You want a market that can be <strong>strategically efficient</strong> when the clinic model is right
+                (good logistics, good planning cadence).
+              </li>
+              <li>
+                You prefer a curated shortlist over a broad database — and want the selection logic explained.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h2 className="text-xl font-medium">When it’s not</h2>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                Your primary objective is the <strong>fastest possible timeline</strong> and you want maximum scheduling
+                flexibility regardless of clinic demand.
+              </li>
+              <li>
+                Your case is highly complex and you want the deepest possible multidisciplinary capability
+                (some clients prefer the US for this).
+              </li>
+              <li>
+                You are optimizing for the most permissive donor ecosystem as the top variable — another country may fit better.
+              </li>
+              <li>
+                You want a fully DIY process; Portugal performs best with structured planning and coordination.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Framework */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+          <h2 className="text-2xl font-medium">Advisor framework: how to evaluate Portugal</h2>
+
+          <div className="mt-6 grid md:grid-cols-3 gap-6">
+            <div>
+              <div className="text-xs tracking-[0.25em] text-[#6A6256]">CLINIC MATURITY</div>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
+                Portugal’s advantage comes from choosing clinics with strong operational cadence:
+                consistent protocols, clean timelines, and good patient communication. We prioritize
+                <strong> repeatable execution</strong>, not marketing.
+              </p>
+            </div>
+
+            <div>
+              <div className="text-xs tracking-[0.25em] text-[#6A6256]">PATHWAY FIT</div>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
+                The right pathway is defined by your profile: timeline tolerance, donor needs, privacy,
+                and travel cadence. Portugal is strong when your plan benefits from a <strong>structured framework</strong>.
+              </p>
+            </div>
+
+            <div>
+              <div className="text-xs tracking-[0.25em] text-[#6A6256]">TRANSPARENCY</div>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
+                We require clarity: what’s included, what’s optional, and how add-ons are priced. Your
+                deliverable is a <strong>bounded cost map</strong> — not surprises.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Core sections */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Clinic standards and patient experience</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                Prefer clinics with a disciplined process map: monitoring cadence, retrieval/transfer scheduling,
+                and clear communication checkpoints.
+              </li>
+              <li>
+                Ask what is standardized vs customized — you want a plan that can adapt without becoming unpredictable.
+              </li>
+              <li>
+                Confirm how the clinic handles out-of-country coordination (records, remote consults, and travel compression).
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Cost structure (strategic view)</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                Portugal can be attractive when you want a clean private-pay pathway with a rational cost structure —
+                but always confirm inclusions.
+              </li>
+              <li>
+                Separate costs into: base cycle, lab add-ons, meds/monitoring, and travel cadence.
+              </li>
+              <li>
+                Your goal is a <strong>decision-grade range</strong> you can commit to, not a theoretical minimum.
+              </li>
+            </ul>
+            <p className="mt-5 text-sm text-[#6A6256]">
+              Note: we avoid publishing numbers unless verified and updated. In advisory, we provide a clear band
+              and the logic behind it.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Governance and eligibility</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                Confirm eligibility and documentation early — Portugal is best when administration is handled upfront.
+              </li>
+              <li>
+                If privacy matters, structure coordination to minimize exposure and reduce unnecessary third-party handling.
+              </li>
+              <li>
+                Treat governance as part of your risk model: predictable rules are an advantage when your case has constraints.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Logistics and travel (including accommodation)</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                Plan travel around monitoring cadence and transfer timing; Portugal can work well with compressed trips.
+              </li>
+              <li>
+                We include <strong>accommodation</strong> as part of the plan: 2–3 vetted options near clinic access,
+                chosen for comfort, predictability, and low friction.
+              </li>
+              <li>
+                We avoid hotel price tables. The objective is execution quality, not “deal hunting.”
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* What we exclude */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+          <h3 className="text-xl font-medium">What we deliberately exclude (the private filter)</h3>
+          <div className="mt-5 grid md:grid-cols-2 gap-6">
+            <ul className="space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>Exhaustive clinic lists (we curate a shortlist, not a database).</li>
+              <li>DIY administrative/visa playbooks (we coordinate with trusted partners).</li>
+              <li>Overly broad treatment encyclopedias (we focus on strategic decisions).</li>
+            </ul>
+            <ul className="space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>Hotel price grids (we recommend 2–3 vetted options for smooth execution).</li>
+              <li>Unverified claims and static numbers (we prioritize accuracy and updates).</li>
+              <li>One-size-fits-all advice (pathway fit is the product).</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="max-w-6xl mx-auto px-6 pb-16">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-10 text-center">
+          <h3 className="text-2xl font-medium">Private advisory, not a public database.</h3>
+          <p className="mt-4 max-w-2xl mx-auto text-[15px] leading-relaxed text-[#2A2A2A]">
+            If Portugal is on your shortlist, the decisive step is aligning your pathway to the right clinic model,
+            timelines, and governance constraints. We’ll structure the plan, curate the shortlist, and provide a clean
+            execution route.
+          </p>
+
+          <div className="mt-7 flex items-center justify-center">
+            <Link
+              href="/consultation"
+              className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+            >
+              Request Private Advisory Review
+            </Link>
+          </div>
+
+          <div className="mt-3 text-xs tracking-wide text-[#6A6256]">
+            Discreet, structured guidance aligned to your profile and jurisdictional constraints.
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
