@@ -1,264 +1,250 @@
 import Link from "next/link";
 
-export default function GreeceDossierPage() {
-  const PAGE_BG = "#F5F1E8";
-  const INK = "#1A1A1A";
-  const MUTED = "#5F5F5F";
-  const GOLD = "#B89B5E";
-  const BORDER = "#E5DDC8";
-  const CARD_BG = "rgba(255,255,255,0.55)";
-
-  const container: React.CSSProperties = {
-    maxWidth: 1120,
-    margin: "0 auto",
-    padding: "40px 24px 80px",
-  };
-
-  const topRow: React.CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 16,
-    marginBottom: 28,
-  };
-
-  const backLink: React.CSSProperties = {
-    color: GOLD,
-    textDecoration: "none",
-    fontSize: 14,
-    letterSpacing: 0.2,
-  };
-
-  const ctaBtn: React.CSSProperties = {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "10px 16px",
-    border: `1px solid ${GOLD}`,
-    borderRadius: 999,
-    color: INK,
-    background: "transparent",
-    textDecoration: "none",
-    fontSize: 13,
-    letterSpacing: 0.2,
-    whiteSpace: "nowrap",
-  };
-
-  const label: React.CSSProperties = {
-    fontSize: 12,
-    letterSpacing: 2.2,
-    color: MUTED,
-    textTransform: "uppercase",
-    marginBottom: 12,
-  };
-
-  const h1: React.CSSProperties = {
-    fontSize: 56,
-    lineHeight: 1.05,
-    letterSpacing: -0.8,
-    margin: 0,
-    color: INK,
-  };
-
-  const intro: React.CSSProperties = {
-    maxWidth: 820,
-    marginTop: 18,
-    fontSize: 18,
-    lineHeight: 1.7,
-    color: "#2A2A2A",
-  };
-
-  const grid: React.CSSProperties = {
-    display: "grid",
-    gridTemplateColumns: "1fr",
-    gap: 18,
-    marginTop: 34,
-  };
-
-  const twoCol: React.CSSProperties = {
-    display: "grid",
-    gridTemplateColumns: "1fr",
-    gap: 18,
-    marginTop: 18,
-  };
-
-  const card: React.CSSProperties = {
-    background: CARD_BG,
-    border: `1px solid ${BORDER}`,
-    borderRadius: 18,
-    padding: "22px 22px",
-  };
-
-  const cardTitle: React.CSSProperties = {
-    margin: 0,
-    marginBottom: 12,
-    fontSize: 18,
-    letterSpacing: -0.2,
-    color: INK,
-  };
-
-  const ul: React.CSSProperties = {
-    margin: 0,
-    paddingLeft: 18,
-    color: "#2A2A2A",
-    lineHeight: 1.8,
-    fontSize: 15.5,
-  };
-
-  const sectionTitle: React.CSSProperties = {
-    margin: 0,
-    marginTop: 34,
-    marginBottom: 10,
-    fontSize: 22,
-    letterSpacing: -0.3,
-    color: INK,
-  };
-
-  const small: React.CSSProperties = {
-    marginTop: 10,
-    fontSize: 13,
-    color: "#6A6A6A",
-    lineHeight: 1.65,
-  };
-
-  const divider: React.CSSProperties = {
-    height: 1,
-    background: BORDER,
-    marginTop: 34,
-  };
-
+export default function GreecePage() {
   return (
-    <main style={{ background: PAGE_BG, color: INK, minHeight: "100vh" }}>
-      <div style={container}>
-        {/* Top navigation */}
-        <div style={topRow}>
-          <Link href="/countries" style={backLink}>
+    <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
+      {/* Top utility bar */}
+      <div className="max-w-6xl mx-auto px-6 pt-10">
+        <div className="flex items-center justify-between">
+          <Link
+            href="/countries"
+            className="text-sm tracking-wide text-[#6A6256] hover:text-[#1A1A1A]"
+          >
             ← Back to countries
           </Link>
 
-          <Link href="/consultation" style={ctaBtn}>
+          <Link
+            href="/consultation"
+            className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-5 py-2 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+          >
             Review Greece Strategy Privately
           </Link>
         </div>
+      </div>
 
-        {/* Header */}
-        <div style={{ textAlign: "center", paddingTop: 12 }}>
-          <div style={label}>Strategic advisory dossier</div>
-          <h1 style={h1}>Greece</h1>
+      {/* Hero */}
+      <section className="max-w-6xl mx-auto px-6 pt-14 pb-10">
+        <div className="text-center">
+          <div className="text-xs tracking-[0.28em] text-[#6A6256]">
+            STRATEGIC ADVISORY DOSSIER
+          </div>
 
-          <p style={intro}>
-            Greece can be a high-value European pathway when you want cost discipline without
-            abandoning EU-grade clinic expectations. The tradeoff is variability: standards differ
-            by clinic, and donor/surrogacy planning requires precision. This dossier clarifies when
-            Greece is strategically strong, when it isn’t, and how to vet it properly.
+          <h1 className="mt-5 text-5xl md:text-6xl leading-tight font-medium">
+            Greece
+          </h1>
+
+          <p className="mt-6 max-w-3xl mx-auto text-lg leading-relaxed text-[#2A2A2A]">
+            Greece is often the “quietly optimal” European option: comparatively accessible,
+            typically cost-favorable versus Western Europe, and frequently strong for donor pathways.
+            The advantage is not that Greece is permissive in every dimension — it’s that outcomes can
+            be excellent when you select the right clinic model and align the pathway to your profile.
           </p>
         </div>
+      </section>
 
-        {/* Core decision cards */}
-        <div style={twoCol}>
-          <div style={card}>
-            <h2 style={cardTitle}>When Greece is the right choice</h2>
-            <ul style={ul}>
+      {/* Two-column decision block */}
+      <section className="max-w-6xl mx-auto px-6 pb-10">
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h2 className="text-xl font-medium">When Greece is the right choice</h2>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
               <li>
-                You want a European option with stronger affordability, while still targeting
-                modern labs and experienced international clinics.
+                You want a European setting with <strong>strong value</strong> and a wide range of
+                private-clinic options.
               </li>
               <li>
-                You value flexible donor pathways and are willing to choose a clinic based on
-                specific lab quality signals, not marketing.
+                Your pathway benefits from <strong>donor planning</strong>, and you want a clinic that
+                runs donor workflows efficiently.
               </li>
               <li>
-                You are planning with a defined budget ceiling and want transparency on what is
-                included vs. add-on costs.
+                You want <strong>shorter lead times</strong> relative to some higher-demand markets.
               </li>
               <li>
-                You can commit to a structured clinic-selection process (shortlist, verification,
-                and disciplined comparisons).
+                You are comfortable with a <strong>private-pay environment</strong> and you want clarity on
+                total cost structure upfront.
+              </li>
+              <li>
+                You want a country where a “curated shortlist” of clinics (not a database) can deliver
+                an excellent outcome with strong oversight.
               </li>
             </ul>
           </div>
 
-          <div style={card}>
-            <h2 style={cardTitle}>When it’s not</h2>
-            <ul style={ul}>
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h2 className="text-xl font-medium">When it’s not</h2>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
               <li>
-                You need “best-in-world” breadth across complex cases and want the deepest bench of
-                subspecialists.
+                You require the most conservative, governance-heavy structure and public reporting norms
+                as your primary filter.
               </li>
               <li>
-                You prefer a jurisdiction where public reporting and governance are the primary
-                confidence signal (rather than clinic-level verification).
+                Your case is highly complex and needs a “top-of-stack” multidisciplinary center with very
+                broad specialist depth (some clients prefer the US for this).
               </li>
               <li>
-                You want a highly standardized experience without spending time on vetting and
-                comparative diligence.
+                You prefer a pathway where every administrative layer is standardized across the entire country;
+                Greece can vary by clinic model.
               </li>
               <li>
-                You have a low tolerance for administrative friction across translations, paperwork,
-                and coordination.
+                You want a fully DIY process — Greece works best with <strong>structured planning</strong> and
+                clear vetting.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Framework */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+          <h2 className="text-2xl font-medium">Advisor framework: how to evaluate Greece</h2>
+
+          <div className="mt-6 grid md:grid-cols-3 gap-6">
+            <div>
+              <div className="text-xs tracking-[0.25em] text-[#6A6256]">CLINIC MODEL</div>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
+                The biggest determinant is <strong>clinic selection</strong>: lab standards, physician cadence,
+                donor coordination, and transparency norms. Greece rewards a curated shortlist.
+              </p>
+            </div>
+
+            <div>
+              <div className="text-xs tracking-[0.25em] text-[#6A6256]">PATHWAY FIT</div>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
+                Align donor needs, timeline tolerance, and travel cadence with a clinic’s workflow.
+                When matched correctly, Greece can be both efficient and high-quality.
+              </p>
+            </div>
+
+            <div>
+              <div className="text-xs tracking-[0.25em] text-[#6A6256]">TRANSPARENCY</div>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
+                Insist on clarity: what’s included, what’s not, and how add-ons are priced.
+                The goal is a <strong>clean cost map</strong>, not surprises.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Core sections */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Clinic standards and lab signals</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                Prefer clinics with demonstrated <strong>lab leadership</strong> and consistent embryology staffing.
+              </li>
+              <li>
+                Ask for an explicit process map: stimulation, monitoring, retrieval, lab, transfer, follow-up cadence.
+              </li>
+              <li>
+                Confirm reporting clarity (even if not a public-reporting regime): success framing, denominators,
+                and what “success” means per pathway.
+              </li>
+              <li>
+                Prioritize mature donor coordination workflows if donor is central to your plan.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Cost structure (strategic view)</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                Greece is often attractive because the “all-in” private pathway can be more predictable than
+                Western Europe — <strong>if</strong> you confirm inclusions.
+              </li>
+              <li>
+                Separate costs into: base cycle, lab add-ons, donor coordination, meds/monitoring, and travel cadence.
+              </li>
+              <li>
+                Your goal is a <strong>bounded range</strong> you can commit to, not a theoretical minimum.
+              </li>
+            </ul>
+            <p className="mt-5 text-sm text-[#6A6256]">
+              Note: we keep numbers out of the public dossier unless verified and updated. In advisory, we provide
+              a clean band and the decision logic behind it.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Eligibility and governance notes</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                Treat governance as a <strong>clinic + pathway</strong> question, not only a country question.
+              </li>
+              <li>
+                Confirm what documentation is required, what can be coordinated remotely, and what must be done on-site.
+              </li>
+              <li>
+                If your situation is sensitive (timing, privacy, donor pathway complexity), we structure the plan so you
+                avoid avoidable friction.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Logistics and travel (including accommodation)</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                Greece is typically travel-friendly; plan around monitoring cadence and transfer timing.
+              </li>
+              <li>
+                We include <strong>accommodation</strong> as part of the plan: 2–3 vetted options near clinic access,
+                chosen for predictability, comfort, and low friction.
+              </li>
+              <li>
+                We avoid “hotel price comparison tables.” Instead: a small, reliable shortlist aligned to your travel style.
               </li>
             </ul>
           </div>
         </div>
+      </section>
 
-        {/* What matters most */}
-        <h3 style={sectionTitle}>What matters most in Greece</h3>
-        <div style={grid}>
-          <div style={card}>
-            <h2 style={cardTitle}>The “private” filter (what we focus on)</h2>
-            <ul style={ul}>
-              <li>
-                Clinic selection is the main risk reducer: lab maturity, embryology leadership, and
-                international patient process quality.
-              </li>
-              <li>
-                Donor pathway clarity: what is permitted, what is typical, and what varies by clinic.
-              </li>
-              <li>
-                Cost structure transparency: what’s bundled, what’s variable, and what usually surprises
-                families.
-              </li>
-              <li>
-                Logistics realism: time in-country, sequencing, and where delays happen (and how to
-                avoid them).
-              </li>
+      {/* What we exclude */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+          <h3 className="text-xl font-medium">What we deliberately exclude (the private filter)</h3>
+          <div className="mt-5 grid md:grid-cols-2 gap-6">
+            <ul className="space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>Exhaustive clinic lists (we curate a shortlist, not 300 options).</li>
+              <li>DIY visa/playbook instructions (we provide trusted coordination, not bureaucracy).</li>
+              <li>Public “database style” treatment encyclopedias (we focus on strategic decisions).</li>
             </ul>
-          </div>
-
-          <div style={card}>
-            <h2 style={cardTitle}>Common failure modes (avoid these)</h2>
-            <ul style={ul}>
-              <li>Choosing based on price or marketing rather than lab signals.</li>
-              <li>Assuming all clinics operate at the same standard level.</li>
-              <li>Underestimating coordination: medication timing, travel cadence, and admin steps.</li>
-              <li>Letting the pathway be designed “for you” instead of building a strategic plan first.</li>
+            <ul className="space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>Hotel price grids (we recommend 2–3 vetted options; the goal is smooth execution).</li>
+              <li>Overly broad claims without verification (we prioritize accuracy and updated intel).</li>
+              <li>One-size-fits-all advice (pathway fit is the product).</li>
             </ul>
           </div>
         </div>
+      </section>
 
-        {/* CTA block */}
-        <div style={divider} />
+      {/* CTA */}
+      <section className="max-w-6xl mx-auto px-6 pb-16">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-10 text-center">
+          <h3 className="text-2xl font-medium">Private advisory, not a public database.</h3>
+          <p className="mt-4 max-w-2xl mx-auto text-[15px] leading-relaxed text-[#2A2A2A]">
+            If Greece is on your shortlist, the decisive step is selecting the right clinic model and structuring the
+            pathway around your profile. We’ll map the plan, vet the shortlist, and provide a clean execution route.
+          </p>
 
-        <section style={{ marginTop: 34 }}>
-          <div style={{ ...card, textAlign: "center", padding: "26px 22px" }}>
-            <div style={label}>Private advisory</div>
-            <div style={{ fontSize: 20, letterSpacing: -0.2 }}>
-              If Greece is on your shortlist, the decision is mostly about <b>clinic selection</b> and{" "}
-              <b>pathway fit</b>.
-            </div>
-
-            <div style={{ marginTop: 18 }}>
-              <Link href="/consultation" style={ctaBtn}>
-                Review Greece Strategy Privately
-              </Link>
-            </div>
-
-            <div style={small}>
-              Discreet, structured guidance aligned to your profile — not a public database.
-            </div>
+          <div className="mt-7 flex items-center justify-center">
+            <Link
+              href="/consultation"
+              className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+            >
+              Request Private Advisory Review
+            </Link>
           </div>
-        </section>
-      </div>
+
+          <div className="mt-3 text-xs tracking-wide text-[#6A6256]">
+            Discreet, structured guidance aligned to your profile and jurisdictional constraints.
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
