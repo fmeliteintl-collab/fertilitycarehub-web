@@ -1,3 +1,4 @@
+import Link from "next/link";
 export default function Home() {
   return (
     <main
@@ -44,32 +45,34 @@ export default function Home() {
         </p>
 
         <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-          <button
-            style={{
-              padding: "12px 26px",
-              backgroundColor: "#b8a77a",
-              color: "#ffffff",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-            }}
-          >
-            Request Private Strategy Consultation
-          </button>
-
-          <button
-            style={{
-              padding: "12px 26px",
-              backgroundColor: "transparent",
-              border: "1px solid #b8a77a",
-              color: "#b8a77a",
-              borderRadius: "4px",
-              cursor: "pointer",
-            }}
-          >
-            Explore International Pathways
-          </button>
-        </div>
+  <Link
+    href="/consultation"
+    style={{
+      padding: "12px 26px",
+      backgroundColor: "#b8a77a",
+      color: "#ffffff",
+      borderRadius: "4px",
+      textDecoration: "none",
+      display: "inline-block",
+    }}
+  >
+    Request Private Strategy Consultation
+  </Link>
+  <Link
+    href="/countries"
+    style={{
+      padding: "12px 26px",
+      backgroundColor: "transparent",
+      border: "1px solid #b8a77a",
+      color: "#b8a77a",
+      borderRadius: "4px",
+      textDecoration: "none",
+      display: "inline-block",
+    }}
+  >
+    Explore International Pathways
+  </Link>
+</div>
 
         {/* Credibility strip */}
         <div
@@ -210,19 +213,20 @@ export default function Home() {
           <p style={{ marginBottom: "34px", color: "#d4d4d4", fontSize: 14 }}>
             Initial consultations available by application.
           </p>
-
-          <button
-            style={{
-              padding: "14px 30px",
-              backgroundColor: "#b8a77a",
-              border: "none",
-              color: "#ffffff",
-              borderRadius: "4px",
-              cursor: "pointer",
-            }}
-          >
-            Request Consultation
-          </button>
+import Link from "next/link";
+<Link
+  href="/consultation"
+  style={{
+    padding: "12px 26px",
+    backgroundColor: "#b8a77a",
+    color: "#ffffff",
+    borderRadius: "4px",
+    textDecoration: "none",
+    display: "inline-block",
+  }}
+>
+  Request Consultation
+</Link>
         </div>
       </section>
 
