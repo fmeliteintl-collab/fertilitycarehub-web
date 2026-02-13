@@ -1,247 +1,239 @@
 import Link from "next/link";
 
-export default function TurkeyDossierPage() {
-  const COUNTRY = "Turkey";
-  const SLUG = "turkey";
-
-  const PAGE_BG = "#F5F1E8";
-  const INK = "#1A1A1A";
-  const MUTED = "#6A6256";
-  const GOLD = "#B89B5E";
-  const BORDER = "#E5DDC8";
-  const CARD_BG = "#FBFAF7";
-
+export default function TurkeyPage() {
   return (
-    <main
-      style={{
-        background: PAGE_BG,
-        color: INK,
-        minHeight: "100vh",
-        fontFamily:
-          'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif',
-      }}
-    >
-      {/* Header */}
-      <header
-        style={{
-          width: "100%",
-          borderBottom: `1px solid ${BORDER}`,
-          background: PAGE_BG,
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1120,
-            margin: "0 auto",
-            padding: "18px 20px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
+    <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
+      {/* Top utility bar */}
+      <div className="max-w-6xl mx-auto px-6 pt-10">
+        <div className="flex items-center justify-between">
           <Link
             href="/countries"
-            style={{
-              textDecoration: "none",
-              color: INK,
-              fontSize: 18,
-              letterSpacing: 0.5,
-            }}
-          >
-            FertilityCareHub
-          </Link>
-
-          <Link
-            href={`/countries/${SLUG}#consultation`}
-            style={{
-              textDecoration: "none",
-              border: `1px solid ${GOLD}`,
-              color: INK,
-              padding: "10px 14px",
-              borderRadius: 999,
-              fontSize: 13,
-              letterSpacing: 0.8,
-              textTransform: "uppercase",
-              background: "transparent",
-            }}
-          >
-            Request Private Advisory Review
-          </Link>
-        </div>
-      </header>
-
-      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "28px 20px 80px" }}>
-        {/* Back */}
-        <div>
-          <Link
-            href="/countries"
-            style={{ textDecoration: "none", color: MUTED, fontSize: 13 }}
+            className="text-sm tracking-wide text-[#6A6256] hover:text-[#1A1A1A]"
           >
             ← Back to countries
           </Link>
-        </div>
-
-        {/* Hero */}
-        <section style={{ paddingTop: 34, paddingBottom: 28, textAlign: "center" }}>
-          <div
-            style={{
-              fontSize: 12,
-              letterSpacing: 2.8,
-              textTransform: "uppercase",
-              color: MUTED,
-              marginBottom: 16,
-            }}
-          >
-            Strategic advisory dossier
-          </div>
-
-          <h1 style={{ margin: 0, fontSize: 56 }}>
-            {COUNTRY}
-          </h1>
-
-          <p
-            style={{
-              margin: "18px auto 0",
-              maxWidth: 860,
-              fontSize: 18,
-              lineHeight: 1.7,
-              color: "#3A342C",
-            }}
-          >
-            Turkey is a medical-tourism-forward market with advanced private hospitals,
-            strong international patient operations, and competitive pricing.
-            The strategic question is not capability — it is eligibility, pathway fit,
-            and regulation boundaries.
-          </p>
-        </section>
-
-        {/* 2 Column */}
-        <section
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 18,
-          }}
-        >
-          <div
-            style={{
-              background: CARD_BG,
-              border: `1px solid ${BORDER}`,
-              borderRadius: 18,
-              padding: 22,
-            }}
-          >
-            <h2>When Turkey is the right choice</h2>
-            <ul style={{ paddingLeft: 18, lineHeight: 1.8 }}>
-              <li>You want strong private hospital infrastructure with international patient services.</li>
-              <li>Cost matters, but you still require advanced lab capability and mature operations.</li>
-              <li>You prefer an environment with clear medical-tourism logistics and fast access.</li>
-              <li>You are aligned with the local eligibility and regulatory scope for ART.</li>
-            </ul>
-          </div>
-
-          <div
-            style={{
-              background: CARD_BG,
-              border: `1px solid ${BORDER}`,
-              borderRadius: 18,
-              padding: 22,
-            }}
-          >
-            <h2>When it’s not</h2>
-            <ul style={{ paddingLeft: 18, lineHeight: 1.8 }}>
-              <li>If you need donor programs or pathways outside Turkish regulatory constraints.</li>
-              <li>If you require LGBTQ+ access or non-married pathways depending on your profile.</li>
-              <li>If maximum legal flexibility matters more than pricing and speed.</li>
-              <li>If you are seeking a “permissive Europe” posture — Turkey is not that.</li>
-            </ul>
-          </div>
-        </section>
-
-        {/* Framework */}
-        <section style={{ marginTop: 40 }}>
-          <h2 style={{ textAlign: "center" }}>
-            Advisory framework for {COUNTRY}
-          </h2>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: 14,
-              marginTop: 20,
-            }}
-          >
-            {[
-              {
-                title: "Eligibility & boundaries",
-                text: "Turkey’s clinical strength is real, but strategy must begin by confirming what is permitted for your profile.",
-              },
-              {
-                title: "Hospital vs clinic selection",
-                text: "Prioritize mature private hospital networks with international patient infrastructure and strong lab processes.",
-              },
-              {
-                title: "Travel sequencing",
-                text: "Turkey is operationally fast; align your travel timing with treatment staging to avoid wasted trips.",
-              },
-            ].map((card) => (
-              <div
-                key={card.title}
-                style={{
-                  background: CARD_BG,
-                  border: `1px solid ${BORDER}`,
-                  borderRadius: 16,
-                  padding: 18,
-                }}
-              >
-                <div style={{ fontWeight: 500 }}>{card.title}</div>
-                <div style={{ marginTop: 8, lineHeight: 1.7 }}>
-                  {card.text}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* CTA */}
-        <section id="consultation" style={{ marginTop: 60, textAlign: "center" }}>
-          <h2>Private advisory review</h2>
-          <p style={{ maxWidth: 800, margin: "12px auto", color: MUTED }}>
-            We assess Turkey against your profile — eligibility, clinic/hospital selection,
-            and an optimized travel cadence designed to reduce friction.
-          </p>
 
           <Link
             href="/consultation"
-            style={{
-              display: "inline-block",
-              border: `1px solid ${GOLD}`,
-              padding: "12px 16px",
-              borderRadius: 999,
-              textDecoration: "none",
-              color: INK,
-              fontSize: 13,
-              letterSpacing: 1,
-              textTransform: "uppercase",
-            }}
+            className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-5 py-2 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
           >
             Review Turkey Strategy Privately
           </Link>
-        </section>
+        </div>
       </div>
 
-      <style>{`
-        @media (max-width: 900px) {
-          section[style*="grid-template-columns: 1fr 1fr"] {
-            grid-template-columns: 1fr !important;
-          }
-          section[style*="repeat(3, 1fr)"] {
-            grid-template-columns: 1fr !important;
-          }
-          h1 { font-size: 40px !important; }
-        }
-      `}</style>
+      {/* Hero */}
+      <section className="max-w-6xl mx-auto px-6 pt-14 pb-10">
+        <div className="text-center">
+          <div className="text-xs tracking-[0.28em] text-[#6A6256]">
+            STRATEGIC ADVISORY DOSSIER
+          </div>
+
+          <h1 className="mt-5 text-5xl md:text-6xl leading-tight font-medium">
+            Turkey
+          </h1>
+
+          <p className="mt-6 max-w-3xl mx-auto text-lg leading-relaxed text-[#2A2A2A]">
+            Turkey is a cross-continental medical hub that combines advanced private hospital
+            infrastructure with a cost structure that can be compelling for the right pathway.
+            The strategic advantage is execution capacity and medical tourism maturity. The tradeoff
+            is that certain pathways are constrained by local rules and eligibility, so selection
+            and compliance must be planned early. This dossier outlines when Turkey is the right
+            strategic fit and how to evaluate it with precision.
+          </p>
+        </div>
+      </section>
+
+      {/* Two-column decision block */}
+      <section className="max-w-6xl mx-auto px-6 pb-10">
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h2 className="text-xl font-medium">When Turkey is the right choice</h2>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                You want strong private hospital infrastructure with a disciplined medical tourism model.
+              </li>
+              <li>
+                You value execution speed and coordination (international patient departments, interpreters, logistics).
+              </li>
+              <li>
+                You want a cost structure that can be favorable relative to many Western markets.
+              </li>
+              <li>
+                You prefer a structured shortlist and clear planning rather than open-ended shopping.
+              </li>
+              <li>
+                You can operate within eligibility constraints and documented compliance.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h2 className="text-xl font-medium">When it’s not</h2>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                Your pathway requires frameworks that are restricted locally (this must be verified early).
+              </li>
+              <li>
+                You want maximum flexibility across all family structures and pathways.
+              </li>
+              <li>
+                You are unwilling to do structured planning, documentation, and timeline coordination.
+              </li>
+              <li>
+                You want a “no constraints” market — Turkey is strong, but bounded.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Framework */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+          <h2 className="text-2xl font-medium">Advisor framework: how to evaluate Turkey</h2>
+
+          <div className="mt-6 grid md:grid-cols-3 gap-6">
+            <div>
+              <div className="text-xs tracking-[0.25em] text-[#6A6256]">INFRASTRUCTURE</div>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
+                Turkey’s advantage is advanced private hospital systems and international patient coordination.
+                The strategic question is choosing the right institution model.
+              </p>
+            </div>
+
+            <div>
+              <div className="text-xs tracking-[0.25em] text-[#6A6256]">ELIGIBILITY</div>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
+                The pathway must align with local rules. We verify eligibility constraints up front —
+                before you commit to travel or a cycle plan.
+              </p>
+            </div>
+
+            <div>
+              <div className="text-xs tracking-[0.25em] text-[#6A6256]">EXECUTION</div>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
+                Success comes from structured execution: records readiness, monitoring cadence, travel windows,
+                procedure scheduling, and post-treatment follow-up mapped in advance.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Core sections */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Clinic selection approach</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                Prefer institutions with strong international patient departments and clear response standards.
+              </li>
+              <li>
+                Confirm lab capability, embryology staffing stability, and written protocols.
+              </li>
+              <li>
+                Validate inclusions vs add-ons to avoid “low headline / high final bill.”
+              </li>
+              <li>
+                Ensure documentation and consent requirements are clarified before travel.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Cost structure (strategic view)</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                Turkey can offer strong value, especially when logistics are bundled and execution is disciplined.
+              </li>
+              <li>
+                We model total pathway cost: cycle + lab add-ons + meds + monitoring + logistics + storage.
+              </li>
+              <li>
+                Advisory provides bounded ranges; we avoid publishing numbers without verification.
+              </li>
+            </ul>
+            <p className="mt-5 text-sm text-[#6A6256]">
+              Note: value is realized only when execution quality stays high.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Logistics and travel (including accommodation)</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                Turkey is built for medical tourism; logistics can be smooth if planned properly.
+              </li>
+              <li>
+                We include <strong>accommodation</strong> as execution support: 2–3 vetted options focused on calm, comfort, and proximity.
+              </li>
+              <li>
+                We avoid hotel price grids; the priority is stability during treatment.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Governance and constraints</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                Eligibility constraints should be verified early (before timelines and payments).
+              </li>
+              <li>
+                Confirm what can be done remotely versus on-site to reduce unnecessary travel.
+              </li>
+              <li>
+                Ensure post-treatment follow-up is planned before starting the pathway.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* What we exclude */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+          <h3 className="text-xl font-medium">What we deliberately exclude (the private filter)</h3>
+          <div className="mt-5 grid md:grid-cols-2 gap-6">
+            <ul className="space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>Exhaustive clinic lists.</li>
+              <li>DIY visa bureaucracy playbooks.</li>
+              <li>Generic “best clinic” rankings without pathway fit logic.</li>
+            </ul>
+            <ul className="space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>Hotel price comparison tables.</li>
+              <li>Static pricing numbers without verification.</li>
+              <li>One-size-fits-all pathway templates.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="max-w-6xl mx-auto px-6 pb-16">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-10 text-center">
+          <h3 className="text-2xl font-medium">Private advisory, not a public database.</h3>
+          <p className="mt-4 max-w-2xl mx-auto text-[15px] leading-relaxed text-[#2A2A2A]">
+            If Turkey is on your shortlist, the decisive step is matching your pathway to the right institution model
+            and verifying constraints early. We curate the shortlist, validate execution, and map a calm plan.
+          </p>
+
+          <div className="mt-7 flex items-center justify-center">
+            <Link
+              href="/consultation"
+              className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+            >
+              Request Private Advisory Review
+            </Link>
+          </div>
+
+          <div className="mt-3 text-xs tracking-wide text-[#6A6256]">
+            Discreet, structured guidance aligned to your profile and jurisdictional constraints.
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
