@@ -1,360 +1,245 @@
 import Link from "next/link";
 
-export default function UnitedStatesDossierPage() {
-  const COUNTRY = "United States";
-  const SLUG = "united-states";
-
-  const PAGE_BG = "#F5F1E8";
-  const INK = "#1A1A1A";
-  const MUTED = "#6A6256";
-  const GOLD = "#B89B5E";
-  const BORDER = "#E5DDC8";
-  const CARD_BG = "#FBFAF7";
-
+export default function UnitedStatesPage() {
   return (
-    <main
-      style={{
-        background: PAGE_BG,
-        color: INK,
-        minHeight: "100vh",
-        fontFamily:
-          'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif',
-      }}
-    >
-      {/* Header */}
-      <header
-        style={{
-          width: "100%",
-          borderBottom: `1px solid ${BORDER}`,
-          background: PAGE_BG,
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1120,
-            margin: "0 auto",
-            padding: "18px 20px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 16,
-          }}
-        >
+    <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
+      {/* Top utility bar */}
+      <div className="max-w-6xl mx-auto px-6 pt-10">
+        <div className="flex items-center justify-between">
           <Link
             href="/countries"
-            style={{
-              textDecoration: "none",
-              color: INK,
-              fontSize: 18,
-              letterSpacing: 0.5,
-            }}
-          >
-            FertilityCareHub
-          </Link>
-
-          <Link
-            href={`/countries/${SLUG}#consultation`}
-            style={{
-              textDecoration: "none",
-              border: `1px solid ${GOLD}`,
-              color: INK,
-              padding: "10px 14px",
-              borderRadius: 999,
-              fontSize: 13,
-              letterSpacing: 0.8,
-              textTransform: "uppercase",
-              whiteSpace: "nowrap",
-              background: "transparent",
-            }}
-          >
-            Request Private Advisory Review
-          </Link>
-        </div>
-      </header>
-
-      {/* Body */}
-      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "28px 20px 80px" }}>
-        {/* Back link */}
-        <div style={{ marginTop: 6 }}>
-          <Link
-            href="/countries"
-            style={{
-              textDecoration: "none",
-              color: MUTED,
-              fontSize: 13,
-              letterSpacing: 0.4,
-            }}
+            className="text-sm tracking-wide text-[#6A6256] hover:text-[#1A1A1A]"
           >
             ← Back to countries
           </Link>
+
+          <Link
+            href="/consultation"
+            className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-5 py-2 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+          >
+            Review United States Strategy Privately
+          </Link>
         </div>
-
-        {/* Hero */}
-        <section style={{ paddingTop: 34, paddingBottom: 28, textAlign: "center" }}>
-          <div
-            style={{
-              fontSize: 12,
-              letterSpacing: 2.8,
-              textTransform: "uppercase",
-              color: MUTED,
-              marginBottom: 16,
-            }}
-          >
-            Strategic advisory dossier
-          </div>
-
-          <h1
-            style={{
-              margin: 0,
-              fontSize: 56,
-              lineHeight: 1.05,
-              letterSpacing: -0.6,
-            }}
-          >
-            {COUNTRY}
-          </h1>
-
-          <p
-            style={{
-              margin: "18px auto 0",
-              maxWidth: 880,
-              fontSize: 18,
-              lineHeight: 1.7,
-              color: "#3A342C",
-            }}
-          >
-            The United States is the premium benchmark market: deep clinical specialization, advanced labs,
-            and the broadest range of protocols — but it’s not one “system.” Strategy depends on selecting
-            the right hub, the right clinic, and (when relevant) the right legal environment.
-          </p>
-        </section>
-
-        {/* 2-up decision boxes */}
-        <section
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 18,
-            marginTop: 18,
-          }}
-        >
-          {/* Right choice */}
-          <div
-            style={{
-              background: CARD_BG,
-              border: `1px solid ${BORDER}`,
-              borderRadius: 18,
-              padding: "22px 22px",
-              boxShadow: "0 1px 0 rgba(0,0,0,0.02)",
-            }}
-          >
-            <h2 style={{ margin: 0, fontSize: 20, letterSpacing: -0.2 }}>
-              When the United States is the right choice
-            </h2>
-
-            <ul style={{ margin: "16px 0 0", paddingLeft: 18, color: "#3A342C", lineHeight: 1.75 }}>
-              <li>
-                You want the <b>deepest bench</b> for complex cases and access to leading protocols and subspecialists.
-              </li>
-              <li>
-                You prioritize <b>lab sophistication</b>, advanced testing options, and a wide range of clinical approaches.
-              </li>
-              <li>
-                You value <b>maximum legal clarity</b> in specific contexts (e.g., state frameworks), and are willing to plan precisely.
-              </li>
-              <li>
-                You want strong infrastructure for international coordination, premium care pathways, and specialized support services.
-              </li>
-            </ul>
-          </div>
-
-          {/* Not */}
-          <div
-            style={{
-              background: CARD_BG,
-              border: `1px solid ${BORDER}`,
-              borderRadius: 18,
-              padding: "22px 22px",
-              boxShadow: "0 1px 0 rgba(0,0,0,0.02)",
-            }}
-          >
-            <h2 style={{ margin: 0, fontSize: 20, letterSpacing: -0.2 }}>When it’s not</h2>
-
-            <ul style={{ margin: "16px 0 0", paddingLeft: 18, color: "#3A342C", lineHeight: 1.75 }}>
-              <li>
-                Your primary constraint is cost — the U.S. is typically premium-priced even before travel and add-ons.
-              </li>
-              <li>
-                You want a single, standardized national model — the U.S. varies significantly by clinic, state, and care pathway.
-              </li>
-              <li>
-                You want a “set-and-forget” experience without careful clinic selection and coordination planning.
-              </li>
-              <li>
-                You prefer shorter decision cycles; the U.S. often involves higher diligence expectations and higher documentation load.
-              </li>
-            </ul>
-          </div>
-        </section>
-
-        {/* Advisory framework */}
-        <section style={{ marginTop: 34 }}>
-          <div style={{ textAlign: "center", marginBottom: 16 }}>
-            <h2 style={{ margin: 0, fontSize: 30, letterSpacing: -0.3 }}>
-              Advisory framework for {COUNTRY}
-            </h2>
-            <p
-              style={{
-                margin: "10px auto 0",
-                maxWidth: 860,
-                color: MUTED,
-                lineHeight: 1.7,
-                fontSize: 15,
-              }}
-            >
-              In the U.S., the strategy is not “pick the best clinic.” It’s: pick the right clinical ecosystem for your profile,
-              then select the right clinic within that ecosystem.
-            </p>
-          </div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: 14,
-            }}
-          >
-            {[
-              {
-                title: "Hub + clinic selection",
-                text: "Choose the right city/clinic ecosystem for your case complexity, lab needs, and international coordination requirements.",
-              },
-              {
-                title: "Protocol fit & lab strategy",
-                text: "Match protocols and lab capabilities to your profile (age, diagnosis, prior cycles). Avoid generic pathway selection.",
-              },
-              {
-                title: "Cost & timing realism",
-                text: "Total planning includes cycle cost, medications, add-ons, and buffers. Timelines often depend on clinic scheduling cadence.",
-              },
-            ].map((c) => (
-              <div
-                key={c.title}
-                style={{
-                  background: CARD_BG,
-                  border: `1px solid ${BORDER}`,
-                  borderRadius: 16,
-                  padding: 18,
-                }}
-              >
-                <div style={{ fontSize: 16, marginBottom: 8, letterSpacing: -0.2 }}>{c.title}</div>
-                <div style={{ color: "#3A342C", lineHeight: 1.7, fontSize: 14 }}>{c.text}</div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* What we exclude */}
-        <section style={{ marginTop: 34 }}>
-          <div style={{ textAlign: "center", marginBottom: 16 }}>
-            <h2 style={{ margin: 0, fontSize: 30, letterSpacing: -0.3 }}>
-              The “private” filter — what we deliberately exclude
-            </h2>
-            <p
-              style={{
-                margin: "10px auto 0",
-                maxWidth: 860,
-                color: MUTED,
-                lineHeight: 1.7,
-                fontSize: 15,
-              }}
-            >
-              The U.S. has endless data. We don’t publish encyclopedias — we build decision clarity.
-            </p>
-          </div>
-
-          <div
-            style={{
-              background: CARD_BG,
-              border: `1px solid ${BORDER}`,
-              borderRadius: 18,
-              padding: 22,
-            }}
-          >
-            <ul style={{ margin: 0, paddingLeft: 18, color: "#3A342C", lineHeight: 1.85 }}>
-              <li>❌ State-by-state clinic directories (we shortlist based on your case profile).</li>
-              <li>❌ Pricing tables pretending to be exact (we structure cost planning ranges and hidden add-ons).</li>
-              <li>❌ Overwhelming success-rate dashboards (we interpret the signal relative to your profile).</li>
-              <li>❌ “Book now” sales language (this is an advisory posture, not a marketplace pitch).</li>
-            </ul>
-          </div>
-        </section>
-
-        {/* Consultation anchor */}
-        <section
-          id="consultation"
-          style={{
-            marginTop: 44,
-            paddingTop: 22,
-            borderTop: `1px solid ${BORDER}`,
-          }}
-        >
-          <div
-            style={{
-              background: CARD_BG,
-              border: `1px solid ${BORDER}`,
-              borderRadius: 18,
-              padding: 24,
-              textAlign: "center",
-            }}
-          >
-            <h2 style={{ margin: 0, fontSize: 28, letterSpacing: -0.2 }}>
-              Private advisory review
-            </h2>
-            <p style={{ margin: "12px auto 0", maxWidth: 860, color: MUTED, lineHeight: 1.7 }}>
-              If the United States is on your shortlist, we’ll assess fit against your profile (complexity, prior cycles,
-              lab strategy, timeline) and propose a structured plan — including recommended hubs and a curated shortlist.
-            </p>
-
-            <div style={{ marginTop: 18 }}>
-              <Link
-                href="/consultation"
-                style={{
-                  display: "inline-block",
-                  textDecoration: "none",
-                  border: `1px solid ${GOLD}`,
-                  padding: "12px 16px",
-                  borderRadius: 999,
-                  color: INK,
-                  fontSize: 13,
-                  letterSpacing: 0.9,
-                  textTransform: "uppercase",
-                  background: "transparent",
-                }}
-              >
-                Review {COUNTRY} Strategy Privately
-              </Link>
-
-              <div style={{ marginTop: 10, fontSize: 13, color: MUTED }}>
-                Discreet, structured guidance aligned to your profile and priorities.
-              </div>
-            </div>
-          </div>
-        </section>
       </div>
 
-      {/* Responsive */}
-      <style>{`
-        @media (max-width: 900px) {
-          section[style*="grid-template-columns: 1fr 1fr"] {
-            grid-template-columns: 1fr !important;
-          }
-          section div[style*="grid-template-columns: repeat(3, 1fr)"] {
-            grid-template-columns: 1fr !important;
-          }
-          h1 { font-size: 40px !important; }
-        }
-      `}</style>
+      {/* Hero */}
+      <section className="max-w-6xl mx-auto px-6 pt-14 pb-10">
+        <div className="text-center">
+          <div className="text-xs tracking-[0.28em] text-[#6A6256]">
+            STRATEGIC ADVISORY DOSSIER
+          </div>
+
+          <h1 className="mt-5 text-5xl md:text-6xl leading-tight font-medium">
+            United States
+          </h1>
+
+          <p className="mt-6 max-w-3xl mx-auto text-lg leading-relaxed text-[#2A2A2A]">
+            The United States is the premium benchmark for breadth and capability. The strategic
+            advantage is not that every clinic is elite — it’s that the U.S. offers a concentration
+            of top-tier centers, advanced labs, and highly specialized pathways. When complexity is
+            high or when you want maximum optionality, the U.S. is often the cleanest decision.
+            This dossier explains when it’s worth it — and when it’s not.
+          </p>
+        </div>
+      </section>
+
+      {/* Two-column decision block */}
+      <section className="max-w-6xl mx-auto px-6 pb-10">
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h2 className="text-xl font-medium">When the U.S. is the right choice</h2>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                Your case is complex and you want the broadest access to{" "}
+                <strong>advanced lab capability</strong> and specialist depth.
+              </li>
+              <li>
+                You want maximum optionality across pathways (including high-complexity male factor,
+                advanced testing, and highly specialized protocols).
+              </li>
+              <li>
+                You want strong infrastructure for international coordination and a high probability
+                of finding a clinic model that fits your exact needs.
+              </li>
+              <li>
+                Legal clarity is central to your plan (including state-level frameworks where relevant).
+              </li>
+              <li>
+                You are willing to pay for premium execution when the outcome and risk profile justify it.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h2 className="text-xl font-medium">When it’s not</h2>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                Cost is your dominant decision variable and your case can be handled with equal quality
+                in a lower-cost market.
+              </li>
+              <li>
+                You want one predictable national framework — in the U.S., some rules and coverage are
+                state-dependent.
+              </li>
+              <li>
+                You want a purely “price-led” decision; the U.S. is a quality-and-capability decision.
+              </li>
+              <li>
+                You prefer minimal planning. The U.S. works best with structured coordination and document readiness.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Framework */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+          <h2 className="text-2xl font-medium">Advisor framework: how to evaluate the U.S.</h2>
+
+          <div className="mt-6 grid md:grid-cols-3 gap-6">
+            <div>
+              <div className="text-xs tracking-[0.25em] text-[#6A6256]">CENTER DEPTH</div>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
+                The U.S. advantage is top-end capability — multidisciplinary depth, lab specialization,
+                and advanced protocols. We focus on finding the right center model for your profile.
+              </p>
+            </div>
+
+            <div>
+              <div className="text-xs tracking-[0.25em] text-[#6A6256]">PATHWAY DESIGN</div>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
+                A good U.S. plan is engineered: what happens locally vs on-site, how many trips, when monitoring occurs,
+                and how records flow. We reduce wasted travel and eliminate ambiguity.
+              </p>
+            </div>
+
+            <div>
+              <div className="text-xs tracking-[0.25em] text-[#6A6256]">TOTAL COST MAP</div>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
+                Costs must be mapped as a system: base cycle, lab add-ons, meds/monitoring, storage, and travel cadence.
+                Your deliverable is a bounded all-in range aligned to your risk tolerance.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Core sections */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Clinic selection (how we think)</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                We look for high-discipline operations: consistent protocols, strong lab staffing, and clean communication cadence.
+              </li>
+              <li>
+                We prioritize clinics that can demonstrate fit for your pathway (not generic “highest success” marketing).
+              </li>
+              <li>
+                We confirm what is included vs optional — and how the clinic handles international patients.
+              </li>
+              <li>
+                We shortlist intentionally (typically 4–5), then structure the decision based on your constraints.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Legal and governance (strategic view)</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                The U.S. can offer strong legal clarity in certain pathways, but rules can be state-dependent.
+              </li>
+              <li>
+                We treat governance as a risk variable: jurisdiction choice, contracts (if relevant), and documentation readiness.
+              </li>
+              <li>
+                The deliverable is not “legal advice” — it’s a structured risk map and a clear coordination plan.
+              </li>
+            </ul>
+            <p className="mt-5 text-sm text-[#6A6256]">
+              Note: legal specifics depend on pathway and jurisdiction; we coordinate with vetted partners where needed.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Cost structure (strategic view)</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                The U.S. is premium-priced. We only recommend it when capability, complexity, or risk reduction justify it.
+              </li>
+              <li>
+                We map total cost as a system: base cycle + lab add-ons + meds/monitoring + storage + travel cadence.
+              </li>
+              <li>
+                We avoid publishing numbers unless verified and updated; in advisory, we provide a decision-grade range.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+            <h3 className="text-xl font-medium">Logistics and travel (including accommodation)</h3>
+            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>
+                The U.S. can be efficient if you structure remote consults and do on-site only when medically necessary.
+              </li>
+              <li>
+                We include <strong>accommodation</strong> as part of execution: 2–3 vetted options near clinic access,
+                chosen for comfort, predictability, and low friction.
+              </li>
+              <li>
+                The goal is calm logistics during a high-stakes process — not “deal hunting.”
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* What we exclude */}
+      <section className="max-w-6xl mx-auto px-6 pb-12">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
+          <h3 className="text-xl font-medium">What we deliberately exclude (the private filter)</h3>
+          <div className="mt-5 grid md:grid-cols-2 gap-6">
+            <ul className="space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>Exhaustive clinic lists (we curate a shortlist, not a directory).</li>
+              <li>Price-table comparisons (we build a bounded cost map aligned to your plan).</li>
+              <li>Generic success-rate claims without context (we evaluate fit, not marketing).</li>
+            </ul>
+            <ul className="space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
+              <li>DIY bureaucracy playbooks (we coordinate with trusted partners).</li>
+              <li>Static numbers without verification (we prioritize accuracy and updates).</li>
+              <li>One-size-fits-all pathways (your constraints define the plan).</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="max-w-6xl mx-auto px-6 pb-16">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-10 text-center">
+          <h3 className="text-2xl font-medium">Private advisory, not a public database.</h3>
+          <p className="mt-4 max-w-2xl mx-auto text-[15px] leading-relaxed text-[#2A2A2A]">
+            If the U.S. is on your shortlist, the decisive step is aligning your complexity and pathway to the right
+            center model, then mapping cost and logistics into a clean execution plan. We curate the shortlist and
+            structure the route.
+          </p>
+
+          <div className="mt-7 flex items-center justify-center">
+            <Link
+              href="/consultation"
+              className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+            >
+              Request Private Advisory Review
+            </Link>
+          </div>
+
+          <div className="mt-3 text-xs tracking-wide text-[#6A6256]">
+            Discreet, structured guidance aligned to your profile and jurisdictional constraints.
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
