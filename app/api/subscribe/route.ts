@@ -9,35 +9,26 @@ const supabase = createClient(
 );
 
 export async function POST(req: Request) {
-  try {
-    const { email } = await req.json();
+  const body = await req.json();
+  console.log("BODY:", body);
 
-    if (!email || typeof email !== "string") {
-      return NextResponse.json(
-        { error: "Email required" },
-        { status: 400 }
-      );
-    }
+  const email = body.email;
+  console.log("EMAIL:", email);
 
-    const clean = email.trim().toLowerCase();
+  if (!email) {
+    return Response.json({ error: "Email missing" }, { status: 400 });
+  }
 
-    const { error } = await supabase
-      .from("subscribers")
-      .insert([{ email: clean }]);
+  const { data, error } = await supabase
+    .from("subscribers")
+    .insert([{ email }]);
 
-    if (error) {
-      console.error(error);
-      return NextResponse.json(
-        { error: "Database insert failed" },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({ ok: true });
-  } catch {
-    return NextResponse.json(
-      { error: "Invalid request" },
-      { status: 400 }
+  if (error) {
+    return Response.json(
+      { error: error.message },
+      { status: 500 }
     );
   }
+
+  return Response.json({ success: true });
 }
