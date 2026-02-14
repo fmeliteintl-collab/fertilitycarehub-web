@@ -1,5 +1,27 @@
+"use client";
+import { useState, type FormEvent } from "react";
 import Link from "next/link";
 export default function Home() {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
+
+  async function onJoinList(e: FormEvent<HTMLFormElement>)  {
+    e.preventDefault();
+    setStatus("loading");
+
+    const res = await fetch("/api/subscribe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+
+    if (res.ok) {
+      setEmail("");
+      setStatus("ok");
+    } else {
+      setStatus("error");
+    }
+  }
   return (
     <main
       style={{
@@ -241,40 +263,55 @@ export default function Home() {
             Receive structured country intelligence updates, regulatory changes, and strategic fertility analysis.
           </p>
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              gap: 10,
-              flexWrap: "wrap",
-            }}
-          >
-            <input
-              type="email"
-              placeholder="Email address"
-              style={{
-                padding: "12px 14px",
-                width: 320,
-                maxWidth: "90vw",
-                borderRadius: 4,
-                border: "1px solid #ddd",
-                fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Arial",
-              }}
-            />
+          <form
+  onSubmit={onJoinList}
+  style={{
+    display: "flex",
+    justifyContent: "center",
+    gap: 12,
+    flexWrap: "wrap",
+  }}
+>
+  <input
+    type="email"
+    value={email}
+    onChange={(e) => setEmail(e.target.value)}
+    required
+    placeholder="Enter your email"
+    style={{
+      padding: "12px 14px",
+      minWidth: "260px",
+      borderRadius: 4,
+      border: "1px solid #ccc",
+      fontSize: "14px",
+    }}
+  />
 
-            <button
-              style={{
-                padding: "12px 22px",
-                backgroundColor: "#b8a77a",
-                color: "#ffffff",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-              }}
-            >
-              Join the List
-            </button>
-          </div>
+  <button
+    type="submit"
+    style={{
+      padding: "12px 20px",
+      backgroundColor: "#b8a77a",
+      color: "#ffffff",
+      borderRadius: 4,
+      border: "none",
+      cursor: "pointer",
+      fontWeight: 500,
+    }}
+  >
+    {status === "loading" ? "Joining..." : "Join the List"}
+  </button>
+</form>
+
+{status === "ok" && (
+  <p style={{ marginTop: 18, color: "#2d6a4f" }}>You’re on the list.</p>
+)}
+
+{status === "error" && (
+  <p style={{ marginTop: 18, color: "#c1121f" }}>
+    Something went wrong. Please try again.
+  </p>
+)}
 
           <p style={{ marginTop: 14, fontSize: 12, color: "#777" }}>
             (Email capture will be wired to the database in a later step.)
