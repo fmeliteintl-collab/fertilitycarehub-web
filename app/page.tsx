@@ -5,7 +5,7 @@ export default function Home() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
 
-  async function onJoinList(e: FormEvent<HTMLFormElement>)  {
+  async function onJoinList(e: React.FormEvent<HTMLFormElement>)  {
     e.preventDefault();
     setStatus("loading");
 
