@@ -3,33 +3,41 @@ import { createClient } from "@supabase/supabase-js";
 
 export const runtime = "edge";
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_ANON_KEY!
-);
+// Using || "" instead of ! prevents the build from crashing if keys are missing during compilation
+const supabaseUrl = process.env.SUPABASE_URL || "";
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || "";
+
+// Only initialize the client if both keys are present
+const supabase = supabaseUrl && supabaseAnonKey 
+  ? createClient(supabaseUrl, supabaseAnonKey) 
+  : null;
 
 export async function POST(req: Request) {
-  const body = await req.json();
-  console.log("BODY:", body);
-
-  const email = body.email;
-  console.log("EMAIL:", email);
-
-  if (!email) {
-    return Response.json({ error: "Email missing" }, { status: 400 });
+  // If the database client isn't ready (common during build/validation), return a 500 error
+  if (!supabase) {
+    console.error("Supabase client not initialized. Check Cloudflare Variables.");
+    return NextResponse.json({ error: "Server Configuration Error" }, { status: 500 });
   }
 
-  const { data, error } = await supabase
-    .from("subscribers")
-    .insert([{ email }]);
+  try {
+    const body = await req.json();
+    const email = body.email;
 
-  if (error) {
-    return Response.json(
-      { error: error.message },
-      { status: 500 }
-    );
+    if (!email) {
+      return NextResponse.json({ error: "Email missing" }, { status: 400 });
+    }
+
+    // Attempt to insert the email into the 'subscribers' table
+    const { data, error } = await supabase
+      .from("subscribers")
+      .insert([{ email }]);
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    return NextResponse.json({ error: "Invalid request format" }, { status: 400 });
   }
-
-  return Response.json({ success: true });
 }
-//v2 update for env vars
