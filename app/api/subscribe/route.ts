@@ -3,41 +3,81 @@ import { createClient } from "@supabase/supabase-js";
 
 export const runtime = "edge";
 
-// Using || "" instead of ! prevents the build from crashing if keys are missing during compilation
-const supabaseUrl = process.env.SUPABASE_URL || "";
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || "";
+// Small helper (works even if process/env behaves differently in edge)
+function getEnv(key: string): string {
+  // @ts-ignore
+  return (typeof process !== "undefined" && process?.env?.[key]) ? (process.env[key] as string) : "";
+}
 
-// Only initialize the client if both keys are present
-const supabase = supabaseUrl && supabaseAnonKey 
-  ? createClient(supabaseUrl, supabaseAnonKey) 
-  : null;
+// Prefer server vars, fallback to NEXT_PUBLIC vars (more reliable on Cloudflare builds)
+const supabaseUrl =
+  getEnv("SUPABASE_URL") || getEnv("NEXT_PUBLIC_SUPABASE_URL");
+
+const supabaseAnonKey =
+  getEnv("SUPABASE_ANON_KEY") || getEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+
+const supabase =
+  supabaseUrl && supabaseAnonKey
+    ? createClient(supabaseUrl, supabaseAnonKey, {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+        },
+      })
+    : null;
 
 export async function POST(req: Request) {
-  // If the database client isn't ready (common during build/validation), return a 500 error
   if (!supabase) {
-    console.error("Supabase client not initialized. Check Cloudflare Variables.");
-    return NextResponse.json({ error: "Server Configuration Error" }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: "Server Configuration Error",
+        details: {
+          hasUrl: Boolean(supabaseUrl),
+          hasKey: Boolean(supabaseAnonKey),
+          expectedEnv: [
+            "SUPABASE_URL / SUPABASE_ANON_KEY (server)",
+            "or NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY (fallback)",
+          ],
+        },
+      },
+      { status: 500 }
+    );
   }
 
   try {
-    const body = await req.json();
-    const email = body.email;
+    const { email } = await req.json();
 
-    if (!email) {
+    if (!email || typeof email !== "string") {
       return NextResponse.json({ error: "Email missing" }, { status: 400 });
     }
 
-    // Attempt to insert the email into the 'subscribers' table
+    const cleanedEmail = email.trim().toLowerCase();
+
+    // Optional basic validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanedEmail)) {
+      return NextResponse.json({ error: "Invalid email" }, { status: 400 });
+    }
+
+    // Insert and return the inserted row
     const { data, error } = await supabase
       .from("subscribers")
-      .insert([{ email }]);
+      .insert([{ email: cleanedEmail }])
+      .select("id, created_at, email")
+      .single();
 
+    // If you added a UNIQUE constraint on email, you can treat duplicates as success:
     if (error) {
+      // Postgres unique violation code = 23505
+      // @ts-ignore
+      if (error.code === "23505") {
+        return NextResponse.json({ success: true, alreadySubscribed: true }, { status: 200 });
+      }
+
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true });
-  } catch (err) {
+    return NextResponse.json({ success: true, data }, { status: 201 });
+  } catch {
     return NextResponse.json({ error: "Invalid request format" }, { status: 400 });
   }
 }
