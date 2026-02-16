@@ -314,7 +314,7 @@ export default function Home() {
 )}
 
           <p style={{ marginTop: 14, fontSize: 12, color: "#777" }}>
-            (Email capture will be wired to the database in a later step.)
+            (We’ll reach out when consultation scheduling becomes available.)
           </p>
         </div>
       </section>
