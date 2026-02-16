@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 
 export default function ConsultationPage() {
@@ -7,7 +10,13 @@ export default function ConsultationPage() {
   const GOLD = "#B89B5E";
   const BORDER = "#E5DDC8";
   const CARD_BG = "#FBFAF7";
+const [optimizingFor, setOptimizingFor] = useState<string[]>([]);
 
+  const toggleOption = (label: string) => {
+    setOptimizingFor((prev) =>
+      prev.includes(label) ? prev.filter((x) => x !== label) : [...prev, label]
+    );
+  };
   return (
     <main
       style={{
@@ -199,12 +208,9 @@ export default function ConsultationPage() {
                   marginTop: 10,
                 }}
               >
-                <Chip text="Highest probability" />
-                <Chip text="Speed & access" />
-                <Chip text="Cost efficiency" />
-                <Chip text="Donor pathway" />
-                <Chip text="Ethical alignment" />
-                <Chip text="Legal clarity" />
+                
+  
+
               </div>
               <p style={{ color: MUTED, fontSize: 12, marginTop: 10 }}>
                 (Phase 1 UI only — selection logic comes later.)
