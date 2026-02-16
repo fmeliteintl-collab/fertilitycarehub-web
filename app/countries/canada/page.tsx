@@ -1,5 +1,22 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 
+export const metadata: Metadata = {
+  title: "Canada IVF Regulations & Fertility Law 2026 | FertilityCareHub",
+  description:
+    "Structured analysis of IVF regulations, donor laws, surrogacy policy, and fertility access rules in Canada. Updated regulatory insights for intended parents.",
+  alternates: {
+    canonical: "https://fertilitycarehub.com/countries/canada",
+  },
+  openGraph: {
+    title: "Canada IVF Regulations & Fertility Law 2026",
+    description:
+      "In-depth fertility law analysis covering IVF, donor gametes, surrogacy, and access regulations in Canada.",
+    url: "https://fertilitycarehub.com/countries/canada",
+    siteName: "FertilityCareHub",
+    type: "article",
+  },
+};
 export default function CanadaPage() {
   return (
     <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
