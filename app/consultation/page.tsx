@@ -1,4 +1,19 @@
+"use client";
+
+import { useMemo, useState } from "react";
 import Link from "next/link";
+
+const OPTIONS = [
+  "Cost-efficiency",
+  "Highest success rates",
+  "Shortest timeline",
+  "Legal clarity",
+  "Donor availability",
+  "Surrogacy pathway",
+  "Privacy & discretion",
+  "Minimal travel",
+  "Best clinic depth",
+];
 
 export default function ConsultationPage() {
   const PAGE_BG = "#F5F1E8";
@@ -7,6 +22,53 @@ export default function ConsultationPage() {
   const GOLD = "#B89B5E";
   const BORDER = "#E5DDC8";
   const CARD_BG = "#FBFAF7";
+
+  // ✅ change this later if needed
+  const TO_EMAIL = "advisory@fertilitycarehub.com";
+
+  // Form state
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [residence, setResidence] = useState("");
+  const [targetCountry, setTargetCountry] = useState("");
+  const [context, setContext] = useState("");
+  const [optimizingFor, setOptimizingFor] = useState<string[]>([]);
+  const [openedDraft, setOpenedDraft] = useState(false);
+
+  const toggleOption = (label: string) => {
+    setOptimizingFor((prev) =>
+      prev.includes(label) ? prev.filter((x) => x !== label) : [...prev, label]
+    );
+  };
+
+  const mailtoHref = useMemo(() => {
+    const subject = encodeURIComponent("Private Advisory Review Request");
+
+    const lines: string[] = [];
+    lines.push("Private Advisory Review Request");
+    lines.push("");
+    lines.push(`Full name: ${fullName || "-"}`);
+    lines.push(`Email: ${email || "-"}`);
+    lines.push(`Country of residence: ${residence || "-"}`);
+    lines.push(`Target country (if known): ${targetCountry || "-"}`);
+    lines.push(
+      `Optimizing for: ${optimizingFor.length ? optimizingFor.join(", ") : "-"}`
+    );
+    lines.push("");
+    lines.push("Brief context:");
+    lines.push(context || "-");
+    lines.push("");
+    lines.push("— Sent from FertilityCareHub intake (Phase 1)");
+
+    const body = encodeURIComponent(lines.join("\n"));
+    return `mailto:${TO_EMAIL}?subject=${subject}&body=${body}`;
+  }, [TO_EMAIL, fullName, email, residence, targetCountry, optimizingFor, context]);
+
+  const onOpenEmailDraft = () => {
+    // open the draft + show the confirmation caption
+    setOpenedDraft(true);
+    window.location.href = mailtoHref;
+  };
 
   return (
     <main
@@ -105,9 +167,9 @@ export default function ConsultationPage() {
               color: "#3A342C",
             }}
           >
-            This is a strategy-led review — not general medical advice.
-            We help you choose the right country pathway, identify what matters,
-            and reduce wasted time, travel, and financial leakage.
+            This is a strategy-led review — not general medical advice. We help you
+            choose the right country pathway, identify what matters, and reduce
+            wasted time, travel, and financial leakage.
           </p>
         </section>
 
@@ -172,7 +234,8 @@ export default function ConsultationPage() {
             <h2 style={{ textAlign: "center" }}>Intake (Phase 1)</h2>
 
             <p style={{ textAlign: "center", color: MUTED, marginTop: 10 }}>
-              For now, this is a clean placeholder. Next phase will connect this form to a secure backend.
+              For now, this sends a structured email draft. Next phase will connect
+              this form to a secure backend.
             </p>
 
             <div
@@ -183,14 +246,35 @@ export default function ConsultationPage() {
                 gap: 12,
               }}
             >
-              <Input label="Full name" placeholder="Your name" />
-              <Input label="Email" placeholder="name@email.com" />
-              <Input label="Country of residence" placeholder="e.g., Canada" />
-              <Input label="Target country (if known)" placeholder="e.g., Spain" />
+              <Input
+                label="Full name"
+                placeholder="Your name"
+                value={fullName}
+                onChange={setFullName}
+              />
+              <Input
+                label="Email"
+                placeholder="name@email.com"
+                value={email}
+                onChange={setEmail}
+              />
+              <Input
+                label="Country of residence"
+                placeholder="e.g., Canada"
+                value={residence}
+                onChange={setResidence}
+              />
+              <Input
+                label="Target country (if known)"
+                placeholder="e.g., Spain"
+                value={targetCountry}
+                onChange={setTargetCountry}
+              />
             </div>
 
             <div style={{ marginTop: 12 }}>
               <Label text="What are you optimizing for?" />
+
               <div
                 style={{
                   display: "grid",
@@ -199,21 +283,26 @@ export default function ConsultationPage() {
                   marginTop: 10,
                 }}
               >
-                <Chip text="Highest probability" />
-                <Chip text="Speed & access" />
-                <Chip text="Cost efficiency" />
-                <Chip text="Donor pathway" />
-                <Chip text="Ethical alignment" />
-                <Chip text="Legal clarity" />
+                {OPTIONS.map((opt) => (
+                  <Chip
+                    key={opt}
+                    text={opt}
+                    selected={optimizingFor.includes(opt)}
+                    onClick={() => toggleOption(opt)}
+                  />
+                ))}
               </div>
+
               <p style={{ color: MUTED, fontSize: 12, marginTop: 10 }}>
-                (Phase 1 UI only — selection logic comes later.)
+                Select all that apply.
               </p>
             </div>
 
             <div style={{ marginTop: 12 }}>
               <Label text="Brief context" />
               <textarea
+                value={context}
+                onChange={(e) => setContext(e.target.value)}
                 placeholder="Age range, prior cycles, diagnosis (if any), preferred timeline, and any constraints you want us to respect."
                 style={{
                   width: "100%",
@@ -241,8 +330,9 @@ export default function ConsultationPage() {
                 flexWrap: "wrap",
               }}
             >
-              <a
-                href="mailto:hello@fertilitycarehub.com?subject=Private%20Advisory%20Review%20Request"
+              <button
+                type="button"
+                onClick={onOpenEmailDraft}
                 style={{
                   display: "inline-block",
                   border: `1px solid ${GOLD}`,
@@ -254,10 +344,11 @@ export default function ConsultationPage() {
                   letterSpacing: 1,
                   textTransform: "uppercase",
                   background: "transparent",
+                  cursor: "pointer",
                 }}
               >
                 Email Request (Phase 1)
-              </a>
+              </button>
 
               <Link
                 href="/countries"
@@ -277,6 +368,20 @@ export default function ConsultationPage() {
                 Return to Countries
               </Link>
             </div>
+
+            {openedDraft && (
+              <p
+                style={{
+                  marginTop: 14,
+                  textAlign: "center",
+                  color: MUTED,
+                  fontSize: 12,
+                }}
+              >
+                Thank you — your email draft has opened. Please press Send to submit.
+                Once received, we’ll route it and a consultant will reach out.
+              </p>
+            )}
 
             <p style={{ color: MUTED, fontSize: 12, textAlign: "center", marginTop: 14 }}>
               Note: This page is not medical advice. Emergency issues should be handled by licensed medical professionals.
@@ -308,12 +413,24 @@ function Label({ text }: { text: string }) {
   );
 }
 
-function Input({ label, placeholder }: { label: string; placeholder: string }) {
+function Input({
+  label,
+  placeholder,
+  value,
+  onChange,
+}: {
+  label: string;
+  placeholder: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
   const BORDER = "#E5DDC8";
   return (
     <div>
       <Label text={label} />
       <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         style={{
           width: "100%",
@@ -331,21 +448,35 @@ function Input({ label, placeholder }: { label: string; placeholder: string }) {
   );
 }
 
-function Chip({ text }: { text: string }) {
+function Chip({
+  text,
+  selected,
+  onClick,
+}: {
+  text: string;
+  selected: boolean;
+  onClick: () => void;
+}) {
   const BORDER = "#E5DDC8";
+  const GOLD = "#B89B5E";
+
   return (
-    <div
+    <button
+      type="button"
+      onClick={onClick}
       style={{
-        border: `1px solid ${BORDER}`,
+        border: `1px solid ${selected ? GOLD : BORDER}`,
         borderRadius: 999,
         padding: "10px 12px",
         fontSize: 13,
-        background: "transparent",
+        background: selected ? "rgba(184, 155, 94, 0.10)" : "transparent",
         textAlign: "center",
         userSelect: "none",
+        cursor: "pointer",
       }}
+      aria-pressed={selected}
     >
       {text}
-    </div>
+    </button>
   );
 }
