@@ -1,5 +1,22 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 
+export const metadata: Metadata = {
+  title: "United Kingdom IVF Regulations & Fertility Law 2026 | FertilityCareHub",
+  description:
+    "Structured analysis of IVF regulations, donor laws, surrogacy policy, and fertility access rules in the United Kingdom. Updated regulatory insights for intended parents.",
+  alternates: {
+    canonical: "https://fertilitycarehub.com/countries/united-kingdom",
+  },
+  openGraph: {
+    title: "United Kingdom IVF Regulations & Fertility Law 2026",
+    description:
+      "In-depth fertility law analysis covering IVF, donor gametes, surrogacy, and access regulations in the United Kingdom.",
+    url: "https://fertilitycarehub.com/countries/united-kingdom",
+    siteName: "FertilityCareHub",
+    type: "article",
+  },
+};
 export default function UnitedKingdomPage() {
   return (
     <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">

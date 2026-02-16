@@ -1,5 +1,22 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 
+export const metadata: Metadata = {
+  title: "Spain IVF Regulations & Fertility Law 2026 | FertilityCareHub",
+  description:
+    "Structured analysis of IVF regulations, donor laws, surrogacy policy, and fertility access rules in Spain. Updated regulatory insights for intended parents.",
+  alternates: {
+    canonical: "https://fertilitycarehub.com/countries/spain",
+  },
+  openGraph: {
+    title: "Spain IVF Regulations & Fertility Law 2026",
+    description:
+      "In-depth fertility law analysis covering IVF, donor gametes, surrogacy, and access regulations in Spain.",
+    url: "https://fertilitycarehub.com/countries/spain",
+    siteName: "FertilityCareHub",
+    type: "article",
+  },
+};
 export default function SpainDossierPage() {
   return (
     <main
