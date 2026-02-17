@@ -1,3 +1,4 @@
+"use client";
 // app/consultation/page.tsx
 import React, { Suspense, useMemo, useState } from "react";
 import Link from "next/link";
