@@ -19,15 +19,7 @@ export const metadata: Metadata = {
 };
 export default function SpainDossierPage() {
   return (
-    <main
-      style={{
-        backgroundColor: "#F5F1E8",
-        color: "#1A1A1A",
-        minHeight: "100vh",
-        fontFamily:
-          'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif',
-      }}
-    >
+    <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
       {/* Top utility row */}
       <section
         style={{
