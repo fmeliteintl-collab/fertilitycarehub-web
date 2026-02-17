@@ -1,21 +1,29 @@
 "use client";
-
-import { useMemo, useState } from "react";
+// app/consultation/page.tsx
+import React, { Suspense, useMemo, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { createClient } from "@supabase/supabase-js";
 
-const OPTIONS = [
-  "Cost-efficiency",
-  "Highest success rates",
-  "Shortest timeline",
-  "Legal clarity",
-  "Donor availability",
-  "Surrogacy pathway",
-  "Privacy & discretion",
-  "Minimal travel",
-  "Best clinic depth",
-];
+/**
+ * IMPORTANT:
+ * This file is intentionally structured as:
+ *  - Default export wraps the inner client component in <Suspense/>
+ *  - Inner component uses useSearchParams()
+ * This prevents the Cloudflare/Next build error:
+ * "useSearchParams() should be wrapped in a suspense boundary"
+ */
 
 export default function ConsultationPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: 24 }}>Loading…</div>}>
+      <ConsultationPageInner />
+    </Suspense>
+  );
+}
+
+function ConsultationPageInner() {
+  // Theme
   const PAGE_BG = "#F5F1E8";
   const INK = "#1A1A1A";
   const MUTED = "#6A6256";
@@ -23,17 +31,34 @@ export default function ConsultationPage() {
   const BORDER = "#E5DDC8";
   const CARD_BG = "#FBFAF7";
 
-  // ✅ change this later if needed
-  const TO_EMAIL = "advisory@fertilitycarehub.com";
+  // Read ?from=spain (optional)
+  const searchParams = useSearchParams();
+  const fromSlug = (searchParams.get("from") || "").trim().toLowerCase();
 
   // Form state
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [residence, setResidence] = useState("");
   const [targetCountry, setTargetCountry] = useState("");
-  const [context, setContext] = useState("");
   const [optimizingFor, setOptimizingFor] = useState<string[]>([]);
-  const [openedDraft, setOpenedDraft] = useState(false);
+  const [context, setContext] = useState("");
+
+  // UX state
+  const [submitting, setSubmitting] = useState(false);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const OPTIONS = useMemo(
+    () => [
+      "Highest probability",
+      "Speed & access",
+      "Cost efficiency",
+      "Donor pathway",
+      "Ethical alignment",
+      "Legal clarity",
+    ],
+    []
+  );
 
   const toggleOption = (label: string) => {
     setOptimizingFor((prev) =>
@@ -41,33 +66,93 @@ export default function ConsultationPage() {
     );
   };
 
-  const mailtoHref = useMemo(() => {
+  // Supabase client (public)
+  const supabase = useMemo(() => {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !key) return null;
+    return createClient(url, key);
+  }, []);
+
+  const canSubmit = useMemo(() => {
+    // keep Phase 1 lightweight: email required
+    return email.trim().length > 3 && email.includes("@");
+  }, [email]);
+
+  const buildMailto = () => {
     const subject = encodeURIComponent("Private Advisory Review Request");
+    const bodyLines = [
+      `Full name: ${fullName || "-"}`,
+      `Email: ${email || "-"}`,
+      `Country of residence: ${residence || "-"}`,
+      `Target country (if known): ${targetCountry || "-"}`,
+      `Optimizing for: ${optimizingFor.length ? optimizingFor.join(", ") : "-"}`,
+      `Brief context: ${context || "-"}`,
+      fromSlug ? `Source country slug: ${fromSlug}` : "",
+      `Source page: ${typeof window !== "undefined" ? window.location.href : ""}`,
+    ].filter(Boolean);
 
-    const lines: string[] = [];
-    lines.push("Private Advisory Review Request");
-    lines.push("");
-    lines.push(`Full name: ${fullName || "-"}`);
-    lines.push(`Email: ${email || "-"}`);
-    lines.push(`Country of residence: ${residence || "-"}`);
-    lines.push(`Target country (if known): ${targetCountry || "-"}`);
-    lines.push(
-      `Optimizing for: ${optimizingFor.length ? optimizingFor.join(", ") : "-"}`
-    );
-    lines.push("");
-    lines.push("Brief context:");
-    lines.push(context || "-");
-    lines.push("");
-    lines.push("— Sent from FertilityCareHub intake (Phase 1)");
+    const body = encodeURIComponent(bodyLines.join("\n"));
+    return `mailto:hello@fertilitycarehub.com?subject=${subject}&body=${body}`;
+  };
 
-    const body = encodeURIComponent(lines.join("\n"));
-    return `mailto:${TO_EMAIL}?subject=${subject}&body=${body}`;
-  }, [TO_EMAIL, fullName, email, residence, targetCountry, optimizingFor, context]);
+  const handleSubmit = async () => {
+    setErrorMsg(null);
+    setSuccessMsg(null);
 
-  const onOpenEmailDraft = () => {
-    // open the draft + show the confirmation caption
-    setOpenedDraft(true);
-    window.location.href = mailtoHref;
+    if (!supabase) {
+      setErrorMsg(
+        "Supabase is not configured in this environment (missing NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY)."
+      );
+      return;
+    }
+    if (!canSubmit) {
+      setErrorMsg("Please enter a valid email address.");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const sourceUrl =
+        typeof window !== "undefined" ? window.location.href : null;
+
+      const payload = {
+        full_name: fullName || null,
+        email: email.trim(),
+        country_of_residence: residence || null,
+        target_country: targetCountry || null,
+        optimizing_for: optimizingFor, // text[]
+        brief_context: context || null,
+        source_country_slug: fromSlug || null,
+        source_url: sourceUrl,
+        status: "new",
+      };
+
+      const { error } = await supabase
+        .from("consultation_requests")
+        .insert([payload]);
+
+      if (error) throw error;
+
+      setSuccessMsg(
+        "Thank you — your request has been submitted. Once received, we’ll route it and a consultant will reach out."
+      );
+
+      // Optional: clear form
+      setFullName("");
+      setEmail("");
+      setResidence("");
+      setTargetCountry("");
+      setOptimizingFor([]);
+      setContext("");
+    } catch (e: any) {
+      setErrorMsg(
+        e?.message ||
+          "Submission failed. Most likely: RLS insert policy is missing for consultation_requests."
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -129,7 +214,9 @@ export default function ConsultationPage() {
         </div>
       </header>
 
-      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "28px 20px 90px" }}>
+      <div
+        style={{ maxWidth: 1120, margin: "0 auto", padding: "28px 20px 90px" }}
+      >
         {/* Back */}
         <div>
           <Link
@@ -234,9 +321,40 @@ export default function ConsultationPage() {
             <h2 style={{ textAlign: "center" }}>Intake (Phase 1)</h2>
 
             <p style={{ textAlign: "center", color: MUTED, marginTop: 10 }}>
-              For now, this sends a structured email draft. Next phase will connect
-              this form to a secure backend.
+              For now, this submits to our internal queue. A consultant will review and reach out.
             </p>
+
+            {/* Alerts */}
+            {successMsg && (
+              <div
+                style={{
+                  marginTop: 14,
+                  padding: 12,
+                  borderRadius: 14,
+                  border: `1px solid ${BORDER}`,
+                  background: "#FFFFFF",
+                  color: "#2B2B2B",
+                  lineHeight: 1.5,
+                }}
+              >
+                {successMsg}
+              </div>
+            )}
+            {errorMsg && (
+              <div
+                style={{
+                  marginTop: 14,
+                  padding: 12,
+                  borderRadius: 14,
+                  border: "1px solid #E0B4B4",
+                  background: "#FFF7F7",
+                  color: "#7A1E1E",
+                  lineHeight: 1.5,
+                }}
+              >
+                {errorMsg}
+              </div>
+            )}
 
             <div
               style={{
@@ -246,35 +364,14 @@ export default function ConsultationPage() {
                 gap: 12,
               }}
             >
-              <Input
-                label="Full name"
-                placeholder="Your name"
-                value={fullName}
-                onChange={setFullName}
-              />
-              <Input
-                label="Email"
-                placeholder="name@email.com"
-                value={email}
-                onChange={setEmail}
-              />
-              <Input
-                label="Country of residence"
-                placeholder="e.g., Canada"
-                value={residence}
-                onChange={setResidence}
-              />
-              <Input
-                label="Target country (if known)"
-                placeholder="e.g., Spain"
-                value={targetCountry}
-                onChange={setTargetCountry}
-              />
+              <Input label="Full name" placeholder="Your name" value={fullName} onChange={setFullName} />
+              <Input label="Email" placeholder="name@email.com" value={email} onChange={setEmail} />
+              <Input label="Country of residence" placeholder="e.g., Canada" value={residence} onChange={setResidence} />
+              <Input label="Target country (if known)" placeholder="e.g., Spain" value={targetCountry} onChange={setTargetCountry} />
             </div>
 
             <div style={{ marginTop: 12 }}>
               <Label text="What are you optimizing for?" />
-
               <div
                 style={{
                   display: "grid",
@@ -284,11 +381,14 @@ export default function ConsultationPage() {
                 }}
               >
                 {OPTIONS.map((opt) => (
-                  <Chip
+                  <ChipButton
                     key={opt}
                     text={opt}
                     selected={optimizingFor.includes(opt)}
                     onClick={() => toggleOption(opt)}
+                    border={BORDER}
+                    gold={GOLD}
+                    ink={INK}
                   />
                 ))}
               </div>
@@ -301,9 +401,9 @@ export default function ConsultationPage() {
             <div style={{ marginTop: 12 }}>
               <Label text="Brief context" />
               <textarea
+                placeholder="Age range, prior cycles, diagnosis (if any), preferred timeline, and any constraints you want us to respect."
                 value={context}
                 onChange={(e) => setContext(e.target.value)}
-                placeholder="Age range, prior cycles, diagnosis (if any), preferred timeline, and any constraints you want us to respect."
                 style={{
                   width: "100%",
                   minHeight: 130,
@@ -332,7 +432,8 @@ export default function ConsultationPage() {
             >
               <button
                 type="button"
-                onClick={onOpenEmailDraft}
+                onClick={handleSubmit}
+                disabled={submitting || !canSubmit}
                 style={{
                   display: "inline-block",
                   border: `1px solid ${GOLD}`,
@@ -343,12 +444,31 @@ export default function ConsultationPage() {
                   fontSize: 13,
                   letterSpacing: 1,
                   textTransform: "uppercase",
-                  background: "transparent",
-                  cursor: "pointer",
+                  background: submitting ? "#EFE7D6" : "transparent",
+                  cursor: submitting || !canSubmit ? "not-allowed" : "pointer",
+                  opacity: submitting || !canSubmit ? 0.7 : 1,
                 }}
               >
-                Email Request (Phase 1)
+                {submitting ? "Submitting…" : "Submit Request (Phase 1)"}
               </button>
+
+              <a
+                href={buildMailto()}
+                style={{
+                  display: "inline-block",
+                  border: `1px solid ${BORDER}`,
+                  padding: "12px 16px",
+                  borderRadius: 999,
+                  textDecoration: "none",
+                  color: INK,
+                  fontSize: 13,
+                  letterSpacing: 1,
+                  textTransform: "uppercase",
+                  background: "transparent",
+                }}
+              >
+                Email Instead
+              </a>
 
               <Link
                 href="/countries"
@@ -369,21 +489,14 @@ export default function ConsultationPage() {
               </Link>
             </div>
 
-            {openedDraft && (
-              <p
-                style={{
-                  marginTop: 14,
-                  textAlign: "center",
-                  color: MUTED,
-                  fontSize: 12,
-                }}
-              >
-                Thank you — your email draft has opened. Please press Send to submit.
-                Once received, we’ll route it and a consultant will reach out.
-              </p>
-            )}
-
-            <p style={{ color: MUTED, fontSize: 12, textAlign: "center", marginTop: 14 }}>
+            <p
+              style={{
+                color: MUTED,
+                fontSize: 12,
+                textAlign: "center",
+                marginTop: 14,
+              }}
+            >
               Note: This page is not medical advice. Emergency issues should be handled by licensed medical professionals.
             </p>
           </div>
@@ -429,9 +542,9 @@ function Input({
     <div>
       <Label text={label} />
       <input
+        placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
         style={{
           width: "100%",
           padding: 12,
@@ -448,33 +561,36 @@ function Input({
   );
 }
 
-function Chip({
+function ChipButton({
   text,
   selected,
   onClick,
+  border,
+  gold,
+  ink,
 }: {
   text: string;
   selected: boolean;
   onClick: () => void;
+  border: string;
+  gold: string;
+  ink: string;
 }) {
-  const BORDER = "#E5DDC8";
-  const GOLD = "#B89B5E";
-
   return (
     <button
       type="button"
       onClick={onClick}
       style={{
-        border: `1px solid ${selected ? GOLD : BORDER}`,
+        border: `1px solid ${border}`,
         borderRadius: 999,
         padding: "10px 12px",
         fontSize: 13,
-        background: selected ? "rgba(184, 155, 94, 0.10)" : "transparent",
+        background: selected ? gold : "transparent",
+        color: ink,
         textAlign: "center",
         userSelect: "none",
         cursor: "pointer",
       }}
-      aria-pressed={selected}
     >
       {text}
     </button>
