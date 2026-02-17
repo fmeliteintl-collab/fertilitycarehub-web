@@ -2,20 +2,11 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-
-const OPTIONS = [
-  "Cost-efficiency",
-  "Highest success rates",
-  "Shortest timeline",
-  "Legal clarity",
-  "Donor availability",
-  "Surrogacy pathway",
-  "Privacy & discretion",
-  "Minimal travel",
-  "Best clinic depth",
-];
+import { useSearchParams } from "next/navigation";
+import { createClient } from "@supabase/supabase-js";
 
 export default function ConsultationPage() {
+  // ====== Brand / UI constants ======
   const PAGE_BG = "#F5F1E8";
   const INK = "#1A1A1A";
   const MUTED = "#6A6256";
@@ -23,51 +14,124 @@ export default function ConsultationPage() {
   const BORDER = "#E5DDC8";
   const CARD_BG = "#FBFAF7";
 
-  // ✅ change this later if needed
-  const TO_EMAIL = "advisory@fertilitycarehub.com";
+  // ====== Supabase client (Cloudflare Pages env vars already set) ======
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  const supabase = useMemo(() => createClient(supabaseUrl, supabaseAnonKey), [supabaseUrl, supabaseAnonKey]);
 
-  // Form state
+  // ====== Options ======
+  const OPTIONS = [
+    "Highest probability",
+    "Speed & access",
+    "Cost efficiency",
+    "Donor pathway",
+    "Ethical alignment",
+    "Legal clarity",
+  ] as const;
+
+  // ====== Form state ======
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [residence, setResidence] = useState("");
   const [targetCountry, setTargetCountry] = useState("");
-  const [context, setContext] = useState("");
   const [optimizingFor, setOptimizingFor] = useState<string[]>([]);
-  const [openedDraft, setOpenedDraft] = useState(false);
+  const [briefContext, setBriefContext] = useState("");
 
+  // UX state
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submittedId, setSubmittedId] = useState<string | null>(null);
+  const [emailOpened, setEmailOpened] = useState(false);
+
+  // ====== Capture source (country page -> consultation) ======
+  const searchParams = useSearchParams();
+  const sourceCountrySlug = (searchParams.get("from") || "").trim() || null;
+  const sourceUrl =
+    typeof window !== "undefined" ? window.location.href : null;
+
+  // ====== Helpers ======
   const toggleOption = (label: string) => {
     setOptimizingFor((prev) =>
       prev.includes(label) ? prev.filter((x) => x !== label) : [...prev, label]
     );
   };
 
+  const isValidEmail = (value: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+
+  const canSubmit =
+    email.trim().length > 0 && isValidEmail(email);
+
+  // ====== Mailto fallback (builds an email draft) ======
   const mailtoHref = useMemo(() => {
-    const subject = encodeURIComponent("Private Advisory Review Request");
+    const subject = "Private Advisory Review Request";
 
-    const lines: string[] = [];
-    lines.push("Private Advisory Review Request");
-    lines.push("");
-    lines.push(`Full name: ${fullName || "-"}`);
-    lines.push(`Email: ${email || "-"}`);
-    lines.push(`Country of residence: ${residence || "-"}`);
-    lines.push(`Target country (if known): ${targetCountry || "-"}`);
-    lines.push(
-      `Optimizing for: ${optimizingFor.length ? optimizingFor.join(", ") : "-"}`
-    );
-    lines.push("");
-    lines.push("Brief context:");
-    lines.push(context || "-");
-    lines.push("");
-    lines.push("— Sent from FertilityCareHub intake (Phase 1)");
+    const lines: string[] = [
+      "FertilityCareHub — Private Advisory Review (Phase 1)",
+      "----------------------------------------------",
+      `Full name: ${fullName || "-"}`,
+      `Email: ${email || "-"}`,
+      `Country of residence: ${residence || "-"}`,
+      `Target country (if known): ${targetCountry || "-"}`,
+      `Optimizing for: ${optimizingFor.length ? optimizingFor.join(", ") : "-"}`,
+      "",
+      "Brief context:",
+      briefContext?.trim() ? briefContext.trim() : "-",
+      "",
+      `Source country slug: ${sourceCountrySlug || "-"}`,
+      `Source URL: ${sourceUrl || "-"}`,
+    ];
 
-    const body = encodeURIComponent(lines.join("\n"));
-    return `mailto:${TO_EMAIL}?subject=${subject}&body=${body}`;
-  }, [TO_EMAIL, fullName, email, residence, targetCountry, optimizingFor, context]);
+    const body = lines.join("\n");
+    return `mailto:hello@fertilitycarehub.com?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
+  }, [fullName, email, residence, targetCountry, optimizingFor, briefContext, sourceCountrySlug, sourceUrl]);
 
-  const onOpenEmailDraft = () => {
-    // open the draft + show the confirmation caption
-    setOpenedDraft(true);
-    window.location.href = mailtoHref;
+  // ====== Submit to Supabase ======
+  const submitToSupabase = async () => {
+    setSubmitError(null);
+    setSubmittedId(null);
+
+    if (!canSubmit) {
+      setSubmitError("Please enter a valid email address before submitting.");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const payload = {
+        full_name: fullName.trim() || null,
+        email: email.trim(),
+        country_of_residence: residence.trim() || null,
+        target_country: targetCountry.trim() || null,
+        optimizing_for: optimizingFor, // text[] in Postgres
+        brief_context: briefContext.trim() || null,
+        source_country_slug: sourceCountrySlug,
+        source_url: sourceUrl,
+        // status column default 'new' (your SQL)
+      };
+
+      const { data, error } = await supabase
+        .from("consultation_requests")
+        .insert(payload)
+        .select("id")
+        .single();
+
+      if (error) throw error;
+
+      setSubmittedId(data?.id ?? "submitted");
+      // Optional: clear form after submit
+      // setFullName(""); setEmail(""); setResidence(""); setTargetCountry(""); setOptimizingFor([]); setBriefContext("");
+    } catch (err: any) {
+      // Common cause: RLS policy not allowing insert
+      setSubmitError(
+        err?.message ||
+          "Submission failed. Please try again (or use Email Request)."
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -129,7 +193,13 @@ export default function ConsultationPage() {
         </div>
       </header>
 
-      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "28px 20px 90px" }}>
+      <div
+        style={{
+          maxWidth: 1120,
+          margin: "0 auto",
+          padding: "28px 20px 90px",
+        }}
+      >
         {/* Back */}
         <div>
           <Link
@@ -141,7 +211,9 @@ export default function ConsultationPage() {
         </div>
 
         {/* Hero */}
-        <section style={{ paddingTop: 34, paddingBottom: 26, textAlign: "center" }}>
+        <section
+          style={{ paddingTop: 34, paddingBottom: 26, textAlign: "center" }}
+        >
           <div
             style={{
               fontSize: 12,
@@ -167,9 +239,9 @@ export default function ConsultationPage() {
               color: "#3A342C",
             }}
           >
-            This is a strategy-led review — not general medical advice. We help you
-            choose the right country pathway, identify what matters, and reduce
-            wasted time, travel, and financial leakage.
+            This is a strategy-led review — not general medical advice. We help
+            you choose the right country pathway, identify what matters, and
+            reduce wasted time, travel, and financial leakage.
           </p>
         </section>
 
@@ -234,10 +306,53 @@ export default function ConsultationPage() {
             <h2 style={{ textAlign: "center" }}>Intake (Phase 1)</h2>
 
             <p style={{ textAlign: "center", color: MUTED, marginTop: 10 }}>
-              For now, this sends a structured email draft. Next phase will connect
-              this form to a secure backend.
+              This form is now connected to our secure backend (Supabase). You can submit directly,
+              or use the email fallback below.
             </p>
 
+            {/* Success / Error banners */}
+            {submittedId && (
+              <div
+                style={{
+                  marginTop: 14,
+                  border: `1px solid ${BORDER}`,
+                  background: "#FFF",
+                  borderRadius: 14,
+                  padding: 12,
+                  color: INK,
+                  lineHeight: 1.6,
+                }}
+              >
+                <strong>Thank you — your request was submitted.</strong>
+                <div style={{ color: MUTED, fontSize: 13, marginTop: 6 }}>
+                  We’ve received it and will route it internally. A consultant will reach out when ready.
+                </div>
+                <div style={{ color: MUTED, fontSize: 12, marginTop: 6 }}>
+                  Reference ID: {submittedId}
+                </div>
+              </div>
+            )}
+
+            {submitError && (
+              <div
+                style={{
+                  marginTop: 14,
+                  border: `1px solid ${BORDER}`,
+                  background: "#FFF",
+                  borderRadius: 14,
+                  padding: 12,
+                  color: "#7A1F1F",
+                  lineHeight: 1.6,
+                }}
+              >
+                <strong>Submission failed.</strong> {submitError}
+                <div style={{ color: MUTED, fontSize: 12, marginTop: 6 }}>
+                  You can still use “Email Request (Phase 1)” below as a fallback.
+                </div>
+              </div>
+            )}
+
+            {/* Inputs */}
             <div
               style={{
                 marginTop: 18,
@@ -246,35 +361,15 @@ export default function ConsultationPage() {
                 gap: 12,
               }}
             >
-              <Input
-                label="Full name"
-                placeholder="Your name"
-                value={fullName}
-                onChange={setFullName}
-              />
-              <Input
-                label="Email"
-                placeholder="name@email.com"
-                value={email}
-                onChange={setEmail}
-              />
-              <Input
-                label="Country of residence"
-                placeholder="e.g., Canada"
-                value={residence}
-                onChange={setResidence}
-              />
-              <Input
-                label="Target country (if known)"
-                placeholder="e.g., Spain"
-                value={targetCountry}
-                onChange={setTargetCountry}
-              />
+              <Input label="Full name" placeholder="Your name" value={fullName} onChange={setFullName} />
+              <Input label="Email" placeholder="name@email.com" value={email} onChange={setEmail} />
+              <Input label="Country of residence" placeholder="e.g., Canada" value={residence} onChange={setResidence} />
+              <Input label="Target country (if known)" placeholder="e.g., Spain" value={targetCountry} onChange={setTargetCountry} />
             </div>
 
+            {/* Optimizing for */}
             <div style={{ marginTop: 12 }}>
               <Label text="What are you optimizing for?" />
-
               <div
                 style={{
                   display: "grid",
@@ -284,11 +379,14 @@ export default function ConsultationPage() {
                 }}
               >
                 {OPTIONS.map((opt) => (
-                  <Chip
+                  <ChipButton
                     key={opt}
                     text={opt}
                     selected={optimizingFor.includes(opt)}
                     onClick={() => toggleOption(opt)}
+                    border={BORDER}
+                    gold={GOLD}
+                    ink={INK}
                   />
                 ))}
               </div>
@@ -298,12 +396,13 @@ export default function ConsultationPage() {
               </p>
             </div>
 
+            {/* Brief context */}
             <div style={{ marginTop: 12 }}>
               <Label text="Brief context" />
               <textarea
-                value={context}
-                onChange={(e) => setContext(e.target.value)}
                 placeholder="Age range, prior cycles, diagnosis (if any), preferred timeline, and any constraints you want us to respect."
+                value={briefContext}
+                onChange={(e) => setBriefContext(e.target.value)}
                 style={{
                   width: "100%",
                   minHeight: 130,
@@ -332,10 +431,30 @@ export default function ConsultationPage() {
             >
               <button
                 type="button"
-                onClick={onOpenEmailDraft}
+                onClick={submitToSupabase}
+                disabled={submitting || !canSubmit}
+                style={{
+                  border: `1px solid ${GOLD}`,
+                  padding: "12px 16px",
+                  borderRadius: 999,
+                  color: INK,
+                  fontSize: 13,
+                  letterSpacing: 1,
+                  textTransform: "uppercase",
+                  background: submitting || !canSubmit ? "#EFE9DA" : "transparent",
+                  cursor: submitting || !canSubmit ? "not-allowed" : "pointer",
+                }}
+                title={!canSubmit ? "Enter a valid email to enable submit" : "Submit request"}
+              >
+                {submitting ? "Submitting..." : "Submit Request"}
+              </button>
+
+              <a
+                href={mailtoHref}
+                onClick={() => setEmailOpened(true)}
                 style={{
                   display: "inline-block",
-                  border: `1px solid ${GOLD}`,
+                  border: `1px solid ${BORDER}`,
                   padding: "12px 16px",
                   borderRadius: 999,
                   textDecoration: "none",
@@ -344,11 +463,10 @@ export default function ConsultationPage() {
                   letterSpacing: 1,
                   textTransform: "uppercase",
                   background: "transparent",
-                  cursor: "pointer",
                 }}
               >
                 Email Request (Phase 1)
-              </button>
+              </a>
 
               <Link
                 href="/countries"
@@ -369,17 +487,10 @@ export default function ConsultationPage() {
               </Link>
             </div>
 
-            {openedDraft && (
-              <p
-                style={{
-                  marginTop: 14,
-                  textAlign: "center",
-                  color: MUTED,
-                  fontSize: 12,
-                }}
-              >
-                Thank you — your email draft has opened. Please press Send to submit.
-                Once received, we’ll route it and a consultant will reach out.
+            {/* Email opened caption (your requested wording) */}
+            {emailOpened && (
+              <p style={{ color: MUTED, fontSize: 12, textAlign: "center", marginTop: 10 }}>
+                Thank you — your email draft has opened. Please press Send to submit. Once received, we’ll route it and a consultant will reach out.
               </p>
             )}
 
@@ -390,6 +501,7 @@ export default function ConsultationPage() {
         </section>
       </div>
 
+      {/* Responsive tweaks */}
       <style>{`
         @media (max-width: 900px) {
           section[style*="grid-template-columns: 1fr 1fr"] {
@@ -404,6 +516,8 @@ export default function ConsultationPage() {
     </main>
   );
 }
+
+// ====== Small UI components (safe, no JSX mismatch) ======
 
 function Label({ text }: { text: string }) {
   return (
@@ -429,9 +543,9 @@ function Input({
     <div>
       <Label text={label} />
       <input
+        placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
         style={{
           width: "100%",
           padding: 12,
@@ -439,8 +553,7 @@ function Input({
           border: `1px solid ${BORDER}`,
           outline: "none",
           background: "#FFF",
-          fontFamily:
-            'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif',
+          fontFamily: 'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif',
           fontSize: 14,
         }}
       />
@@ -448,31 +561,35 @@ function Input({
   );
 }
 
-function Chip({
+function ChipButton({
   text,
   selected,
   onClick,
+  border,
+  gold,
+  ink,
 }: {
   text: string;
   selected: boolean;
   onClick: () => void;
+  border: string;
+  gold: string;
+  ink: string;
 }) {
-  const BORDER = "#E5DDC8";
-  const GOLD = "#B89B5E";
-
   return (
     <button
       type="button"
       onClick={onClick}
       style={{
-        border: `1px solid ${selected ? GOLD : BORDER}`,
-        borderRadius: 999,
         padding: "10px 12px",
+        borderRadius: 999,
+        border: `1px solid ${selected ? gold : border}`,
+        background: selected ? "rgba(184, 155, 94, 0.18)" : "transparent",
+        color: ink,
         fontSize: 13,
-        background: selected ? "rgba(184, 155, 94, 0.10)" : "transparent",
         textAlign: "center",
-        userSelect: "none",
         cursor: "pointer",
+        userSelect: "none",
       }}
       aria-pressed={selected}
     >
