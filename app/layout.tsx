@@ -4,7 +4,12 @@ import Link from "next/link";
 
 export const metadata = {
   title: "FertilityCareHub",
-  description: "Private Global Fertility Strategy Advisory",
+  description: "Trusted global fertility guidance platform",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({
