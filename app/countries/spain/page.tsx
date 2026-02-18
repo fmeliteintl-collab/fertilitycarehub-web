@@ -3,36 +3,36 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Spain IVF Regulations & Fertility Law 2026 | FertilityCareHub",
-  description:
-    "Structured analysis of IVF regulations, donor laws, surrogacy policy, and fertility access rules in Spain. Updated regulatory insights for intended parents.",
-  alternates: {
-    canonical: "https://fertilitycarehub.com/countries/spain",
-  },
-  openGraph: {
-    title: "Spain IVF Regulations & Fertility Law 2026",
     description:
-      "In-depth fertility law analysis covering IVF, donor gametes, surrogacy, and access regulations in Spain.",
-    url: "https://fertilitycarehub.com/countries/spain",
-    siteName: "FertilityCareHub",
-    type: "article",
-  },
-};
-export default function SpainDossierPage() {
-  return (
-    <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
-      {/* Top utility row */}
-      <section
-        style={{
-          maxWidth: 1120,
-          margin: "0 auto",
-          padding: "28px 20px 0",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 16,
-        }}
-      >
-        <Link
+        "Structured analysis of IVF regulations, donor laws, surrogacy policy, and fertility access rules in Spain. Updated regulatory insights for intended parents.",
+          alternates: {
+              canonical: "https://fertilitycarehub.com/countries/spain",
+                },
+                  openGraph: {
+                      title: "Spain IVF Regulations & Fertility Law 2026",
+                          description:
+                                "In-depth fertility law analysis covering IVF, donor gametes, surrogacy, and access regulations in Spain.",
+                                    url: "https://fertilitycarehub.com/countries/spain",
+                                        siteName: "FertilityCareHub",
+                                            type: "article",
+                                              },
+                                              };
+                                              export default function SpainDossierPage() {
+                                                return (
+                                                    <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
+                                                          {/* Top utility row */}
+                                                                <section
+                                                                        style={{
+                                                                                  maxWidth: 1120,
+                                                                                            margin: "0 auto",
+                                                                                                      padding: "28px 20px 0",
+                                                                                                                display: "flex",
+                                                                                                                          alignItems: "center",
+                                                                                                                                    justifyContent: "space-between",
+                                                                                                                                              gap: 16,
+                                                                                                                                                      }}
+                                                                                                                                                            >
+                                                                                                                                                                    <Link
           href="/countries"
           style={{
             color: "#7B6A3A",
