@@ -186,6 +186,8 @@ export default function AdminConsultationsPage() {
 
             <div className="mt-3 flex gap-2">
               <input
+                
+                type="password"
                 value={token}
                 onChange={(e) => setToken(e.target.value)}
                 placeholder="Bearer token value…"
