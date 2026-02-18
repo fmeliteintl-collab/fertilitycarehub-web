@@ -44,32 +44,16 @@ export default function AdminConsultationsPage() {
     setToken(t);
   }, []);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return rows;
-    return rows.filter((r) => {
-      const blob = [
-        r.name,
-        r.email,
-        r.phone,
-        r.country,
-        r.message,
-        r.source_country_slug,
-        r.source_url,
-        (r.optimizing_for || []).join(", "),
-        r.status,
-        r.id,
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
-      return blob.includes(q);
-    });
-  }, [rows, query]);
-
   async function fetchRows(activeToken?: string) {
     const t = (activeToken ?? savedToken ?? token).trim();
     setErr("");
+
+    if (!t) {
+      setErr("Missing admin token. Save your token first.");
+      setRows([]);
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch("/api/admin/consultations", {
@@ -96,10 +80,43 @@ export default function AdminConsultationsPage() {
     }
   }
 
+  // ✅ NEW: If token exists after refresh, auto-load the table
+  useEffect(() => {
+    if (!savedToken) return;
+    fetchRows(savedToken);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [savedToken]);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return rows;
+    return rows.filter((r) => {
+      const blob = [
+        r.name,
+        r.email,
+        r.phone,
+        r.country,
+        r.message,
+        r.source_country_slug,
+        r.source_url,
+        (r.optimizing_for || []).join(", "),
+        r.status,
+        r.id,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return blob.includes(q);
+    });
+  }, [rows, query]);
+
   function saveToken() {
     const t = token.trim();
     window.localStorage.setItem("FCH_ADMIN_TOKEN", t);
     setSavedToken(t);
+
+    // ✅ NEW: After saving token, auto-load immediately
+    if (t) fetchRows(t);
   }
 
   async function updateStatus(id: string, status: string) {
@@ -337,7 +354,8 @@ export default function AdminConsultationsPage() {
               {!loading && filtered.length === 0 && (
                 <tr>
                   <td className="p-6 text-[#6A6256]" colSpan={6}>
-                    No rows yet. Click <b>Load / Refresh</b>.
+                    No rows yet. If your token is saved, rows should load
+                    automatically. Otherwise click <b>Load / Refresh</b>.
                   </td>
                 </tr>
               )}
