@@ -2,37 +2,38 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Spain IVF Regulations & Fertility Law 2026 | FertilityCareHub",
+  title: "Spain Fertility Strategy Advisory | Regulatory & Clinical Alignment 2026",
+  description:
+    "Private strategic advisory for individuals and families evaluating fertility care in Spain. Jurisdiction assessment, regulatory clarity, and clinical pathway alignment across Europe.",
+  alternates: {
+    canonical: "https://fertilitycarehub.com/countries/spain",
+  },
+  openGraph: {
+    title: "Spain Fertility Strategy Advisory | FertilityCareHub",
     description:
-        "Structured analysis of IVF regulations, donor laws, surrogacy policy, and fertility access rules in Spain. Updated regulatory insights for intended parents.",
-          alternates: {
-              canonical: "https://fertilitycarehub.com/countries/spain",
-                },
-                  openGraph: {
-                      title: "Spain IVF Regulations & Fertility Law 2026",
-                          description:
-                                "In-depth fertility law analysis covering IVF, donor gametes, surrogacy, and access regulations in Spain.",
-                                    url: "https://fertilitycarehub.com/countries/spain",
-                                        siteName: "FertilityCareHub",
-                                            type: "article",
-                                              },
-                                              };
-                                              export default function SpainDossierPage() {
-                                                return (
-                                                    <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
-                                                          {/* Top utility row */}
-                                                                <section
-                                                                        style={{
-                                                                                  maxWidth: 1120,
-                                                                                            margin: "0 auto",
-                                                                                                      padding: "28px 20px 0",
-                                                                                                                display: "flex",
-                                                                                                                          alignItems: "center",
-                                                                                                                                    justifyContent: "space-between",
-                                                                                                                                              gap: 16,
-                                                                                                                                                      }}
-                                                                                                                                                            >
-                                                                                                                                                                    <Link
+      "Strategic jurisdiction assessment and regulatory clarity for cross-border fertility care in Spain.",
+    url: "https://fertilitycarehub.com/countries/spain",
+    siteName: "FertilityCareHub",
+    type: "article",
+  },
+};
+
+export default function SpainDossierPage() {
+  return (
+    <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
+      {/* Top utility row */}
+      <section
+        style={{
+          maxWidth: 1120,
+          margin: "0 auto",
+          padding: "28px 20px 0",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 16,
+        }}
+      >
+        <Link
           href="/countries"
           style={{
             color: "#7B6A3A",
@@ -58,7 +59,7 @@ export const metadata: Metadata = {
             whiteSpace: "nowrap",
           }}
         >
-          Review Spain Strategy Privately
+          Request Spain Strategy Review
         </Link>
       </section>
 
@@ -86,7 +87,7 @@ export const metadata: Metadata = {
               letterSpacing: "-0.02em",
             }}
           >
-            Spain
+            Spain: Fertility Jurisdiction Assessment
           </h1>
 
           <p
@@ -98,12 +99,11 @@ export const metadata: Metadata = {
               color: "#2A2A2A",
             }}
           >
-            Spain occupies a unique position in European fertility care. Unlike
-            neighbors who restrict, Spain permits — and this permissiveness,
-            combined with world-class clinical standards, creates strategic
-            advantages for specific patient profiles. This dossier outlines when
-            Spain should be your primary option, when it should not, and how to
-            navigate its landscape with precision.
+            Spain occupies a distinctive position within the European fertility landscape.
+            Its regulatory posture supports donor pathways under defined conditions while
+            maintaining mature clinical standards. This dossier evaluates when Spain is a
+            high-alignment jurisdiction, where structural constraints may appear, and how
+            cross-border factors shape strategic decision-making.
           </p>
         </div>
       </section>
@@ -142,21 +142,20 @@ export const metadata: Metadata = {
               }}
             >
               <li>
-                You want a permissive European framework with mature clinical
-                depth and internationally experienced teams.
+                You want a permissive European framework with mature clinical depth and
+                internationally experienced teams.
               </li>
               <li>
-                Donor pathways matter. Spain’s ecosystem often supports donor
-                availability and streamlined donor processes.
+                Donor pathways matter. Spain’s ecosystem often supports donor availability
+                and streamlined processes.
               </li>
               <li>
-                You value a predictable “clinic cadence” (coordination,
-                scheduling, standardized workflows) and want reduced friction
-                across the journey.
+                You value a predictable clinic cadence (coordination, scheduling,
+                standardized workflows) and want reduced friction.
               </li>
               <li>
-                You prefer a strong balance of quality + access, without the
-                strict governance constraints seen in more regulated systems.
+                You prefer a strong balance of quality and access, without the strict
+                governance constraints seen in more regulated systems.
               </li>
             </ul>
           </div>
@@ -186,20 +185,20 @@ export const metadata: Metadata = {
               }}
             >
               <li>
-                You require the strongest “public reporting” governance signals
-                and highly standardized national oversight.
+                You require the strongest public reporting governance signals and highly
+                standardized national oversight.
               </li>
               <li>
-                Your pathway depends on a very specific legal structure where a
-                different jurisdiction is clearly more aligned.
+                Your pathway depends on a specific legal structure where another
+                jurisdiction is clearly more aligned.
               </li>
               <li>
-                You want a fully DIY approach with exhaustive lists — Spain is
-                best used with curation, not database browsing.
+                You want a fully DIY approach with exhaustive lists — Spain performs best
+                with curation, not database browsing.
               </li>
               <li>
-                You need the broadest possible menu of edge-case options; Spain
-                is strong, but not always the most permissive for every scenario.
+                You need the broadest menu of edge-case options; Spain is strong, but not
+                always the most permissive for every scenario.
               </li>
             </ul>
           </div>
@@ -212,9 +211,16 @@ export const metadata: Metadata = {
           <h2 style={{ fontSize: 28, margin: 0, fontWeight: 600 }}>
             Advisory Framework
           </h2>
-          <p style={{ margin: "10px auto 0", maxWidth: 760, color: "#3A3A3A", lineHeight: 1.7 }}>
-            This is intentionally not a public database. We focus on strategic
-            decision points, the signals that matter, and what to exclude.
+          <p
+            style={{
+              margin: "10px auto 0",
+              maxWidth: 760,
+              color: "#3A3A3A",
+              lineHeight: 1.7,
+            }}
+          >
+            This is intentionally not a public database. We focus on strategic decision
+            points, the signals that matter, and what to exclude.
           </p>
         </div>
 
@@ -234,12 +240,19 @@ export const metadata: Metadata = {
               padding: "22px 20px",
             }}
           >
-            <div style={{ fontSize: 14, letterSpacing: "0.18em", textTransform: "uppercase", color: "#7B6A3A" }}>
+            <div
+              style={{
+                fontSize: 14,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "#7B6A3A",
+              }}
+            >
               Country Intelligence
             </div>
             <p style={{ margin: "12px 0 0", lineHeight: 1.7, color: "#2A2A2A" }}>
-              Legal environment, donor policy posture, cross-border eligibility
-              friction, and timeline realism.
+              Legal environment, donor policy posture, cross-border eligibility friction,
+              and timeline realism.
             </p>
           </div>
 
@@ -252,12 +265,19 @@ export const metadata: Metadata = {
               padding: "22px 20px",
             }}
           >
-            <div style={{ fontSize: 14, letterSpacing: "0.18em", textTransform: "uppercase", color: "#7B6A3A" }}>
+            <div
+              style={{
+                fontSize: 14,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "#7B6A3A",
+              }}
+            >
               Clinic Standards Insight
             </div>
             <p style={{ margin: "12px 0 0", lineHeight: 1.7, color: "#2A2A2A" }}>
-              Accreditation signals, lab quality indicators, process maturity,
-              and how to avoid “pretty marketing.”
+              Accreditation signals, lab quality indicators, process maturity, and how to
+              avoid “pretty marketing.”
             </p>
           </div>
 
@@ -270,12 +290,19 @@ export const metadata: Metadata = {
               padding: "22px 20px",
             }}
           >
-            <div style={{ fontSize: 14, letterSpacing: "0.18em", textTransform: "uppercase", color: "#7B6A3A" }}>
+            <div
+              style={{
+                fontSize: 14,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "#7B6A3A",
+              }}
+            >
               Strategic Advisory
             </div>
             <p style={{ margin: "12px 0 0", lineHeight: 1.7, color: "#2A2A2A" }}>
-              What to choose, what to exclude, and when Spain should be
-              primary vs. secondary in your plan.
+              What to choose, what to exclude, and when Spain should be primary vs.
+              secondary in your plan.
             </p>
           </div>
         </div>
@@ -293,6 +320,7 @@ export const metadata: Metadata = {
           <h3 style={{ margin: 0, fontSize: 20, fontWeight: 600 }}>
             The “Private” filter — what we deliberately exclude
           </h3>
+
           <div
             style={{
               display: "grid",
@@ -307,6 +335,7 @@ export const metadata: Metadata = {
               <div>❌ Exhaustive clinic lists (we curate, not index)</div>
               <div>❌ Step-by-step visa instructions (we guide strategically)</div>
             </div>
+
             <div style={{ gridColumn: "span 6" }}>
               <div>❌ Hotel price comparisons (we recommend vetted options)</div>
               <div>❌ Every treatment detail (we focus on decision points)</div>
@@ -329,7 +358,7 @@ export const metadata: Metadata = {
               letterSpacing: "0.06em",
             }}
           >
-            Review Spain Strategy Privately
+            Request Spain Strategy Review
           </Link>
 
           <div style={{ marginTop: 10, fontSize: 13, color: "#6A6A6A" }}>
