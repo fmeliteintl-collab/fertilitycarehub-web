@@ -2,13 +2,42 @@ import "./globals.css";
 import Link from "next/link";
 
 
-export const metadata = {
-  title: "FertilityCareHub",
-  description: "Trusted global fertility guidance platform",
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: {
+    default:
+      "Global Fertility Strategy Advisory — Europe & Beyond | FertilityCareHub",
+    template: "%s | FertilityCareHub",
+  },
+  description:
+    "Private global fertility strategy advisory for cross-border care across Europe and select international destinations — jurisdiction clarity, pathway alignment, and discreet planning.",
+  metadataBase: new URL("https://fertilitycarehub.com"),
+
+  alternates: {
+    canonical: "/",
+  },
+
+  openGraph: {
+    title:
+      "Global Fertility Strategy Advisory — Europe & Beyond",
+    description:
+      "Private global fertility strategy advisory for cross-border care across Europe and select international destinations — jurisdiction clarity, pathway alignment, and discreet planning.",
+    url: "https://fertilitycarehub.com",
+    siteName: "FertilityCareHub",
+    type: "website",
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
+
   icons: {
     icon: "/favicon.ico",
     apple: "/apple-touch-icon.png",
   },
+
   manifest: "/site.webmanifest",
 };
 
