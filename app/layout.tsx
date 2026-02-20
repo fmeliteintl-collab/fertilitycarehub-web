@@ -1,8 +1,25 @@
 import "./globals.css";
 import Link from "next/link";
-
-
 import type { Metadata } from "next";
+
+const ORG_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "FertilityCareHub",
+  url: "https://fertilitycarehub.com",
+  logo: "https://fertilitycarehub.com/logo.png",
+  description:
+    "Private global fertility strategy advisory for cross-border care across Europe and select international destinations — jurisdiction clarity, pathway alignment, and discreet planning.",
+  contactPoint: [
+    {
+      "@type": "ContactPoint",
+      contactType: "customer support",
+      email: "hello@fertilitycarehub.com",
+      availableLanguage: ["en"],
+    },
+  ],
+};
+
 
 export const metadata: Metadata = {
   title: {
@@ -48,6 +65,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_JSON_LD) }}
+/>
+
       <body className="bg-[#F5F1E8] text-[#1A1A1A] font-serif">
         
         <header className="w-full py-6 border-b border-[#E5DDC8]">
