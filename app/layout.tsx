@@ -18,7 +18,7 @@ const ORG_JSON_LD = {
       availableLanguage: ["en"],
     },
   ],
-};
+} as const;
 
 
 export const metadata: Metadata = {
