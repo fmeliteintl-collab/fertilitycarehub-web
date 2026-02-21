@@ -1,3 +1,4 @@
+import Breadcrumbs from "../components/Breadcrumbs";
 import Link from "next/link";
 type Country = {
   slug: string;
@@ -94,6 +95,13 @@ export default function CountriesPage() {
         padding: "64px 20px",
       }}
     >
+      <Breadcrumbs
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Countries", href: "/countries" },
+        ]}
+      />
+
       <header style={{ textAlign: "center", marginBottom: 40 }}>
         <h1
           style={{

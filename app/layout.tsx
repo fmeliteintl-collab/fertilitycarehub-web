@@ -20,7 +20,6 @@ const ORG_JSON_LD = {
   ],
 } as const;
 
-
 export const metadata: Metadata = {
   title: {
     default:
@@ -36,8 +35,7 @@ export const metadata: Metadata = {
   },
 
   openGraph: {
-    title:
-      "Global Fertility Strategy Advisory — Europe & Beyond",
+    title: "Global Fertility Strategy Advisory — Europe & Beyond",
     description:
       "Private global fertility strategy advisory for cross-border care across Europe and select international destinations — jurisdiction clarity, pathway alignment, and discreet planning.",
     url: "https://fertilitycarehub.com",
@@ -66,20 +64,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <script
-  type="application/ld+json"
-  dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_JSON_LD) }}
-/>
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(ORG_JSON_LD),
+        }}
+      />
 
       <body className="bg-[#F5F1E8] text-[#1A1A1A] font-serif">
-        
         <header className="w-full py-6 border-b border-[#E5DDC8]">
           <div className="max-w-6xl mx-auto flex items-center justify-between px-6">
-            
             <Link href="/" className="flex items-center gap-4">
-              
-              <span className="text-xl tracking-wide">
-                FertilityCareHub
-              </span>
+              <span className="text-xl tracking-wide">FertilityCareHub</span>
             </Link>
 
             <Link
@@ -88,12 +83,10 @@ export default function RootLayout({
             >
               Request Advisory Consultation
             </Link>
-
           </div>
         </header>
 
         <main>{children}</main>
-
       </body>
     </html>
   );
