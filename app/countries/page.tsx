@@ -5,7 +5,7 @@ type Country = {
   status: "Live" | "In build";
   oneLiner: string;
 };
-const countries = [
+const countries: Country[] = [
   {
     slug: "spain",
     name: "Spain",
