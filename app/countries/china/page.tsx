@@ -1,3 +1,5 @@
+import CountryWebPageSchema from "../../components/CountryWebPageSchema";
+import Breadcrumbs from "../../components/Breadcrumbs";
 import Link from "next/link";
 import type { Metadata } from "next";
 
@@ -20,6 +22,19 @@ export const metadata: Metadata = {
 export default function ChinaPage() {
   return (
     <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
+      <Breadcrumbs
+  items={[
+    { name: "Home", href: "/" },
+    { name: "Countries", href: "/countries" },
+    { name: "China", href: "/countries/china" },
+  ]}
+/>
+<CountryWebPageSchema
+  countryName="China"
+  countrySlug="china"
+  title="China: Fertility Jurisdiction Assessment"
+  description="Strategic jurisdiction assessment and regulatory clarity for fertility care within China's regulatory framework."
+/>
       {/* Top utility bar */}
       <div className="max-w-6xl mx-auto px-6 pt-10">
         <div className="flex items-center justify-between">

@@ -1,7 +1,8 @@
+import CountryWebPageSchema from "../../components/CountryWebPageSchema";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import Link from "next/link";
 import type { Metadata } from "next";
-import Script from "next/script";
+
 
 export const metadata: Metadata = {
   title: "Spain Fertility Strategy Advisory | Regulatory & Clinical Alignment 2026",
@@ -31,27 +32,20 @@ export default function SpainDossierPage() {
         ]}
       />
 
-      <Script
-        id="ld-spain-advisory"
-        type="application/ld+json"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebPage",
-            name: "Spain: Fertility Jurisdiction Assessment",
-            description:
-              "Strategic jurisdiction assessment and regulatory clarity for cross-border fertility care in Spain.",
-            url: "https://fertilitycarehub.com/countries/spain",
-            isPartOf: {
-              "@type": "WebSite",
-              name: "FertilityCareHub",
-              url: "https://fertilitycarehub.com",
-            },
-            
-          }),
-        }}
+      <CountryWebPageSchema
+        countryName="Spain"
+        countrySlug="spain"
+        title="Spain: Fertility Jurisdiction Assessment"
+        description="Strategic jurisdiction assessment and regulatory clarity for cross-border fertility care in Spain."
       />
+
+
+      <CountryWebPageSchema
+  countryName="Spain"
+  countrySlug="spain"
+  title="Spain: Fertility Jurisdiction Assessment"
+  description="Strategic jurisdiction assessment and regulatory clarity for cross-border fertility care in Spain."
+/>
 
     {/* rest of your existing page */}
 
