@@ -30,42 +30,26 @@ function formatDate(s?: string) {
 }
 
 export default function AdminConsultationsPage() {
-  const [token, setToken] = useState("");
-  const [savedToken, setSavedToken] = useState<string>("");
   const [rows, setRows] = useState<ConsultationRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string>("");
   const [query, setQuery] = useState("");
 
-  // Load token from localStorage on first render
-  useEffect(() => {
-    const t = window.localStorage.getItem("FCH_ADMIN_TOKEN") || "";
-    setSavedToken(t);
-    setToken(t);
-  }, []);
-
-  async function fetchRows(activeToken?: string) {
-    const t = (activeToken ?? savedToken ?? token).trim();
+  async function fetchRows() {
     setErr("");
-
-    if (!t) {
-      setErr("Missing admin token. Save your token first.");
-      setRows([]);
-      return;
-    }
-
     setLoading(true);
+
     try {
+      // ✅ Cookie-based auth (HttpOnly) — no token in JS, no Authorization header
       const res = await fetch("/api/admin/consultations", {
         method: "GET",
-        headers: {
-          authorization: `Bearer ${t}`,
-        },
       });
 
       const json = await res.json().catch(() => ({}));
 
       if (!res.ok) {
+        // If unauthorized, the server guard should normally redirect already,
+        // but handle gracefully anyway.
         setErr(json?.error || `Request failed (${res.status})`);
         setRows([]);
         return;
@@ -73,22 +57,20 @@ export default function AdminConsultationsPage() {
 
       setRows(Array.isArray(json?.data) ? json.data : []);
     } catch (e: unknown) {
-  const message =
-    e instanceof Error ? e.message : "Failed to fetch consultations.";
-
-  setErr(message);
-  setRows([]);
-} finally {
+      const message =
+        e instanceof Error ? e.message : "Failed to fetch consultations.";
+      setErr(message);
+      setRows([]);
+    } finally {
       setLoading(false);
     }
   }
 
-  // ✅ NEW: If token exists after refresh, auto-load the table
+  // ✅ Auto-load on page render (cookie already present if logged in)
   useEffect(() => {
-    if (!savedToken) return;
-    fetchRows(savedToken);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [savedToken]);
+    fetchRows();
+     
+  }, []);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -113,32 +95,18 @@ export default function AdminConsultationsPage() {
     });
   }, [rows, query]);
 
-  function saveToken() {
-    const t = token.trim();
-    window.localStorage.setItem("FCH_ADMIN_TOKEN", t);
-    setSavedToken(t);
-
-    // ✅ NEW: After saving token, auto-load immediately
-    if (t) fetchRows(t);
-  }
-
   async function updateStatus(id: string, status: string) {
-    const t = savedToken.trim();
-    if (!t) {
-      setErr("Missing admin token. Save your token first.");
-      return;
-    }
-
     setErr("");
+
     // optimistic UI update
     setRows((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
 
     try {
+      // ✅ Cookie-based auth — no Authorization header
       const res = await fetch(`/api/admin/consultations/${id}`, {
         method: "PATCH",
         headers: {
           "content-type": "application/json",
-          authorization: `Bearer ${t}`,
         },
         body: JSON.stringify({ status }),
       });
@@ -148,16 +116,14 @@ export default function AdminConsultationsPage() {
       if (!res.ok) {
         setErr(json?.error || `PATCH failed (${res.status})`);
         // revert by re-fetching
-        await fetchRows(t);
+        await fetchRows();
         return;
       }
     } catch (e: unknown) {
-  const message =
-    e instanceof Error ? e.message : "Failed to update status.";
-
-  setErr(message);
-  await fetchRows(t);
-}
+      const message = e instanceof Error ? e.message : "Failed to update status.";
+      setErr(message);
+      await fetchRows();
+    }
   }
 
   return (
@@ -169,8 +135,8 @@ export default function AdminConsultationsPage() {
               Admin · Consultation Requests
             </h1>
             <p className="text-sm text-[#6A6256] mt-2">
-              Secure viewer for <code>consultation_requests</code>. Uses your
-              admin token (saved locally in your browser).
+              Secure viewer for <code>consultation_requests</code>. Access is
+              protected by an HttpOnly session cookie (no token stored in the browser).
             </p>
 
             <div className="mt-3">
@@ -183,55 +149,25 @@ export default function AdminConsultationsPage() {
             </div>
           </div>
 
+          {/* ✅ Token box removed (login page sets HttpOnly cookie) */}
           <div className="w-full max-w-md rounded-2xl border border-[#E6DDCD] bg-white/60 p-4">
-            <div className="text-sm font-medium">Admin Token</div>
+            <div className="text-sm font-medium">Session</div>
             <p className="text-xs text-[#6A6256] mt-1">
-              Paste the same token you stored in Cloudflare as{" "}
-              <code>ADMIN_DASH_TOKEN</code>.
+              You’re authenticated via secure cookie. If you lose access, return to{" "}
+              <Link href="/admin/login" className="underline hover:opacity-80">
+                /admin/login
+              </Link>
+              .
             </p>
 
             <div className="mt-3 flex gap-2">
-              <input
-                
-                type="password"
-                value={token}
-                onChange={(e) => setToken(e.target.value)}
-                placeholder="Bearer token value…"
-                className="w-full rounded-xl border border-[#E6DDCD] bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#D7C8AF]"
-              />
               <button
-                onClick={saveToken}
-                className="rounded-xl bg-[#1A1A1A] text-[#F5F1E8] px-4 py-2 text-sm font-medium hover:opacity-90"
-              >
-                Save
-              </button>
-            </div>
-
-            <div className="mt-3 flex gap-2">
-              <button
-                onClick={() => fetchRows(savedToken || token)}
+                onClick={() => fetchRows()}
                 className="w-full rounded-xl border border-[#1A1A1A] px-4 py-2 text-sm font-medium hover:bg-black/5"
               >
                 Load / Refresh
               </button>
-              <button
-                onClick={() => {
-                  window.localStorage.removeItem("FCH_ADMIN_TOKEN");
-                  setSavedToken("");
-                  setToken("");
-                  setRows([]);
-                }}
-                className="rounded-xl border border-[#E6DDCD] px-4 py-2 text-sm hover:bg-black/5"
-              >
-                Clear
-              </button>
             </div>
-
-            {!!savedToken && (
-              <div className="mt-2 text-xs text-[#6A6256]">
-                Token is saved in this browser.
-              </div>
-            )}
           </div>
         </div>
 
@@ -283,7 +219,9 @@ export default function AdminConsultationsPage() {
                   <td className="p-3">
                     <div className="font-medium">{r.name || "—"}</div>
                     {r.phone && (
-                      <div className="text-[#6A6256] text-xs mt-1">{r.phone}</div>
+                      <div className="text-[#6A6256] text-xs mt-1">
+                        {r.phone}
+                      </div>
                     )}
                   </td>
 
@@ -337,7 +275,9 @@ export default function AdminConsultationsPage() {
 
                     {r.message && (
                       <div className="mt-3 text-[#1A1A1A] whitespace-pre-wrap">
-                        <div className="text-xs text-[#6A6256] mb-1">Message</div>
+                        <div className="text-xs text-[#6A6256] mb-1">
+                          Message
+                        </div>
                         <div className="text-sm">{r.message}</div>
                       </div>
                     )}
@@ -362,8 +302,8 @@ export default function AdminConsultationsPage() {
               {!loading && filtered.length === 0 && (
                 <tr>
                   <td className="p-6 text-[#6A6256]" colSpan={6}>
-                    No rows yet. If your token is saved, rows should load
-                    automatically. Otherwise click <b>Load / Refresh</b>.
+                    No rows yet. If you’re logged in, rows should load automatically.
+                    Otherwise go to <b>/admin/login</b>.
                   </td>
                 </tr>
               )}
@@ -372,7 +312,7 @@ export default function AdminConsultationsPage() {
         </div>
 
         <div className="mt-6 text-xs text-[#6A6256]">
-          Tip: This page is protected by your admin token. Don’t share it.
+          Tip: This admin area is protected by a secure HttpOnly cookie. Don’t share your token.
         </div>
       </div>
     </main>

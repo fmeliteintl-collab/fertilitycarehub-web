@@ -8,21 +8,34 @@ export default function AdminLoginPage() {
   const [token, setToken] = useState("");
   const [err, setErr] = useState("");
 
-  function saveToken() {
-    const t = token.trim();
-    if (!t) {
-      setErr("Please paste your admin token.");
-      return;
-    }
-
-    // store both ways (localStorage for your existing code, cookie for server gate)
-    window.localStorage.setItem("FCH_ADMIN_TOKEN", t);
-    document.cookie = `FCH_ADMIN_TOKEN=${encodeURIComponent(
-      t
-    )}; Path=/; SameSite=Lax; Secure`;
-
-    router.push("/admin");
+ async function saveToken() {
+  const t = token.trim();
+  if (!t) {
+    setErr("Please paste your admin token.");
+    return;
   }
+
+  setErr("");
+
+  const res = await fetch("/api/admin/login", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ token: t }),
+  });
+
+  if (!res.ok) {
+    const json = await res.json().catch(() => ({}));
+    setErr(json?.error || "Login failed.");
+    return;
+  }
+
+  // IMPORTANT: remove legacy storage
+  try {
+    
+  } catch {}
+
+  router.push("/admin");
+}
 
   return (
     <main style={{ maxWidth: 720, margin: "0 auto", padding: "64px 20px" }}>
@@ -32,17 +45,18 @@ export default function AdminLoginPage() {
       </p>
 
       <div style={{ marginTop: 18, display: "grid", gap: 10 }}>
-        <input
-          value={token}
-          onChange={(e) => setToken(e.target.value)}
-          placeholder="Paste admin token"
-          style={{
-            padding: "12px 14px",
-            borderRadius: 12,
-            border: "1px solid rgba(0,0,0,0.18)",
-            background: "rgba(255,255,255,0.6)",
-          }}
-        />
+       <input
+  type="password"
+  value={token}
+  onChange={(e) => setToken(e.target.value)}
+  placeholder="Paste admin token"
+  style={{
+    padding: "12px 14px",
+    borderRadius: 12,
+    border: "1px solid rgba(0,0,0,0.18)",
+    background: "rgba(255,255,255,0.6)",
+  }}
+/>
 
         {err ? (
           <div style={{ color: "rgba(160,0,0,0.9)", fontSize: 14 }}>{err}</div>
