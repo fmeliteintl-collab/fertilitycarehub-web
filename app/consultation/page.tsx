@@ -42,7 +42,7 @@ import { createClient } from "@supabase/supabase-js";
                                                        const [targetCountry, setTargetCountry] = useState("");
                                                          const [optimizingFor, setOptimizingFor] = useState<string[]>([]);
                                                            const [context, setContext] = useState("");
-                                                           
+                                                           const [consent, setConsent] = useState(false);
                                                              // UX state
                                                                const [submitting, setSubmitting] = useState(false);
                                                                  const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -75,9 +75,8 @@ import { createClient } from "@supabase/supabase-js";
                                                                                                                                                                }, []);
                                                                                                                                                                
                                                                                                                                                                  const canSubmit = useMemo(() => {
-                                                                                                                                                                     // keep Phase 1 lightweight: email required
-                                                                                                                                                                         return email.trim().length > 3 && email.includes("@");
-                                                                                                                                                                           }, [email]);
+  return consent && email.trim().length > 3 && email.includes("@");
+}, [email, consent]);
                                                                                                                                                                            
                                                                                                                                                                              const buildMailto = () => {
                                                                                                                                                                                  const subject = encodeURIComponent("Private Advisory Review Request");
@@ -95,7 +94,7 @@ import { createClient } from "@supabase/supabase-js";
                                                                                                                                                                                                                                              const body = encodeURIComponent(bodyLines.join("\n"));
                                                                                                                                                                                                                                                  return `mailto:hello@fertilitycarehub.com?subject=${subject}&body=${body}`;
                                                                                                                                                                                                                                                    };
-                                                                                                                                                                                                                                                   "
+                                                                                                                                                                                                                                                   
   const handleSubmit = async () => {
     setErrorMsg(null);
     setSuccessMsg(null);
@@ -107,7 +106,7 @@ import { createClient } from "@supabase/supabase-js";
       return;
     }
     if (!canSubmit) {
-      setErrorMsg("Please enter a valid email address.");
+      setErrorMsg("Please enter a valid email and confirm consent.");
       return;
     }
 
@@ -146,6 +145,7 @@ import { createClient } from "@supabase/supabase-js";
       setOptimizingFor([]);
       setContext("");
     } catch (e: unknown) {
+      setConsent(false);
   const message =
     e instanceof Error
       ? e.message
@@ -421,6 +421,32 @@ import { createClient } from "@supabase/supabase-js";
                 }}
               />
             </div>
+<label
+  style={{
+    display: "flex",
+    gap: 10,
+    alignItems: "flex-start",
+    marginTop: 14,
+  }}
+>
+  <input
+    type="checkbox"
+    checked={consent}
+    onChange={(e) => setConsent(e.target.checked)}
+    style={{ marginTop: 4 }}
+  />
+  <span style={{ color: MUTED, lineHeight: 1.5 }}>
+    I agree to be contacted about my request and acknowledge the{" "}
+    <Link href="/privacy" style={{ textDecoration: "underline" }}>
+      Privacy Policy
+    </Link>{" "}
+    and{" "}
+    <Link href="/terms" style={{ textDecoration: "underline" }}>
+      Terms
+    </Link>
+    .
+  </span>
+</label>
 
             {/* CTA row */}
             <div
