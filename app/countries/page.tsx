@@ -1,3 +1,4 @@
+import Breadcrumbs from "../components/Breadcrumbs";
 import Link from "next/link";
 type Country = {
   slug: string;
@@ -5,7 +6,7 @@ type Country = {
   status: "Live" | "In build";
   oneLiner: string;
 };
-const countries = [
+const countries: Country[] = [
   {
     slug: "spain",
     name: "Spain",
@@ -94,6 +95,13 @@ export default function CountriesPage() {
         padding: "64px 20px",
       }}
     >
+      <Breadcrumbs
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Countries", href: "/countries" },
+        ]}
+      />
+
       <header style={{ textAlign: "center", marginBottom: 40 }}>
         <h1
           style={{

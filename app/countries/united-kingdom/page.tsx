@@ -1,3 +1,5 @@
+import CountryWebPageSchema from "../../components/CountryWebPageSchema";
+import Breadcrumbs from "../../components/Breadcrumbs";
 import Link from "next/link";
 import type { Metadata } from "next";
 
@@ -20,6 +22,19 @@ export const metadata: Metadata = {
 export default function UnitedKingdomPage() {
   return (
     <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
+      <Breadcrumbs
+  items={[
+    { name: "Home", href: "/" },
+    { name: "Countries", href: "/countries" },
+    { name: "United Kingdom", href: "/countries/united-kingdom" },
+  ]}
+/>
+<CountryWebPageSchema
+  countryName="United Kingdom"
+  countrySlug="united-kingdom"
+  title="United Kingdom: Fertility Jurisdiction Assessment"
+  description="Strategic jurisdiction assessment and regulatory clarity for fertility care under the UK's regulatory framework."
+/>
       {/* Top utility bar */}
       <div className="max-w-6xl mx-auto px-6 pt-10">
         <div className="flex items-center justify-between">
