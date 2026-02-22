@@ -125,6 +125,8 @@ import { createClient } from "@supabase/supabase-js";
         source_country_slug: fromSlug || null,
         source_url: sourceUrl,
         status: "new",
+        consent_contact: consent,
+consent_timestamp: consent ? new Date().toISOString() : null,
       };
 
       const { error } = await supabase
