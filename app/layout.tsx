@@ -87,6 +87,31 @@ export default function RootLayout({
         </header>
 
         <main>{children}</main>
+        <footer className="w-full border-t border-[#E5DDC8] mt-16">
+  <div className="max-w-6xl mx-auto px-6 py-10 text-sm text-[#6A6256] space-y-4">
+    <p className="leading-relaxed">
+      <strong className="text-[#1A1A1A]">Medical disclaimer:</strong> FertilityCareHub provides
+      informational and strategic advisory support only. Content is not medical, legal, or financial
+      advice and should not be used as a substitute for professional guidance.
+    </p>
+
+    <p className="leading-relaxed">
+      <strong className="text-[#1A1A1A]">Positioning:</strong> We are not a clinic, broker, or
+      treatment provider. We do not sell medical services or make treatment outcome guarantees.
+    </p>
+
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-2">
+      <Link href="/privacy" className="underline underline-offset-4 hover:text-[#1A1A1A]">
+        Privacy Policy
+      </Link>
+      <Link href="/terms" className="underline underline-offset-4 hover:text-[#1A1A1A]">
+        Terms
+      </Link>
+      <span aria-hidden="true">•</span>
+      <span>© {new Date().getFullYear()} FertilityCareHub</span>
+    </div>
+  </div>
+</footer>
       </body>
     </html>
   );

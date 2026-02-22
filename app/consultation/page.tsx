@@ -7,95 +7,94 @@ import { createClient } from "@supabase/supabase-js";
 
 /**
  * IMPORTANT:
- * This file is intentionally structured as:
- *  - Default export wraps the inner client component in <Suspense/>
- *  - Inner component uses useSearchParams()
- * This prevents the Cloudflare/Next build error:
- * "useSearchParams() should be wrapped in a suspense boundary"
- */
-
-export default function ConsultationPage() {
-  return (
-    <Suspense fallback={<div style={{ padding: 24 }}>Loading…</div>}>
-      <ConsultationPageInner />
-    </Suspense>
-  );
-}
-
-function ConsultationPageInner() {
-  // Theme
-  const PAGE_BG = "#F5F1E8";
-  const INK = "#1A1A1A";
-  const MUTED = "#6A6256";
-  const GOLD = "#B89B5E";
-  const BORDER = "#E5DDC8";
-  const CARD_BG = "#FBFAF7";
-
-  // Read ?from=spain (optional)
-  const searchParams = useSearchParams();
-  const fromSlug = (searchParams.get("from") || "").trim().toLowerCase();
-
-  // Form state
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [residence, setResidence] = useState("");
-  const [targetCountry, setTargetCountry] = useState("");
-  const [optimizingFor, setOptimizingFor] = useState<string[]>([]);
-  const [context, setContext] = useState("");
-
-  // UX state
-  const [submitting, setSubmitting] = useState(false);
-  const [successMsg, setSuccessMsg] = useState<string | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
-  const OPTIONS = useMemo(
-    () => [
-      "Highest probability",
-      "Speed & access",
-      "Cost efficiency",
-      "Donor pathway",
-      "Ethical alignment",
-      "Legal clarity",
-    ],
-    []
-  );
-
-  const toggleOption = (label: string) => {
-    setOptimizingFor((prev) =>
-      prev.includes(label) ? prev.filter((x) => x !== label) : [...prev, label]
-    );
-  };
-
-  // Supabase client (public)
-  const supabase = useMemo(() => {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (!url || !key) return null;
-    return createClient(url, key);
-  }, []);
-
-  const canSubmit = useMemo(() => {
-    // keep Phase 1 lightweight: email required
-    return email.trim().length > 3 && email.includes("@");
-  }, [email]);
-
-  const buildMailto = () => {
-    const subject = encodeURIComponent("Private Advisory Review Request");
-    const bodyLines = [
-      `Full name: ${fullName || "-"}`,
-      `Email: ${email || "-"}`,
-      `Country of residence: ${residence || "-"}`,
-      `Target country (if known): ${targetCountry || "-"}`,
-      `Optimizing for: ${optimizingFor.length ? optimizingFor.join(", ") : "-"}`,
-      `Brief context: ${context || "-"}`,
-      fromSlug ? `Source country slug: ${fromSlug}` : "",
-      `Source page: ${typeof window !== "undefined" ? window.location.href : ""}`,
-    ].filter(Boolean);
-
-    const body = encodeURIComponent(bodyLines.join("\n"));
-    return `mailto:hello@fertilitycarehub.com?subject=${subject}&body=${body}`;
-  };
-
+  * This file is intentionally structured as:
+   *  - Default export wraps the inner client component in <Suspense/>
+    *  - Inner component uses useSearchParams()
+     * This prevents the Cloudflare/Next build error:
+      * "useSearchParams() should be wrapped in a suspense boundary"
+       */
+       
+       export default function ConsultationPage() {
+         return (
+             <Suspense fallback={<div style={{ padding: 24 }}>Loading…</div>}>
+                   <ConsultationPageInner />
+                       </Suspense>
+                         );
+                         }
+                         
+                         function ConsultationPageInner() {
+                           // Theme
+                             const PAGE_BG = "#F5F1E8";
+                               const INK = "#1A1A1A";
+                                 const MUTED = "#6A6256";
+                                   const GOLD = "#B89B5E";
+                                     const BORDER = "#E5DDC8";
+                                       const CARD_BG = "#FBFAF7";
+                                       
+                                         // Read ?from=spain (optional)
+                                           const searchParams = useSearchParams();
+                                             const fromSlug = (searchParams.get("from") || "").trim().toLowerCase();
+                                             
+                                               // Form state
+                                                 const [fullName, setFullName] = useState("");
+                                                   const [email, setEmail] = useState("");
+                                                     const [residence, setResidence] = useState("");
+                                                       const [targetCountry, setTargetCountry] = useState("");
+                                                         const [optimizingFor, setOptimizingFor] = useState<string[]>([]);
+                                                           const [context, setContext] = useState("");
+                                                           const [consent, setConsent] = useState(false);
+                                                             // UX state
+                                                               const [submitting, setSubmitting] = useState(false);
+                                                                 const [successMsg, setSuccessMsg] = useState<string | null>(null);
+                                                                   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+                                                                   
+                                                                     const OPTIONS = useMemo(
+                                                                         () => [
+                                                                               "Highest probability",
+                                                                                     "Speed & access",
+                                                                                           "Cost efficiency",
+                                                                                                 "Donor pathway",
+                                                                                                       "Ethical alignment",
+                                                                                                             "Legal clarity",
+                                                                                                                 ],
+                                                                                                                     []
+                                                                                                                       );
+                                                                                                                       
+                                                                                                                         const toggleOption = (label: string) => {
+                                                                                                                             setOptimizingFor((prev) =>
+                                                                                                                                   prev.includes(label) ? prev.filter((x) => x !== label) : [...prev, label]
+                                                                                                                                       );
+                                                                                                                                         };
+                                                                                                                                         
+                                                                                                                                           // Supabase client (public)
+                                                                                                                                             const supabase = useMemo(() => {
+                                                                                                                                                 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+                                                                                                                                                     const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+                                                                                                                                                         if (!url || !key) return null;
+                                                                                                                                                             return createClient(url, key);
+                                                                                                                                                               }, []);
+                                                                                                                                                               
+                                                                                                                                                                 const canSubmit = useMemo(() => {
+  return consent && email.trim().length > 3 && email.includes("@");
+}, [email, consent]);
+                                                                                                                                                                           
+                                                                                                                                                                             const buildMailto = () => {
+                                                                                                                                                                                 const subject = encodeURIComponent("Private Advisory Review Request");
+                                                                                                                                                                                     const bodyLines = [
+                                                                                                                                                                                           `Full name: ${fullName || "-"}`,
+                                                                                                                                                                                                 `Email: ${email || "-"}`,
+                                                                                                                                                                                                       `Country of residence: ${residence || "-"}`,
+                                                                                                                                                                                                             `Target country (if known): ${targetCountry || "-"}`,
+                                                                                                                                                                                                                   `Optimizing for: ${optimizingFor.length ? optimizingFor.join(", ") : "-"}`,
+                                                                                                                                                                                                                         `Brief context: ${context || "-"}`,
+                                                                                                                                                                                                                               fromSlug ? `Source country slug: ${fromSlug}` : "",
+                                                                                                                                                                                                                                     `Source page: ${typeof window !== "undefined" ? window.location.href : ""}`,
+                                                                                                                                                                                                                                         ].filter(Boolean);
+                                                                                                                                                                                                                                         
+                                                                                                                                                                                                                                             const body = encodeURIComponent(bodyLines.join("\n"));
+                                                                                                                                                                                                                                                 return `mailto:hello@fertilitycarehub.com?subject=${subject}&body=${body}`;
+                                                                                                                                                                                                                                                   };
+                                                                                                                                                                                                                                                   
   const handleSubmit = async () => {
     setErrorMsg(null);
     setSuccessMsg(null);
@@ -107,7 +106,7 @@ function ConsultationPageInner() {
       return;
     }
     if (!canSubmit) {
-      setErrorMsg("Please enter a valid email address.");
+      setErrorMsg("Please enter a valid email and confirm consent.");
       return;
     }
 
@@ -146,6 +145,7 @@ function ConsultationPageInner() {
       setOptimizingFor([]);
       setContext("");
     } catch (e: unknown) {
+      setConsent(false);
   const message =
     e instanceof Error
       ? e.message
@@ -421,6 +421,32 @@ function ConsultationPageInner() {
                 }}
               />
             </div>
+<label
+  style={{
+    display: "flex",
+    gap: 10,
+    alignItems: "flex-start",
+    marginTop: 14,
+  }}
+>
+  <input
+    type="checkbox"
+    checked={consent}
+    onChange={(e) => setConsent(e.target.checked)}
+    style={{ marginTop: 4 }}
+  />
+  <span style={{ color: MUTED, lineHeight: 1.5 }}>
+    I agree to be contacted about my request and acknowledge the{" "}
+    <Link href="/privacy" style={{ textDecoration: "underline" }}>
+      Privacy Policy
+    </Link>{" "}
+    and{" "}
+    <Link href="/terms" style={{ textDecoration: "underline" }}>
+      Terms
+    </Link>
+    .
+  </span>
+</label>
 
             {/* CTA row */}
             <div
