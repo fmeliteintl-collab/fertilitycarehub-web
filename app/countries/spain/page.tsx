@@ -2,6 +2,7 @@ import CountryWebPageSchema from "../../components/CountryWebPageSchema";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import Link from "next/link";
 import type { Metadata } from "next";
+import FAQSchema from "../../components/FAQSchema";
 
 
 export const metadata: Metadata = {
@@ -38,14 +39,33 @@ export default function SpainDossierPage() {
         title="Spain: Fertility Jurisdiction Assessment"
         description="Strategic jurisdiction assessment and regulatory clarity for cross-border fertility care in Spain."
       />
-
-
-      <CountryWebPageSchema
-  countryName="Spain"
-  countrySlug="spain"
-  title="Spain: Fertility Jurisdiction Assessment"
-  description="Strategic jurisdiction assessment and regulatory clarity for cross-border fertility care in Spain."
+      <FAQSchema
+  id="faq-spain"
+  items={[
+    {
+      question: "Is FertilityCareHub a clinic or broker?",
+      answer:
+        "No. FertilityCareHub is an independent strategic advisory platform. We do not provide medical treatment, sell medical services, or guarantee outcomes.",
+    },
+    {
+      question: "What is Spain typically strong for in cross-border fertility planning?",
+      answer:
+        "Spain is often considered for mature clinic infrastructure, established donor pathways, and a predictable patient experience. Suitability depends on your legal, ethical, medical, and timeline constraints.",
+    },
+    {
+      question: "Do you provide medical advice or diagnosis?",
+      answer:
+        "No. We provide structured navigation and decision support. Medical decisions should be made with licensed clinicians.",
+    },
+    {
+      question: "What happens after I submit a consultation request?",
+      answer:
+        "Your request is routed to an internal review queue. A consultant reviews it for fit and follow-up, and then reaches out by email.",
+    },
+  ]}
 />
+
+  
 
     {/* rest of your existing page */}
 
