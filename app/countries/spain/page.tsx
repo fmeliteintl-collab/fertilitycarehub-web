@@ -479,6 +479,7 @@ export default function SpainDossierPage() {
   </Link>
 </section>
 
+
       <section className="mt-16 border-t border-[#E5DDC8] pt-10">      
   <h2 className="text-2xl font-semibold mb-6">
     Compare Other Jurisdictions
