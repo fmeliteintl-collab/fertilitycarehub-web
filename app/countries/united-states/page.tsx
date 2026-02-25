@@ -272,6 +272,23 @@ export default function UnitedStatesPage() {
           </div>
         </div>
       </section>
+      <section className="mt-16 border-t border-[#E5DDC8] pt-10">
+  <h2 className="text-2xl font-semibold mb-6">Compare Other Jurisdictions</h2>
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <Link href="/countries/canada" className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition">
+      <h3 className="text-lg font-medium">Canada</h3>
+      <p className="text-sm text-[#6A6256] mt-2">Ethics-forward governance model with tight regulatory boundaries.</p>
+    </Link>
+    <Link href="/countries/united-kingdom" className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition">
+      <h3 className="text-lg font-medium">United Kingdom</h3>
+      <p className="text-sm text-[#6A6256] mt-2">Highly regulated environment prioritizing governance and oversight.</p>
+    </Link>
+    <Link href="/countries/spain" className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition">
+      <h3 className="text-lg font-medium">Spain</h3>
+      <p className="text-sm text-[#6A6256] mt-2">Established EU ecosystem often chosen for execution consistency.</p>
+    </Link>
+  </div>
+</section>
     </main>
   );
 }
