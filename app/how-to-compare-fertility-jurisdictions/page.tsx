@@ -1,8 +1,23 @@
+import Breadcrumbs from "../components/Breadcrumbs";
+import CountryWebPageSchema from "../components/CountryWebPageSchema";
 import Link from "next/link";
 
 export default function CompareFertilityJurisdictionsPage() {
   return (
     <main className="max-w-4xl mx-auto px-6 py-16">
+        <Breadcrumbs
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Guides", href: "/how-to-compare-fertility-jurisdictions" },
+        ]}
+      />
+
+      <CountryWebPageSchema
+        countryName="Guides"
+        countrySlug="how-to-compare-fertility-jurisdictions"
+        title="How to Compare Fertility Jurisdictions Strategically"
+        description="A structured framework to compare fertility destinations based on governance, donor pathway, eligibility friction, and execution risk."
+      />
       <h1 className="text-3xl font-semibold mb-6">
         How to Compare Fertility Jurisdictions Strategically
       </h1>
