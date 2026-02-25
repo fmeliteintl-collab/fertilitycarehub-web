@@ -414,11 +414,62 @@ export default function SpainDossierPage() {
           </div>
         </div>
       </section>
-      <section className="mt-16 border-t border-[#E5DDC8] pt-10">
+      {/* FAQ */}
+<section className="mt-16 border-t border-[#E5DDC8] pt-10">
+  <h2 className="text-2xl font-semibold mb-6">FAQ</h2>
+
+  <div className="space-y-4">
+    <details className="rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
+      <summary className="cursor-pointer text-lg font-medium">
+        Is FertilityCareHub providing medical advice?
+      </summary>
+      <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
+        No. We provide structured, strategic advisory support only. Any medical decisions should be
+        made with licensed clinicians. Our work focuses on clarity, jurisdiction fit, and planning.
+      </p>
+    </details>
+
+    <details className="rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
+      <summary className="cursor-pointer text-lg font-medium">
+        Do you recommend specific clinics in Spain?
+      </summary>
+      <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
+        We don’t publish public “best clinic” lists or endorsements. If you engage advisory services,
+        we can provide a curated shortlist aligned to your constraints and planning priorities.
+      </p>
+    </details>
+
+    <details className="rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
+      <summary className="cursor-pointer text-lg font-medium">
+        What information should I prepare before requesting advisory?
+      </summary>
+      <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
+        Useful inputs include your target timeline, prior treatment history (if any), key constraints
+        (budget, travel cadence, donor pathway), and any legal/eligibility considerations.
+      </p>
+    </details>
+
+    <details className="rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
+      <summary className="cursor-pointer text-lg font-medium">
+        Can advisory help compare Spain with other destinations?
+      </summary>
+      <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
+  Yes. We help structure a comparison across a small set of relevant jurisdictions, focusing on
+  decision factors like access, governance, donor pathway, and execution risk. For a structured
+  framework, see our{" "}
+  <Link href="/how-to-compare-fertility-jurisdictions" className="underline">
+    jurisdiction comparison guide
+  </Link>.
+</p>
+    </details>
+  </div>
+</section>
+
+
+      <section className="mt-16 border-t border-[#E5DDC8] pt-10">      
   <h2 className="text-2xl font-semibold mb-6">
     Compare Other Jurisdictions
   </h2>
-
   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
     <Link
       href="/countries/greece"
@@ -451,6 +502,7 @@ export default function SpainDossierPage() {
     </Link>
   </div>
 </section>
+
     </main>
   );
 }
