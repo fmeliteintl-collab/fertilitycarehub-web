@@ -129,7 +129,54 @@ export default function CountriesPage() {
           advisor-style dossiers, not a public database.
         </p>
       </header>
+{/* Guides */}
+      <section
+        style={{
+          marginTop: 18,
+          marginBottom: 22,
+          background: "rgba(255,255,255,0.55)",
+          border: "1px solid rgba(0,0,0,0.10)",
+          borderRadius: 18,
+          padding: 18,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+          flexWrap: "wrap",
+        }}
+      >
+        <div>
+          <div
+            style={{
+              fontSize: 12,
+              textTransform: "uppercase",
+              letterSpacing: "0.12em",
+              color: "rgba(0,0,0,0.55)",
+              marginBottom: 6,
+            }}
+          >
+            Guides
+          </div>
+          <div style={{ fontSize: 16, color: "rgba(0,0,0,0.80)" }}>
+            Learn how to compare jurisdictions before picking a destination.
+          </div>
+        </div>
 
+        <Link
+          href="/how-to-compare-fertility-jurisdictions"
+          style={{
+            textDecoration: "none",
+            border: "1px solid #B89B5E",
+            padding: "10px 14px",
+            borderRadius: 12,
+            color: "rgba(0,0,0,0.85)",
+            background: "rgba(184,155,94,0.10)",
+            whiteSpace: "nowrap",
+          }}
+        >
+          Read the comparison guide →
+        </Link>
+      </section>
       <section
         style={{
           display: "grid",
