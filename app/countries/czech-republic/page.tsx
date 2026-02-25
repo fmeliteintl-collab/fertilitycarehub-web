@@ -268,6 +268,23 @@ export default function CzechRepublicPage() {
           </div>
         </div>
       </section>
+      <section className="mt-16 border-t border-[#E5DDC8] pt-10">
+  <h2 className="text-2xl font-semibold mb-6">Compare Other Jurisdictions</h2>
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <Link href="/countries/spain" className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition">
+      <h3 className="text-lg font-medium">Spain</h3>
+      <p className="text-sm text-[#6A6256] mt-2">Stronger on breadth and donor depth in a mature EU environment.</p>
+    </Link>
+    <Link href="/countries/greece" className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition">
+      <h3 className="text-lg font-medium">Greece</h3>
+      <p className="text-sm text-[#6A6256] mt-2">Often evaluated for access flexibility and logistics advantages.</p>
+    </Link>
+    <Link href="/countries/portugal" className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition">
+      <h3 className="text-lg font-medium">Portugal</h3>
+      <p className="text-sm text-[#6A6256] mt-2">Modern environment with specific legal and access nuances.</p>
+    </Link>
+  </div>
+</section>
     </main>
   );
 }

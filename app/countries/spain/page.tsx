@@ -414,6 +414,43 @@ export default function SpainDossierPage() {
           </div>
         </div>
       </section>
+      <section className="mt-16 border-t border-[#E5DDC8] pt-10">
+  <h2 className="text-2xl font-semibold mb-6">
+    Compare Other Jurisdictions
+  </h2>
+
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <Link
+      href="/countries/greece"
+      className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition"
+    >
+      <h3 className="text-lg font-medium">Greece</h3>
+      <p className="text-sm text-[#6A6256] mt-2">
+        Often considered for access flexibility and streamlined entry pathways.
+      </p>
+    </Link>
+
+    <Link
+      href="/countries/portugal"
+      className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition"
+    >
+      <h3 className="text-lg font-medium">Portugal</h3>
+      <p className="text-sm text-[#6A6256] mt-2">
+        Growing infrastructure with specific legal and access nuances.
+      </p>
+    </Link>
+
+    <Link
+      href="/countries/czech-republic"
+      className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition"
+    >
+      <h3 className="text-lg font-medium">Czech Republic</h3>
+      <p className="text-sm text-[#6A6256] mt-2">
+        Frequently evaluated for cost-efficiency and clinic density.
+      </p>
+    </Link>
+  </div>
+</section>
     </main>
   );
 }

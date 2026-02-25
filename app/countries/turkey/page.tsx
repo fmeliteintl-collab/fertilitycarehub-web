@@ -266,6 +266,23 @@ export default function TurkeyPage() {
           </div>
         </div>
       </section>
+      <section className="mt-16 border-t border-[#E5DDC8] pt-10">
+  <h2 className="text-2xl font-semibold mb-6">Compare Other Jurisdictions</h2>
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <Link href="/countries/mexico" className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition">
+      <h3 className="text-lg font-medium">Mexico</h3>
+      <p className="text-sm text-[#6A6256] mt-2">Proximity-driven option where vetting and execution discipline matter.</p>
+    </Link>
+    <Link href="/countries/india" className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition">
+      <h3 className="text-lg font-medium">India</h3>
+      <p className="text-sm text-[#6A6256] mt-2">Cost-differentiated market where regulatory clarity is decisive.</p>
+    </Link>
+    <Link href="/countries/spain" className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition">
+      <h3 className="text-lg font-medium">Spain</h3>
+      <p className="text-sm text-[#6A6256] mt-2">EU alternative with mature clinic pathways and broader ecosystem depth.</p>
+    </Link>
+  </div>
+</section>
     </main>
   );
 }
