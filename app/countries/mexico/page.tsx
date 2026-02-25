@@ -266,6 +266,20 @@ export default function MexicoPage() {
           </div>
         </div>
       </section>
+      {/* Comparison guide CTA */}
+<section className="mt-10 border border-[#E5DDC8] bg-white/60 rounded-xl p-5">
+  <h3 className="text-lg font-medium">Compare destinations before choosing</h3>
+  <p className="mt-2 text-sm text-[#6A6256] leading-relaxed">
+    Use our structured framework to compare governance, donor pathway, eligibility friction,
+    timeline realism, and execution risk across countries.
+  </p>
+  <Link
+    href="/how-to-compare-fertility-jurisdictions"
+    className="inline-block mt-3 underline text-sm"
+  >
+    Read the comparison guide →
+  </Link>
+</section>
       <section className="mt-16 border-t border-[#E5DDC8] pt-10">
   <h2 className="text-2xl font-semibold mb-6">Compare Other Jurisdictions</h2>
   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
