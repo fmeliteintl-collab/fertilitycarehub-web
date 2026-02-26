@@ -2,6 +2,7 @@ import CountryWebPageSchema from "../../components/CountryWebPageSchema";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import Link from "next/link";
 import type { Metadata } from "next";
+import FAQSchema from "../../components/FAQSchema";
 
 export const metadata: Metadata = {
   title: "Canada IVF Regulations & Fertility Law 2026 | FertilityCareHub",
@@ -19,22 +20,25 @@ export const metadata: Metadata = {
     type: "article",
   },
 };
+
 export default function CanadaPage() {
   return (
     <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
       <Breadcrumbs
-  items={[
-    { name: "Home", href: "/" },
-    { name: "Countries", href: "/countries" },
-    { name: "Canada", href: "/countries/canada" },
-  ]}
-/>
-<CountryWebPageSchema
-  countryName="Canada"
-  countrySlug="canada"
-  title="Canada: Fertility Jurisdiction Assessment"
-  description="Strategic jurisdiction assessment and regulatory clarity for fertility care pathways within Canada."
-/>
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Countries", href: "/countries" },
+          { name: "Canada", href: "/countries/canada" },
+        ]}
+      />
+
+      <CountryWebPageSchema
+        countryName="Canada"
+        countrySlug="canada"
+        title="Canada: Fertility Jurisdiction Assessment"
+        description="Strategic jurisdiction assessment and regulatory clarity for fertility care pathways within Canada."
+      />
+
       {/* Top utility bar */}
       <div className="max-w-6xl mx-auto px-6 pt-10">
         <div className="flex items-center justify-between">
@@ -191,9 +195,7 @@ export default function CanadaPage() {
           <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
             <h3 className="text-xl font-medium">Logistics and travel (including accommodation)</h3>
             <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>
-                Many clients prefer Canada for continuity and calm logistics.
-              </li>
+              <li>Many clients prefer Canada for continuity and calm logistics.</li>
               <li>
                 If travel is required, we include <strong>accommodation</strong> as part of execution:
                 2–3 vetted options chosen for comfort and predictability.
@@ -207,15 +209,9 @@ export default function CanadaPage() {
           <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
             <h3 className="text-xl font-medium">Clinic selection approach</h3>
             <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>
-                We shortlist selectively (typically 4–5), not exhaustively.
-              </li>
-              <li>
-                We prioritize lab stability, protocol clarity, and predictable communication cadence.
-              </li>
-              <li>
-                We structure the decision around your constraints, not generic “rankings.”
-              </li>
+              <li>We shortlist selectively (typically 4–5), not exhaustively.</li>
+              <li>We prioritize lab stability, protocol clarity, and predictable communication cadence.</li>
+              <li>We structure the decision around your constraints, not generic “rankings.”</li>
             </ul>
           </div>
         </div>
@@ -263,37 +259,134 @@ export default function CanadaPage() {
           </div>
         </div>
       </section>
-      {/* Comparison guide CTA */}
-<section className="mt-10 border border-[#E5DDC8] bg-white/60 rounded-xl p-5">
-  <h3 className="text-lg font-medium">Compare destinations before choosing</h3>
-  <p className="mt-2 text-sm text-[#6A6256] leading-relaxed">
-    Use our structured framework to compare governance, donor pathway, eligibility friction,
-    timeline realism, and execution risk across countries.
-  </p>
-  <Link
-    href="/how-to-compare-fertility-jurisdictions"
-    className="inline-block mt-3 underline text-sm"
-  >
-    Read the comparison guide →
-  </Link>
-</section>
+
+      {/* FAQ */}
       <section className="mt-16 border-t border-[#E5DDC8] pt-10">
-  <h2 className="text-2xl font-semibold mb-6">Compare Other Jurisdictions</h2>
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <Link href="/countries/united-states" className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition">
-      <h3 className="text-lg font-medium">United States</h3>
-      <p className="text-sm text-[#6A6256] mt-2">Premium capability and breadth for complex planning scenarios.</p>
-    </Link>
-    <Link href="/countries/united-kingdom" className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition">
-      <h3 className="text-lg font-medium">United Kingdom</h3>
-      <p className="text-sm text-[#6A6256] mt-2">Governance-first HFEA environment when oversight is key.</p>
-    </Link>
-    <Link href="/countries/spain" className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition">
-      <h3 className="text-lg font-medium">Spain</h3>
-      <p className="text-sm text-[#6A6256] mt-2">EU option with mature execution and strong donor pathway depth.</p>
-    </Link>
-  </div>
-</section>
+        <h2 className="text-2xl font-semibold mb-6">FAQ</h2>
+
+        <FAQSchema
+  id="canada-faq"
+  items={[
+    {
+      question: "Is FertilityCareHub providing medical advice?",
+      answer:
+        "No. We provide structured, strategic advisory support only. Any medical decisions should be made with licensed clinicians. Our work focuses on clarity, jurisdiction fit, and planning.",
+    },
+    {
+      question: "Do you recommend specific clinics in Canada?",
+      answer:
+        "We don’t publish public “best clinic” lists or endorsements. If you engage advisory services, we can provide a curated shortlist aligned to your constraints and planning priorities.",
+    },
+    {
+      question: "What information should I prepare before requesting advisory?",
+      answer:
+        "Useful inputs include your target timeline, prior treatment history (if any), key constraints (budget, travel cadence, donor pathway), and any legal/eligibility considerations.",
+    },
+    {
+      question: "Can advisory help compare Canada with other destinations?",
+      answer:
+        "Yes. We help structure a comparison across a small set of relevant jurisdictions, focusing on governance, access, donor pathway, and execution risk.",
+    },
+  ]}
+/>
+
+        <div className="space-y-4">
+          <details className="rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
+            <summary className="cursor-pointer text-lg font-medium">
+              Is FertilityCareHub providing medical advice?
+            </summary>
+            <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
+              No. We provide structured, strategic advisory support only. Any medical decisions should be
+              made with licensed clinicians. Our work focuses on clarity, jurisdiction fit, and planning.
+            </p>
+          </details>
+
+          <details className="rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
+            <summary className="cursor-pointer text-lg font-medium">
+              Do you recommend specific clinics in Canada?
+            </summary>
+            <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
+              We don’t publish public “best clinic” lists or endorsements. If you engage advisory services,
+              we can provide a curated shortlist aligned to your constraints and planning priorities.
+            </p>
+          </details>
+
+          <details className="rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
+            <summary className="cursor-pointer text-lg font-medium">
+              What information should I prepare before requesting advisory?
+            </summary>
+            <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
+              Useful inputs include your target timeline, prior treatment history (if any), key constraints
+              (budget, travel cadence, donor pathway), and any legal/eligibility considerations.
+            </p>
+          </details>
+
+          <details className="rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
+            <summary className="cursor-pointer text-lg font-medium">
+              Can advisory help compare Canada with other destinations?
+            </summary>
+            <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
+              Yes. We help structure a comparison across a small set of relevant jurisdictions, focusing on
+              decision factors like governance, access, donor pathway, and execution risk. For a structured
+              framework, see our{" "}
+              <Link href="/how-to-compare-fertility-jurisdictions" className="underline">
+                jurisdiction comparison guide
+              </Link>
+              .
+            </p>
+          </details>
+        </div>
+      </section>
+
+      {/* Comparison guide CTA */}
+      <section className="mt-10 border border-[#E5DDC8] bg-white/60 rounded-xl p-5">
+        <h3 className="text-lg font-medium">Compare destinations before choosing</h3>
+        <p className="mt-2 text-sm text-[#6A6256] leading-relaxed">
+          Use our structured framework to compare governance, donor pathway, eligibility friction,
+          timeline realism, and execution risk across countries.
+        </p>
+        <Link
+          href="/how-to-compare-fertility-jurisdictions"
+          className="inline-block mt-3 underline text-sm"
+        >
+          Read the comparison guide →
+        </Link>
+      </section>
+
+      <section className="mt-16 border-t border-[#E5DDC8] pt-10">
+        <h2 className="text-2xl font-semibold mb-6">Compare Other Jurisdictions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Link
+            href="/countries/united-states"
+            className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition"
+          >
+            <h3 className="text-lg font-medium">United States</h3>
+            <p className="text-sm text-[#6A6256] mt-2">
+              Premium capability and breadth for complex planning scenarios.
+            </p>
+          </Link>
+
+          <Link
+            href="/countries/united-kingdom"
+            className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition"
+          >
+            <h3 className="text-lg font-medium">United Kingdom</h3>
+            <p className="text-sm text-[#6A6256] mt-2">
+              Governance-first HFEA environment when oversight is key.
+            </p>
+          </Link>
+
+          <Link
+            href="/countries/spain"
+            className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition"
+          >
+            <h3 className="text-lg font-medium">Spain</h3>
+            <p className="text-sm text-[#6A6256] mt-2">
+              EU option with mature execution and strong donor pathway depth.
+            </p>
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }

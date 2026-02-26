@@ -259,6 +259,52 @@ export default function ChinaPage() {
           </div>
         </div>
       </section>
+      {/* FAQ */}
+<section className="mt-16 border-t border-[#E5DDC8] pt-10">
+  <h2 className="text-2xl font-semibold mb-6">FAQ</h2>
+
+  <div className="space-y-4">
+    <details className="rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
+      <summary className="cursor-pointer text-lg font-medium">
+        Is FertilityCareHub providing medical or legal advice?
+      </summary>
+      <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
+        No. We provide structured, strategic advisory support only. Medical and legal decisions must
+        be made with licensed professionals. Our role is clarity, feasibility, and planning structure.
+      </p>
+    </details>
+
+    <details className="rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
+      <summary className="cursor-pointer text-lg font-medium">
+        Do you recommend specific clinics in China?
+      </summary>
+      <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
+        We do not publish public “best clinic” lists. If you engage advisory services, we can provide
+        a curated shortlist aligned to feasibility, access constraints, and execution priorities.
+      </p>
+    </details>
+
+    <details className="rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
+      <summary className="cursor-pointer text-lg font-medium">
+        What should I prepare before requesting advisory?
+      </summary>
+      <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
+        Helpful inputs include your target timeline, prior treatment history (if any), your constraints
+        (budget, travel cadence, donor pathway), and any eligibility or documentation considerations.
+      </p>
+    </details>
+
+    <details className="rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
+      <summary className="cursor-pointer text-lg font-medium">
+        Can advisory help compare China with other destinations?
+      </summary>
+      <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
+        Yes. We structure comparisons across a small set of relevant jurisdictions using decision factors
+        like governance, eligibility friction, donor pathway constraints, timeline realism, and execution risk.
+      </p>
+    </details>
+  </div>
+</section>
       {/* Comparison guide CTA */}
 <section className="mt-10 border border-[#E5DDC8] bg-white/60 rounded-xl p-5">
   <h3 className="text-lg font-medium">Compare destinations before choosing</h3>

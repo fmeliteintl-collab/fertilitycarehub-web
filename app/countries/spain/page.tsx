@@ -392,29 +392,31 @@ export default function SpainDossierPage() {
         </div>
 
         {/* Bottom CTA */}
-        <div style={{ textAlign: "center", marginTop: 26 }}>
-          <Link
-            href="/consultation"
-            style={{
-              display: "inline-block",
-              border: "1px solid #B89B5E",
-              color: "#7B6A3A",
-              padding: "12px 18px",
-              borderRadius: 999,
-              textDecoration: "none",
-              fontSize: 13,
-              letterSpacing: "0.06em",
-            }}
-          >
-            Request Spain Strategy Review
-          </Link>
+<div style={{ textAlign: "center", marginTop: 26 }}>
+  <Link
+    href="/consultation"
+    style={{
+      display: "inline-block",
+      border: "1px solid #B89B5E",
+      color: "#7B6A3A",
+      padding: "12px 18px",
+      borderRadius: 999,
+      textDecoration: "none",
+      fontSize: 13,
+      letterSpacing: "0.06em",
+    }}
+  >
+    Request Spain Strategy Review
+  </Link>
 
-          <div style={{ marginTop: 10, fontSize: 13, color: "#6A6A6A" }}>
-            Discreet, structured guidance aligned to your profile and pathway.
-          </div>
-        </div>
-      </section>
-      {/* FAQ */}
+  <div style={{ marginTop: 10, fontSize: 13, color: "#6A6A6A" }}>
+    Discreet, structured guidance aligned to your profile and pathway.
+  </div>
+</div>
+</section>
+
+
+{/* FAQ */}
 <section className="mt-16 border-t border-[#E5DDC8] pt-10">
   <h2 className="text-2xl font-semibold mb-6">FAQ</h2>
 
@@ -454,22 +456,29 @@ export default function SpainDossierPage() {
         Can advisory help compare Spain with other destinations?
       </summary>
       <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
-  Yes. We help structure a comparison across a small set of relevant jurisdictions, focusing on
-  decision factors like access, governance, donor pathway, and execution risk. For a structured
-  framework, see our{" "}
-  <Link href="/how-to-compare-fertility-jurisdictions" className="underline">
-    jurisdiction comparison guide
-  </Link>.
-</p>
+        Yes. We help structure a comparison across a small set of relevant jurisdictions, focusing on
+        decision factors like access, governance, donor pathway, and execution risk.
+        For a structured framework, see our{" "}
+        <Link
+          href="/how-to-compare-fertility-jurisdictions"
+          className="underline"
+        >
+          jurisdiction comparison guide
+        </Link>.
+      </p>
     </details>
   </div>
 </section>
-{/* Comparison guide CTA */}
+
+
+{/* Comparison Guide CTA — Internal Authority Boost */}
 <section className="mt-10 border border-[#E5DDC8] bg-white/60 rounded-xl p-5">
-  <h3 className="text-lg font-medium">Compare destinations before choosing</h3>
+  <h3 className="text-lg font-medium">
+    Compare destinations before choosing
+  </h3>
   <p className="mt-2 text-sm text-[#6A6256] leading-relaxed">
-    Use our structured framework to compare governance, donor pathway, eligibility friction,
-    timeline realism, and execution risk across countries.
+    Use our structured framework to compare governance, donor pathway,
+    eligibility friction, timeline realism, and execution risk across countries.
   </p>
   <Link
     href="/how-to-compare-fertility-jurisdictions"
@@ -480,10 +489,13 @@ export default function SpainDossierPage() {
 </section>
 
 
-      <section className="mt-16 border-t border-[#E5DDC8] pt-10">      
+
+{/* Compare Other Jurisdictions */}
+<section className="mt-16 border-t border-[#E5DDC8] pt-10">
   <h2 className="text-2xl font-semibold mb-6">
     Compare Other Jurisdictions
   </h2>
+
   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
     <Link
       href="/countries/greece"
