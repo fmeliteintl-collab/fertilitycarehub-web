@@ -132,12 +132,14 @@ export default function AdvisoryPage() {
             </ul>
 
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link
-                href="/consultation"
-                className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
-              >
-                Start Intake for Premium Package
-              </Link>
+              <a
+  href="https://buy.stripe.com/3cI9AV0tVdSi753giL3ks03"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+>
+  Pay $2,500 — Premium Advisory
+</a>
 
               <Link
                 href="/countries/spain"
@@ -182,9 +184,14 @@ export default function AdvisoryPage() {
               <summary className="cursor-pointer text-lg font-medium">
                 How do I start?
               </summary>
-              <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
-                Start with the intake form. We’ll review and route you to the appropriate tier based on your profile and goals.
-              </p>
+              <a
+  href="https://buy.stripe.com/cNi5kF2C3dSidtrgiL3ks02"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+>
+  Pay $500 — Strategy Session
+</a>
             </details>
           </div>
         </div>
