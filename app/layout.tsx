@@ -77,9 +77,7 @@ export default function RootLayout({
         <header className="w-full py-6 border-b border-[#E5DDC8]">
           <div className="max-w-6xl mx-auto flex items-center justify-between px-6">
             <Link href="/" className="flex items-center gap-4">
-              <span className="text-xl tracking-wide">
-                FertilityCareHub
-              </span>
+              <span className="text-xl tracking-wide">FertilityCareHub</span>
             </Link>
 
             <Link
@@ -96,20 +94,24 @@ export default function RootLayout({
         <footer className="w-full border-t border-[#E5DDC8] mt-16">
           <div className="max-w-6xl mx-auto px-6 py-10 text-sm text-[#6A6256] space-y-4">
             <p className="leading-relaxed">
-              <strong className="text-[#1A1A1A]">
-                Medical disclaimer:
-              </strong>{" "}
+              <strong className="text-[#1A1A1A]">Medical disclaimer:</strong>{" "}
               FertilityCareHub provides informational and strategic advisory
               support only. Content is not medical, legal, or financial advice
               and should not be used as a substitute for professional guidance.
             </p>
 
             <p className="leading-relaxed">
-              <strong className="text-[#1A1A1A]">
-                Positioning:
-              </strong>{" "}
-              We are not a clinic, broker, or treatment provider. We do not
-              sell medical services or make treatment outcome guarantees.
+              <strong className="text-[#1A1A1A]">Positioning:</strong> We are
+              not a clinic, broker, or treatment provider. We do not sell
+              medical services or make treatment outcome guarantees.
+            </p>
+
+            <p className="leading-relaxed">
+              <strong className="text-[#1A1A1A]">Important:</strong>{" "}
+              If you have urgent or emergency medical concerns, contact local
+              emergency services or a licensed clinician. Submitting a form on
+              this site does not create a medical, legal, or fiduciary
+              relationship.
             </p>
 
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-2">
@@ -126,9 +128,7 @@ export default function RootLayout({
                 Terms
               </Link>
               <span aria-hidden="true">•</span>
-              <span>
-                © {new Date().getFullYear()} FertilityCareHub
-              </span>
+              <span>© 2026 FertilityCareHub</span>
             </div>
           </div>
         </footer>
