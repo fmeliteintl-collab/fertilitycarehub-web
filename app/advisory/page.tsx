@@ -4,14 +4,14 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Private Advisory — Strategy Session & Premium Package | FertilityCareHub",
   description:
-    "Private cross-border fertility strategy advisory. Book a $500 Strategy Session or engage a $2,500 Premium Advisory Package.",
+    "Private cross-border fertility strategy advisory. Book a US$500 Strategy Session or engage a US$2,500 Premium Advisory Package.",
   alternates: {
     canonical: "https://fertilitycarehub.com/advisory",
   },
   openGraph: {
     title: "Private Advisory — Strategy Session & Premium Package",
     description:
-      "Private cross-border fertility strategy advisory. Book a $500 Strategy Session or engage a $2,500 Premium Advisory Package.",
+      "Private cross-border fertility strategy advisory. Book a US$500 Strategy Session or engage a US$2,500 Premium Advisory Package.",
     url: "https://fertilitycarehub.com/advisory",
     siteName: "FertilityCareHub",
     type: "website",
@@ -76,7 +76,7 @@ export default function AdvisoryPage() {
               TIER 1
             </div>
             <h2 className="mt-3 text-2xl font-medium">
-              $500 Strategy Session
+              US$500 Strategy Session
             </h2>
             <p className="mt-4 text-[15px] leading-relaxed text-[#2A2A2A]">
               A focused 60–90 minute advisory session to establish your jurisdiction fit and decision logic.
@@ -91,11 +91,20 @@ export default function AdvisoryPage() {
             </ul>
 
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link
-                href="/consultation"
+              <a
+                href="https://buy.stripe.com/cNi5kF2C3dSidtrgiL3ks02"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
               >
-                Start Intake for Strategy Session
+                Pay US$500 — Strategy Session
+              </a>
+
+              <Link
+                href="/consultation?tier=1"
+                className="inline-flex items-center justify-center rounded-full border border-[#E5DDC8] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-white/40"
+              >
+                Start Intake (Phase 1)
               </Link>
 
               <Link
@@ -117,7 +126,7 @@ export default function AdvisoryPage() {
               TIER 2
             </div>
             <h2 className="mt-3 text-2xl font-medium">
-              $2,500 Premium Advisory Package
+              US$2,500 Premium Advisory Package
             </h2>
             <p className="mt-4 text-[15px] leading-relaxed text-[#2A2A2A]">
               A deeper engagement for clients who want a structured, end-to-end jurisdiction plan and risk brief.
@@ -132,22 +141,29 @@ export default function AdvisoryPage() {
             </ul>
 
             <div className="mt-7 flex flex-wrap gap-3">
-              <a
-  href="https://buy.stripe.com/3cI9AV0tVdSi753giL3ks03"
-  target="_blank"
-  rel="noopener noreferrer"
-  className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
->
-  Pay $2,500 — Premium Advisory
-</a>
+  <a
+    href="https://buy.stripe.com/3cI9AV0tVdSi753giL3ks03"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+  >
+    Pay US$2,500 — Premium Advisory
+  </a>
 
-              <Link
-                href="/countries/spain"
-                className="inline-flex items-center justify-center rounded-full border border-[#E5DDC8] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-white/40"
-              >
-                View Example Dossier (Spain)
-              </Link>
-            </div>
+  <Link
+    href="/consultation?tier=2"
+    className="inline-flex items-center justify-center rounded-full border border-[#E5DDC8] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-white/40"
+  >
+    Start Intake (Phase 1)
+  </Link>
+
+  <Link
+    href="/countries/spain"
+    className="inline-flex items-center justify-center rounded-full border border-[#E5DDC8] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-white/40"
+  >
+    View Example Dossier (Spain)
+  </Link>
+</div>
 
             <p className="mt-4 text-xs text-[#6A6256] leading-relaxed">
               No outcome guarantees. We provide structured planning, not medical treatment.
@@ -184,14 +200,9 @@ export default function AdvisoryPage() {
               <summary className="cursor-pointer text-lg font-medium">
                 How do I start?
               </summary>
-              <a
-  href="https://buy.stripe.com/cNi5kF2C3dSidtrgiL3ks02"
-  target="_blank"
-  rel="noopener noreferrer"
-  className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
->
-  Pay $500 — Strategy Session
-</a>
+              <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
+                Choose a tier above: you can either start with Intake (recommended if you have questions), or pay directly if you’re ready. All pricing is in USD.
+              </p>
             </details>
           </div>
         </div>
