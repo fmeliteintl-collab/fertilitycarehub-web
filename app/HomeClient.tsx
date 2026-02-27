@@ -1,5 +1,5 @@
 "use client";
-import { useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
 
 export default function Home() {
@@ -7,6 +7,39 @@ export default function Home() {
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">(
     "idle"
   );
+
+  // Deep-link context: /?from=country  (example: /?from=spain)
+  const [from, setFrom] = useState("");
+
+  useEffect(() => {
+    const handleRouteChange = () => {
+      const params = new URLSearchParams(window.location.search);
+      const raw = (params.get("from") || "").trim().toLowerCase();
+
+      // Allow only slugs like "spain" or "united-states"
+      const safe = /^[a-z-]+$/.test(raw) ? raw : "";
+      setFrom(safe);
+    };
+
+    // Defer to next tick to avoid synchronous setState
+    const timeoutId = setTimeout(handleRouteChange, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, []);
+
+  const countryLink = useMemo(() => {
+    if (!from) return null;
+    return `/countries/${encodeURIComponent(from)}`;
+  }, [from]);
+
+  const countryLabel = useMemo(() => {
+    if (!from) return "";
+    // simple label formatting: "united-states" -> "United States"
+    return from
+      .split("-")
+      .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : ""))
+      .join(" ");
+  }, [from]);
 
   async function onJoinList(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -100,6 +133,24 @@ export default function Home() {
           >
             Explore International Pathways
           </Link>
+
+          {/* Deep-link CTA (only appears when ?from=xxx is present and valid) */}
+          {countryLink ? (
+            <Link
+              href={countryLink}
+              style={{
+                padding: "12px 26px",
+                backgroundColor: "transparent",
+                border: "1px solid #e5ddc8",
+                color: "#6a6256",
+                borderRadius: "4px",
+                textDecoration: "none",
+                display: "inline-block",
+              }}
+            >
+              From {countryLabel}? Start Here →
+            </Link>
+          ) : null}
         </div>
 
         {/* Optional helper link */}
@@ -347,7 +398,7 @@ export default function Home() {
 
           {status === "ok" && (
             <p style={{ marginTop: 18, color: "#2d6a4f" }}>
-              You’re on the list.
+              You are on the list.
             </p>
           )}
 
@@ -358,7 +409,7 @@ export default function Home() {
           )}
 
           <p style={{ marginTop: 14, fontSize: 12, color: "#777" }}>
-            (We’ll reach out when consultation scheduling becomes available.)
+            (We will reach out when consultation scheduling becomes available.)
           </p>
         </div>
       </section>
@@ -368,7 +419,7 @@ export default function Home() {
         style={{ padding: "34px 20px", textAlign: "center", color: "#777" }}
       >
         <div style={{ fontSize: 12 }}>
-          ©️ {new Date().getFullYear()} FertilityCareHub • Privacy • Terms •
+          © {new Date().getFullYear()} FertilityCareHub • Privacy • Terms •
           Disclaimer
         </div>
       </footer>
