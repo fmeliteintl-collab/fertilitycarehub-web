@@ -89,11 +89,11 @@ export default function RootLayout({
   </Link>
 
   <Link
-    href="/consultation#request"
-    className="border border-[#B89B5E] px-5 py-2 text-sm tracking-wide hover:bg-[#B89B5E] hover:text-white transition"
-  >
-    Request Advisory Consultation
-  </Link>
+  href="/advisory"
+  className="border border-[#B89B5E] px-5 py-2 text-sm tracking-wide hover:bg-[#B89B5E] hover:text-white transition"
+>
+  View Advisory Options
+</Link>
 </div>
           </div>
         </header>
