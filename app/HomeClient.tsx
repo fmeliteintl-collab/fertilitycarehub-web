@@ -1,11 +1,14 @@
 "use client";
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
+
 export default function Home() {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">(
+    "idle"
+  );
 
-  async function onJoinList(e: FormEvent<HTMLFormElement>)  {
+  async function onJoinList(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setStatus("loading");
 
@@ -22,6 +25,7 @@ export default function Home() {
       setStatus("error");
     }
   }
+
   return (
     <main
       style={{
@@ -40,52 +44,78 @@ export default function Home() {
           margin: "0 auto",
         }}
       >
-<h1
-  style={{
-    fontSize: "42px",
-    fontWeight: 500,
-    marginBottom: "20px",
-    letterSpacing: "0.2px",
-  }}
->
-  Private Global Fertility Strategy Advisory
-  <br />
-  Discretion. Clarity. Cross-Border Direction.
-</h1>
+        <h1
+          style={{
+            fontSize: "42px",
+            fontWeight: 500,
+            marginBottom: "20px",
+            letterSpacing: "0.2px",
+          }}
+        >
+          Private Global Fertility Strategy Advisory
+          <br />
+          Discretion. Clarity. Cross-Border Direction.
+        </h1>
 
         <p style={{ fontSize: "18px", color: "#5a5a5a" }}>
-  Strategic jurisdiction assessment and clinical alignment for individuals and families navigating cross-border reproductive care.
-</p>
+          Strategic jurisdiction assessment and clinical alignment for individuals
+          and families navigating cross-border reproductive care.
+        </p>
 
-        <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-  <Link
-    href="/consultation"
-    style={{
-      padding: "12px 26px",
-      backgroundColor: "#b8a77a",
-      color: "#ffffff",
-      borderRadius: "4px",
-      textDecoration: "none",
-      display: "inline-block",
-    }}
-  >
-    Request Private Strategy Consultation
-  </Link>
-  <Link
-    href="/countries"
-    style={{
-      padding: "12px 26px",
-      backgroundColor: "transparent",
-      border: "1px solid #b8a77a",
-      color: "#b8a77a",
-      borderRadius: "4px",
-      textDecoration: "none",
-      display: "inline-block",
-    }}
-  >
-    Explore International Pathways
-  </Link>
-</div>
+        <div
+          style={{
+            display: "flex",
+            gap: 14,
+            justifyContent: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          {/* PRIMARY CTA -> /advisory (tier selection) */}
+          <Link
+            href="/advisory"
+            style={{
+              padding: "12px 26px",
+              backgroundColor: "#b8a77a",
+              color: "#ffffff",
+              borderRadius: "4px",
+              textDecoration: "none",
+              display: "inline-block",
+            }}
+          >
+            View Advisory Tiers (US$500 / US$2,500)
+          </Link>
+
+          {/* SECONDARY CTA */}
+          <Link
+            href="/countries"
+            style={{
+              padding: "12px 26px",
+              backgroundColor: "transparent",
+              border: "1px solid #b8a77a",
+              color: "#b8a77a",
+              borderRadius: "4px",
+              textDecoration: "none",
+              display: "inline-block",
+            }}
+          >
+            Explore International Pathways
+          </Link>
+        </div>
+
+        {/* Optional helper link */}
+        <div style={{ marginTop: 12 }}>
+          <Link
+            href="/consultation"
+            style={{
+              fontSize: 13,
+              color: "#6a6256",
+              textDecoration: "underline",
+              textUnderlineOffset: 4,
+            }}
+          >
+            Or request intake first (Phase 1)
+          </Link>
+        </div>
 
         {/* Credibility strip */}
         <div
@@ -97,7 +127,8 @@ export default function Home() {
             color: "#7a7a7a",
           }}
         >
-          Structured Analysis Across 30+ Jurisdictions • Legal &amp; Clinical Intelligence • Cross-Border Strategic Advisory
+          Structured Analysis Across 30+ Jurisdictions • Legal &amp; Clinical
+          Intelligence • Cross-Border Strategic Advisory
         </div>
       </section>
 
@@ -115,14 +146,16 @@ export default function Home() {
           </h2>
 
           <p style={{ color: "#555", marginBottom: 14 }}>
-            Fertility treatment is one of the most emotionally and financially significant decisions a family will make.
-            Legal environments differ. Donor anonymity regulations vary. Cost transparency is inconsistent. Success
-            reporting standards are not universal.
+            Fertility treatment is one of the most emotionally and financially
+            significant decisions a family will make. Legal environments differ.
+            Donor anonymity regulations vary. Cost transparency is inconsistent.
+            Success reporting standards are not universal.
           </p>
 
           <p style={{ color: "#555" }}>
-            FertilityCareHub provides structured, independent global analysis — allowing families to make informed
-            decisions across jurisdictions with clarity and confidence.
+            FertilityCareHub provides structured, independent global analysis —
+            allowing families to make informed decisions across jurisdictions with
+            clarity and confidence.
           </p>
         </div>
       </section>
@@ -153,16 +186,16 @@ export default function Home() {
             <div style={{ background: "#ffffff", padding: 26, borderRadius: 6 }}>
               <h3 style={{ marginTop: 0 }}>Clinic Standards Insight</h3>
               <p style={{ color: "#555", marginBottom: 0 }}>
-                Accreditation clarity, laboratory benchmarks, embryology standards,
-                and transparency in outcome reporting.
+                Accreditation clarity, laboratory benchmarks, embryology
+                standards, and transparency in outcome reporting.
               </p>
             </div>
 
             <div style={{ background: "#ffffff", padding: 26, borderRadius: 6 }}>
               <h3 style={{ marginTop: 0 }}>Strategic Fertility Planning</h3>
               <p style={{ color: "#555", marginBottom: 0 }}>
-                Cross-border pathway mapping, jurisdictional risk assessment,
-                cost structure evaluation, and confidential advisory planning.
+                Cross-border pathway mapping, jurisdictional risk assessment, cost
+                structure evaluation, and confidential advisory planning.
               </p>
             </div>
           </div>
@@ -195,8 +228,9 @@ export default function Home() {
           </h2>
 
           <p style={{ color: "#555", marginBottom: 14 }}>
-            Unlike promotional clinic directories or commission-driven ranking platforms, FertilityCareHub provides
-            structured global fertility strategy grounded in regulatory, clinical, and cost intelligence.
+            Unlike promotional clinic directories or commission-driven ranking
+            platforms, FertilityCareHub provides structured global fertility
+            strategy grounded in regulatory, clinical, and cost intelligence.
           </p>
 
           <p style={{ color: "#555", marginBottom: 0 }}>
@@ -220,30 +254,46 @@ export default function Home() {
           </h2>
 
           <p style={{ marginBottom: "14px", color: "#d4d4d4" }}>
-            For families requiring structured, confidential global fertility guidance across jurisdictions.
+            For families requiring structured, confidential global fertility
+            guidance across jurisdictions.
           </p>
 
           <p style={{ marginBottom: "34px", color: "#d4d4d4", fontSize: 14 }}>
             Initial consultations available by application.
           </p>
 
-<Link
-  href="/consultation"
-  style={{
-    padding: "12px 26px",
-    backgroundColor: "#b8a77a",
-    color: "#ffffff",
-    borderRadius: "4px",
-    textDecoration: "none",
-    display: "inline-block",
-  }}
->
-  Request Consultation
-</Link>
+          {/* CTA -> /advisory */}
+          <Link
+            href="/advisory"
+            style={{
+              padding: "12px 26px",
+              backgroundColor: "#b8a77a",
+              color: "#ffffff",
+              borderRadius: "4px",
+              textDecoration: "none",
+              display: "inline-block",
+            }}
+          >
+            View Advisory Tiers (US$500 / US$2,500)
+          </Link>
+
+          <div style={{ marginTop: 14 }}>
+            <Link
+              href="/consultation"
+              style={{
+                color: "#d4d4d4",
+                fontSize: 13,
+                textDecoration: "underline",
+                textUnderlineOffset: 4,
+              }}
+            >
+              Prefer to start with intake first? Request Intake (Phase 1)
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* EMAIL CAPTURE (placeholder UI only for now) */}
+      {/* EMAIL CAPTURE */}
       <section style={{ padding: "95px 20px", backgroundColor: "#ffffff" }}>
         <div style={{ maxWidth: "820px", margin: "0 auto", textAlign: "center" }}>
           <h2 style={{ fontSize: "28px", marginBottom: 14 }}>
@@ -251,58 +301,61 @@ export default function Home() {
           </h2>
 
           <p style={{ color: "#555", marginBottom: 26 }}>
-            Receive structured country intelligence updates, regulatory changes, and strategic fertility analysis.
+            Receive structured country intelligence updates, regulatory changes,
+            and strategic fertility analysis.
           </p>
 
           <form
-  onSubmit={onJoinList}
-  style={{
-    display: "flex",
-    justifyContent: "center",
-    gap: 12,
-    flexWrap: "wrap",
-  }}
->
-  <input
-    type="email"
-    value={email}
-    onChange={(e) => setEmail(e.target.value)}
-    required
-    placeholder="Enter your email"
-    style={{
-      padding: "12px 14px",
-      minWidth: "260px",
-      borderRadius: 4,
-      border: "1px solid #ccc",
-      fontSize: "14px",
-    }}
-  />
+            onSubmit={onJoinList}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: 12,
+              flexWrap: "wrap",
+            }}
+          >
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              placeholder="Enter your email"
+              style={{
+                padding: "12px 14px",
+                minWidth: "260px",
+                borderRadius: 4,
+                border: "1px solid #ccc",
+                fontSize: "14px",
+              }}
+            />
 
-  <button
-    type="submit"
-    style={{
-      padding: "12px 20px",
-      backgroundColor: "#b8a77a",
-      color: "#ffffff",
-      borderRadius: 4,
-      border: "none",
-      cursor: "pointer",
-      fontWeight: 500,
-    }}
-  >
-    {status === "loading" ? "Joining..." : "Join the List"}
-  </button>
-</form>
+            <button
+              type="submit"
+              style={{
+                padding: "12px 20px",
+                backgroundColor: "#b8a77a",
+                color: "#ffffff",
+                borderRadius: 4,
+                border: "none",
+                cursor: "pointer",
+                fontWeight: 500,
+              }}
+            >
+              {status === "loading" ? "Joining..." : "Join the List"}
+            </button>
+          </form>
 
-{status === "ok" && (
-  <p style={{ marginTop: 18, color: "#2d6a4f" }}>You’re on the list.</p>
-)}
+          {status === "ok" && (
+            <p style={{ marginTop: 18, color: "#2d6a4f" }}>
+              You’re on the list.
+            </p>
+          )}
 
-{status === "error" && (
-  <p style={{ marginTop: 18, color: "#c1121f" }}>
-    Something went wrong. Please try again.
-  </p>
-)}
+          {status === "error" && (
+            <p style={{ marginTop: 18, color: "#c1121f" }}>
+              Something went wrong. Please try again.
+            </p>
+          )}
 
           <p style={{ marginTop: 14, fontSize: 12, color: "#777" }}>
             (We’ll reach out when consultation scheduling becomes available.)
@@ -311,9 +364,12 @@ export default function Home() {
       </section>
 
       {/* FOOTER */}
-      <footer style={{ padding: "34px 20px", textAlign: "center", color: "#777" }}>
+      <footer
+        style={{ padding: "34px 20px", textAlign: "center", color: "#777" }}
+      >
         <div style={{ fontSize: 12 }}>
-          © {new Date().getFullYear()} FertilityCareHub • Privacy • Terms • Disclaimer
+          ©️ {new Date().getFullYear()} FertilityCareHub • Privacy • Terms •
+          Disclaimer
         </div>
       </footer>
     </main>
