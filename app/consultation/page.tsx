@@ -14,7 +14,7 @@ import { createClient } from "@supabase/supabase-js";
       * "useSearchParams() should be wrapped in a suspense boundary"
        */
        
-       export default function ConsultationPage() {
+  export default function ConsultationPage() {
          return (
              <Suspense fallback={<div style={{ padding: 24 }}>Loading…</div>}>
                    <ConsultationPageInner />

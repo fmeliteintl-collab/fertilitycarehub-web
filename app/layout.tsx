@@ -79,13 +79,22 @@ export default function RootLayout({
             <Link href="/" className="flex items-center gap-4">
               <span className="text-xl tracking-wide">FertilityCareHub</span>
             </Link>
+            
+            <div className="flex items-center gap-4">
+  <Link
+    href="/advisory"
+    className="text-sm tracking-wide text-[#6A6256] hover:text-[#1A1A1A]"
+  >
+    Advisory Pricing
+  </Link>
 
-            <Link
-              href="/consultation#request"
-              className="border border-[#B89B5E] px-5 py-2 text-sm tracking-wide hover:bg-[#B89B5E] hover:text-white transition"
-            >
-              Request Advisory Consultation
-            </Link>
+  <Link
+    href="/consultation#request"
+    className="border border-[#B89B5E] px-5 py-2 text-sm tracking-wide hover:bg-[#B89B5E] hover:text-white transition"
+  >
+    Request Advisory Consultation
+  </Link>
+</div>
           </div>
         </header>
 
