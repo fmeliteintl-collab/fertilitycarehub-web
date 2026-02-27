@@ -56,67 +56,65 @@ export default function ThankYouPage({ searchParams }: Props) {
       </div>
 
       <section className="max-w-4xl mx-auto px-6 pt-10 pb-16">
-        <div className="rounded-2xl border border-[#E5DDC8] bg-white/70 p-8">
-          <div className="text-xs tracking-[0.28em] text-[#6A6256]">
-            PAYMENT CONFIRMATION
-          </div>
+  <div className="rounded-2xl border border-[#E5DDC8] bg-white/80 p-10 shadow-sm">
+    <div className="text-xs tracking-[0.28em] text-[#6A6256]">
+      PAYMENT CONFIRMATION
+    </div>
 
-          <h1 className="mt-4 text-3xl md:text-4xl font-medium leading-tight">
-            {headline}
-          </h1>
+    <h1 className="mt-4 text-3xl md:text-4xl font-medium leading-tight">
+      {headline}
+    </h1>
 
-          <p className="mt-4 text-[15px] leading-relaxed text-[#2A2A2A]">
-            Thank you. {sub}
-          </p>
+    <p className="mt-5 text-[16px] leading-relaxed text-[#2A2A2A]">
+  Thank you for your trust. Your payment has been successfully processed.
+  <span className="block mt-2 text-[#2A2A2A]">{sub}</span>
+</p>
 
-          <div className="mt-7 flex flex-wrap gap-3">
-            <Link
-              href="/consultation"
-              className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
-            >
-              Start Intake (Phase 1)
-            </Link>
+    <div className="mt-8 rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-6">
+      <h2 className="text-lg font-medium">What happens next</h2>
 
-            <Link
-              href="/advisory"
-              className="inline-flex items-center justify-center rounded-full border border-[#E5DDC8] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-white/40"
-            >
-              Back to Advisory Options
-            </Link>
+      <ol className="mt-4 space-y-3 text-sm text-[#6A6256] leading-relaxed list-decimal pl-5">
+        <li>Complete the short intake form (Phase 1).</li>
+        <li>We review your context and jurisdiction objectives.</li>
+        <li>
+          You will receive an email within 24–48 business hours with next steps
+          and scheduling details.
+        </li>
+      </ol>
+    </div>
 
-            <Link
-              href="/countries"
-              className="inline-flex items-center justify-center rounded-full border border-[#E5DDC8] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-white/40"
-            >
-              Explore Country Dossiers
-            </Link>
-          </div>
+    <div className="mt-8 flex flex-wrap gap-3">
+      <Link
+        href="/consultation"
+        className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+      >
+        Complete Intake (Phase 1)
+      </Link>
 
-          <div className="mt-8 rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
-            <h2 className="text-lg font-medium">What happens next</h2>
-            <ol className="mt-3 space-y-2 text-sm text-[#6A6256] leading-relaxed list-decimal pl-5">
-              <li>Complete the short intake (Phase 1).</li>
-              <li>We review your context and route you to the right next step.</li>
-              <li>We’ll contact you by email for scheduling / next actions.</li>
-            </ol>
+      <Link
+        href="/advisory"
+        className="inline-flex items-center justify-center rounded-full border border-[#E5DDC8] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-white/40"
+      >
+        Review Advisory Details
+      </Link>
+    </div>
 
-            <p className="mt-4 text-sm text-[#6A6256] leading-relaxed">
-              Support:{" "}
-              <a
-                href="mailto:support@fertilitycarehub.com"
-                className="underline textUnderlineOffset-4"
-              >
-                support@fertilitycarehub.com
-              </a>
-            </p>
-          </div>
+    <div className="mt-8 text-sm text-[#6A6256] leading-relaxed">
+      If you have urgent logistical questions, contact us at{" "}
+      <a
+        href="mailto:support@fertilitycarehub.com"
+        className="underline textUnderlineOffset-4"
+      >
+        support@fertilitycarehub.com
+      </a>.
+    </div>
 
-          <p className="mt-6 text-xs text-[#6A6256] leading-relaxed">
-            Advisory only. No medical diagnosis, no guarantees, and no clinic sales.
-            FertilityCareHub provides strategic planning support and jurisdiction clarity.
-          </p>
-        </div>
-      </section>
+    <p className="mt-8 text-xs text-[#6A6256] leading-relaxed">
+      FertilityCareHub provides structured cross-border fertility planning support.
+      We are not a clinic, do not provide medical treatment, and do not guarantee outcomes.
+    </p>
+  </div>
+</section>
     </main>
   );
 }
