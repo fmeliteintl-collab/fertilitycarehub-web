@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   },
 };
 
+const STRIPE_TIER1_URL = "https://buy.stripe.com/14A8wOcbw7RedIjgz94AU00";
+const STRIPE_TIER2_URL = "https://buy.stripe.com/aFa8wO5N8gnK8nZ0Ab4AU01";
+
 export default function AdvisoryPage() {
   return (
     <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
@@ -41,9 +44,10 @@ export default function AdvisoryPage() {
         </h1>
 
         <p className="mt-6 max-w-3xl mx-auto text-lg leading-relaxed text-[#2A2A2A]">
-          FertilityCareHub is a cross-border fertility strategy advisory — not a clinic and not a broker.
-          We help you reduce wasted time, travel, and financial leakage by mapping the right country pathway,
-          the right decision checkpoints, and the execution risks to avoid.
+          FertilityCareHub is a cross-border fertility strategy advisory — not a
+          clinic and not a broker. We help you reduce wasted time, travel, and
+          financial leakage by mapping the right country pathway, the right
+          decision checkpoints, and the execution risks to avoid.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
@@ -72,14 +76,13 @@ export default function AdvisoryPage() {
         <div className="grid md:grid-cols-2 gap-6">
           {/* Tier 1 */}
           <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-            <div className="text-xs tracking-[0.25em] text-[#6A6256]">
-              TIER 1
-            </div>
-            <h2 className="mt-3 text-2xl font-medium">
-              US$500 Strategy Session
-            </h2>
+            <div className="text-xs tracking-[0.25em] text-[#6A6256]">TIER 1</div>
+
+            <h2 className="mt-3 text-2xl font-medium">US$500 Strategy Session</h2>
+
             <p className="mt-4 text-[15px] leading-relaxed text-[#2A2A2A]">
-              A focused 60–90 minute advisory session to establish your jurisdiction fit and decision logic.
+              A focused 60–90 minute advisory session to establish your
+              jurisdiction fit and decision logic.
             </p>
 
             <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
@@ -92,7 +95,7 @@ export default function AdvisoryPage() {
 
             <div className="mt-7 flex flex-wrap gap-3">
               <a
-                href="https://buy.stripe.com/cNi5kF2C3dSidtrgiL3ks02"
+                href={STRIPE_TIER1_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
@@ -101,10 +104,10 @@ export default function AdvisoryPage() {
               </a>
 
               <Link
-                href="/consultation?tier=1"
-                className="inline-flex items-center justify-center rounded-full border border-[#E5DDC8] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-white/40"
+                href="/consultation"
+                className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
               >
-                Start Intake (Phase 1)
+                Start Intake (Questions / Context)
               </Link>
 
               <Link
@@ -116,57 +119,63 @@ export default function AdvisoryPage() {
             </div>
 
             <p className="mt-4 text-xs text-[#6A6256] leading-relaxed">
-              Note: This is advisory planning support. It does not replace licensed medical or legal professionals.
+              Note: This is advisory planning support. It does not replace
+              licensed medical or legal professionals.
             </p>
           </div>
 
           {/* Tier 2 */}
           <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-            <div className="text-xs tracking-[0.25em] text-[#6A6256]">
-              TIER 2
-            </div>
+            <div className="text-xs tracking-[0.25em] text-[#6A6256]">TIER 2</div>
+
             <h2 className="mt-3 text-2xl font-medium">
               US$2,500 Premium Advisory Package
             </h2>
+
             <p className="mt-4 text-[15px] leading-relaxed text-[#2A2A2A]">
-              A deeper engagement for clients who want a structured, end-to-end jurisdiction plan and risk brief.
+              A deeper engagement for clients who want a structured, end-to-end
+              jurisdiction plan and risk brief.
             </p>
 
             <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
               <li>Country comparative assessment (focused set, not “every country”)</li>
-              <li>Risk briefing: governance, donor pathway, eligibility friction, execution constraints</li>
+              <li>
+                Risk briefing: governance, donor pathway, eligibility friction,
+                execution constraints
+              </li>
               <li>Clinic model selection logic (curated shortlist principles)</li>
               <li>Logistics planning structure and decision checkpoints</li>
               <li>Document + timeline readiness checklist</li>
             </ul>
 
             <div className="mt-7 flex flex-wrap gap-3">
-  <a
-    href="https://buy.stripe.com/3cI9AV0tVdSi753giL3ks03"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
-  >
-    Pay US$2,500 — Premium Advisory
-  </a>
+              <a
+                href={STRIPE_TIER2_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+              >
+                Pay US$2,500 — Premium Package
+              </a>
 
-  <Link
-    href="/consultation?tier=2"
-    className="inline-flex items-center justify-center rounded-full border border-[#E5DDC8] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-white/40"
-  >
-    Start Intake (Phase 1)
-  </Link>
+              <Link
+                href="/consultation"
+                className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+              >
+                Start Intake (Questions / Context)
+              </Link>
 
-  <Link
-    href="/countries/spain"
-    className="inline-flex items-center justify-center rounded-full border border-[#E5DDC8] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-white/40"
-  >
-    View Example Dossier (Spain)
-  </Link>
-</div>
+              <Link
+                href="/countries/spain"
+                className="inline-flex items-center justify-center rounded-full border border-[#E5DDC8] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-white/40"
+              >
+                View Example Dossier (Spain)
+              </Link>
+            </div>
 
             <p className="mt-4 text-xs text-[#6A6256] leading-relaxed">
-              No outcome guarantees. We provide structured planning, not medical treatment.
+              No outcome guarantees. We provide structured planning, not medical
+              treatment.
             </p>
           </div>
         </div>
@@ -183,7 +192,8 @@ export default function AdvisoryPage() {
                 Is this medical advice?
               </summary>
               <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
-                No. We provide strategic planning and jurisdiction clarity. Medical decisions should be made with licensed clinicians.
+                No. We provide strategic planning and jurisdiction clarity.
+                Medical decisions should be made with licensed clinicians.
               </p>
             </details>
 
@@ -192,7 +202,9 @@ export default function AdvisoryPage() {
                 What’s the difference between Tier 1 and Tier 2?
               </summary>
               <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
-                Tier 1 is a focused strategy session to establish fit and direction. Tier 2 is a deeper engagement that structures the plan, risks, checkpoints, and readiness.
+                Tier 1 is a focused strategy session to establish fit and
+                direction. Tier 2 is a deeper engagement that structures the
+                plan, risks, checkpoints, and readiness.
               </p>
             </details>
 
@@ -201,7 +213,9 @@ export default function AdvisoryPage() {
                 How do I start?
               </summary>
               <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
-                Choose a tier above: you can either start with Intake (recommended if you have questions), or pay directly if you’re ready. All pricing is in USD.
+                If you’re ready to proceed, you can pay directly above (Tier 1
+                or Tier 2). If you have questions or want us to route you to the
+                best tier, start with the intake form.
               </p>
             </details>
           </div>
