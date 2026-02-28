@@ -16,6 +16,36 @@ export default function SpainVsPortugalPage() {
   return (
     <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
       <div className="max-w-5xl mx-auto px-6 py-16">
+        {/* Breadcrumb JSON-LD */}
+<script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: "https://fertilitycarehub.com/",
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Compare",
+          item: "https://fertilitycarehub.com/compare",
+        },
+        {
+  "@type": "ListItem",
+  position: 3,
+  name: "Spain vs Portugal IVF Regulations (2026)",
+  item: "https://fertilitycarehub.com/compare/spain-vs-portugal-ivf-regulations",
+},
+      ],
+    }),
+  }}
+/>
         {/* Breadcrumb */}
         <div className="text-sm text-[#6A6256] mb-6">
           <Link href="/" className="underline textUnderlineOffset-4">
