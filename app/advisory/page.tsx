@@ -119,18 +119,23 @@ export default function AdvisoryPage() {
             </h2>
 
             <p className="mt-4 text-sm leading-relaxed text-[#2A2A2A]">
-              A condensed application of the FCH Framework designed to provide
-              directional clarity across 2–3 structurally viable jurisdictions.
-            </p>
+  A structured diagnostic application of the FCH Framework designed to establish
+  jurisdiction fit and identify primary regulatory and execution risks across
+  2–3 viable pathways.
+</p>
 
-            <ul className="mt-5 space-y-2 text-sm text-[#6A6256] list-disc pl-5">
-              <li>Case variable mapping</li>
-              <li>Top-line jurisdiction comparison</li>
-              <li>Pillar-level qualitative assessment</li>
-              <li>Primary structural risk summary</li>
-              <li>Clear directional recommendation</li>
-            </ul>
+<ul className="mt-5 space-y-2 text-sm text-[#6A6256] list-disc pl-5">
+  <li>Case variable profile & constraint mapping</li>
+  <li>Shortlist identification (2–3 structurally viable jurisdictions)</li>
+  <li>Pillar-level qualitative risk bands</li>
+  <li>Primary regulatory friction flags</li>
+  <li>Strategic direction with rationale</li>
+</ul>
 
+<p className="mt-4 text-xs text-[#6A6256] leading-relaxed">
+  This engagement provides directional clarity. It does not include full
+  comparative modeling, weighted scoring matrices, or execution roadmap design.
+</p>
             <div className="mt-7 flex flex-wrap gap-3">
               <a
                 href={STRIPE_TIER1_URL}
