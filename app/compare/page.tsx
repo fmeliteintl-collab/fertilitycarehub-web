@@ -54,6 +54,45 @@ export default function CompareIndexPage() {
             </p>
           </Link>
 
+          <Link
+            href="/compare/spain-vs-italy-ivf-regulations"
+            className="block border border-[#E5DDC8] p-6 rounded-xl hover:bg-[#EFE9DB] transition"
+          >
+            <h2 className="text-xl font-medium">
+              Spain vs Italy IVF Regulations (2026)
+            </h2>
+            <p className="mt-2 text-sm text-[#6A6256]">
+              Structural comparison focused on donor legality,
+              regulatory stability, and procedural alignment.
+            </p>
+          </Link>
+
+          <Link
+            href="/compare/spain-vs-czech-republic-ivf-regulations"
+            className="block border border-[#E5DDC8] p-6 rounded-xl hover:bg-[#EFE9DB] transition"
+          >
+            <h2 className="text-xl font-medium">
+              Spain vs Czech Republic IVF Regulations (2026)
+            </h2>
+            <p className="mt-2 text-sm text-[#6A6256]">
+              Framework overview of governance posture,
+              infrastructure depth, and execution considerations.
+            </p>
+          </Link>
+
+          <Link
+            href="/compare/spain-vs-north-cyprus-ivf-regulations"
+            className="block border border-[#E5DDC8] p-6 rounded-xl hover:bg-[#EFE9DB] transition"
+          >
+            <h2 className="text-xl font-medium">
+              Spain vs North Cyprus IVF Regulations (2026)
+            </h2>
+            <p className="mt-2 text-sm text-[#6A6256]">
+              Comparative overview emphasizing regulatory predictability,
+              donor governance structure, and operational risk.
+            </p>
+          </Link>
+
         </div>
 
         <section className="mt-16 text-center">

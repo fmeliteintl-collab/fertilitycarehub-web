@@ -131,7 +131,10 @@ export default function AdvisoryPage() {
   <li>Primary regulatory friction flags</li>
   <li>Strategic direction with rationale</li>
 </ul>
-
+<p className="mt-6 text-xs leading-relaxed text-[#6A6256]">
+  Designed for early-stage jurisdiction screening before deeper comparative modeling
+  or full execution planning.
+</p>
 <p className="mt-4 text-xs text-[#6A6256] leading-relaxed">
   This engagement provides directional clarity. It does not include full
   comparative modeling, weighted scoring matrices, or execution roadmap design.
@@ -195,11 +198,11 @@ export default function AdvisoryPage() {
         <div className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-8">
           <h2 className="text-2xl font-medium">Advisory Capacity</h2>
           <p className="mt-4 text-sm text-[#6A6256] leading-relaxed max-w-3xl mx-auto">
-            To preserve analytical rigor, advisory engagements are accepted in
-            controlled intake cycles. Each case undergoes structured framework
-            application and internal review. If your timeline is compressed,
-            begin with the Strategic Alignment Snapshot™️.
-          </p>
+  To preserve analytical rigor and framework integrity, advisory engagements
+  are accepted in controlled intake cycles. Each case undergoes structured
+  internal review before acceptance. Where timelines are compressed, the
+  Strategic Alignment Snapshot™ may be used as an initial screening layer.
+</p>
         </div>
       </section>
       <script

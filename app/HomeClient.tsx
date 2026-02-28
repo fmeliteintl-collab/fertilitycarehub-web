@@ -137,7 +137,14 @@ export default function Home() {
           >
             Explore International Pathways
           </Link>
-
+          <div style={{ marginTop: 14, fontSize: 13, color: "#6A6256" }}>
+  <Link
+    href="/compare"
+    style={{ textDecoration: "underline", color: "inherit" }}
+  >
+    View Jurisdiction Comparisons
+  </Link>
+</div>
           {/* Deep-link CTA (only appears when ?from=xxx is present and valid) */}
           {countryLink ? (
             <Link
@@ -524,23 +531,18 @@ export default function Home() {
       <footer
         style={{ padding: "34px 20px", textAlign: "center", color: "#777" }}
       >
-        <div style={{ fontSize: 12 }}>
-  ©️ {new Date().getFullYear()} FertilityCareHub •{" "}
-  <Link href="/privacy" style={{ textDecoration: "underline", color: "inherit" }}>
-    Privacy
-  </Link>{" "}
-  •{" "}
-  <Link href="/terms" style={{ textDecoration: "underline", color: "inherit" }}>
-    Terms
-  </Link>{" "}
-  •{" "}
-  <Link
-    href="/disclaimer"
-    style={{ textDecoration: "underline", color: "inherit" }}
-  >
-    Disclaimer
-  </Link>
-</div>
+        ©️ {new Date().getFullYear()} FertilityCareHub •{" "}
+<Link href="/privacy" style={{ textDecoration: "underline", color: "inherit" }}>
+  Privacy
+</Link>{" "}
+•{" "}
+<Link href="/terms" style={{ textDecoration: "underline", color: "inherit" }}>
+  Terms
+</Link>{" "}
+•{" "}
+<Link href="/disclaimer" style={{ textDecoration: "underline", color: "inherit" }}>
+  Disclaimer
+</Link>
       </footer>
     </main>
   );
