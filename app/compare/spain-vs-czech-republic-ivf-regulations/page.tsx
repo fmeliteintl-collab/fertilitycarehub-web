@@ -3,19 +3,51 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title:
-    "Spain vs Italy IVF Regulations (2026) | Cross-Border Fertility Comparison",
+    "Spain vs Czech Republic IVF Regulations (2026) | Cross-Border Fertility Comparison",
   description:
-    "Structured comparison of Spain and Italy IVF regulations under the FCH Global Fertility Intelligence Framework™️.",
+    "Structured comparison of Spain and the Czech Republic IVF regulations under the FCH Global Fertility Intelligence Framework™️.",
   alternates: {
-    canonical: "https://fertilitycarehub.com/compare/spain-vs-italy-ivf-regulations",
+    canonical:
+      "https://fertilitycarehub.com/compare/spain-vs-czech-republic-ivf-regulations",
   },
 };
 
-export default function SpainVsItalyPage() {
+export default function SpainVsCzechRepublicPage() {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://fertilitycarehub.com/",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Compare",
+        item: "https://fertilitycarehub.com/compare",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: "Spain vs Czech Republic IVF Regulations (2026)",
+        item: "https://fertilitycarehub.com/compare/spain-vs-czech-republic-ivf-regulations",
+      },
+    ],
+  };
+
   return (
     <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
+      {/* JSON-LD: Breadcrumbs */}
+     <script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+/>
+
       <div className="max-w-5xl mx-auto px-6 py-16">
-        {/* Breadcrumb */}
+        {/* Breadcrumb UI */}
         <div className="text-sm text-[#6A6256] mb-6">
           <Link href="/" className="underline textUnderlineOffset-4">
             Home
@@ -27,15 +59,15 @@ export default function SpainVsItalyPage() {
         </div>
 
         <h1 className="text-4xl font-medium leading-tight">
-          Spain vs Italy IVF Regulations (2026 Framework Overview)
+          Spain vs Czech Republic IVF Regulations (2026 Framework Overview)
         </h1>
 
         <p className="mt-6 text-lg leading-relaxed text-[#2A2A2A]">
-          Spain and Italy are often evaluated side-by-side by intended parents
-          comparing Southern European pathways. Both jurisdictions support IVF,
-          but structural differences exist across regulatory alignment, donor
-          governance, clinical infrastructure transparency, and execution
-          complexity.
+          Spain and the Czech Republic are frequently evaluated for cross-border
+          fertility treatment in Europe. While both jurisdictions support
+          donor-assisted IVF pathways, structural differences can emerge across
+          regulatory alignment, donor governance, clinical infrastructure
+          transparency, and execution complexity.
         </p>
 
         {/* Regulatory */}
@@ -43,11 +75,11 @@ export default function SpainVsItalyPage() {
           <h2 className="text-2xl font-medium">Regulatory Alignment</h2>
           <p className="mt-4 text-[#6A6256] leading-relaxed">
             Spain operates under consolidated national legislation governing
-            assisted reproductive technologies, with established operational norms
-            for international care pathways. Italy permits IVF within a regulated
-            framework that has historically included tighter pathway constraints,
-            and practical access may vary depending on eligibility profile and
-            treatment structure.
+            assisted reproductive technologies, with defined eligibility and donor
+            governance structures. The Czech Republic permits comparable fertility
+            treatment pathways within a national regulatory framework that may
+            involve different procedural requirements depending on pathway type
+            and case profile.
           </p>
         </section>
 
@@ -55,11 +87,12 @@ export default function SpainVsItalyPage() {
         <section className="mt-12">
           <h2 className="text-2xl font-medium">Clinical Infrastructure Depth</h2>
           <p className="mt-4 text-[#6A6256] leading-relaxed">
-            Spain maintains a dense private fertility sector with extensive
-            laboratory capacity and long-standing international patient
-            familiarity. Italy has established clinics and expertise as well,
-            though infrastructure concentration, wait-time dynamics, and
-            cross-border readiness may vary by region and provider type.
+            Spain maintains a mature private fertility sector with high clinic
+            density in major cities and established international patient
+            operations. The Czech Republic also supports an established fertility
+            clinic ecosystem, though infrastructure concentration, laboratory
+            capacity, and international patient throughput can vary by region and
+            provider scale.
           </p>
         </section>
 
@@ -67,12 +100,11 @@ export default function SpainVsItalyPage() {
         <section className="mt-12">
           <h2 className="text-2xl font-medium">Governance & Donor Structure</h2>
           <p className="mt-4 text-[#6A6256] leading-relaxed">
-            Donor governance is a key differentiator in Southern Europe. Spain
-            applies structured donor governance under national law, supporting
-            donor-assisted pathways within defined parameters. Italy’s donor
-            governance environment may involve additional structural constraints
-            and pathway-specific compliance considerations, making case variables
-            decisive for feasibility.
+            Spain enforces anonymous donor structures under national law. The
+            Czech Republic permits donor-assisted pathways under defined
+            governance parameters, with structural considerations influenced by
+            pathway type, documentation structure, and case variables such as
+            partner status and treatment configuration.
           </p>
         </section>
 
@@ -80,10 +112,10 @@ export default function SpainVsItalyPage() {
         <section className="mt-12">
           <h2 className="text-2xl font-medium">Execution Complexity</h2>
           <p className="mt-4 text-[#6A6256] leading-relaxed">
-            Execution complexity in both jurisdictions depends on treatment type,
-            documentation requirements, travel cadence, and coordination load.
-            Operational friction may be driven more by pathway eligibility and
-            clinic process design than by jurisdiction alone.
+            Execution complexity in both jurisdictions depends on the intended
+            pathway, documentation friction, coordination logistics, and timeline
+            sensitivity. In practice, operational risk is often driven more by
+            case structure and coordination load than by jurisdiction alone.
           </p>
         </section>
 
@@ -91,11 +123,11 @@ export default function SpainVsItalyPage() {
         <section className="mt-16 border-t border-[#E5DDC8] pt-12">
           <h2 className="text-2xl font-medium">Structural Position Summary</h2>
           <p className="mt-4 text-[#6A6256] leading-relaxed">
-            Spain and Italy can both be viable in cross-border fertility planning,
-            but suitability is contingent upon donor structure, storage horizon,
-            citizenship exposure, financial planning, and timeline sensitivity.
-            For donor-assisted pathways, governance rules and operational readiness
-            typically drive the decision more than geography.
+            Spain and the Czech Republic each present viable regulatory
+            environments for cross-border fertility treatment. Final suitability
+            is contingent upon donor pathway constraints, storage horizon,
+            citizenship exposure, financial planning, and execution risk within
+            the client’s specific case profile.
           </p>
         </section>
         {/* Related comparisons */}

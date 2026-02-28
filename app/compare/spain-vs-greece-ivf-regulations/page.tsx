@@ -124,7 +124,37 @@ export default function SpainVsGreecePage() {
             profile.
           </p>
         </section>
-
+        {/* Related comparisons */}
+<section className="mt-12 border-t border-[#E5DDC8] pt-10">
+  <h2 className="text-lg font-medium">Related comparisons</h2>
+  <ul className="mt-4 space-y-2 text-sm text-[#6A6256]">
+    <li>
+      <Link href="/compare/spain-vs-portugal-ivf-regulations" className="underline textUnderlineOffset-4">
+        Spain vs Portugal IVF Regulations
+      </Link>
+    </li>
+    <li>
+      <Link href="/compare/spain-vs-greece-ivf-regulations" className="underline textUnderlineOffset-4">
+        Spain vs Greece IVF Regulations
+      </Link>
+    </li>
+    <li>
+      <Link href="/compare/spain-vs-italy-ivf-regulations" className="underline textUnderlineOffset-4">
+        Spain vs Italy IVF Regulations
+      </Link>
+    </li>
+    <li>
+      <Link href="/compare/spain-vs-czech-republic-ivf-regulations" className="underline textUnderlineOffset-4">
+        Spain vs Czech Republic IVF Regulations
+      </Link>
+    </li>
+    <li>
+      <Link href="/compare/spain-vs-north-cyprus-ivf-regulations" className="underline textUnderlineOffset-4">
+        Spain vs North Cyprus IVF Regulations
+      </Link>
+    </li>
+  </ul>
+</section>
         {/* CTA */}
         <section className="mt-16 text-center">
           <p className="text-sm text-[#6A6256]">
