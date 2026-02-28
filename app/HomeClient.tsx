@@ -239,46 +239,61 @@ export default function Home() {
       </section>
 
       {/* FRAMEWORK */}
-      <section style={{ padding: "100px 20px", textAlign: "center" }}>
-        <div style={{ maxWidth: "1050px", margin: "0 auto" }}>
-          <h2 style={{ fontSize: "28px", marginBottom: "58px" }}>
-            Our Global Advisory Framework
-          </h2>
+<section style={{ padding: "100px 20px", textAlign: "center" }}>
+  <div style={{ maxWidth: "1050px", margin: "0 auto" }}>
+    <h2 style={{ fontSize: "28px", marginBottom: "18px" }}>
+      The FCH Global Fertility Intelligence Framework™️
+    </h2>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-              gap: "42px",
-              textAlign: "left",
-            }}
-          >
-            <div style={{ background: "#ffffff", padding: 26, borderRadius: 6 }}>
-              <h3 style={{ marginTop: 0 }}>Country Intelligence</h3>
-              <p style={{ color: "#555", marginBottom: 0 }}>
-                Legal frameworks, storage regulations, donor eligibility policies,
-                treatment access rules, and citizenship implications.
-              </p>
-            </div>
+    <p style={{ color: "#555", marginBottom: "58px", maxWidth: 720, marginLeft: "auto", marginRight: "auto" }}>
+      Our institutional methodology evaluates cross-border fertility pathways
+      across four structural pillars. Each jurisdiction is assessed using
+      weighted internal scoring and translated into clear qualitative risk bands
+      for strategic clarity.
+    </p>
 
-            <div style={{ background: "#ffffff", padding: 26, borderRadius: 6 }}>
-              <h3 style={{ marginTop: 0 }}>Clinic Standards Insight</h3>
-              <p style={{ color: "#555", marginBottom: 0 }}>
-                Accreditation clarity, laboratory benchmarks, embryology
-                standards, and transparency in outcome reporting.
-              </p>
-            </div>
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+        gap: "42px",
+        textAlign: "left",
+      }}
+    >
+      <div style={{ background: "#ffffff", padding: 26, borderRadius: 6 }}>
+        <h3 style={{ marginTop: 0 }}>Regulatory Alignment</h3>
+        <p style={{ color: "#555", marginBottom: 0 }}>
+          Legal eligibility, donor governance rules, storage regulations, and
+          citizenship implications. Regulatory misalignment invalidates strategy.
+        </p>
+      </div>
 
-            <div style={{ background: "#ffffff", padding: 26, borderRadius: 6 }}>
-              <h3 style={{ marginTop: 0 }}>Strategic Fertility Planning</h3>
-              <p style={{ color: "#555", marginBottom: 0 }}>
-                Cross-border pathway mapping, jurisdictional risk assessment, cost
-                structure evaluation, and confidential advisory planning.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <div style={{ background: "#ffffff", padding: 26, borderRadius: 6 }}>
+        <h3 style={{ marginTop: 0 }}>Clinical Infrastructure Depth</h3>
+        <p style={{ color: "#555", marginBottom: 0 }}>
+          Laboratory standards, transparency posture, embryology capability, and
+          institutional quality signals.
+        </p>
+      </div>
+
+      <div style={{ background: "#ffffff", padding: 26, borderRadius: 6 }}>
+        <h3 style={{ marginTop: 0 }}>Governance & Donor Policy Structure</h3>
+        <p style={{ color: "#555", marginBottom: 0 }}>
+          Anonymity frameworks, disclosure requirements, donor eligibility rules,
+          and long-term compliance exposure.
+        </p>
+      </div>
+
+      <div style={{ background: "#ffffff", padding: 26, borderRadius: 6 }}>
+        <h3 style={{ marginTop: 0 }}>Execution Complexity Mapping</h3>
+        <p style={{ color: "#555", marginBottom: 0 }}>
+          Travel cadence, documentation friction, coordination burden, and
+          timeline realism across jurisdictions.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* WHO WE SERVE */}
       <section style={{ padding: "90px 20px", backgroundColor: "#ffffff" }}>
