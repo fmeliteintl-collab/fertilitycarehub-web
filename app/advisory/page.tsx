@@ -93,7 +93,15 @@ export default function AdvisoryPage() {
               <li>Next actions: what to do this week vs later</li>
             </ul>
 
+            {/* Button order: Intake -> Pay -> Secondary */}
             <div className="mt-7 flex flex-wrap gap-3">
+              <Link
+                href="/consultation"
+                className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+              >
+                Start Intake (Phase 1)
+              </Link>
+
               <a
                 href={STRIPE_TIER1_URL}
                 target="_blank"
@@ -102,14 +110,12 @@ export default function AdvisoryPage() {
               >
                 Pay US$500 — Strategy Session
               </a>
-
-              <Link
-                href="/consultation"
-                className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
-              >
-                Start Intake (Questions / Context)
-              </Link>
-
+              <p className="mt-3 text-xs text-[#6A6256]">
+  Secure checkout via Stripe. After payment, you’ll be redirected to next steps.
+</p>
+<p className="mt-3 text-xs text-[#6A6256]">
+  Secure checkout via Stripe. After payment, you’ll be redirected to next steps.
+</p>
               <Link
                 href="/how-to-compare-fertility-jurisdictions"
                 className="inline-flex items-center justify-center rounded-full border border-[#E5DDC8] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-white/40"
@@ -138,7 +144,9 @@ export default function AdvisoryPage() {
             </p>
 
             <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>Country comparative assessment (focused set, not “every country”)</li>
+              <li>
+                Country comparative assessment (focused set, not “every country”)
+              </li>
               <li>
                 Risk briefing: governance, donor pathway, eligibility friction,
                 execution constraints
@@ -148,7 +156,15 @@ export default function AdvisoryPage() {
               <li>Document + timeline readiness checklist</li>
             </ul>
 
+            {/* Button order: Intake -> Pay -> Secondary */}
             <div className="mt-7 flex flex-wrap gap-3">
+              <Link
+                href="/consultation"
+                className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+              >
+                Start Intake (Phase 1)
+              </Link>
+
               <a
                 href={STRIPE_TIER2_URL}
                 target="_blank"
@@ -157,14 +173,12 @@ export default function AdvisoryPage() {
               >
                 Pay US$2,500 — Premium Package
               </a>
-
-              <Link
-                href="/consultation"
-                className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
-              >
-                Start Intake (Questions / Context)
-              </Link>
-
+              <p className="mt-3 text-xs text-[#6A6256]">
+  Secure checkout via Stripe. After payment, you’ll be redirected to next steps.
+</p>
+              <p className="mt-3 text-xs text-[#6A6256]">
+  Secure checkout via Stripe. After payment, you’ll be redirected to next steps.
+</p>
               <Link
                 href="/countries/spain"
                 className="inline-flex items-center justify-center rounded-full border border-[#E5DDC8] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-white/40"
