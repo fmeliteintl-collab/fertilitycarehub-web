@@ -20,7 +20,8 @@ const SUPPORT_EMAIL = "support@fertilitycarehub.com";
 
 export default function PrivacyPage() {
   return (
-    <main style={{ maxWidth: 900, margin: "0 auto", padding: "64px 20px" }}>
+    <main style={{ backgroundColor: "#F5F1E8", minHeight: "100vh" }}>
+  <div style={{ maxWidth: 900, margin: "0 auto", padding: "64px 20px" }}>
       <h1 style={{ fontSize: 36, margin: 0, letterSpacing: "-0.02em" }}>
         Privacy Policy
       </h1>
@@ -121,6 +122,7 @@ export default function PrivacyPage() {
           Back to home
         </Link>
       </p>
+      </div>
     </main>
   );
 }
