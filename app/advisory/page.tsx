@@ -197,6 +197,53 @@ export default function AdvisoryPage() {
           </p>
         </div>
       </section>
+      <script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: [
+        {
+          "@type": "Question",
+          name: "Is FertilityCareHub a clinic or broker?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text:
+              "No. FertilityCareHub is an independent cross-border fertility strategy advisory platform. We do not sell clinics, provide medical treatment, or receive referral commissions.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "What is included in the Strategic Alignment Snapshot™?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text:
+              "The Strategic Alignment Snapshot™ is a structured diagnostic engagement applying the FCH Global Fertility Intelligence Framework™ to identify viable jurisdictions, primary regulatory risks, and directional strategy.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "What is the difference between Tier 1 and Tier 2?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text:
+              "Tier 1 provides directional clarity across shortlisted jurisdictions. Tier 2 applies the full framework with adaptive comparative modeling, deeper regulatory analysis, and structured execution roadmap design.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Does FertilityCareHub guarantee fertility outcomes?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text:
+              "No. FertilityCareHub provides structured strategic planning support and jurisdictional clarity. Medical outcomes depend on licensed clinical providers and individual medical factors.",
+          },
+        },
+      ],
+    }),
+  }}
+/>
     </main>
   );
 }
