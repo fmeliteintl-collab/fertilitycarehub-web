@@ -1,4 +1,22 @@
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy | FertilityCareHub",
+  description:
+    "How FertilityCareHub collects, uses, stores, and safeguards personal information.",
+  alternates: { canonical: "https://fertilitycarehub.com/privacy" },
+  openGraph: {
+    title: "Privacy Policy | FertilityCareHub",
+    description:
+      "How FertilityCareHub collects, uses, stores, and safeguards personal information.",
+    url: "https://fertilitycarehub.com/privacy",
+    siteName: "FertilityCareHub",
+    type: "website",
+  },
+};
+
+const SUPPORT_EMAIL = "support@fertilitycarehub.com";
 
 export default function PrivacyPage() {
   return (
@@ -37,11 +55,11 @@ export default function PrivacyPage() {
       <h2 style={{ marginTop: 28, fontSize: 20 }}>Legal Basis for Processing</h2>
       <p style={{ lineHeight: 1.7, color: "rgba(0,0,0,0.72)" }}>
         We process personal data based on user consent, legitimate business
-        interests related to advisory services, and contractual necessity
-        where applicable.
+        interests related to advisory services, and contractual necessity where
+        applicable.
       </p>
 
-      <h2 style={{ marginTop: 28, fontSize: 20 }}>Data Storage & Security</h2>
+      <h2 style={{ marginTop: 28, fontSize: 20 }}>Data Storage &amp; Security</h2>
       <p style={{ lineHeight: 1.7, color: "rgba(0,0,0,0.72)" }}>
         Consultation and subscriber data may be stored using secure third-party
         infrastructure providers, including Supabase or comparable cloud
@@ -84,11 +102,12 @@ export default function PrivacyPage() {
         You may request access to, correction of, or deletion of your personal
         data by contacting us at{" "}
         <a
-          href="mailto:hello@fertilitycarehub.com"
+          href={"mailto:" + SUPPORT_EMAIL}
           style={{ textDecoration: "underline" }}
         >
-          hello@fertilitycarehub.com
-        </a>.
+          {SUPPORT_EMAIL}
+        </a>
+        .
       </p>
 
       <h2 style={{ marginTop: 28, fontSize: 20 }}>Policy Updates</h2>
