@@ -94,7 +94,11 @@ export default function Home() {
           Strategic jurisdiction assessment and clinical alignment for individuals
           and families navigating cross-border reproductive care.
         </p>
-
+        <p style={{ fontSize: 14, color: "#6a6256", marginTop: 14 }}>
+  Powered by the <strong>FCH Global Fertility Intelligence Framework™</strong> — a
+  structured model that evaluates jurisdictions across regulatory alignment,
+  donor pathway constraints, clinical infrastructure, and execution risk.
+</p>
         <div
           style={{
             display: "flex",
@@ -152,7 +156,30 @@ export default function Home() {
             </Link>
           ) : null}
         </div>
-
+          <div
+  style={{
+    marginTop: 18,
+    display: "flex",
+    gap: 10,
+    justifyContent: "center",
+    flexWrap: "wrap",
+    fontSize: 12,
+    color: "#6a6256",
+  }}
+>
+  <span style={{ padding: "6px 10px", border: "1px solid #e5ddc8", borderRadius: 999 }}>
+    Regulatory Alignment
+  </span>
+  <span style={{ padding: "6px 10px", border: "1px solid #e5ddc8", borderRadius: 999 }}>
+    Donor Pathway Constraints
+  </span>
+  <span style={{ padding: "6px 10px", border: "1px solid #e5ddc8", borderRadius: 999 }}>
+    Clinical Infrastructure
+  </span>
+  <span style={{ padding: "6px 10px", border: "1px solid #e5ddc8", borderRadius: 999 }}>
+    Execution Risk
+  </span>
+</div>
         {/* Optional helper link */}
         <div style={{ marginTop: 12 }}>
           <Link
