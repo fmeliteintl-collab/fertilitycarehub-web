@@ -2,7 +2,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Spain vs Portugal IVF Regulations (2026) | Cross-Border Fertility Comparison",
+  title:
+    "Spain vs Portugal IVF Regulations (2026) | Cross-Border Fertility Comparison",
   description:
     "Structured comparison of Spain and Portugal IVF regulations under the FCH Global Fertility Intelligence Framework™️.",
   alternates: {
@@ -10,19 +11,21 @@ export const metadata: Metadata = {
       "https://fertilitycarehub.com/compare/spain-vs-portugal-ivf-regulations",
   },
 };
-<div className="text-sm text-[#6A6256]">
-  <Link href="/" className="underline textUnderlineOffset-4">
-    Home
-  </Link>
-  <span className="mx-2">/</span>
-  <Link href="/compare" className="underline textUnderlineOffset-4">
-    Compare
-  </Link>
-</div>
+
 export default function SpainVsPortugalPage() {
   return (
     <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
       <div className="max-w-5xl mx-auto px-6 py-16">
+        {/* Breadcrumb */}
+        <div className="text-sm text-[#6A6256] mb-6">
+          <Link href="/" className="underline textUnderlineOffset-4">
+            Home
+          </Link>
+          <span className="mx-2">/</span>
+          <Link href="/compare" className="underline textUnderlineOffset-4">
+            Compare
+          </Link>
+        </div>
 
         <h1 className="text-4xl font-medium leading-tight">
           Spain vs Portugal IVF Regulations (2026 Framework Overview)
@@ -103,17 +106,16 @@ export default function SpainVsPortugalPage() {
         {/* CTA */}
         <section className="mt-16 text-center">
           <p className="text-sm text-[#6A6256]">
-            For structured comparative modeling across jurisdictions,
-            see the{" "}
+            For structured comparative modeling across jurisdictions, see the{" "}
             <Link
               href="/advisory"
               className="underline textUnderlineOffset-4"
             >
               Global Fertility Intelligence Brief™️
-            </Link>.
+            </Link>
+            .
           </p>
         </section>
-
       </div>
     </main>
   );
