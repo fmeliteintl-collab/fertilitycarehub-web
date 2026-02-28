@@ -157,10 +157,12 @@ export default function AdvisoryPage() {
               Global Fertility Intelligence Brief™️ — US$2,500
             </h2>
 
-            <p className="mt-4 text-sm leading-relaxed text-[#2A2A2A]">
-              A full adaptive application of the FCH Framework tailored to your
-              specific case variables and execution constraints.
-            </p>
+           <p className="mt-4 text-sm leading-relaxed text-[#2A2A2A]">
+  A full institutional application of the FCH Global Fertility Intelligence Framework™,
+  incorporating jurisdiction elimination logic, pillar-based comparative analysis,
+  structural risk mapping, and a formal execution roadmap tailored to your
+  pathway complexity.
+</p>
 
             <ul className="mt-5 space-y-2 text-sm text-[#6A6256] list-disc pl-5">
               <li>Jurisdiction shortlist rationale</li>
@@ -170,7 +172,10 @@ export default function AdvisoryPage() {
               <li>Conditional scenario modeling</li>
               <li>Execution roadmap &amp; readiness checklist</li>
             </ul>
-
+           <p className="mt-6 text-xs leading-relaxed text-[#6A6256]">
+  Appropriate for complex donor structures, multi-jurisdiction requirements,
+  regulatory sensitivity, or cases requiring a documented execution roadmap.
+</p>
             <div className="mt-7 flex flex-wrap gap-3">
               <a
                 href={STRIPE_TIER2_URL}

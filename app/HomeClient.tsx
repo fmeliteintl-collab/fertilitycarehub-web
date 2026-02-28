@@ -209,7 +209,66 @@ export default function Home() {
           Intelligence • Cross-Border Strategic Advisory
         </div>
       </section>
+      {/* INSTITUTIONAL MODEL */}
+<section
+  style={{
+    padding: "70px 20px",
+    backgroundColor: "#ffffff",
+    textAlign: "center",
+  }}
+>
+  <div style={{ maxWidth: "880px", margin: "0 auto" }}>
+    <h2 style={{ fontSize: "24px", marginBottom: "18px" }}>
+      Our Advisory Model
+    </h2>
 
+    <p style={{ color: "#555", marginBottom: 16 }}>
+      FertilityCareHub operates under the <strong>FCH Global Fertility Intelligence Framework™</strong> — 
+      a documented, version-controlled jurisdiction evaluation model.
+    </p>
+  <p
+  style={{
+    color: "#555",
+    marginBottom: 32,
+    maxWidth: 780,
+    marginLeft: "auto",
+    marginRight: "auto",
+  }}
+>
+  Framework application adapts conditionally based on pathway type,
+  donor structure complexity, regulatory exposure, and execution sensitivity.
+</p>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        flexWrap: "wrap",
+        gap: 10,
+        fontSize: 13,
+        color: "#6a6256",
+        marginBottom: 18,
+      }}
+    >
+      <span style={{ padding: "6px 10px", border: "1px solid #e5ddc8", borderRadius: 999 }}>
+        Weighted Regulatory Analysis
+      </span>
+      <span style={{ padding: "6px 10px", border: "1px solid #e5ddc8", borderRadius: 999 }}>
+        Clinical Infrastructure Assessment
+      </span>
+      <span style={{ padding: "6px 10px", border: "1px solid #e5ddc8", borderRadius: 999 }}>
+        Adaptive Donor Governance Weighting
+      </span>
+      <span style={{ padding: "6px 10px", border: "1px solid #e5ddc8", borderRadius: 999 }}>
+        Execution Complexity Mapping
+      </span>
+    </div>
+
+    <p style={{ color: "#555", marginBottom: 0 }}>
+      Each engagement follows structured internal scoring discipline with qualitative client-facing risk translation.
+      This is institutional advisory — not clinic referral, not rankings, and not promotional comparison.
+    </p>
+  </div>
+</section>
       {/* POSITIONING */}
       <section
         style={{
@@ -231,9 +290,11 @@ export default function Home() {
           </p>
 
           <p style={{ color: "#555" }}>
-            FertilityCareHub provides structured, independent global analysis —
-            allowing families to make informed decisions across jurisdictions with
-            clarity and confidence.
+            FertilityCareHub applies a documented four-pillar jurisdictional
+             framework designed to evaluate regulatory alignment, governance
+              structure, clinical infrastructure depth, and execution complexity.
+               Advisory outputs are derived from structured internal scoring discipline
+                and qualitative risk translation — not promotional ranking models.
           </p>
         </div>
       </section>
@@ -321,9 +382,12 @@ export default function Home() {
           </h2>
 
           <p style={{ color: "#555", marginBottom: 14 }}>
-            Unlike promotional clinic directories or commission-driven ranking
-            platforms, FertilityCareHub provides structured global fertility
-            strategy grounded in regulatory, clinical, and cost intelligence.
+            Unlike promotional clinic directories or commission-driven
+            treatment intermediaries, FertilityCareHub operates as an
+            independent analytical advisory platform. Jurisdictional
+            comparisons are produced under structured elimination
+            protocols and weighted framework modeling — not referral
+            incentives.
           </p>
 
           <p style={{ color: "#555", marginBottom: 0 }}>
@@ -352,7 +416,7 @@ export default function Home() {
           </p>
 
           <p style={{ marginBottom: "34px", color: "#d4d4d4", fontSize: 14 }}>
-            Initial consultations available by application.
+            Advisory capacity is managed through structured intake cycles to preserve analytical rigor.
           </p>
 
           {/* CTA -> /advisory */}
@@ -461,9 +525,22 @@ export default function Home() {
         style={{ padding: "34px 20px", textAlign: "center", color: "#777" }}
       >
         <div style={{ fontSize: 12 }}>
-          © {new Date().getFullYear()} FertilityCareHub • Privacy • Terms •
-          Disclaimer
-        </div>
+  ©️ {new Date().getFullYear()} FertilityCareHub •{" "}
+  <Link href="/privacy" style={{ textDecoration: "underline", color: "inherit" }}>
+    Privacy
+  </Link>{" "}
+  •{" "}
+  <Link href="/terms" style={{ textDecoration: "underline", color: "inherit" }}>
+    Terms
+  </Link>{" "}
+  •{" "}
+  <Link
+    href="/disclaimer"
+    style={{ textDecoration: "underline", color: "inherit" }}
+  >
+    Disclaimer
+  </Link>
+</div>
       </footer>
     </main>
   );
