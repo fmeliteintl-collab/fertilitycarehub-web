@@ -97,11 +97,13 @@ export default function BriefPage() {
             or cases requiring a documented execution roadmap.
           </p>
         </section>
+
         <p className="mt-4 text-sm text-[#6A6256] leading-relaxed">
-  This engagement provides structured strategic analysis only. Medical,
-  clinical, and legal decisions must be made with appropriately licensed
-  professionals in the relevant jurisdiction.
-</p>
+          This engagement provides structured strategic analysis only. Medical,
+          clinical, and legal decisions must be made with appropriately licensed
+          professionals in the relevant jurisdiction.
+        </p>
+
         {/* CTA */}
         <section className="mt-14 text-center">
           <div className="flex flex-wrap justify-center gap-3">
