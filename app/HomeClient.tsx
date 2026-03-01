@@ -527,23 +527,29 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer
-        style={{ padding: "34px 20px", textAlign: "center", color: "#777" }}
-      >
-        ©️ {new Date().getFullYear()} FertilityCareHub •{" "}
-<Link href="/privacy" style={{ textDecoration: "underline", color: "inherit" }}>
-  Privacy
-</Link>{" "}
-•{" "}
-<Link href="/terms" style={{ textDecoration: "underline", color: "inherit" }}>
-  Terms
-</Link>{" "}
-•{" "}
-<Link href="/disclaimer" style={{ textDecoration: "underline", color: "inherit" }}>
-  Disclaimer
-</Link>
-      </footer>
+     {/* FOOTER */}
+<footer
+  style={{ padding: "34px 20px", textAlign: "center", color: "#777" }}
+>
+  <div style={{ fontSize: 12 }}>
+    ©️ {new Date().getFullYear()} FertilityCareHub •{" "}
+    <Link href="/privacy" style={{ textDecoration: "underline" }}>
+      Privacy
+    </Link>{" "}
+    •{" "}
+    <Link href="/terms" style={{ textDecoration: "underline" }}>
+      Terms
+    </Link>{" "}
+    •{" "}
+    <Link href="/disclaimer" style={{ textDecoration: "underline" }}>
+      Disclaimer
+    </Link>
+  </div>
+
+  <div style={{ marginTop: 10, fontSize: 11, color: "#8a8a8a" }}>
+    Independent advisory platform. Not medical or legal advice.
+  </div>
+</footer>
     </main>
   );
 }
