@@ -156,20 +156,20 @@ export default function AdvisoryPage() {
             </div>
           </div>
 
-          <div className="mt-7 flex flex-wrap gap-3">
-            <Link href="/snapshot" className={CTA_SECONDARY}>
-              View Strategic Alignment Snapshot™️
-            </Link>
-            <a
-              href={STRIPE_TIER2_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={CTA_PRIMARY}
-            >
-              Engage Tier 2
-            </a>
-          </div>
-        </div>
+    <div className="mt-7 flex flex-wrap gap-3">
+  <Link href="/brief" className={CTA_SECONDARY}>
+    View Global Fertility Intelligence Brief™️
+  </Link>
+  <a
+    href={STRIPE_TIER2_URL}
+    target="_blank"
+    rel="noopener noreferrer"
+    className={CTA_PRIMARY}
+  >
+    Engage Tier 2
+  </a>
+</div>
+</div>
       </section>
 
       {/* Tiers */}
