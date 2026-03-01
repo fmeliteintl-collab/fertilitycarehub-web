@@ -111,6 +111,67 @@ export default function AdvisoryPage() {
         </div>
       </section>
 
+      {/* ✅ Decision Router (Tighten funnel logic) */}
+      <section className="max-w-6xl mx-auto px-6 pb-16">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-white/70 p-8">
+          <h2 className="text-2xl font-medium">Select the correct engagement</h2>
+          <p className="mt-4 text-sm text-[#6A6256] leading-relaxed max-w-4xl">
+            This is an institutional advisory funnel. If you are still determining
+            jurisdiction fit, begin with Snapshot™️. If your pathway is complex or
+            requires a documented execution roadmap, engage Tier 2.
+          </p>
+
+          <div className="mt-6 grid md:grid-cols-3 gap-6 text-sm leading-relaxed text-[#2A2A2A]">
+            <div className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-6">
+              <div className="text-xs tracking-[0.22em] text-[#6A6256]">
+                START HERE
+              </div>
+              <div className="mt-2 font-medium">Uncertain which jurisdiction fits</div>
+              <p className="mt-2 text-[#6A6256]">
+                Identify viable jurisdictions and primary friction risks before
+                deeper comparative modeling.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-6">
+              <div className="text-xs tracking-[0.22em] text-[#6A6256]">
+                COMPLEX PATHWAYS
+              </div>
+              <div className="mt-2 font-medium">Donor structures / constraints</div>
+              <p className="mt-2 text-[#6A6256]">
+                Tier 2 applies elimination logic, pillar-based comparison, risk
+                mapping, and a formal roadmap.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-6">
+              <div className="text-xs tracking-[0.22em] text-[#6A6256]">
+                TIME SENSITIVE
+              </div>
+              <div className="mt-2 font-medium">Compressed timelines</div>
+              <p className="mt-2 text-[#6A6256]">
+                Use Snapshot™️ as a screening layer when you need early directional
+                clarity quickly.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link href="/snapshot" className={CTA_SECONDARY}>
+              View Strategic Alignment Snapshot™️
+            </Link>
+            <a
+              href={STRIPE_TIER2_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={CTA_PRIMARY}
+            >
+              Engage Tier 2
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* Tiers */}
       <section className="max-w-6xl mx-auto px-6 pb-20">
         <div className="grid md:grid-cols-2 gap-8">
