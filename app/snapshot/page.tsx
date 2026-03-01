@@ -13,6 +13,9 @@ export const metadata: Metadata = {
 const CTA_PRIMARY =
   "inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]";
 
+const CTA_SECONDARY =
+  "inline-flex items-center justify-center rounded-full border border-[#E5DDC8] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#EFE9DB]";
+
 const STRIPE_TIER1_URL = "https://buy.stripe.com/14A8wOcbw7RedIjgz94AU00";
 
 export default function SnapshotPage() {
@@ -49,25 +52,40 @@ export default function SnapshotPage() {
           </p>
         </section>
 
-        {/* CTA */}
-        <section className="mt-14 text-center">
-          <a
-            href={STRIPE_TIER1_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={CTA_PRIMARY}
-          >
-            Engage Strategic Alignment Snapshot™️ — US$500
-          </a>
+        {/* Funnel upgrade */}
+        <section className="mt-12 border-t border-[#E5DDC8] pt-10">
+          <h2 className="text-2xl font-medium">If You Need Deeper Modeling</h2>
+          <p className="mt-4 text-[#6A6256] leading-relaxed">
+            Tier 1 is designed for early-stage jurisdiction screening. If your
+            case involves complex donor structures, multi-jurisdiction
+            requirements, or you need a documented execution roadmap, review the
+            Tier 2 deliverable structure before upgrading.
+          </p>
 
-          <div className="mt-6">
-            <Link
-              href="/advisory"
-              className="text-sm underline textUnderlineOffset-4 text-[#6A6256]"
-            >
-              Return to Advisory Overview
+          <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+            <Link href="/brief" className={CTA_SECONDARY}>
+              View Tier 2 Brief Template
             </Link>
+
+            <a
+              href={STRIPE_TIER1_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={CTA_PRIMARY}
+            >
+              Engage Strategic Alignment Snapshot™️ — US$500
+            </a>
           </div>
+        </section>
+
+        {/* Return */}
+        <section className="mt-10 text-center">
+          <Link
+            href="/advisory"
+            className="text-sm underline textUnderlineOffset-4 text-[#6A6256]"
+          >
+            Return to Advisory Overview
+          </Link>
         </section>
       </div>
     </main>
