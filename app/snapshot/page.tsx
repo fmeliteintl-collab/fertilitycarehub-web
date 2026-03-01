@@ -2,26 +2,30 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Strategic Alignment Snapshot™ | FertilityCareHub",
+  title: "Strategic Alignment Snapshot™️ | FertilityCareHub",
   description:
-    "Tier 1 Strategic Alignment Snapshot™ under the FCH Global Fertility Intelligence Framework™.",
+    "Tier 1 Strategic Alignment Snapshot™️ under the FCH Global Fertility Intelligence Framework™️.",
   alternates: {
     canonical: "https://fertilitycarehub.com/snapshot",
   },
 };
 
+const CTA_PRIMARY =
+  "inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]";
+
+const STRIPE_TIER1_URL = "https://buy.stripe.com/14A8wOcbw7RedIjgz94AU00";
+
 export default function SnapshotPage() {
   return (
     <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
       <div className="max-w-4xl mx-auto px-6 py-16">
-
         <h1 className="text-4xl font-medium leading-tight">
-          Strategic Alignment Snapshot™
+          Strategic Alignment Snapshot™️
         </h1>
 
         <p className="mt-6 text-lg leading-relaxed text-[#2A2A2A]">
-          The Strategic Alignment Snapshot™ is a structured one-page evaluation
-          applying the FCH Global Fertility Intelligence Framework™ to your
+          The Strategic Alignment Snapshot™️ is a structured one-page evaluation
+          applying the FCH Global Fertility Intelligence Framework™️ to your
           specific case profile. It identifies regulatory fit, governance risk,
           infrastructure alignment, and execution considerations across priority
           jurisdictions.
@@ -45,15 +49,26 @@ export default function SnapshotPage() {
           </p>
         </section>
 
-        <section className="mt-16 text-center">
-          <Link
-            href="/advisory"
-            className="underline textUnderlineOffset-4 text-sm text-[#6A6256]"
+        {/* CTA */}
+        <section className="mt-14 text-center">
+          <a
+            href={STRIPE_TIER1_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={CTA_PRIMARY}
           >
-            Return to Advisory Overview
-          </Link>
-        </section>
+            Engage Strategic Alignment Snapshot™️ — US$500
+          </a>
 
+          <div className="mt-6">
+            <Link
+              href="/advisory"
+              className="text-sm underline textUnderlineOffset-4 text-[#6A6256]"
+            >
+              Return to Advisory Overview
+            </Link>
+          </div>
+        </section>
       </div>
     </main>
   );
