@@ -19,9 +19,53 @@ const CTA_SECONDARY =
 const STRIPE_TIER2_URL = "https://buy.stripe.com/aFa8wO5N8gnK8nZ0Ab4AU01";
 
 export default function BriefPage() {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://fertilitycarehub.com/",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Advisory",
+        item: "https://fertilitycarehub.com/advisory",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: "Global Fertility Intelligence Brief™️",
+        item: "https://fertilitycarehub.com/brief",
+      },
+    ],
+  };
+
   return (
     <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
+      {/* JSON-LD: Breadcrumbs */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+
       <div className="max-w-4xl mx-auto px-6 py-16">
+        {/* Breadcrumb UI */}
+        <nav className="text-sm text-[#6A6256] mb-6" aria-label="Breadcrumb">
+          <Link href="/" className="underline textUnderlineOffset-4">
+            Home
+          </Link>
+          <span className="mx-2">/</span>
+          <Link href="/advisory" className="underline textUnderlineOffset-4">
+            Advisory
+          </Link>
+          <span className="mx-2">/</span>
+          <span aria-current="page">Global Brief</span>
+        </nav>
+
         <h1 className="text-4xl font-medium leading-tight">
           Global Fertility Intelligence Brief™️
         </h1>
@@ -53,7 +97,11 @@ export default function BriefPage() {
             or cases requiring a documented execution roadmap.
           </p>
         </section>
-
+        <p className="mt-4 text-sm text-[#6A6256] leading-relaxed">
+  This engagement provides structured strategic analysis only. Medical,
+  clinical, and legal decisions must be made with appropriately licensed
+  professionals in the relevant jurisdiction.
+</p>
         {/* CTA */}
         <section className="mt-14 text-center">
           <div className="flex flex-wrap justify-center gap-3">
