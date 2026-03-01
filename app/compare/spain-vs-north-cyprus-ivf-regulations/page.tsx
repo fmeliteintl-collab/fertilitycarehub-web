@@ -13,42 +13,42 @@ export const metadata: Metadata = {
 };
 
 export default function SpainVsNorthCyprusPage() {
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: "https://fertilitycarehub.com/",
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Compare",
-        item: "https://fertilitycarehub.com/compare",
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
-        name: "Spain vs North Cyprus IVF Regulations",
-        item: "https://fertilitycarehub.com/compare/spain-vs-north-cyprus-ivf-regulations",
-      },
-    ],
-  };
-
   return (
     <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
-      {/* JSON-LD: Breadcrumbs */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
-
       <div className="max-w-5xl mx-auto px-6 py-16">
+        {/* Breadcrumb JSON-LD */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                {
+                  "@type": "ListItem",
+                  position: 1,
+                  name: "Home",
+                  item: "https://fertilitycarehub.com/",
+                },
+                {
+                  "@type": "ListItem",
+                  position: 2,
+                  name: "Compare",
+                  item: "https://fertilitycarehub.com/compare",
+                },
+                {
+                  "@type": "ListItem",
+                  position: 3,
+                  name: "Spain vs North Cyprus IVF Regulations (2026)",
+                  item: "https://fertilitycarehub.com/compare/spain-vs-north-cyprus-ivf-regulations",
+                },
+              ],
+            }),
+          }}
+        />
+
         {/* Breadcrumb */}
-        <div className="text-sm text-[#6A6256] mb-6">
+        <nav className="text-sm text-[#6A6256] mb-6" aria-label="Breadcrumb">
           <Link href="/" className="underline textUnderlineOffset-4">
             Home
           </Link>
@@ -56,7 +56,9 @@ export default function SpainVsNorthCyprusPage() {
           <Link href="/compare" className="underline textUnderlineOffset-4">
             Compare
           </Link>
-        </div>
+          <span className="mx-2">/</span>
+          <span aria-current="page">Spain vs North Cyprus</span>
+        </nav>
 
         <h1 className="text-4xl font-medium leading-tight">
           Spain vs North Cyprus IVF Regulations (2026 Framework Overview)
@@ -132,37 +134,46 @@ export default function SpainVsNorthCyprusPage() {
             transparency requirements, documentation tolerance, and timeline sensitivity within the client’s case profile.
           </p>
         </section>
+
         {/* Related comparisons */}
-<section className="mt-12 border-t border-[#E5DDC8] pt-10">
-  <h2 className="text-lg font-medium">Related comparisons</h2>
-  <ul className="mt-4 space-y-2 text-sm text-[#6A6256]">
-    <li>
-      <Link href="/compare/spain-vs-portugal-ivf-regulations" className="underline textUnderlineOffset-4">
-        Spain vs Portugal IVF Regulations
-      </Link>
-    </li>
-    <li>
-      <Link href="/compare/spain-vs-greece-ivf-regulations" className="underline textUnderlineOffset-4">
-        Spain vs Greece IVF Regulations
-      </Link>
-    </li>
-    <li>
-      <Link href="/compare/spain-vs-italy-ivf-regulations" className="underline textUnderlineOffset-4">
-        Spain vs Italy IVF Regulations
-      </Link>
-    </li>
-    <li>
-      <Link href="/compare/spain-vs-czech-republic-ivf-regulations" className="underline textUnderlineOffset-4">
-        Spain vs Czech Republic IVF Regulations
-      </Link>
-    </li>
-    <li>
-      <Link href="/compare/spain-vs-north-cyprus-ivf-regulations" className="underline textUnderlineOffset-4">
-        Spain vs North Cyprus IVF Regulations
-      </Link>
-    </li>
-  </ul>
-</section>
+        <section className="mt-12 border-t border-[#E5DDC8] pt-10">
+          <h2 className="text-lg font-medium">Related comparisons</h2>
+          <ul className="mt-4 space-y-2 text-sm text-[#6A6256]">
+            <li>
+              <Link
+                href="/compare/spain-vs-portugal-ivf-regulations"
+                className="underline textUnderlineOffset-4"
+              >
+                Spain vs Portugal IVF Regulations
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/compare/spain-vs-greece-ivf-regulations"
+                className="underline textUnderlineOffset-4"
+              >
+                Spain vs Greece IVF Regulations
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/compare/spain-vs-italy-ivf-regulations"
+                className="underline textUnderlineOffset-4"
+              >
+                Spain vs Italy IVF Regulations
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/compare/spain-vs-czech-republic-ivf-regulations"
+                className="underline textUnderlineOffset-4"
+              >
+                Spain vs Czech Republic IVF Regulations
+              </Link>
+            </li>
+          </ul>
+        </section>
+
         {/* CTA */}
         <section className="mt-16 text-center">
           <p className="text-sm text-[#6A6256]">
