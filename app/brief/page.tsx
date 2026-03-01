@@ -10,6 +10,14 @@ export const metadata: Metadata = {
   },
 };
 
+const CTA_PRIMARY =
+  "inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]";
+
+const CTA_SECONDARY =
+  "inline-flex items-center justify-center rounded-full border border-[#E5DDC8] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#EFE9DB]";
+
+const STRIPE_TIER2_URL = "https://buy.stripe.com/aFa8wO5N8gnK8nZ0Ab4AU01";
+
 export default function BriefPage() {
   return (
     <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
@@ -29,7 +37,7 @@ export default function BriefPage() {
         <section className="mt-12">
           <h2 className="text-2xl font-medium">What This Includes</h2>
           <ul className="mt-4 space-y-3 text-[#6A6256]">
-            <li>• Case variable profile & pathway classification</li>
+            <li>• Case variable profile &amp; pathway classification</li>
             <li>• Jurisdiction elimination summary (defensible rationale)</li>
             <li>• Pillar-based comparative analysis across shortlisted options</li>
             <li>• Structural risk brief with mitigation pathways</li>
@@ -46,13 +54,31 @@ export default function BriefPage() {
           </p>
         </section>
 
-        <section className="mt-16 text-center">
-          <Link
-            href="/advisory"
-            className="underline textUnderlineOffset-4 text-sm text-[#6A6256]"
-          >
-            Return to Advisory Overview
-          </Link>
+        {/* CTA */}
+        <section className="mt-14 text-center">
+          <div className="flex flex-wrap justify-center gap-3">
+            <a
+              href={STRIPE_TIER2_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={CTA_PRIMARY}
+            >
+              Engage Global Fertility Intelligence Brief™️ — US$2,500
+            </a>
+
+            <Link href="/snapshot" className={CTA_SECONDARY}>
+              Prefer to start with Snapshot (Tier 1)
+            </Link>
+          </div>
+
+          <div className="mt-6">
+            <Link
+              href="/advisory"
+              className="text-sm underline textUnderlineOffset-4 text-[#6A6256]"
+            >
+              Return to Advisory Overview
+            </Link>
+          </div>
         </section>
       </div>
     </main>
