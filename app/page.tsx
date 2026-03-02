@@ -18,6 +18,50 @@ export const metadata: Metadata = {
   },
 };
 
+const WEBSITE_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "FertilityCareHub",
+  url: "https://fertilitycarehub.com",
+  publisher: {
+    "@type": "Organization",
+    name: "FertilityCareHub",
+    url: "https://fertilitycarehub.com",
+    logo: "https://fertilitycarehub.com/logo.png",
+  },
+} as const;
+
+const WEBPAGE_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Private Global Fertility Strategy Advisory",
+  url: "https://fertilitycarehub.com",
+  isPartOf: {
+    "@type": "WebSite",
+    url: "https://fertilitycarehub.com",
+  },
+  about: {
+    "@type": "Thing",
+    name: "Cross-border fertility strategy advisory",
+  },
+} as const;
+
 export default function Page() {
-  return <HomeClient />;
+  return (
+    <>
+      {/* JSON-LD: WebSite */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(WEBSITE_JSON_LD) }}
+      />
+
+      {/* JSON-LD: WebPage */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(WEBPAGE_JSON_LD) }}
+      />
+
+      <HomeClient />
+    </>
+  );
 }

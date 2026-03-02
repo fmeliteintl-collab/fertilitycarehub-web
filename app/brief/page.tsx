@@ -18,6 +18,49 @@ const CTA_SECONDARY =
 
 const STRIPE_TIER2_URL = "https://buy.stripe.com/aFa8wO5N8gnK8nZ0Ab4AU01";
 
+const FAQ_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "What is the Global Fertility Intelligence Brief™️?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "The Global Fertility Intelligence Brief™️ is a Tier 2 institutional advisory deliverable applying the FCH Global Fertility Intelligence Framework™️ to your case profile, including comparative analysis, risk mapping, and an execution roadmap.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What is included in Tier 2?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "Tier 2 includes jurisdiction elimination logic, pillar-based comparative analysis across shortlisted options, structural risk mapping with mitigation pathways, and a readiness-focused execution roadmap.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Should I start with Tier 1 or Tier 2?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "If you are uncertain about jurisdiction fit, start with Tier 1. If your case is complex, time-sensitive, multi-jurisdiction, or requires a documented roadmap, Tier 2 is typically more appropriate.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Does FertilityCareHub provide medical or legal advice?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "No. FertilityCareHub provides structured strategic analysis only and does not replace licensed medical or legal professionals in the relevant jurisdiction.",
+      },
+    },
+  ],
+} as const;
+
 export default function BriefPage() {
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -50,6 +93,12 @@ export default function BriefPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+
+      {/* JSON-LD: FAQ */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_JSON_LD) }}
       />
 
       <div className="max-w-4xl mx-auto px-6 py-16">

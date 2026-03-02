@@ -18,9 +18,89 @@ const CTA_SECONDARY =
 
 const STRIPE_TIER1_URL = "https://buy.stripe.com/14A8wOcbw7RedIjgz94AU00";
 
+const BREADCRUMB_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Home",
+      item: "https://fertilitycarehub.com/",
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "Advisory",
+      item: "https://fertilitycarehub.com/advisory",
+    },
+    {
+      "@type": "ListItem",
+      position: 3,
+      name: "Strategic Alignment Snapshot™️",
+      item: "https://fertilitycarehub.com/snapshot",
+    },
+  ],
+} as const;
+
+const FAQ_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "What is the Strategic Alignment Snapshot™️?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "The Strategic Alignment Snapshot™️ is a Tier 1 one-page evaluation applying the FCH Global Fertility Intelligence Framework™️ to your case profile to identify viable jurisdictions and primary regulatory and execution risks.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What do I receive in Tier 1?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "You receive a structured brief with case variable mapping, a shortlist of 2–3 viable jurisdictions, qualitative pillar risk bands, primary friction flags, and directional next steps.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "When should I upgrade to Tier 2?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "Tier 2 is recommended for complex donor structures, multi-jurisdiction requirements, regulatory sensitivity, or when you need a documented execution roadmap and deeper comparative modeling.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Does Tier 1 include clinic referral or outcome guarantees?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "No. FertilityCareHub is not a clinic or broker and does not provide medical treatment, referrals for commission, or outcome guarantees.",
+      },
+    },
+  ],
+} as const;
+
 export default function SnapshotPage() {
   return (
     <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
+      {/* JSON-LD: Breadcrumbs */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_JSON_LD) }}
+      />
+
+      {/* JSON-LD: FAQ */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_JSON_LD) }}
+      />
+
       <div className="max-w-4xl mx-auto px-6 py-16">
         <h1 className="text-4xl font-medium leading-tight">
           Strategic Alignment Snapshot™️
