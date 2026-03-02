@@ -8,6 +8,12 @@
 
 ---
 
+## Document Controls
+- Version: v1.0
+- Confidentiality: Private & Confidential (Client Use Only)
+- Review Status: Internal Review Required Before Delivery
+
+---
 ## 1) Case Variable Profile (Inputs)
 *Residence / Citizenship:* {{}}  
 *Marital status / Partner structure (if relevant):* {{}}  
@@ -26,7 +32,7 @@
 
 ---
 
-## 2) Strategic Objective
+## 2) Strategic Objective (Decision Framing)
 *Primary decision the client is trying to make:*  
 {{One sentence. Example: “Select the most structurally viable jurisdiction for donor egg IVF within a 6-month timeline while minimizing regulatory risk.”}}
 
@@ -42,7 +48,7 @@
 
 ---
 
-## 4) Pillar Risk Bands (Client-Facing)
+## 4) Pillar Risk Bands (FCH Framework™️ — Client-Facing)
 *Legend:* Low / Moderate / High (qualitative banding)
 
 | Jurisdiction | Regulatory Alignment | Donor / Governance | Clinical Infrastructure | Execution Risk |
@@ -113,3 +119,12 @@ Tier 2 is recommended if any of the following are true:
 
 ## 10) Advisory Boundary
 FertilityCareHub provides structured strategic planning support and jurisdictional clarity. We are not a clinic, do not provide medical treatment, and do not guarantee outcomes. Medical and legal decisions must be made with licensed professionals.
+
+---
+
+## 11) Analyst Discipline Rules (Internal)
+1) No clinic endorsements or success-rate claims.
+2) No numerical scoring disclosed in Tier 1.
+3) Every recommendation must map to regulatory + execution logic.
+4) If unknown, state “Requires Tier 2 deep-dive validation.”
+5) Keep output to one page when converted to PDF.
