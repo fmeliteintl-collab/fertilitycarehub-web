@@ -91,14 +91,18 @@ export default function Home() {
         </h1>
 
         <p style={{ fontSize: "18px", color: "#5a5a5a" }}>
-          Strategic jurisdiction assessment and clinical alignment for individuals
-          and families navigating cross-border reproductive care.
+          Strategic jurisdiction assessment and clinical alignment for
+          individuals and families navigating cross-border reproductive care.
         </p>
+
         <p style={{ fontSize: 14, color: "#6a6256", marginTop: 14 }}>
-  Powered by the <strong>FCH Global Fertility Intelligence Framework™</strong> — a
-  structured model that evaluates jurisdictions across regulatory alignment,
-  donor pathway constraints, clinical infrastructure, and execution risk.
-</p>
+          Powered by the{" "}
+          <strong>FCH Global Fertility Intelligence Framework™️</strong> — a
+          structured model that evaluates jurisdictions across regulatory
+          alignment, donor pathway constraints, clinical infrastructure, and
+          execution risk.
+        </p>
+
         <div
           style={{
             display: "flex",
@@ -137,14 +141,16 @@ export default function Home() {
           >
             Explore International Pathways
           </Link>
+
           <div style={{ marginTop: 14, fontSize: 13, color: "#6A6256" }}>
-  <Link
-    href="/compare"
-    style={{ textDecoration: "underline", color: "inherit" }}
-  >
-    View Jurisdiction Comparisons
-  </Link>
-</div>
+            <Link
+              href="/compare"
+              style={{ textDecoration: "underline", color: "inherit" }}
+            >
+              View Jurisdiction Comparisons
+            </Link>
+          </div>
+
           {/* Deep-link CTA (only appears when ?from=xxx is present and valid) */}
           {countryLink ? (
             <Link
@@ -163,30 +169,56 @@ export default function Home() {
             </Link>
           ) : null}
         </div>
-          <div
-  style={{
-    marginTop: 18,
-    display: "flex",
-    gap: 10,
-    justifyContent: "center",
-    flexWrap: "wrap",
-    fontSize: 12,
-    color: "#6a6256",
-  }}
->
-  <span style={{ padding: "6px 10px", border: "1px solid #e5ddc8", borderRadius: 999 }}>
-    Regulatory Alignment
-  </span>
-  <span style={{ padding: "6px 10px", border: "1px solid #e5ddc8", borderRadius: 999 }}>
-    Donor Pathway Constraints
-  </span>
-  <span style={{ padding: "6px 10px", border: "1px solid #e5ddc8", borderRadius: 999 }}>
-    Clinical Infrastructure
-  </span>
-  <span style={{ padding: "6px 10px", border: "1px solid #e5ddc8", borderRadius: 999 }}>
-    Execution Risk
-  </span>
-</div>
+
+        <div
+          style={{
+            marginTop: 18,
+            display: "flex",
+            gap: 10,
+            justifyContent: "center",
+            flexWrap: "wrap",
+            fontSize: 12,
+            color: "#6a6256",
+          }}
+        >
+          <span
+            style={{
+              padding: "6px 10px",
+              border: "1px solid #e5ddc8",
+              borderRadius: 999,
+            }}
+          >
+            Regulatory Alignment
+          </span>
+          <span
+            style={{
+              padding: "6px 10px",
+              border: "1px solid #e5ddc8",
+              borderRadius: 999,
+            }}
+          >
+            Donor Pathway Constraints
+          </span>
+          <span
+            style={{
+              padding: "6px 10px",
+              border: "1px solid #e5ddc8",
+              borderRadius: 999,
+            }}
+          >
+            Clinical Infrastructure
+          </span>
+          <span
+            style={{
+              padding: "6px 10px",
+              border: "1px solid #e5ddc8",
+              borderRadius: 999,
+            }}
+          >
+            Execution Risk
+          </span>
+        </div>
+
         {/* Optional helper link */}
         <div style={{ marginTop: 12 }}>
           <Link
@@ -216,66 +248,98 @@ export default function Home() {
           Intelligence • Cross-Border Strategic Advisory
         </div>
       </section>
+
       {/* INSTITUTIONAL MODEL */}
-<section
-  style={{
-    padding: "70px 20px",
-    backgroundColor: "#ffffff",
-    textAlign: "center",
-  }}
->
-  <div style={{ maxWidth: "880px", margin: "0 auto" }}>
-    <h2 style={{ fontSize: "24px", marginBottom: "18px" }}>
-      Our Advisory Model
-    </h2>
+      <section
+        style={{
+          padding: "70px 20px",
+          backgroundColor: "#ffffff",
+          textAlign: "center",
+        }}
+      >
+        <div style={{ maxWidth: "880px", margin: "0 auto" }}>
+          <h2 style={{ fontSize: "24px", marginBottom: "18px" }}>
+            Our Advisory Model
+          </h2>
 
-    <p style={{ color: "#555", marginBottom: 16 }}>
-      FertilityCareHub operates under the <strong>FCH Global Fertility Intelligence Framework™</strong> — 
-      a documented, version-controlled jurisdiction evaluation model.
-    </p>
-  <p
-  style={{
-    color: "#555",
-    marginBottom: 32,
-    maxWidth: 780,
-    marginLeft: "auto",
-    marginRight: "auto",
-  }}
->
-  Framework application adapts conditionally based on pathway type,
-  donor structure complexity, regulatory exposure, and execution sensitivity.
-</p>
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        flexWrap: "wrap",
-        gap: 10,
-        fontSize: 13,
-        color: "#6a6256",
-        marginBottom: 18,
-      }}
-    >
-      <span style={{ padding: "6px 10px", border: "1px solid #e5ddc8", borderRadius: 999 }}>
-        Weighted Regulatory Analysis
-      </span>
-      <span style={{ padding: "6px 10px", border: "1px solid #e5ddc8", borderRadius: 999 }}>
-        Clinical Infrastructure Assessment
-      </span>
-      <span style={{ padding: "6px 10px", border: "1px solid #e5ddc8", borderRadius: 999 }}>
-        Adaptive Donor Governance Weighting
-      </span>
-      <span style={{ padding: "6px 10px", border: "1px solid #e5ddc8", borderRadius: 999 }}>
-        Execution Complexity Mapping
-      </span>
-    </div>
+          <p style={{ color: "#555", marginBottom: 16 }}>
+            FertilityCareHub operates under the{" "}
+            <strong>FCH Global Fertility Intelligence Framework™️</strong> — a
+            documented, version-controlled jurisdiction evaluation model.
+          </p>
 
-    <p style={{ color: "#555", marginBottom: 0 }}>
-      Each engagement follows structured internal scoring discipline with qualitative client-facing risk translation.
-      This is institutional advisory — not clinic referral, not rankings, and not promotional comparison.
-    </p>
-  </div>
-</section>
+          <p
+            style={{
+              color: "#555",
+              marginBottom: 32,
+              maxWidth: 780,
+              marginLeft: "auto",
+              marginRight: "auto",
+            }}
+          >
+            Framework application adapts conditionally based on pathway type,
+            donor structure complexity, regulatory exposure, and execution
+            sensitivity.
+          </p>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              flexWrap: "wrap",
+              gap: 10,
+              fontSize: 13,
+              color: "#6a6256",
+              marginBottom: 18,
+            }}
+          >
+            <span
+              style={{
+                padding: "6px 10px",
+                border: "1px solid #e5ddc8",
+                borderRadius: 999,
+              }}
+            >
+              Weighted Regulatory Analysis
+            </span>
+            <span
+              style={{
+                padding: "6px 10px",
+                border: "1px solid #e5ddc8",
+                borderRadius: 999,
+              }}
+            >
+              Clinical Infrastructure Assessment
+            </span>
+            <span
+              style={{
+                padding: "6px 10px",
+                border: "1px solid #e5ddc8",
+                borderRadius: 999,
+              }}
+            >
+              Adaptive Donor Governance Weighting
+            </span>
+            <span
+              style={{
+                padding: "6px 10px",
+                border: "1px solid #e5ddc8",
+                borderRadius: 999,
+              }}
+            >
+              Execution Complexity Mapping
+            </span>
+          </div>
+
+          <p style={{ color: "#555", marginBottom: 0 }}>
+            Each engagement follows structured internal scoring discipline with
+            qualitative client-facing risk translation. This is institutional
+            advisory — not clinic referral, not rankings, and not promotional
+            comparison.
+          </p>
+        </div>
+      </section>
+
       {/* POSITIONING */}
       <section
         style={{
@@ -298,75 +362,89 @@ export default function Home() {
 
           <p style={{ color: "#555" }}>
             FertilityCareHub applies a documented four-pillar jurisdictional
-             framework designed to evaluate regulatory alignment, governance
-              structure, clinical infrastructure depth, and execution complexity.
-               Advisory outputs are derived from structured internal scoring discipline
-                and qualitative risk translation — not promotional ranking models.
+            framework designed to evaluate regulatory alignment, governance
+            structure, clinical infrastructure depth, and execution complexity.
+            Advisory outputs are derived from structured internal scoring
+            discipline and qualitative risk translation — not promotional ranking
+            models.
           </p>
         </div>
       </section>
 
       {/* FRAMEWORK */}
-<section style={{ padding: "100px 20px", textAlign: "center" }}>
-  <div style={{ maxWidth: "1050px", margin: "0 auto" }}>
-    <h2 style={{ fontSize: "28px", marginBottom: "18px" }}>
-      The FCH Global Fertility Intelligence Framework™️
-    </h2>
+      <section style={{ padding: "100px 20px", textAlign: "center" }}>
+        <div style={{ maxWidth: "1050px", margin: "0 auto" }}>
+          <h2 style={{ fontSize: "28px", marginBottom: "18px" }}>
+            The FCH Global Fertility Intelligence Framework™️
+          </h2>
 
-    <p style={{ color: "#555", marginBottom: "58px", maxWidth: 720, marginLeft: "auto", marginRight: "auto" }}>
-      Our institutional methodology evaluates cross-border fertility pathways
-      across four structural pillars. Each jurisdiction is assessed using
-      weighted internal scoring and translated into clear qualitative risk bands
-      for strategic clarity.
-    </p>
+          <p
+            style={{
+              color: "#555",
+              marginBottom: "58px",
+              maxWidth: 720,
+              marginLeft: "auto",
+              marginRight: "auto",
+            }}
+          >
+            Our institutional methodology evaluates cross-border fertility
+            pathways across four structural pillars. Each jurisdiction is
+            assessed using weighted internal scoring and translated into clear
+            qualitative risk bands for strategic clarity.
+          </p>
 
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-        gap: "42px",
-        textAlign: "left",
-      }}
-    >
-      <div style={{ background: "#ffffff", padding: 26, borderRadius: 6 }}>
-        <h3 style={{ marginTop: 0 }}>Regulatory Alignment</h3>
-        <p style={{ color: "#555", marginBottom: 0 }}>
-          Legal eligibility, donor governance rules, storage regulations, and
-          citizenship implications. Regulatory misalignment invalidates strategy.
-        </p>
-      </div>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+              gap: "42px",
+              textAlign: "left",
+            }}
+          >
+            <div style={{ background: "#ffffff", padding: 26, borderRadius: 6 }}>
+              <h3 style={{ marginTop: 0 }}>Regulatory Alignment</h3>
+              <p style={{ color: "#555", marginBottom: 0 }}>
+                Legal eligibility, donor governance rules, storage regulations,
+                and citizenship implications. Regulatory misalignment invalidates
+                strategy.
+              </p>
+            </div>
 
-      <div style={{ background: "#ffffff", padding: 26, borderRadius: 6 }}>
-        <h3 style={{ marginTop: 0 }}>Clinical Infrastructure Depth</h3>
-        <p style={{ color: "#555", marginBottom: 0 }}>
-          Laboratory standards, transparency posture, embryology capability, and
-          institutional quality signals.
-        </p>
-      </div>
+            <div style={{ background: "#ffffff", padding: 26, borderRadius: 6 }}>
+              <h3 style={{ marginTop: 0 }}>Clinical Infrastructure Depth</h3>
+              <p style={{ color: "#555", marginBottom: 0 }}>
+                Laboratory standards, transparency posture, embryology
+                capability, and institutional quality signals.
+              </p>
+            </div>
 
-      <div style={{ background: "#ffffff", padding: 26, borderRadius: 6 }}>
-        <h3 style={{ marginTop: 0 }}>Governance & Donor Policy Structure</h3>
-        <p style={{ color: "#555", marginBottom: 0 }}>
-          Anonymity frameworks, disclosure requirements, donor eligibility rules,
-          and long-term compliance exposure.
-        </p>
-      </div>
+            <div style={{ background: "#ffffff", padding: 26, borderRadius: 6 }}>
+              <h3 style={{ marginTop: 0 }}>
+                Governance &amp; Donor Policy Structure
+              </h3>
+              <p style={{ color: "#555", marginBottom: 0 }}>
+                Anonymity frameworks, disclosure requirements, donor eligibility
+                rules, and long-term compliance exposure.
+              </p>
+            </div>
 
-      <div style={{ background: "#ffffff", padding: 26, borderRadius: 6 }}>
-        <h3 style={{ marginTop: 0 }}>Execution Complexity Mapping</h3>
-        <p style={{ color: "#555", marginBottom: 0 }}>
-          Travel cadence, documentation friction, coordination burden, and
-          timeline realism across jurisdictions.
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
+            <div style={{ background: "#ffffff", padding: 26, borderRadius: 6 }}>
+              <h3 style={{ marginTop: 0 }}>Execution Complexity Mapping</h3>
+              <p style={{ color: "#555", marginBottom: 0 }}>
+                Travel cadence, documentation friction, coordination burden, and
+                timeline realism across jurisdictions.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* WHO WE SERVE */}
       <section style={{ padding: "90px 20px", backgroundColor: "#ffffff" }}>
         <div style={{ maxWidth: "980px", margin: "0 auto" }}>
-          <h2 style={{ fontSize: "28px", marginBottom: 18, textAlign: "center" }}>
+          <h2
+            style={{ fontSize: "28px", marginBottom: 18, textAlign: "center" }}
+          >
             Who We Serve
           </h2>
 
@@ -389,12 +467,11 @@ export default function Home() {
           </h2>
 
           <p style={{ color: "#555", marginBottom: 14 }}>
-            Unlike promotional clinic directories or commission-driven
-            treatment intermediaries, FertilityCareHub operates as an
-            independent analytical advisory platform. Jurisdictional
-            comparisons are produced under structured elimination
-            protocols and weighted framework modeling — not referral
-            incentives.
+            Unlike promotional clinic directories or commission-driven treatment
+            intermediaries, FertilityCareHub operates as an independent
+            analytical advisory platform. Jurisdictional comparisons are
+            produced under structured elimination protocols and weighted
+            framework modeling — not referral incentives.
           </p>
 
           <p style={{ color: "#555", marginBottom: 0 }}>
@@ -423,7 +500,8 @@ export default function Home() {
           </p>
 
           <p style={{ marginBottom: "34px", color: "#d4d4d4", fontSize: 14 }}>
-            Advisory capacity is managed through structured intake cycles to preserve analytical rigor.
+            Advisory capacity is managed through structured intake cycles to
+            preserve analytical rigor.
           </p>
 
           {/* CTA -> /advisory */}
@@ -510,9 +588,7 @@ export default function Home() {
           </form>
 
           {status === "ok" && (
-            <p style={{ marginTop: 18, color: "#2d6a4f" }}>
-              You are on the list.
-            </p>
+            <p style={{ marginTop: 18, color: "#2d6a4f" }}>You are on the list.</p>
           )}
 
           {status === "error" && (
@@ -527,29 +603,27 @@ export default function Home() {
         </div>
       </section>
 
-     {/* FOOTER */}
-<footer
-  style={{ padding: "34px 20px", textAlign: "center", color: "#777" }}
->
-  <div style={{ fontSize: 12 }}>
-    ©️ {new Date().getFullYear()} FertilityCareHub •{" "}
-    <Link href="/privacy" style={{ textDecoration: "underline" }}>
-      Privacy
-    </Link>{" "}
-    •{" "}
-    <Link href="/terms" style={{ textDecoration: "underline" }}>
-      Terms
-    </Link>{" "}
-    •{" "}
-    <Link href="/disclaimer" style={{ textDecoration: "underline" }}>
-      Disclaimer
-    </Link>
-  </div>
+      {/* FOOTER */}
+      <footer style={{ padding: "34px 20px", textAlign: "center", color: "#777" }}>
+        <div style={{ fontSize: 12 }}>
+          ©️ {new Date().getFullYear()} FertilityCareHub •{" "}
+          <Link href="/privacy" style={{ textDecoration: "underline" }}>
+            Privacy
+          </Link>{" "}
+          •{" "}
+          <Link href="/terms" style={{ textDecoration: "underline" }}>
+            Terms
+          </Link>{" "}
+          •{" "}
+          <Link href="/disclaimer" style={{ textDecoration: "underline" }}>
+            Disclaimer
+          </Link>
+        </div>
 
-  <div style={{ marginTop: 10, fontSize: 11, color: "#8a8a8a" }}>
-    Independent advisory platform. Not medical or legal advice.
-  </div>
-</footer>
+        <div style={{ marginTop: 10, fontSize: 11, color: "#8a8a8a" }}>
+          Independent advisory platform. Not medical or legal advice.
+        </div>
+      </footer>
     </main>
   );
 }
