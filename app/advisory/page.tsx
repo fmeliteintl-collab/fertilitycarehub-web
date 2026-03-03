@@ -196,10 +196,25 @@ export default function AdvisoryPage() {
             </div>
           </div>
 
+          {/* Router CTAs (Tier 1 + Tier 2) */}
           <div className="mt-7 flex flex-wrap gap-3">
+            <Link href="/snapshot" className={CTA_SECONDARY}>
+              View Strategic Alignment Snapshot™️
+            </Link>
+
+            <a
+              href={STRIPE_TIER1_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={CTA_PRIMARY}
+            >
+              Engage Tier 1
+            </a>
+
             <Link href="/brief" className={CTA_SECONDARY}>
               View Global Fertility Intelligence Brief™️
             </Link>
+
             <a
               href={STRIPE_TIER2_URL}
               target="_blank"
@@ -286,8 +301,8 @@ export default function AdvisoryPage() {
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/snapshot" className={CTA_SECONDARY}>
-                View Strategic Alignment Snapshot™️
+              <Link href="/brief" className={CTA_SECONDARY}>
+                View Global Fertility Intelligence Brief™️
               </Link>
 
               <a
