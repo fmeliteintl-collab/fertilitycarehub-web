@@ -29,10 +29,45 @@ const STRIPE_TIER1_URL = "https://buy.stripe.com/14A8wOcbw7RedIjgz94AU00";
 const STRIPE_TIER2_URL = "https://buy.stripe.com/aFa8wO5N8gnK8nZ0Ab4AU01";
 
 export default function AdvisoryPage() {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://fertilitycarehub.com/",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Advisory",
+        item: "https://fertilitycarehub.com/advisory",
+      },
+    ],
+  };
+
   return (
     <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
-      {/* Back */}
+      {/* JSON-LD: Breadcrumbs */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+
+      {/* Top nav */}
       <div className="max-w-6xl mx-auto px-6 pt-10">
+        {/* Breadcrumb UI */}
+        <nav className="text-sm text-[#6A6256] mb-4" aria-label="Breadcrumb">
+          <Link href="/" className="underline textUnderlineOffset-4">
+            Home
+          </Link>
+          <span className="mx-2">/</span>
+          <span aria-current="page">Advisory</span>
+        </nav>
+
+        {/* Back */}
         <Link
           href="/"
           className="text-sm tracking-wide text-[#6A6256] hover:text-[#1A1A1A]"
@@ -111,14 +146,15 @@ export default function AdvisoryPage() {
         </div>
       </section>
 
-      {/* ✅ Decision Router (Tighten funnel logic) */}
+      {/* Decision Router */}
       <section className="max-w-6xl mx-auto px-6 pb-16">
         <div className="rounded-2xl border border-[#E5DDC8] bg-white/70 p-8">
           <h2 className="text-2xl font-medium">Select the correct engagement</h2>
           <p className="mt-4 text-sm text-[#6A6256] leading-relaxed max-w-4xl">
-            This is an institutional advisory funnel. If you are still determining
-            jurisdiction fit, begin with Snapshot™️. If your pathway is complex or
-            requires a documented execution roadmap, engage Tier 2.
+            This is an institutional advisory funnel. If you are still
+            determining jurisdiction fit, begin with Snapshot™️. If your pathway
+            is complex or requires a documented execution roadmap, engage Tier
+            2.
           </p>
 
           <div className="mt-6 grid md:grid-cols-3 gap-6 text-sm leading-relaxed text-[#2A2A2A]">
@@ -126,7 +162,9 @@ export default function AdvisoryPage() {
               <div className="text-xs tracking-[0.22em] text-[#6A6256]">
                 START HERE
               </div>
-              <div className="mt-2 font-medium">Uncertain which jurisdiction fits</div>
+              <div className="mt-2 font-medium">
+                Uncertain which jurisdiction fits
+              </div>
               <p className="mt-2 text-[#6A6256]">
                 Identify viable jurisdictions and primary friction risks before
                 deeper comparative modeling.
@@ -137,7 +175,9 @@ export default function AdvisoryPage() {
               <div className="text-xs tracking-[0.22em] text-[#6A6256]">
                 COMPLEX PATHWAYS
               </div>
-              <div className="mt-2 font-medium">Donor structures / constraints</div>
+              <div className="mt-2 font-medium">
+                Donor structures / constraints
+              </div>
               <p className="mt-2 text-[#6A6256]">
                 Tier 2 applies elimination logic, pillar-based comparison, risk
                 mapping, and a formal roadmap.
@@ -150,26 +190,26 @@ export default function AdvisoryPage() {
               </div>
               <div className="mt-2 font-medium">Compressed timelines</div>
               <p className="mt-2 text-[#6A6256]">
-                Use Snapshot™️ as a screening layer when you need early directional
-                clarity quickly.
+                Use Snapshot™️ as a screening layer when you need early
+                directional clarity quickly.
               </p>
             </div>
           </div>
 
-    <div className="mt-7 flex flex-wrap gap-3">
-  <Link href="/brief" className={CTA_SECONDARY}>
-    View Global Fertility Intelligence Brief™️
-  </Link>
-  <a
-    href={STRIPE_TIER2_URL}
-    target="_blank"
-    rel="noopener noreferrer"
-    className={CTA_PRIMARY}
-  >
-    Engage Tier 2
-  </a>
-</div>
-</div>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link href="/brief" className={CTA_SECONDARY}>
+              View Global Fertility Intelligence Brief™️
+            </Link>
+            <a
+              href={STRIPE_TIER2_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={CTA_PRIMARY}
+            >
+              Engage Tier 2
+            </a>
+          </div>
+        </div>
       </section>
 
       {/* Tiers */}
@@ -191,7 +231,6 @@ export default function AdvisoryPage() {
               execution risks across 2–3 viable pathways.
             </p>
 
-            {/* CTA row (single, clean) */}
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/snapshot" className={CTA_SECONDARY}>
                 View Strategic Alignment Snapshot™️
@@ -246,7 +285,6 @@ export default function AdvisoryPage() {
               and a formal execution roadmap tailored to your pathway complexity.
             </p>
 
-            {/* CTA row (matches Tier 1 style) */}
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/snapshot" className={CTA_SECONDARY}>
                 View Strategic Alignment Snapshot™️
