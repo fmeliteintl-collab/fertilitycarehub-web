@@ -88,12 +88,10 @@ export default function AdminConsultationsPage() {
       }
 
       setRows(Array.isArray(json?.data) ? json.data : []);
-   } catch (e: unknown) {
-  const message =
-    e instanceof Error ? e.message : "Failed to fetch consultations.";
-  setErr(message);
-  setRows([]);
-
+       } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : "Failed to fetch consultations.";
+      setErr(errorMessage);
+      setRows([]);
     } finally {
       setLoading(false);
     }
@@ -134,12 +132,11 @@ export default function AdminConsultationsPage() {
         await fetchRows(t);
         return;
       }
-   } catch (e: unknown) {
-  const message =
-    e instanceof Error ? e.message : "Failed to update status.";
-  setErr(message);
-  await fetchRows(t);
-}
+        } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : "Failed to update status.";
+      setErr(errorMessage);
+      await fetchRows(t);
+    }
   }
 
   return (

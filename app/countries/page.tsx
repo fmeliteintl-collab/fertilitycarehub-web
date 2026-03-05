@@ -1,12 +1,7 @@
 import Breadcrumbs from "../components/Breadcrumbs";
 import Link from "next/link";
-type Country = {
-  slug: string;
-  name: string;
-  status: "Live" | "In build";
-  oneLiner: string;
-};
-const countries: Country[] = [
+
+const countries = [
   {
     slug: "spain",
     name: "Spain",

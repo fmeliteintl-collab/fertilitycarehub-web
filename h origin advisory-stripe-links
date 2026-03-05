@@ -1,0 +1,16 @@
+  advisory-positioning-phase1 [m 6af1740 [[34morigin/advisory-positioning-phase1[m: ahead 1] Merge pull request #11 from fmeliteintl-collab/advisory-positioning-phase1
+* [32madvisory-stripe-links       [m e6ed274 [[34morigin/advisory-stripe-links[m: ahead 3] Update advisory router CTAs and fix Tier 2 link
+  backup/production-stable    [m 1732f90 [[34morigin/backup/production-stable[m] Add production sitemap
+  breadcrumb-standardization  [m 784130d [[34morigin/breadcrumb-standardization[m] Internal linking: add Guides CTA on countries index
+  breadcrumbs-standardization [m 9185c3e Merge pull request #17 from fmeliteintl-collab/global-organization-schema
+  consultation-metadata       [m 8bd95b4 [[34morigin/consultation-metadata[m] Add consultation page metadata layout
+  consultation-seo-fix        [m 206f315 [[34morigin/consultation-seo-fix[m] Add metadata for consultation page
+  consultation-structured-data[m feced3d Consultation: add structured data + fix ReactNode typing
+  global-organization-schema  [m 38b3b61 [[34morigin/global-organization-schema[m] Add global Organization JSON-LD schema
+  guides-internal-linking     [m 762f751 [[34morigin/guides-internal-linking[m] Add comparison guide CTA: Czech Republic
+  legal-foundation-upgrade    [m 50262aa [[34morigin/legal-foundation-upgrade[m] Add deep-link country CTA logic to HomeClient (/?from=slug support)
+  main                        [m dfd9d59 [[34morigin/main[m] Merge pull request #29 from fmeliteintl-collab/legal-foundation-upgrade
+  seo-sitemap-favicon         [m 8a78d5a [[34morigin/seo-sitemap-favicon[m] Homepage advisory positioning update
+  spain-advisory-meta-cta     [m e813010 [[34morigin/spain-advisory-meta-cta[m] Refine Spain advisory page and CTA alignment
+  spain-structured-data       [m 3842c29 [[34morigin/spain-structured-data[m] Add Spain JSON-LD structured data
+  stable-v1                   [m ca59158 [[34morigin/stable-v1[m] Rvert blinking fix attempt
