@@ -57,18 +57,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
-<<<<<<< HEAD
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_JSON_LD) }}
-=======
-        {/* Global Organization Structured Data */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(ORG_JSON_LD),
-          }}
->>>>>>> origin/main
         />
       </head>
 
@@ -79,86 +70,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <span className="text-xl tracking-wide">FertilityCareHub</span>
             </Link>
 
-<<<<<<< HEAD
             <Link
               href="/consultation#request"
               className="border border-[#B89B5E] px-5 py-2 text-sm tracking-wide hover:bg-[#B89B5E] hover:text-white transition"
             >
               Request Advisory Consultation
             </Link>
-=======
-            <div className="flex items-center gap-4">
-              <Link
-                href="/advisory"
-                className="text-sm tracking-wide text-[#6A6256] hover:text-[#1A1A1A]"
-              >
-                Advisory Pricing
-              </Link>
-
-              <Link
-                href="/advisory"
-                className="border border-[#B89B5E] px-5 py-2 text-sm tracking-wide hover:bg-[#B89B5E] hover:text-white transition"
-              >
-                View Advisory Options
-              </Link>
-            </div>
->>>>>>> origin/main
           </div>
         </header>
 
         <main>{children}</main>
-<<<<<<< HEAD
-=======
-
-        <footer className="w-full border-t border-[#E5DDC8] mt-16">
-          <div className="max-w-6xl mx-auto px-6 py-10 text-sm text-[#6A6256] space-y-4">
-            <p className="leading-relaxed">
-              <strong className="text-[#1A1A1A]">Advisory boundary:</strong>{" "}
-              FertilityCareHub provides independent cross-border fertility
-              strategy support. Content and engagements are informational and
-              strategic in nature and are not medical, legal, or financial
-              advice.
-            </p>
-
-            <p className="leading-relaxed">
-              <strong className="text-[#1A1A1A]">Independent status:</strong>{" "}
-              We are not a clinic, broker, or treatment provider. We do not sell
-              medical services, do not arrange treatment, and do not guarantee
-              outcomes.
-            </p>
-
-            <p className="leading-relaxed">
-              <strong className="text-[#1A1A1A]">Important:</strong> For urgent
-              or emergency medical concerns, contact local emergency services or
-              a licensed clinician. Use of this site does not create a medical,
-              legal, or fiduciary relationship.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-2">
-              <Link
-                href="/privacy"
-                className="underline underline-offset-4 hover:text-[#1A1A1A]"
-              >
-                Privacy Policy
-              </Link>
-              <Link
-                href="/terms"
-                className="underline underline-offset-4 hover:text-[#1A1A1A]"
-              >
-                Terms
-              </Link>
-              <Link
-                href="/disclaimer"
-                className="underline underline-offset-4 hover:text-[#1A1A1A]"
-              >
-                Disclaimer
-              </Link>
-              <span aria-hidden="true">•</span>
-              <span>©️ {new Date().getFullYear()} FertilityCareHub</span>
-            </div>
-          </div>
-        </footer>
->>>>>>> origin/main
       </body>
     </html>
   );
