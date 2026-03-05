@@ -1,6 +1,9 @@
+import CountryWebPageSchema from "../../components/CountryWebPageSchema";
+import Breadcrumbs from "../../components/Breadcrumbs";
 import Link from "next/link";
 import type { Metadata } from "next";
-import Script from "next/script";
+import FAQSchema from "../../components/FAQSchema";
+
 
 export const metadata: Metadata = {
   title: "Spain Fertility Strategy Advisory | Regulatory & Clinical Alignment 2026",
@@ -22,43 +25,47 @@ export const metadata: Metadata = {
 export default function SpainDossierPage() {
   return (
     <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
-      <Script
-      id="ld-spain-advisory"
-      type="application/ld+json"
-      strategy="afterInteractive"
-      dangerouslySetInnerHTML={{
-        __html: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebPage",
-          name: "Spain: Fertility Jurisdiction Assessment",
-          description:
-            "Strategic jurisdiction assessment and regulatory clarity for cross-border fertility care in Spain.",
-          url: "https://fertilitycarehub.com/countries/spain",
-          isPartOf: {
-            "@type": "WebSite",
-            name: "FertilityCareHub",
-            url: "https://fertilitycarehub.com",
-          },
-          breadcrumb: {
-            "@type": "BreadcrumbList",
-            itemListElement: [
-              {
-                "@type": "ListItem",
-                position: 1,
-                name: "Countries",
-                item: "https://fertilitycarehub.com/countries",
-              },
-              {
-                "@type": "ListItem",
-                position: 2,
-                name: "Spain",
-                item: "https://fertilitycarehub.com/countries/spain",
-              },
-            ],
-          },
-        }),
-      }}
-    />
+      <Breadcrumbs
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Countries", href: "/countries" },
+          { name: "Spain", href: "/countries/spain" },
+        ]}
+      />
+
+      <CountryWebPageSchema
+        countryName="Spain"
+        countrySlug="spain"
+        title="Spain: Fertility Jurisdiction Assessment"
+        description="Strategic jurisdiction assessment and regulatory clarity for cross-border fertility care in Spain."
+      />
+      <FAQSchema
+  id="faq-spain"
+  items={[
+    {
+      question: "Is FertilityCareHub a clinic or broker?",
+      answer:
+        "No. FertilityCareHub is an independent strategic advisory platform. We do not provide medical treatment, sell medical services, or guarantee outcomes.",
+    },
+    {
+      question: "What is Spain typically strong for in cross-border fertility planning?",
+      answer:
+        "Spain is often considered for mature clinic infrastructure, established donor pathways, and a predictable patient experience. Suitability depends on your legal, ethical, medical, and timeline constraints.",
+    },
+    {
+      question: "Do you provide medical advice or diagnosis?",
+      answer:
+        "No. We provide structured navigation and decision support. Medical decisions should be made with licensed clinicians.",
+    },
+    {
+      question: "What happens after I submit a consultation request?",
+      answer:
+        "Your request is routed to an internal review queue. A consultant reviews it for fit and follow-up, and then reaches out by email.",
+    },
+  ]}
+/>
+
+  
 
     {/* rest of your existing page */}
 
@@ -385,28 +392,143 @@ export default function SpainDossierPage() {
         </div>
 
         {/* Bottom CTA */}
-        <div style={{ textAlign: "center", marginTop: 26 }}>
-          <Link
-            href="/consultation"
-            style={{
-              display: "inline-block",
-              border: "1px solid #B89B5E",
-              color: "#7B6A3A",
-              padding: "12px 18px",
-              borderRadius: 999,
-              textDecoration: "none",
-              fontSize: 13,
-              letterSpacing: "0.06em",
-            }}
-          >
-            Request Spain Strategy Review
-          </Link>
+<div style={{ textAlign: "center", marginTop: 26 }}>
+  <Link
+    href="/consultation"
+    style={{
+      display: "inline-block",
+      border: "1px solid #B89B5E",
+      color: "#7B6A3A",
+      padding: "12px 18px",
+      borderRadius: 999,
+      textDecoration: "none",
+      fontSize: 13,
+      letterSpacing: "0.06em",
+    }}
+  >
+    Request Spain Strategy Review
+  </Link>
 
-          <div style={{ marginTop: 10, fontSize: 13, color: "#6A6A6A" }}>
-            Discreet, structured guidance aligned to your profile and pathway.
-          </div>
-        </div>
-      </section>
+  <div style={{ marginTop: 10, fontSize: 13, color: "#6A6A6A" }}>
+    Discreet, structured guidance aligned to your profile and pathway.
+  </div>
+</div>
+</section>
+
+
+{/* FAQ */}
+<section className="mt-16 border-t border-[#E5DDC8] pt-10">
+  <h2 className="text-2xl font-semibold mb-6">FAQ</h2>
+
+  <div className="space-y-4">
+    <details className="rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
+      <summary className="cursor-pointer text-lg font-medium">
+        Is FertilityCareHub providing medical advice?
+      </summary>
+      <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
+        No. We provide structured, strategic advisory support only. Any medical decisions should be
+        made with licensed clinicians. Our work focuses on clarity, jurisdiction fit, and planning.
+      </p>
+    </details>
+
+    <details className="rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
+      <summary className="cursor-pointer text-lg font-medium">
+        Do you recommend specific clinics in Spain?
+      </summary>
+      <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
+        We don’t publish public “best clinic” lists or endorsements. If you engage advisory services,
+        we can provide a curated shortlist aligned to your constraints and planning priorities.
+      </p>
+    </details>
+
+    <details className="rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
+      <summary className="cursor-pointer text-lg font-medium">
+        What information should I prepare before requesting advisory?
+      </summary>
+      <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
+        Useful inputs include your target timeline, prior treatment history (if any), key constraints
+        (budget, travel cadence, donor pathway), and any legal/eligibility considerations.
+      </p>
+    </details>
+
+    <details className="rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
+      <summary className="cursor-pointer text-lg font-medium">
+        Can advisory help compare Spain with other destinations?
+      </summary>
+      <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
+        Yes. We help structure a comparison across a small set of relevant jurisdictions, focusing on
+        decision factors like access, governance, donor pathway, and execution risk.
+        For a structured framework, see our{" "}
+        <Link
+          href="/how-to-compare-fertility-jurisdictions"
+          className="underline"
+        >
+          jurisdiction comparison guide
+        </Link>.
+      </p>
+    </details>
+  </div>
+</section>
+
+
+{/* Comparison Guide CTA — Internal Authority Boost */}
+<section className="mt-10 border border-[#E5DDC8] bg-white/60 rounded-xl p-5">
+  <h3 className="text-lg font-medium">
+    Compare destinations before choosing
+  </h3>
+  <p className="mt-2 text-sm text-[#6A6256] leading-relaxed">
+    Use our structured framework to compare governance, donor pathway,
+    eligibility friction, timeline realism, and execution risk across countries.
+  </p>
+  <Link
+    href="/how-to-compare-fertility-jurisdictions"
+    className="inline-block mt-3 underline text-sm"
+  >
+    Read the comparison guide →
+  </Link>
+</section>
+
+
+
+{/* Compare Other Jurisdictions */}
+<section className="mt-16 border-t border-[#E5DDC8] pt-10">
+  <h2 className="text-2xl font-semibold mb-6">
+    Compare Other Jurisdictions
+  </h2>
+
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <Link
+      href="/countries/greece"
+      className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition"
+    >
+      <h3 className="text-lg font-medium">Greece</h3>
+      <p className="text-sm text-[#6A6256] mt-2">
+        Often considered for access flexibility and streamlined entry pathways.
+      </p>
+    </Link>
+
+    <Link
+      href="/countries/portugal"
+      className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition"
+    >
+      <h3 className="text-lg font-medium">Portugal</h3>
+      <p className="text-sm text-[#6A6256] mt-2">
+        Growing infrastructure with specific legal and access nuances.
+      </p>
+    </Link>
+
+    <Link
+      href="/countries/czech-republic"
+      className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition"
+    >
+      <h3 className="text-lg font-medium">Czech Republic</h3>
+      <p className="text-sm text-[#6A6256] mt-2">
+        Frequently evaluated for cost-efficiency and clinic density.
+      </p>
+    </Link>
+  </div>
+</section>
+
     </main>
   );
 }

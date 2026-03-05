@@ -1,3 +1,5 @@
+import CountryWebPageSchema from "../../components/CountryWebPageSchema";
+import Breadcrumbs from "../../components/Breadcrumbs";
 import Link from "next/link";
 import type { Metadata } from "next";
 
@@ -20,6 +22,19 @@ export const metadata: Metadata = {
 export default function MexicoPage() {
   return (
     <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
+      <Breadcrumbs
+  items={[
+    { name: "Home", href: "/" },
+    { name: "Countries", href: "/countries" },
+    { name: "Mexico", href: "/countries/mexico" },
+  ]}
+/>
+<CountryWebPageSchema
+  countryName="Mexico"
+  countrySlug="mexico"
+  title="Mexico: Fertility Jurisdiction Assessment"
+  description="Strategic jurisdiction assessment and regulatory clarity for cross-border fertility care in Mexico."
+/>
       {/* Top utility bar */}
       <div className="max-w-6xl mx-auto px-6 pt-10">
         <div className="flex items-center justify-between">
@@ -251,6 +266,37 @@ export default function MexicoPage() {
           </div>
         </div>
       </section>
+      {/* Comparison guide CTA */}
+<section className="mt-10 border border-[#E5DDC8] bg-white/60 rounded-xl p-5">
+  <h3 className="text-lg font-medium">Compare destinations before choosing</h3>
+  <p className="mt-2 text-sm text-[#6A6256] leading-relaxed">
+    Use our structured framework to compare governance, donor pathway, eligibility friction,
+    timeline realism, and execution risk across countries.
+  </p>
+  <Link
+    href="/how-to-compare-fertility-jurisdictions"
+    className="inline-block mt-3 underline text-sm"
+  >
+    Read the comparison guide →
+  </Link>
+</section>
+      <section className="mt-16 border-t border-[#E5DDC8] pt-10">
+  <h2 className="text-2xl font-semibold mb-6">Compare Other Jurisdictions</h2>
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <Link href="/countries/united-states" className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition">
+      <h3 className="text-lg font-medium">United States</h3>
+      <p className="text-sm text-[#6A6256] mt-2">Premium benchmark for breadth and capability in complex scenarios.</p>
+    </Link>
+    <Link href="/countries/canada" className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition">
+      <h3 className="text-lg font-medium">Canada</h3>
+      <p className="text-sm text-[#6A6256] mt-2">Governance-forward framework with tight ethical boundaries.</p>
+    </Link>
+    <Link href="/countries/turkey" className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition">
+      <h3 className="text-lg font-medium">Turkey</h3>
+      <p className="text-sm text-[#6A6256] mt-2">Cross-continental private hospital infrastructure with cost advantages.</p>
+    </Link>
+  </div>
+</section>
     </main>
   );
 }

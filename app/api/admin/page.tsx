@@ -88,10 +88,19 @@ export default function AdminConsultationsPage() {
       }
 
       setRows(Array.isArray(json?.data) ? json.data : []);
+<<<<<<< HEAD
        } catch (e: unknown) {
       const errorMessage = e instanceof Error ? e.message : "Failed to fetch consultations.";
       setErr(errorMessage);
       setRows([]);
+=======
+   } catch (e: unknown) {
+  const message =
+    e instanceof Error ? e.message : "Failed to fetch consultations.";
+  setErr(message);
+  setRows([]);
+
+>>>>>>> origin/main
     } finally {
       setLoading(false);
     }
@@ -132,11 +141,20 @@ export default function AdminConsultationsPage() {
         await fetchRows(t);
         return;
       }
+<<<<<<< HEAD
         } catch (e: unknown) {
       const errorMessage = e instanceof Error ? e.message : "Failed to update status.";
       setErr(errorMessage);
       await fetchRows(t);
     }
+=======
+   } catch (e: unknown) {
+  const message =
+    e instanceof Error ? e.message : "Failed to update status.";
+  setErr(message);
+  await fetchRows(t);
+}
+>>>>>>> origin/main
   }
 
   return (
