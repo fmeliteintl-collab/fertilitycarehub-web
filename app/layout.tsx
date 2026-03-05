@@ -1,6 +1,7 @@
 import "./globals.css";
 import Link from "next/link";
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 
 const ORG_JSON_LD = {
   "@context": "https://schema.org",
@@ -18,8 +19,8 @@ const ORG_JSON_LD = {
       availableLanguage: ["en"],
     },
   ],
+  sameAs: [],
 } as const;
-
 
 export const metadata: Metadata = {
   title: {
@@ -30,56 +31,43 @@ export const metadata: Metadata = {
   description:
     "Private global fertility strategy advisory for cross-border care across Europe and select international destinations — jurisdiction clarity, pathway alignment, and discreet planning.",
   metadataBase: new URL("https://fertilitycarehub.com"),
-
   alternates: {
     canonical: "/",
   },
-
   openGraph: {
-    title:
-      "Global Fertility Strategy Advisory — Europe & Beyond",
+    title: "Global Fertility Strategy Advisory — Europe & Beyond",
     description:
       "Private global fertility strategy advisory for cross-border care across Europe and select international destinations — jurisdiction clarity, pathway alignment, and discreet planning.",
     url: "https://fertilitycarehub.com",
     siteName: "FertilityCareHub",
     type: "website",
   },
-
   robots: {
     index: true,
     follow: true,
   },
-
   icons: {
     icon: "/favicon.ico",
     apple: "/apple-touch-icon.png",
   },
-
   manifest: "/site.webmanifest",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <script
-  type="application/ld+json"
-  dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_JSON_LD) }}
-/>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_JSON_LD) }}
+        />
+      </head>
 
       <body className="bg-[#F5F1E8] text-[#1A1A1A] font-serif">
-        
         <header className="w-full py-6 border-b border-[#E5DDC8]">
           <div className="max-w-6xl mx-auto flex items-center justify-between px-6">
-            
             <Link href="/" className="flex items-center gap-4">
-              
-              <span className="text-xl tracking-wide">
-                FertilityCareHub
-              </span>
+              <span className="text-xl tracking-wide">FertilityCareHub</span>
             </Link>
 
             <Link
@@ -88,12 +76,10 @@ export default function RootLayout({
             >
               Request Advisory Consultation
             </Link>
-
           </div>
         </header>
 
         <main>{children}</main>
-
       </body>
     </html>
   );

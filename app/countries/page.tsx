@@ -1,10 +1,5 @@
 import Link from "next/link";
-type Country = {
-  slug: string;
-  name: string;
-  status: "Live" | "In build";
-  oneLiner: string;
-};
+
 const countries = [
   {
     slug: "spain",

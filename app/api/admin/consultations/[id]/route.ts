@@ -48,9 +48,10 @@ export async function PATCH(
     }
 
     return NextResponse.json({ success: true });
-  } catch (e: any) {
+    } catch (e: unknown) {
+    const errorMessage = e instanceof Error ? e.message : "Server error";
     return NextResponse.json(
-      { error: e?.message || "Server error" },
+      { error: errorMessage },
       { status: 500 }
     );
   }

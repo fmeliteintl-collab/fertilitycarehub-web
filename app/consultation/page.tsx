@@ -145,11 +145,9 @@ function ConsultationPageInner() {
       setTargetCountry("");
       setOptimizingFor([]);
       setContext("");
-    } catch (e: any) {
-      setErrorMsg(
-        e?.message ||
-          "Submission failed. Most likely: RLS insert policy is missing for consultation_requests."
-      );
+   } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : "Submission failed. Most likely: RLS insert policy is missing for consultation_requests.";
+      setErrorMsg(errorMessage);
     } finally {
       setSubmitting(false);
     }
