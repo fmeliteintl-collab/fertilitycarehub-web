@@ -302,7 +302,7 @@ export default function AdvisoryPage() {
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/brief" className={CTA_SECONDARY}>
-                View Global Fertility Intelligence Brief™️
+                Start with Strategic Alignment Snapshot™️
               </Link>
 
               <a
