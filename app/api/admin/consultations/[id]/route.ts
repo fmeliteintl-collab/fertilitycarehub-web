@@ -1,9 +1,9 @@
+export const runtime = 'edge';
+
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-export const runtime = "edge";
-
-const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
+// REMOVE THIS LINE: const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -18,17 +18,16 @@ const supabase = createClient(
 
 export async function PATCH(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }  // <-- Changed to Promise
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Check for admin session cookie
     const cookieHeader = request.headers.get("cookie");
-    const adminSession = cookieHeader
+    const authed = cookieHeader
       ?.split(";")
-      .find((c) => c.trim().startsWith("admin_session="))
+      .find((c) => c.trim().startsWith("FCH_ADMIN_AUTH="))
       ?.split("=")[1];
 
-    if (!adminSession || adminSession !== ADMIN_TOKEN) {
+    if (authed !== "1") {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -45,8 +44,7 @@ export async function PATCH(
       );
     }
 
-    // Await the params Promise
-    const { id } = await params;  // <-- Added await here
+    const { id } = await params;
 
     const { data, error } = await supabase
       .from("consultation_requests")

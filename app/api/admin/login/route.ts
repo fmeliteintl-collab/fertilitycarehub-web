@@ -1,30 +1,40 @@
+export const runtime = 'edge';
+
 import { NextResponse } from "next/server";
 
-export const runtime = "edge";
-
-const ADMIN_TOKEN = process.env.ADMIN_DASH_TOKEN;
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { token } = body as { token?: string };
+    const { token } = body;
 
     if (!token) {
-      return NextResponse.json({ error: "Token required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Token required" },
+        { status: 400 }
+      );
     }
 
-    if (!ADMIN_TOKEN || token !== ADMIN_TOKEN) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    if (token !== ADMIN_TOKEN) {
+      return NextResponse.json(
+        { error: "Invalid token" },
+        { status: 401 }
+      );
     }
 
-    const response = NextResponse.json({ success: true }, { status: 200 });
+    // Set FCH_ADMIN_AUTH cookie (matches your server-side page)
+    const response = NextResponse.json(
+      { success: true },
+      { status: 200 }
+    );
 
     response.cookies.set("FCH_ADMIN_AUTH", "1", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 24 * 7,
+      maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
     return response;
