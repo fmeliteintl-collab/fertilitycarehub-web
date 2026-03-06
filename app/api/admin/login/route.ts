@@ -2,8 +2,8 @@ export const runtime = 'edge';
 
 import { NextResponse } from "next/server";
 
-// Hardcoded token for testing - use exactly this to login
-const ADMIN_TOKEN = "testtoken123";
+// Admin token - change this to your desired password
+const ADMIN_TOKEN = "elite77737773";
 
 export async function POST(request: Request) {
   try {
@@ -17,17 +17,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // Debug info
     if (token !== ADMIN_TOKEN) {
       return NextResponse.json(
-        { 
-          error: "Invalid token",
-          debug: {
-            expected: ADMIN_TOKEN,
-            received: token,
-            match: token === ADMIN_TOKEN
-          }
-        },
+        { error: "Invalid token" },
         { status: 401 }
       );
     }
