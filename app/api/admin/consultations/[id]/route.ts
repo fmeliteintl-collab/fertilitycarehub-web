@@ -1,57 +1,68 @@
-// app/api/admin/consultations/[id]/route.ts
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-export const runtime = "edge";
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 
-function assertAdmin(req: NextRequest) {
-  // Support BOTH header styles (so your UI can send either)
-  const token =
-    req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ||
-    req.headers.get("x-admin-token") ||
-    "";
-
-  const expected = process.env.ADMIN_DASH_TOKEN || "";
-  return Boolean(token && expected && token === expected);
-}
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  }
+);
 
 export async function PATCH(
-  req: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  request: Request,
+  { params }: { params: { id: string } }
 ) {
   try {
-    if (!assertAdmin(req)) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Check for admin session cookie
+    const cookieHeader = request.headers.get("cookie");
+    const adminSession = cookieHeader
+      ?.split(";")
+      .find((c) => c.trim().startsWith("admin_session="))
+      ?.split("=")[1];
+
+    if (!adminSession || adminSession !== ADMIN_TOKEN) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
     }
 
-    const { id } = await context.params;
-
-    const body = await req.json().catch(() => ({}));
-    const status = body?.status as string | undefined;
+    const body = await request.json();
+    const { status } = body;
 
     if (!status) {
-      return NextResponse.json({ error: "Missing status" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Status required" },
+        { status: 400 }
+      );
     }
 
-    const supabase = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("consultation_requests")
       .update({ status })
-      .eq("id", id);
+      .eq("id", params.id)
+      .select()
+      .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error("Supabase error:", error);
+      return NextResponse.json(
+        { error: "Failed to update status" },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json({ success: true });
-    } catch (e: unknown) {
-    const errorMessage = e instanceof Error ? e.message : "Server error";
+    return NextResponse.json({ data }, { status: 200 });
+  } catch (error) {
+    console.error("API error:", error);
     return NextResponse.json(
-      { error: errorMessage },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
