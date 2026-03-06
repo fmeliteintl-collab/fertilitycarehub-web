@@ -16,7 +16,7 @@ const supabase = createClient(
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }  // <-- Changed to Promise
 ) {
   try {
     // Check for admin session cookie
@@ -43,10 +43,13 @@ export async function PATCH(
       );
     }
 
+    // Await the params Promise
+    const { id } = await params;  // <-- Added await here
+
     const { data, error } = await supabase
       .from("consultation_requests")
       .update({ status })
-      .eq("id", params.id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -59,8 +62,7 @@ export async function PATCH(
     }
 
     return NextResponse.json({ data }, { status: 200 });
-  } catch (error) {
-    console.error("API error:", error);
+  } catch {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
