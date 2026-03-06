@@ -2,16 +2,10 @@ export const runtime = 'edge';
 
 import { NextResponse } from "next/server";
 
-const ADMIN_TOKEN = process.env.ADMIN_DASH_TOKEN?.trim(); // Add .trim() here
+// Hardcoded token for testing - use exactly this to login
+const ADMIN_TOKEN = "testtoken123";
 
 export async function POST(request: Request) {
-  if (!ADMIN_TOKEN) {
-    return NextResponse.json(
-      { error: "Server configuration error" },
-      { status: 500 }
-    );
-  }
-
   try {
     const body = await request.json();
     const { token } = body;
@@ -23,9 +17,17 @@ export async function POST(request: Request) {
       );
     }
 
-    if (token.trim() !== ADMIN_TOKEN) { // Already has .trim()
+    // Debug info
+    if (token !== ADMIN_TOKEN) {
       return NextResponse.json(
-        { error: "Invalid token" },
+        { 
+          error: "Invalid token",
+          debug: {
+            expected: ADMIN_TOKEN,
+            received: token,
+            match: token === ADMIN_TOKEN
+          }
+        },
         { status: 401 }
       );
     }
