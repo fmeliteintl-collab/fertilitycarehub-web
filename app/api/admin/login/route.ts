@@ -2,7 +2,7 @@ export const runtime = 'edge';
 
 import { NextResponse } from "next/server";
 
-const ADMIN_TOKEN = process.env.ADMIN_DASH_TOKEN;  // Changed from ADMIN_TOKEN
+const ADMIN_TOKEN = process.env.ADMIN_DASH_TOKEN;  // Change this line
 
 export async function POST(request: Request) {
   if (!ADMIN_TOKEN) {
