@@ -2,17 +2,48 @@ export const runtime = 'edge';
 
 import { NextResponse } from "next/server";
 
-const ADMIN_TOKEN = process.env.ADMIN_DASH_TOKEN;  // Change this line
+// Try multiple possible environment variable names
+const POSSIBLE_TOKEN_NAMES = [
+  'ADMIN_DASH_TOKEN',
+  'ADMIN_TOKEN', 
+  'ADMIN_DASH_TOKEN_PREVIEW',
+  'ADMIN_TOKEN_PREVIEW'
+];
 
 export async function POST(request: Request) {
-  if (!ADMIN_TOKEN) {
-    return NextResponse.json(
-      { error: "ADMIN_DASH_TOKEN environment variable is not set" },
-      { status: 500 }
-    );
-  }
-
   try {
+    // Find which environment variable is set
+    let foundToken: string | undefined;
+    let foundName: string | undefined;
+    
+    for (const name of POSSIBLE_TOKEN_NAMES) {
+      const value = process.env[name];
+      if (value) {
+        foundToken = value;
+        foundName = name;
+        break;
+      }
+    }
+
+    // If no token found, return error with available env vars (names only, not values)
+    if (!foundToken) {
+      const availableEnvVars = Object.keys(process.env)
+        .filter(key => key.includes('ADMIN') || key.includes('TOKEN'))
+        .join(', ');
+      
+      return NextResponse.json(
+        { 
+          error: "No admin token configured",
+          debug: {
+            checkedVariables: POSSIBLE_TOKEN_NAMES,
+            availableMatchingVars: availableEnvVars || 'None found',
+            totalEnvVars: Object.keys(process.env).length
+          }
+        },
+        { status: 500 }
+      );
+    }
+
     const body = await request.json();
     const { token } = body;
 
@@ -23,13 +54,28 @@ export async function POST(request: Request) {
       );
     }
 
-    if (token !== ADMIN_TOKEN) {
+    // Detailed comparison
+    const trimmedInput = token.trim();
+    const trimmedEnv = foundToken.trim();
+    
+    if (trimmedInput !== trimmedEnv) {
       return NextResponse.json(
-        { error: "Invalid token" },
+        { 
+          error: "Invalid token",
+          debug: {
+            envVarName: foundName,
+            inputLength: trimmedInput.length,
+            envLength: trimmedEnv.length,
+            inputFirst3: trimmedInput.substring(0, 3),
+            envFirst3: trimmedEnv.substring(0, 3),
+            match: trimmedInput === trimmedEnv
+          }
+        },
         { status: 401 }
       );
     }
 
+    // Success - set cookie
     const response = NextResponse.json(
       { success: true },
       { status: 200 }
@@ -44,9 +90,12 @@ export async function POST(request: Request) {
     });
 
     return response;
-  } catch {
+  } catch (err) {
     return NextResponse.json(
-      { error: "Internal server error" },
+      { 
+        error: "Internal server error",
+        message: err instanceof Error ? err.message : String(err)
+      },
       { status: 500 }
     );
   }

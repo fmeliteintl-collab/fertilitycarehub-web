@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";  // Add this import
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function AdminLoginPage() {
@@ -25,14 +25,16 @@ export default function AdminLoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data?.error || "Invalid token");
+        // Show full error with debug info
+        console.log('Login error:', data);
+        setError(JSON.stringify(data, null, 2));
         setLoading(false);
         return;
       }
 
       // Cookie is set by server, now redirect to admin dashboard
       router.push("/admin");
-    } catch {  // Removed 'err'
+    } catch (err) {
       setError("Failed to login. Please try again.");
     } finally {
       setLoading(false);
@@ -60,7 +62,7 @@ export default function AdminLoginPage() {
           </div>
 
           {error && (
-            <div className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-800">
+            <div className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-800 font-mono whitespace-pre-wrap max-h-60 overflow-y-auto">
               {error}
             </div>
           )}
@@ -75,7 +77,7 @@ export default function AdminLoginPage() {
         </form>
 
         <div className="mt-6 text-center">
-          <Link  // Changed from <a> to <Link>
+          <Link
             href="/"
             className="text-sm text-[#6A6256] underline hover:text-[#1A1A1A]"
           >
