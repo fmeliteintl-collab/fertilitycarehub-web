@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-
+export const runtime = "edge";
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 
 export async function POST(request: Request) {

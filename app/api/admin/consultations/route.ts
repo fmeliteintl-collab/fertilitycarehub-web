@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
+export const runtime = "edge";
+
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 
 // Initialize Supabase with service role key (bypasses RLS)
