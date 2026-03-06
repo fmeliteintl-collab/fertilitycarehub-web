@@ -2,17 +2,19 @@ export const runtime = 'edge';
 
 import { NextResponse } from "next/server";
 
-const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
+const ADMIN_TOKEN = process.env.ADMIN_DASH_TOKEN;  // Changed from ADMIN_TOKEN
 
 export async function POST(request: Request) {
+  if (!ADMIN_TOKEN) {
+    return NextResponse.json(
+      { error: "ADMIN_DASH_TOKEN environment variable is not set" },
+      { status: 500 }
+    );
+  }
+
   try {
     const body = await request.json();
     const { token } = body;
-
-    // Debug logging (remove after fixing)
-    console.log("Received token:", token);
-    console.log("Expected token:", ADMIN_TOKEN);
-    console.log("Match:", token === ADMIN_TOKEN);
 
     if (!token) {
       return NextResponse.json(
