@@ -5,24 +5,17 @@ import { cookies } from "next/headers";
 export const runtime = "edge";
 
 async function assertAdmin(req: Request) {
-  const expected = process.env.ADMIN_DASH_TOKEN ?? "";
-  if (!expected) return false;
-
-  // 1) Authorization header
-  const headerToken =
-    req.headers.get("authorization")?.replace("Bearer ", "")?.trim() ?? "";
-  if (headerToken && headerToken === expected) return true;
-
-  // 2) Session cookie
   const cookieStore = await cookies();
-  const authed = cookieStore.get("FCH_ADMIN_AUTH")?.value?.trim() ?? "";
-  if (authed === "1") return true;
+  const authed = cookieStore.get("FCH_ADMIN_AUTH")?.value?.trim();
 
-  // 3) Token cookie fallback
-  const cookieToken = cookieStore.get("FCH_ADMIN_TOKEN")?.value?.trim() ?? "";
-  if (cookieToken && cookieToken === expected) return true;
+  if (authed === "1") {
+    return true;
+  }
 
-  return false;
+  const token = req.headers.get("authorization")?.replace("Bearer ", "") ?? "";
+  const expected = process.env.ADMIN_DASH_TOKEN ?? "";
+
+  return Boolean(token && expected && token === expected);
 }
 
 export async function GET(req: Request) {
@@ -41,6 +34,9 @@ export async function GET(req: Request) {
     .order("created_at", { ascending: false })
     .limit(200);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
   return NextResponse.json({ data });
 }
