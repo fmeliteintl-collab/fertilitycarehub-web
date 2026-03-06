@@ -1,16 +1,32 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { cookies } from "next/headers";
 
 export const runtime = "edge";
 
-function assertAdmin(req: Request) {
-  const token = req.headers.get("authorization")?.replace("Bearer ", "") ?? "";
+async function assertAdmin(req: Request) {
   const expected = process.env.ADMIN_DASH_TOKEN ?? "";
-  return token && expected && token === expected;
+  if (!expected) return false;
+
+  // 1) Authorization header
+  const headerToken =
+    req.headers.get("authorization")?.replace("Bearer ", "")?.trim() ?? "";
+  if (headerToken && headerToken === expected) return true;
+
+  // 2) Session cookie
+  const cookieStore = await cookies();
+  const authed = cookieStore.get("FCH_ADMIN_AUTH")?.value?.trim() ?? "";
+  if (authed === "1") return true;
+
+  // 3) Token cookie fallback
+  const cookieToken = cookieStore.get("FCH_ADMIN_TOKEN")?.value?.trim() ?? "";
+  if (cookieToken && cookieToken === expected) return true;
+
+  return false;
 }
 
 export async function GET(req: Request) {
-  if (!assertAdmin(req)) {
+  if (!(await assertAdmin(req))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
