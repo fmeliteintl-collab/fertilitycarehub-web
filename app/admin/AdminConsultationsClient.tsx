@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type ConsultationRow = {
   id: string;
@@ -30,47 +31,55 @@ function formatDate(s?: string) {
 }
 
 export default function AdminConsultationsPage() {
+  const router = useRouter();
   const [rows, setRows] = useState<ConsultationRow[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string>("");
   const [query, setQuery] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
-  async function fetchRows() {
+  // useCallback to fix dependency warning
+  const fetchRows = useCallback(async () => {
     setErr("");
     setLoading(true);
 
     try {
-      // ✅ Cookie-based auth (HttpOnly) — no token in JS, no Authorization header
       const res = await fetch("/api/admin/consultations", {
         method: "GET",
+        credentials: "include",
       });
+
+      if (res.status === 401 || res.status === 403) {
+        setIsAuthenticated(false);
+        router.push("/admin/login");
+        return;
+      }
 
       const json = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        // If unauthorized, the server guard should normally redirect already,
-        // but handle gracefully anyway.
         setErr(json?.error || `Request failed (${res.status})`);
         setRows([]);
+        setIsAuthenticated(false);
         return;
       }
 
       setRows(Array.isArray(json?.data) ? json.data : []);
+      setIsAuthenticated(true);
     } catch (e: unknown) {
       const message =
         e instanceof Error ? e.message : "Failed to fetch consultations.";
       setErr(message);
       setRows([]);
+      setIsAuthenticated(false);
     } finally {
       setLoading(false);
     }
-  }
+  }, [router]);
 
-  // ✅ Auto-load on page render (cookie already present if logged in)
   useEffect(() => {
     fetchRows();
-     
-  }, []);
+  }, [fetchRows]); // Now fetchRows is a stable dependency
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -98,24 +107,27 @@ export default function AdminConsultationsPage() {
   async function updateStatus(id: string, status: string) {
     setErr("");
 
-    // optimistic UI update
     setRows((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
 
     try {
-      // ✅ Cookie-based auth — no Authorization header
       const res = await fetch(`/api/admin/consultations/${id}`, {
         method: "PATCH",
         headers: {
           "content-type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({ status }),
       });
+
+      if (res.status === 401 || res.status === 403) {
+        router.push("/admin/login");
+        return;
+      }
 
       const json = await res.json().catch(() => ({}));
 
       if (!res.ok) {
         setErr(json?.error || `PATCH failed (${res.status})`);
-        // revert by re-fetching
         await fetchRows();
         return;
       }
@@ -124,6 +136,22 @@ export default function AdminConsultationsPage() {
       setErr(message);
       await fetchRows();
     }
+  }
+
+  if (loading && isAuthenticated === null) {
+    return (
+      <main className="min-h-screen bg-[#F5F1E8] flex items-center justify-center">
+        <div className="text-[#6A6256]">Checking authentication...</div>
+      </main>
+    );
+  }
+
+  if (isAuthenticated === false && !loading) {
+    return (
+      <main className="min-h-screen bg-[#F5F1E8] flex items-center justify-center">
+        <div className="text-[#6A6256]">Redirecting to login...</div>
+      </main>
+    );
   }
 
   return (
@@ -136,7 +164,7 @@ export default function AdminConsultationsPage() {
             </h1>
             <p className="text-sm text-[#6A6256] mt-2">
               Secure viewer for <code>consultation_requests</code>. Access is
-              protected by an HttpOnly session cookie (no token stored in the browser).
+              protected by an HttpOnly session cookie.
             </p>
 
             <div className="mt-3">
@@ -149,11 +177,10 @@ export default function AdminConsultationsPage() {
             </div>
           </div>
 
-          {/* ✅ Token box removed (login page sets HttpOnly cookie) */}
           <div className="w-full max-w-md rounded-2xl border border-[#E6DDCD] bg-white/60 p-4">
             <div className="text-sm font-medium">Session</div>
             <p className="text-xs text-[#6A6256] mt-1">
-              You’re authenticated via secure cookie. If you lose access, return to{" "}
+              You&apos;re authenticated via secure cookie. If you lose access, return to{" "}
               <Link href="/admin/login" className="underline hover:opacity-80">
                 /admin/login
               </Link>
@@ -302,7 +329,7 @@ export default function AdminConsultationsPage() {
               {!loading && filtered.length === 0 && (
                 <tr>
                   <td className="p-6 text-[#6A6256]" colSpan={6}>
-                    No rows yet. If you’re logged in, rows should load automatically.
+                    No rows yet. If you&apos;re logged in, rows should load automatically.
                     Otherwise go to <b>/admin/login</b>.
                   </td>
                 </tr>
@@ -312,7 +339,7 @@ export default function AdminConsultationsPage() {
         </div>
 
         <div className="mt-6 text-xs text-[#6A6256]">
-          Tip: This admin area is protected by a secure HttpOnly cookie. Don’t share your token.
+          Tip: This admin area is protected by a secure HttpOnly cookie. Don&apos;t share your token.
         </div>
       </div>
     </main>

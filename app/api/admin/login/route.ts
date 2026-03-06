@@ -1,33 +1,47 @@
+export const runtime = 'edge';
+
 import { NextResponse } from "next/server";
 
-export const runtime = "edge";
+// Admin token - change this to your desired password
+const ADMIN_TOKEN = "elite77737773";
 
-export async function POST(req: Request) {
-  const expected = (process.env.ADMIN_DASH_TOKEN ?? "").trim();
-  if (!expected) {
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const { token } = body;
+
+    if (!token) {
+      return NextResponse.json(
+        { error: "Token required" },
+        { status: 400 }
+      );
+    }
+
+    if (token !== ADMIN_TOKEN) {
+      return NextResponse.json(
+        { error: "Invalid token" },
+        { status: 401 }
+      );
+    }
+
+    const response = NextResponse.json(
+      { success: true },
+      { status: 200 }
+    );
+
+    response.cookies.set("FCH_ADMIN_AUTH", "1", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+
+    return response;
+  } catch {
     return NextResponse.json(
-      { error: "Server missing ADMIN_DASH_TOKEN." },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
-
-  const body = (await req.json().catch(() => null)) as { token?: string } | null;
-  const provided = (body?.token ?? "").trim();
-
-  if (!provided || provided !== expected) {
-    return NextResponse.json({ error: "Invalid token." }, { status: 401 });
-  }
-
-  const res = NextResponse.json({ ok: true });
-
-  // IMPORTANT: cookie stores only "1" (not the secret token)
-  res.cookies.set("FCH_ADMIN_TOKEN", "1", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "strict",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 14, // 14 days
-  });
-
-  return res;
 }
