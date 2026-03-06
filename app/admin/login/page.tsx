@@ -25,16 +25,13 @@ export default function AdminLoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        // Show full error with debug info
-        console.log('Login error:', data);
-        setError(JSON.stringify(data, null, 2));
+        setError(data?.error || "Invalid token");
         setLoading(false);
         return;
       }
 
-      // Cookie is set by server, now redirect to admin dashboard
       router.push("/admin");
-    } catch (err) {
+    } catch {
       setError("Failed to login. Please try again.");
     } finally {
       setLoading(false);
@@ -62,7 +59,7 @@ export default function AdminLoginPage() {
           </div>
 
           {error && (
-            <div className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-800 font-mono whitespace-pre-wrap max-h-60 overflow-y-auto">
+            <div className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-800">
               {error}
             </div>
           )}
