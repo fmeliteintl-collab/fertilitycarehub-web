@@ -9,6 +9,11 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { token } = body;
 
+    // Debug logging (remove after fixing)
+    console.log("Received token:", token);
+    console.log("Expected token:", ADMIN_TOKEN);
+    console.log("Match:", token === ADMIN_TOKEN);
+
     if (!token) {
       return NextResponse.json(
         { error: "Token required" },
@@ -23,7 +28,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Set FCH_ADMIN_AUTH cookie (matches your server-side page)
     const response = NextResponse.json(
       { success: true },
       { status: 200 }
@@ -34,7 +38,7 @@ export async function POST(request: Request) {
       secure: true,
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 7,
     });
 
     return response;
