@@ -1,33 +1,30 @@
-export const runtime = 'edge';
-
 import { NextResponse } from "next/server";
 
-// Admin token - change this to your desired password
-const ADMIN_TOKEN = "elite77737773";
+export const runtime = "edge";
+
+const ADMIN_TOKEN = process.env.ADMIN_DASH_TOKEN;
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { token } = body;
+    const body = (await request.json()) as { token?: string };
+    const token = body.token?.trim();
 
     if (!token) {
+      return NextResponse.json({ error: "Token required" }, { status: 400 });
+    }
+
+    if (!ADMIN_TOKEN) {
       return NextResponse.json(
-        { error: "Token required" },
-        { status: 400 }
+        { error: "ADMIN_DASH_TOKEN missing" },
+        { status: 500 }
       );
     }
 
-    if (token !== ADMIN_TOKEN) {
-      return NextResponse.json(
-        { error: "Invalid token" },
-        { status: 401 }
-      );
+    if (token !== ADMIN_TOKEN.trim()) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
-    const response = NextResponse.json(
-      { success: true },
-      { status: 200 }
-    );
+    const response = NextResponse.json({ success: true }, { status: 200 });
 
     response.cookies.set("FCH_ADMIN_AUTH", "1", {
       httpOnly: true,

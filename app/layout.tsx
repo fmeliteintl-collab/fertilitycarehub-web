@@ -59,20 +59,21 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_JSON_LD) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(ORG_JSON_LD),
+          }}
         />
       </head>
-
-      <body className="bg-[#F5F1E8] text-[#1A1A1A] font-serif">
-        <header className="w-full py-6 border-b border-[#E5DDC8]">
-          <div className="max-w-6xl mx-auto flex items-center justify-between px-6">
+      <body className="bg-[#F5F1E8] font-serif text-[#1A1A1A]">
+        <header className="w-full border-b border-[#E5DDC8] py-6">
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-6">
             <Link href="/" className="flex items-center gap-4">
               <span className="text-xl tracking-wide">FertilityCareHub</span>
             </Link>
 
             <Link
               href="/consultation#request"
-              className="border border-[#B89B5E] px-5 py-2 text-sm tracking-wide hover:bg-[#B89B5E] hover:text-white transition"
+              className="border border-[#B89B5E] px-5 py-2 text-sm tracking-wide transition hover:bg-[#B89B5E] hover:text-white"
             >
               Request Advisory Consultation
             </Link>
