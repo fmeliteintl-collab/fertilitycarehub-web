@@ -2,7 +2,11 @@
 
 import { useRouter } from "next/navigation";
 
-export default function PortalHeader() {
+type PortalHeaderProps = {
+  userLabel?: string;
+};
+
+export default function PortalHeader({ userLabel }: PortalHeaderProps) {
   const router = useRouter();
 
   async function handleLogout() {
@@ -16,9 +20,14 @@ export default function PortalHeader() {
 
   return (
     <header className="flex items-center justify-between border-b border-stone-200 bg-white px-6 py-4">
-      <h1 className="text-lg font-semibold text-stone-900">
-        FertilityCareHub Portal
-      </h1>
+      <div>
+        <h1 className="text-lg font-semibold text-stone-900">
+          FertilityCareHub Portal
+        </h1>
+        {userLabel ? (
+          <p className="mt-1 text-sm text-stone-500">{userLabel}</p>
+        ) : null}
+      </div>
 
       <button
         onClick={handleLogout}
