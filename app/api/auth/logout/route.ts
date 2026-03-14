@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 export const runtime = "edge";
 
 export async function POST() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -15,6 +15,8 @@ export async function POST() {
         get(name: string) {
           return cookieStore.get(name)?.value;
         },
+        set() {},
+        remove() {},
       },
     }
   );
