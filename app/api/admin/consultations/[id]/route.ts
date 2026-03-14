@@ -3,11 +3,20 @@ export const runtime = 'edge';
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-// REMOVE THIS LINE: const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+// Check if env vars exist before creating client
+if (!supabaseUrl || !supabaseKey) {
+  console.error('Missing Supabase environment variables:', {
+    url: !!supabaseUrl,
+    key: !!supabaseKey
+  });
+}
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  supabaseUrl || '',
+  supabaseKey || '',
   {
     auth: {
       autoRefreshToken: false,
@@ -21,6 +30,14 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Check if Supabase is properly configured
+    if (!supabaseUrl || !supabaseKey) {
+      return NextResponse.json(
+        { error: "Server configuration error: Missing Supabase credentials" },
+        { status: 500 }
+      );
+    }
+
     const cookieHeader = request.headers.get("cookie");
     const authed = cookieHeader
       ?.split(";")
