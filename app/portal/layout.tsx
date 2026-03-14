@@ -1,3 +1,4 @@
+export const runtime = "edge";
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/get-current-user";
