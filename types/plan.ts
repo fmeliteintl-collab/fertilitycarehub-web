@@ -8,6 +8,7 @@ export type UserPlan = {
   surrogate_needed: boolean;
   priorities: string[];
   constraints: string[];
+  shortlisted_countries: string[];
   target_timeline: string | null;
   budget_range: string | null;
   notes: string | null;
@@ -23,6 +24,7 @@ export type UserPlanInput = {
   surrogate_needed: boolean;
   priorities: string[];
   constraints: string[];
+  shortlisted_countries: string[];
   target_timeline: string | null;
   budget_range: string | null;
   notes: string | null;
@@ -36,6 +38,7 @@ export const EMPTY_USER_PLAN_INPUT: UserPlanInput = {
   surrogate_needed: false,
   priorities: [],
   constraints: [],
+  shortlisted_countries: [],
   target_timeline: null,
   budget_range: null,
   notes: null,

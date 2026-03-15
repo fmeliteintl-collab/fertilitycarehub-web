@@ -14,6 +14,8 @@ export default function MyPlanPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [isError, setIsError] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [hasLoadedInitialData, setHasLoadedInitialData] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -22,7 +24,9 @@ export default function MyPlanPage() {
       try {
         const existing = await getCurrentUserPlan();
 
-        if (!isMounted) return;
+        if (!isMounted) {
+          return;
+        }
 
         if (existing) {
           setPlan({
@@ -33,17 +37,16 @@ export default function MyPlanPage() {
             surrogate_needed: existing.surrogate_needed,
             priorities: existing.priorities ?? [],
             constraints: existing.constraints ?? [],
+            shortlisted_countries: existing.shortlisted_countries ?? [],
             target_timeline: existing.target_timeline,
             budget_range: existing.budget_range,
             notes: existing.notes,
           });
 
           setLastSavedAt(
-            "updated_at" in existing &&
-              typeof existing.updated_at === "string"
+            "updated_at" in existing && typeof existing.updated_at === "string"
               ? existing.updated_at
-              : "created_at" in existing &&
-                  typeof existing.created_at === "string"
+              : "created_at" in existing && typeof existing.created_at === "string"
                 ? existing.created_at
                 : null
           );
@@ -58,6 +61,7 @@ export default function MyPlanPage() {
       } finally {
         if (isMounted) {
           setLoading(false);
+          setHasLoadedInitialData(true);
         }
       }
     }
@@ -77,6 +81,12 @@ export default function MyPlanPage() {
       ...current,
       [field]: value,
     }));
+
+    if (hasLoadedInitialData) {
+      setHasUnsavedChanges(true);
+      setMessage(null);
+      setIsError(false);
+    }
   }
 
   async function handleSave() {
@@ -89,6 +99,7 @@ export default function MyPlanPage() {
 
       setMessage("Plan saved successfully.");
       setLastSavedAt(new Date().toISOString());
+      setHasUnsavedChanges(false);
     } catch (error: unknown) {
       console.error(error);
       setIsError(true);
@@ -122,6 +133,14 @@ export default function MyPlanPage() {
         ) : (
           <p className="mt-2 text-xs text-gray-500">No saved plan yet.</p>
         )}
+
+        <p
+          className={`mt-1 text-xs ${
+            hasUnsavedChanges ? "text-amber-600" : "text-gray-500"
+          }`}
+        >
+          {hasUnsavedChanges ? "Unsaved changes" : "All changes saved"}
+        </p>
       </div>
 
       <div className="space-y-5 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -270,10 +289,10 @@ export default function MyPlanPage() {
           <button
             type="button"
             onClick={handleSave}
-            disabled={saving}
+            disabled={saving || !hasUnsavedChanges}
             className="rounded-lg bg-black px-4 py-2 text-white transition disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {saving ? "Saving..." : "Save Plan"}
+            {saving ? "Saving..." : hasUnsavedChanges ? "Save Plan" : "Saved"}
           </button>
 
           {message ? (

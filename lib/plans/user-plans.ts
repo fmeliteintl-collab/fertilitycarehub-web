@@ -6,6 +6,9 @@ function normalizeUserPlan(row: UserPlan): UserPlan {
     ...row,
     priorities: Array.isArray(row.priorities) ? row.priorities : [],
     constraints: Array.isArray(row.constraints) ? row.constraints : [],
+    shortlisted_countries: Array.isArray(row.shortlisted_countries)
+      ? row.shortlisted_countries
+      : [],
   };
 }
 
@@ -65,6 +68,7 @@ export async function upsertCurrentUserPlan(
     surrogate_needed: input.surrogate_needed,
     priorities: input.priorities,
     constraints: input.constraints,
+    shortlisted_countries: input.shortlisted_countries,
     target_timeline: input.target_timeline,
     budget_range: input.budget_range,
     notes: input.notes,
