@@ -133,3 +133,43 @@ export async function deleteCurrentUserDocument(id: string): Promise<void> {
     throw error;
   }
 }
+
+export async function uploadCurrentUserDocument(file: File): Promise<{
+  filePath: string;
+  fileSize: number;
+  fileName: string;
+}> {
+  const supabase = getSupabaseBrowserClient();
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError) {
+    throw userError;
+  }
+
+  if (!user) {
+    throw new Error("User is not authenticated.");
+  }
+
+  const sanitizedFileName = file.name.replace(/\s+/g, "-");
+  const filePath = `${user.id}/${Date.now()}-${sanitizedFileName}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("documents")
+    .upload(filePath, file, {
+      upsert: false,
+    });
+
+  if (uploadError) {
+    throw uploadError;
+  }
+
+  return {
+    filePath,
+    fileSize: file.size,
+    fileName: file.name,
+  };
+}

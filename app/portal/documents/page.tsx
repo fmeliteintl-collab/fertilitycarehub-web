@@ -6,6 +6,7 @@ import {
   deleteCurrentUserDocument,
   getCurrentUserDocuments,
   updateCurrentUserDocument,
+  uploadCurrentUserDocument,
 } from "@/lib/documents/user-documents";
 import type {
   UserDocument,
@@ -29,6 +30,7 @@ const STATUS_OPTIONS: UserDocumentStatus[] = ["Uploaded", "Pending", "Draft"];
 export default function PortalDocumentsPage() {
   const [documents, setDocuments] = useState<UserDocument[]>([]);
   const [form, setForm] = useState<UserDocumentInput>(EMPTY_DOCUMENT_INPUT);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -86,7 +88,7 @@ export default function PortalDocumentsPage() {
     field: K,
     value: UserDocumentInput[K]
   ) {
-    setForm((current) => ({
+    setForm((current: UserDocumentInput) => ({
       ...current,
       [field]: value,
     }));
@@ -101,21 +103,48 @@ export default function PortalDocumentsPage() {
       setMessage(null);
       setIsError(false);
 
-      if (form.file_name.trim().length === 0) {
+      if (selectedFile === null && form.file_name.trim().length === 0) {
+        throw new Error("Document name is required.");
+      }
+
+      let finalFileName = form.file_name.trim();
+      let finalFilePath: string | null = form.file_path;
+      let finalFileSize: number | null = form.file_size;
+      let finalStatus: UserDocumentStatus = form.status;
+
+      if (selectedFile !== null) {
+        const uploadResult = await uploadCurrentUserDocument(selectedFile);
+
+        finalFileName = uploadResult.fileName;
+        finalFilePath = uploadResult.filePath;
+        finalFileSize = uploadResult.fileSize;
+        finalStatus = "Uploaded";
+      }
+
+      if (finalFileName.length === 0) {
         throw new Error("Document name is required.");
       }
 
       const created = await createCurrentUserDocument({
-        ...form,
-        file_name: form.file_name.trim(),
+        file_name: finalFileName,
         document_type:
-          form.document_type.trim().length > 0 ? form.document_type.trim() : "General",
+          form.document_type.trim().length > 0
+            ? form.document_type.trim()
+            : "General",
+        status: finalStatus,
         note: form.note?.trim() ? form.note.trim() : null,
+        file_path: finalFilePath,
+        file_size: finalFileSize,
       });
 
-      setDocuments((current) => [created, ...current]);
+      setDocuments((current: UserDocument[]) => [created, ...current]);
       setForm(EMPTY_DOCUMENT_INPUT);
-      setMessage("Document added successfully.");
+      setSelectedFile(null);
+      setMessage(
+        selectedFile !== null
+          ? "Document uploaded successfully."
+          : "Document entry added successfully."
+      );
     } catch (error: unknown) {
       console.error(error);
       setIsError(true);
@@ -134,7 +163,7 @@ export default function PortalDocumentsPage() {
 
       const updated = await updateCurrentUserDocument(id, { status });
 
-      setDocuments((current) =>
+      setDocuments((current: UserDocument[]) =>
         current.map((doc) => (doc.id === id ? updated : doc))
       );
 
@@ -153,7 +182,9 @@ export default function PortalDocumentsPage() {
 
       await deleteCurrentUserDocument(id);
 
-      setDocuments((current) => current.filter((doc) => doc.id !== id));
+      setDocuments((current: UserDocument[]) =>
+        current.filter((doc) => doc.id !== id)
+      );
       setMessage("Document removed successfully.");
     } catch (error: unknown) {
       console.error(error);
@@ -219,12 +250,39 @@ export default function PortalDocumentsPage() {
             Add Document Entry
           </h2>
           <p className="mt-1 text-sm text-stone-600">
-            For V1, add structured document records first. Direct file upload to
-            Supabase Storage comes next.
+            You can either upload a real file now or create a structured document
+            record first.
           </p>
         </div>
 
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
+          <div className="lg:col-span-2">
+            <label className="mb-1 block text-sm font-medium text-stone-700">
+              File Upload
+            </label>
+            <input
+              type="file"
+              className="w-full rounded-xl border border-stone-300 px-3 py-2 text-sm text-stone-900"
+              accept=".pdf,.jpg,.jpeg,.png,.webp"
+              onChange={(e) => {
+                const file = e.target.files?.[0] ?? null;
+                setSelectedFile(file);
+                setMessage(null);
+                setIsError(false);
+
+                if (file !== null) {
+                  setForm((current: UserDocumentInput) => ({
+                    ...current,
+                    file_name: file.name,
+                  }));
+                }
+              }}
+            />
+            <p className="mt-2 text-xs text-stone-500">
+              Allowed: PDF, JPG, PNG, WEBP
+            </p>
+          </div>
+
           <div>
             <label className="mb-1 block text-sm font-medium text-stone-700">
               Document Name
@@ -289,7 +347,11 @@ export default function PortalDocumentsPage() {
             disabled={saving}
             className="rounded-xl bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {saving ? "Saving..." : "Add Document"}
+            {saving
+              ? "Saving..."
+              : selectedFile !== null
+                ? "Upload Document"
+                : "Add Document"}
           </button>
 
           {message ? (
@@ -310,7 +372,7 @@ export default function PortalDocumentsPage() {
             Current Document List
           </h2>
           <p className="mt-1 text-sm text-stone-600">
-            These entries are now saved to your private document vault metadata layer.
+            These entries are now saved to your private document vault.
           </p>
         </div>
 
@@ -334,11 +396,20 @@ export default function PortalDocumentsPage() {
                       <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-700">
                         {document.document_type}
                       </span>
+                      <span className="rounded-full border border-stone-300 px-3 py-1 text-xs font-medium text-stone-700">
+                        {document.status}
+                      </span>
                     </div>
 
                     <p className="mt-3 max-w-3xl text-sm leading-6 text-stone-600">
                       {document.note ?? "No note added yet."}
                     </p>
+
+                    {document.file_path ? (
+                      <p className="mt-2 text-xs text-stone-500">
+                        Stored securely in document vault.
+                      </p>
+                    ) : null}
                   </div>
 
                   <div className="flex flex-wrap gap-3">
