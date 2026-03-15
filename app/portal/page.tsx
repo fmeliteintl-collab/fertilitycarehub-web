@@ -141,6 +141,43 @@ function calculateProgress(
   };
 }
 
+function buildOnboardingChecklist(
+  plan: Awaited<ReturnType<typeof getCurrentUserPlan>>,
+  documentCount: number
+) {
+  return [
+    {
+      label: "Complete My Plan",
+      done: Boolean(
+        plan?.pathway_type?.trim() ||
+          plan?.treatment_goal?.trim() ||
+          plan?.notes?.trim()
+      ),
+      href: "/portal/my-plan",
+    },
+    {
+      label: "Add shortlisted countries",
+      done: (plan?.shortlisted_countries ?? []).length > 0,
+      href: "/portal/countries",
+    },
+    {
+      label: "Generate or create timeline",
+      done: (plan?.timeline_items ?? []).length > 0,
+      href: "/portal/timeline",
+    },
+    {
+      label: "Add at least one document",
+      done: documentCount > 0,
+      href: "/portal/documents",
+    },
+    {
+      label: "Save advisory status",
+      done: Boolean(plan?.advisory_status?.trim()),
+      href: "/portal/advisory",
+    },
+  ];
+}
+
 export default async function PortalDashboardPage() {
   const [plan, documents] = await Promise.all([
     getCurrentUserPlan(),
@@ -166,8 +203,12 @@ export default async function PortalDashboardPage() {
     plan?.notes?.trim() ||
     "No planning notes saved yet. Add your priorities and case context in My Plan.";
   const nextAction = getNextAction(plan);
-
   const progress = calculateProgress(plan, documentCount);
+  const onboardingChecklist = buildOnboardingChecklist(plan, documentCount);
+
+  const completedChecklistCount = onboardingChecklist.filter(
+    (item) => item.done
+  ).length;
 
   const quickStats = [
     {
@@ -266,6 +307,58 @@ export default async function PortalDashboardPage() {
                 : "No major gaps detected in the core workflow."}
             </p>
           </div>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
+              First-Run Guidance
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold text-stone-900">
+              Onboarding Checklist
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-stone-600">
+              Complete the core setup steps to turn this workspace into a fully
+              functioning planning environment.
+            </p>
+          </div>
+
+          <div className="text-sm text-stone-600">
+            {completedChecklistCount} of {onboardingChecklist.length} completed
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-4">
+          {onboardingChecklist.map((item) => (
+            <div
+              key={item.label}
+              className="flex flex-col gap-3 rounded-xl border border-stone-200 p-4 lg:flex-row lg:items-center lg:justify-between"
+            >
+              <div className="flex items-center gap-3">
+                <span
+                  className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${
+                    item.done
+                      ? "bg-stone-900 text-white"
+                      : "border border-stone-300 bg-white text-stone-700"
+                  }`}
+                >
+                  {item.done ? "✓" : ""}
+                </span>
+                <p className="text-sm font-medium text-stone-900">
+                  {item.label}
+                </p>
+              </div>
+
+              <Link
+                href={item.href}
+                className="inline-flex rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
+              >
+                {item.done ? "Review" : "Complete"}
+              </Link>
+            </div>
+          ))}
         </div>
       </section>
 
