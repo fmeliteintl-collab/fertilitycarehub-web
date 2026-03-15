@@ -173,3 +173,23 @@ export async function uploadCurrentUserDocument(file: File): Promise<{
     fileName: file.name,
   };
 }
+
+export async function getCurrentUserDocumentSignedUrl(
+  filePath: string
+): Promise<string> {
+  const supabase = getSupabaseBrowserClient();
+
+  const { data, error } = await supabase.storage
+    .from("documents")
+    .createSignedUrl(filePath, 60 * 10);
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data?.signedUrl) {
+    throw new Error("Failed to generate secure file link.");
+  }
+
+  return data.signedUrl;
+}
