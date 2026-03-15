@@ -22,7 +22,7 @@ export default function SignupPage() {
       setMessage(null);
       setSuccess(false);
 
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
         options: {
@@ -36,27 +36,10 @@ export default function SignupPage() {
         throw error;
       }
 
-      const userId = data.user?.id;
-
-      if (userId) {
-        const { error: profileError } = await supabase
-          .from("profiles")
-          .upsert({
-            id: userId,
-            email: email.trim(),
-            full_name: fullName.trim(),
-          });
-
-        if (profileError) {
-          throw profileError;
-        }
-      }
-
       setSuccess(true);
       setMessage(
         "Account created. Check your email for confirmation if email verification is enabled."
       );
-
       setFullName("");
       setEmail("");
       setPassword("");
@@ -77,9 +60,7 @@ export default function SignupPage() {
           FertilityCareHub
         </p>
 
-        <h1 className="mt-3 text-2xl font-semibold text-stone-900">
-          Sign Up
-        </h1>
+        <h1 className="mt-3 text-2xl font-semibold text-stone-900">Sign Up</h1>
 
         <p className="mt-2 text-sm leading-6 text-stone-600">
           Create your account to access your private fertility planning
@@ -154,7 +135,7 @@ export default function SignupPage() {
           </button>
         </form>
 
-        {message && (
+        {message ? (
           <p
             className={`mt-4 text-sm ${
               success ? "text-green-700" : "text-red-600"
@@ -162,7 +143,7 @@ export default function SignupPage() {
           >
             {message}
           </p>
-        )}
+        ) : null}
 
         <p className="mt-6 text-sm text-stone-600">
           Already have an account?{" "}
