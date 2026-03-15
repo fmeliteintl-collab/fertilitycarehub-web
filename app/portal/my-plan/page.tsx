@@ -13,6 +13,7 @@ export default function MyPlanPage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [isError, setIsError] = useState(false);
+  const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -36,6 +37,16 @@ export default function MyPlanPage() {
             budget_range: existing.budget_range,
             notes: existing.notes,
           });
+
+          setLastSavedAt(
+            "updated_at" in existing &&
+              typeof existing.updated_at === "string"
+              ? existing.updated_at
+              : "created_at" in existing &&
+                  typeof existing.created_at === "string"
+                ? existing.created_at
+                : null
+          );
         }
       } catch (error: unknown) {
         console.error(error);
@@ -45,7 +56,9 @@ export default function MyPlanPage() {
           setMessage("Failed to load your plan.");
         }
       } finally {
-        if (isMounted) setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
 
@@ -75,6 +88,7 @@ export default function MyPlanPage() {
       await upsertCurrentUserPlan(plan);
 
       setMessage("Plan saved successfully.");
+      setLastSavedAt(new Date().toISOString());
     } catch (error: unknown) {
       console.error(error);
       setIsError(true);
@@ -84,6 +98,9 @@ export default function MyPlanPage() {
     }
   }
 
+  const formattedLastSaved =
+    lastSavedAt !== null ? new Date(lastSavedAt).toLocaleString() : null;
+
   if (loading) {
     return <div className="p-6">Loading your plan...</div>;
   }
@@ -92,14 +109,22 @@ export default function MyPlanPage() {
     <div className="max-w-3xl space-y-6 p-6">
       <div>
         <h1 className="text-2xl font-semibold">My Fertility Plan</h1>
+
         <p className="mt-2 text-sm text-gray-600">
           Save your pathway details, priorities, timeline, and notes so your
           plan is available when you return.
         </p>
+
+        {formattedLastSaved ? (
+          <p className="mt-2 text-xs text-gray-500">
+            Last saved: {formattedLastSaved}
+          </p>
+        ) : (
+          <p className="mt-2 text-xs text-gray-500">No saved plan yet.</p>
+        )}
       </div>
 
       <div className="space-y-5 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-        {/* Pathway Type */}
         <div>
           <label className="mb-1 block text-sm font-medium">Pathway Type</label>
           <input
@@ -110,7 +135,6 @@ export default function MyPlanPage() {
           />
         </div>
 
-        {/* Family Structure */}
         <div>
           <label className="mb-1 block text-sm font-medium">
             Family Structure
@@ -125,7 +149,6 @@ export default function MyPlanPage() {
           />
         </div>
 
-        {/* Treatment Goal */}
         <div>
           <label className="mb-1 block text-sm font-medium">
             Treatment Goal
@@ -138,7 +161,6 @@ export default function MyPlanPage() {
           />
         </div>
 
-        {/* Donor Needed */}
         <div>
           <label className="mb-1 block text-sm font-medium">
             Donor Needed
@@ -155,7 +177,6 @@ export default function MyPlanPage() {
           </select>
         </div>
 
-        {/* Surrogate Needed */}
         <div>
           <label className="mb-1 block text-sm font-medium">
             Surrogate Needed
@@ -172,7 +193,6 @@ export default function MyPlanPage() {
           </select>
         </div>
 
-        {/* Priorities */}
         <div>
           <label className="mb-1 block text-sm font-medium">Priorities</label>
           <textarea
@@ -182,14 +202,16 @@ export default function MyPlanPage() {
             onChange={(e) =>
               updatePlanField(
                 "priorities",
-                e.target.value.split(",").map((p) => p.trim())
+                e.target.value
+                  .split(",")
+                  .map((p) => p.trim())
+                  .filter(Boolean)
               )
             }
             placeholder="cost, success rates, legal clarity, donor access"
           />
         </div>
 
-        {/* Constraints */}
         <div>
           <label className="mb-1 block text-sm font-medium">Constraints</label>
           <textarea
@@ -199,14 +221,16 @@ export default function MyPlanPage() {
             onChange={(e) =>
               updatePlanField(
                 "constraints",
-                e.target.value.split(",").map((p) => p.trim())
+                e.target.value
+                  .split(",")
+                  .map((p) => p.trim())
+                  .filter(Boolean)
               )
             }
             placeholder="budget, travel limitations, documentation"
           />
         </div>
 
-        {/* Timeline */}
         <div>
           <label className="mb-1 block text-sm font-medium">
             Target Timeline
@@ -219,7 +243,6 @@ export default function MyPlanPage() {
           />
         </div>
 
-        {/* Budget */}
         <div>
           <label className="mb-1 block text-sm font-medium">
             Budget Range
@@ -232,7 +255,6 @@ export default function MyPlanPage() {
           />
         </div>
 
-        {/* Notes */}
         <div>
           <label className="mb-1 block text-sm font-medium">Notes</label>
           <textarea
@@ -249,12 +271,12 @@ export default function MyPlanPage() {
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="rounded-lg bg-black px-4 py-2 text-white disabled:opacity-60"
+            className="rounded-lg bg-black px-4 py-2 text-white transition disabled:cursor-not-allowed disabled:opacity-60"
           >
             {saving ? "Saving..." : "Save Plan"}
           </button>
 
-          {message && (
+          {message ? (
             <p
               className={`text-sm ${
                 isError ? "text-red-600" : "text-green-700"
@@ -262,7 +284,7 @@ export default function MyPlanPage() {
             >
               {message}
             </p>
-          )}
+          ) : null}
         </div>
       </div>
     </div>
