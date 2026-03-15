@@ -1,5 +1,39 @@
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
-import type { UserPlan, UserPlanInput } from "@/types/plan";
+import type { TimelineItem, UserPlan, UserPlanInput } from "@/types/plan";
+
+function normalizeTimelineItems(value: unknown): TimelineItem[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .filter((item): item is Record<string, unknown> => {
+      return typeof item === "object" && item !== null;
+    })
+    .map((item, index): TimelineItem => {
+      let status: TimelineItem["status"] = "Upcoming";
+
+      if (
+        item.status === "Completed" ||
+        item.status === "In Progress" ||
+        item.status === "Upcoming"
+      ) {
+        status = item.status;
+      }
+
+      return {
+        id:
+          typeof item.id === "string" && item.id.length > 0
+            ? item.id
+            : `timeline-${index + 1}`,
+        title: typeof item.title === "string" ? item.title : "",
+        category: typeof item.category === "string" ? item.category : "Planning",
+        status,
+        description: typeof item.description === "string" ? item.description : "",
+      };
+    })
+    .filter((item) => item.title.length > 0);
+}
 
 function normalizeUserPlan(row: UserPlan): UserPlan {
   return {
@@ -9,6 +43,7 @@ function normalizeUserPlan(row: UserPlan): UserPlan {
     shortlisted_countries: Array.isArray(row.shortlisted_countries)
       ? row.shortlisted_countries
       : [],
+    timeline_items: normalizeTimelineItems(row.timeline_items),
   };
 }
 
@@ -69,6 +104,7 @@ export async function upsertCurrentUserPlan(
     priorities: input.priorities,
     constraints: input.constraints,
     shortlisted_countries: input.shortlisted_countries,
+    timeline_items: input.timeline_items,
     target_timeline: input.target_timeline,
     budget_range: input.budget_range,
     notes: input.notes,

@@ -127,18 +127,19 @@ export default function PortalCountriesPage() {
 
         if (existing) {
           setPlan({
-            pathway_type: existing.pathway_type,
-            family_structure: existing.family_structure,
-            treatment_goal: existing.treatment_goal,
-            donor_needed: existing.donor_needed,
-            surrogate_needed: existing.surrogate_needed,
-            priorities: existing.priorities ?? [],
-            constraints: existing.constraints ?? [],
-            shortlisted_countries: existing.shortlisted_countries ?? [],
-            target_timeline: existing.target_timeline,
-            budget_range: existing.budget_range,
-            notes: existing.notes,
-          });
+  pathway_type: existing.pathway_type,
+  family_structure: existing.family_structure,
+  treatment_goal: existing.treatment_goal,
+  donor_needed: existing.donor_needed,
+  surrogate_needed: existing.surrogate_needed,
+  priorities: existing.priorities ?? [],
+  constraints: existing.constraints ?? [],
+  shortlisted_countries: existing.shortlisted_countries ?? [],
+  timeline_items: existing.timeline_items ?? [],
+  target_timeline: existing.target_timeline,
+  budget_range: existing.budget_range,
+  notes: existing.notes,
+});
         }
       } catch (error: unknown) {
         console.error(error);
