@@ -31,14 +31,17 @@ export default async function PortalLayout({
   const userLabel = fullName || user.email || "Account";
 
   return (
-    <div className="flex min-h-screen bg-stone-50">
-      <div className="hidden w-72 lg:block">
+    <div className="min-h-screen bg-stone-50 lg:flex">
+      <div className="hidden lg:block lg:w-72 lg:shrink-0">
         <PortalSidebar />
       </div>
 
-      <div className="flex flex-1 flex-col">
+      <div className="flex min-h-screen flex-1 flex-col">
         <PortalTopBar userLabel={userLabel} />
-        <main className="flex-1 px-6 py-8 sm:px-10 lg:px-12">{children}</main>
+
+        <main className="flex-1 px-4 py-5 sm:px-6 sm:py-6 md:px-8 lg:px-10 lg:py-8 xl:px-12">
+          <div className="mx-auto w-full max-w-7xl">{children}</div>
+        </main>
       </div>
     </div>
   );
