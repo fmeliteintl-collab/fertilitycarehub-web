@@ -55,6 +55,114 @@ const STATUS_OPTIONS: TimelineItemStatus[] = [
   "Upcoming",
 ];
 
+function createGeneratedTimeline(plan: UserPlanInput): TimelineItem[] {
+  const items: TimelineItem[] = [];
+  let index = 1;
+
+  const addItem = (
+    title: string,
+    category: string,
+    description: string,
+    status: TimelineItemStatus = "Upcoming"
+  ) => {
+    items.push({
+      id: `timeline-generated-${index}`,
+      title,
+      category,
+      status,
+      description,
+    });
+    index += 1;
+  };
+
+  addItem(
+    "Clarify pathway direction",
+    "Planning",
+    `Confirm the core pathway (${plan.pathway_type?.trim() || "not yet specified"}) and align it with your fertility planning goals.`,
+    "In Progress"
+  );
+
+  addItem(
+    "Define shortlist criteria",
+    "Planning",
+    "Set the key filters for jurisdiction selection, including legal fit, medical structure, timing, budget, and logistics."
+  );
+
+  if ((plan.shortlisted_countries ?? []).length > 0) {
+    addItem(
+      "Review shortlisted countries",
+      "Research",
+      `Compare the currently shortlisted jurisdictions: ${plan.shortlisted_countries.join(
+        ", "
+      )}.`
+    );
+  } else {
+    addItem(
+      "Build first shortlist",
+      "Research",
+      "Identify the first set of countries worth comparing based on treatment fit, legal structure, and travel practicality."
+    );
+  }
+
+  if (plan.donor_needed) {
+    addItem(
+      "Confirm donor pathway requirements",
+      "Research",
+      "Review donor eligibility, jurisdiction compatibility, and donor-related treatment constraints."
+    );
+  }
+
+  if (plan.surrogate_needed) {
+    addItem(
+      "Assess surrogacy pathway structure",
+      "Legal",
+      "Review surrogacy legality, process structure, and cross-border execution requirements."
+    );
+  }
+
+  addItem(
+    "Gather medical records and case summary",
+    "Documents",
+    "Prepare the core medical summary, treatment history, and supporting records needed for planning and advisory review."
+  );
+
+  addItem(
+    "Prepare advisory questions",
+    "Advisory",
+    "Organize the main legal, medical, logistical, and budget questions to bring into an advisory review."
+  );
+
+  if (plan.target_timeline?.trim()) {
+    addItem(
+      "Validate target timeline",
+      "Timeline",
+      `Check whether your desired timeline (${plan.target_timeline}) is realistic given planning, travel, and treatment requirements.`
+    );
+  } else {
+    addItem(
+      "Set practical target timing",
+      "Timeline",
+      "Define a realistic planning window for research, advisory, logistics, and treatment execution."
+    );
+  }
+
+  if (plan.budget_range?.trim()) {
+    addItem(
+      "Pressure-test budget assumptions",
+      "Finance",
+      `Review whether your stated budget range (${plan.budget_range}) supports the pathway, jurisdictions, and planning complexity involved.`
+    );
+  }
+
+  addItem(
+    "Finalize next execution step",
+    "Execution",
+    "Move from planning into action by choosing the highest-priority next step: shortlist refinement, advisory booking, or document preparation."
+  );
+
+  return items;
+}
+
 export default function PortalTimelinePage() {
   const [plan, setPlan] = useState<UserPlanInput>(EMPTY_USER_PLAN_INPUT);
   const [loading, setLoading] = useState(true);
@@ -91,9 +199,9 @@ export default function PortalTimelinePage() {
             budget_range: existing.budget_range,
             notes: existing.notes,
             advisory_status: existing.advisory_status ?? null,
-advisory_pathway: existing.advisory_pathway ?? null,
-advisory_notes: existing.advisory_notes ?? null,
-advisory_next_step: existing.advisory_next_step ?? null,
+            advisory_pathway: existing.advisory_pathway ?? null,
+            advisory_notes: existing.advisory_notes ?? null,
+            advisory_next_step: existing.advisory_next_step ?? null,
           });
         } else {
           setPlan((current) => ({
@@ -184,8 +292,24 @@ advisory_next_step: existing.advisory_next_step ?? null,
 
     setPlan((current) => ({
       ...current,
-      timeline_items: current.timeline_items.filter((item) => item.id !== itemId),
+      timeline_items: current.timeline_items.filter(
+        (item) => item.id !== itemId
+      ),
     }));
+  }
+
+  function handleGenerateTimeline() {
+    setMessage(null);
+    setIsError(false);
+
+    const generatedTimeline = createGeneratedTimeline(plan);
+
+    setPlan((current) => ({
+      ...current,
+      timeline_items: generatedTimeline,
+    }));
+
+    setMessage("Suggested timeline generated. Review and save it.");
   }
 
   async function handleSaveTimeline() {
@@ -265,18 +389,28 @@ advisory_next_step: existing.advisory_next_step ?? null,
               Manage Timeline
             </h2>
             <p className="mt-1 text-sm text-stone-600">
-              Update statuses, edit descriptions, add steps, and save your
-              personal planning timeline.
+              Update statuses, edit descriptions, add steps, or generate a
+              suggested timeline from your saved planning profile.
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={addTimelineItem}
-            className="rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
-          >
-            Add Step
-          </button>
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={handleGenerateTimeline}
+              className="rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
+            >
+              Generate Suggested Timeline
+            </button>
+
+            <button
+              type="button"
+              onClick={addTimelineItem}
+              className="rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
+            >
+              Add Step
+            </button>
+          </div>
         </div>
 
         <div className="mt-6 flex items-center gap-3">
