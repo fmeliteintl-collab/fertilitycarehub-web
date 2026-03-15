@@ -85,6 +85,62 @@ function getNextAction(plan: Awaited<ReturnType<typeof getCurrentUserPlan>>) {
   };
 }
 
+function calculateProgress(
+  plan: Awaited<ReturnType<typeof getCurrentUserPlan>>,
+  documentCount: number
+) {
+  let score = 0;
+  const completed: string[] = [];
+  const remaining: string[] = [];
+
+  const hasMyPlanBasics = Boolean(
+    plan?.pathway_type?.trim() ||
+      plan?.treatment_goal?.trim() ||
+      plan?.notes?.trim()
+  );
+
+  if (hasMyPlanBasics) {
+    score += 25;
+    completed.push("My Plan started");
+  } else {
+    remaining.push("Complete My Plan");
+  }
+
+  if ((plan?.shortlisted_countries ?? []).length > 0) {
+    score += 20;
+    completed.push("Countries shortlisted");
+  } else {
+    remaining.push("Add shortlisted countries");
+  }
+
+  if ((plan?.timeline_items ?? []).length > 0) {
+    score += 20;
+    completed.push("Timeline created");
+  } else {
+    remaining.push("Create timeline");
+  }
+
+  if (documentCount > 0) {
+    score += 20;
+    completed.push("Documents added");
+  } else {
+    remaining.push("Add documents");
+  }
+
+  if (plan?.advisory_status?.trim()) {
+    score += 15;
+    completed.push("Advisory status saved");
+  } else {
+    remaining.push("Set advisory status");
+  }
+
+  return {
+    score,
+    completed,
+    remaining,
+  };
+}
+
 export default async function PortalDashboardPage() {
   const [plan, documents] = await Promise.all([
     getCurrentUserPlan(),
@@ -110,6 +166,8 @@ export default async function PortalDashboardPage() {
     plan?.notes?.trim() ||
     "No planning notes saved yet. Add your priorities and case context in My Plan.";
   const nextAction = getNextAction(plan);
+
+  const progress = calculateProgress(plan, documentCount);
 
   const quickStats = [
     {
@@ -155,6 +213,60 @@ export default async function PortalDashboardPage() {
             </p>
           </div>
         ))}
+      </section>
+
+      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
+              Planning Progress
+            </p>
+            <h2 className="mt-2 text-3xl font-semibold text-stone-900">
+              {progress.score}%
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-stone-600">
+              Your workspace completion score based on planning data already
+              saved across the portal.
+            </p>
+          </div>
+
+          <div className="max-w-xl text-sm text-stone-600">
+            {progress.remaining.length > 0
+              ? `Still to complete: ${progress.remaining.join(", ")}.`
+              : "Your core planning workspace is fully established."}
+          </div>
+        </div>
+
+        <div className="mt-5 h-3 w-full overflow-hidden rounded-full bg-stone-200">
+          <div
+            className="h-full rounded-full bg-stone-900 transition-all"
+            style={{ width: `${progress.score}%` }}
+          />
+        </div>
+
+        <div className="mt-5 grid gap-4 lg:grid-cols-2">
+          <div className="rounded-xl bg-stone-50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+              Completed
+            </p>
+            <p className="mt-2 text-sm leading-6 text-stone-700">
+              {progress.completed.length > 0
+                ? progress.completed.join(", ")
+                : "Nothing completed yet."}
+            </p>
+          </div>
+
+          <div className="rounded-xl bg-stone-50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+              Missing
+            </p>
+            <p className="mt-2 text-sm leading-6 text-stone-700">
+              {progress.remaining.length > 0
+                ? progress.remaining.join(", ")
+                : "No major gaps detected in the core workflow."}
+            </p>
+          </div>
+        </div>
       </section>
 
       <section className="grid gap-6 lg:grid-cols-3">
