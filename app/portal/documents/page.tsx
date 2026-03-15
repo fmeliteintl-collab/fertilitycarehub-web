@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   createCurrentUserDocument,
   deleteCurrentUserDocument,
+  getCurrentUserDocumentSignedUrl,
   getCurrentUserDocuments,
   updateCurrentUserDocument,
   uploadCurrentUserDocument,
@@ -190,6 +191,29 @@ export default function PortalDocumentsPage() {
       console.error(error);
       setIsError(true);
       setMessage("Failed to remove document.");
+    }
+  }
+
+  async function handleViewFile(filePath: string | null) {
+    try {
+      setMessage(null);
+      setIsError(false);
+
+      if (!filePath) {
+        throw new Error("This document does not have an uploaded file yet.");
+      }
+
+      const signedUrl = await getCurrentUserDocumentSignedUrl(filePath);
+
+      window.open(signedUrl, "_blank", "noopener,noreferrer");
+    } catch (error: unknown) {
+      console.error(error);
+      setIsError(true);
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Failed to open the secure file link."
+      );
     }
   }
 
@@ -413,6 +437,16 @@ export default function PortalDocumentsPage() {
                   </div>
 
                   <div className="flex flex-wrap gap-3">
+                    {document.file_path ? (
+                      <button
+                        type="button"
+                        onClick={() => handleViewFile(document.file_path)}
+                        className="rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
+                      >
+                        View File
+                      </button>
+                    ) : null}
+
                     <select
                       className="rounded-xl border border-stone-300 px-3 py-2 text-sm text-stone-700"
                       value={document.status}
