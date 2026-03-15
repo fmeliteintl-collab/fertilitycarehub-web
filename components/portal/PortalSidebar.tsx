@@ -9,6 +9,10 @@ type PortalNavItem = {
   shortLabel: string;
 };
 
+type PortalSidebarProps = {
+  onNavigate?: () => void;
+};
+
 const NAV_ITEMS: PortalNavItem[] = [
   { href: "/portal", label: "Dashboard", shortLabel: "Home" },
   { href: "/portal/my-plan", label: "My Plan", shortLabel: "Plan" },
@@ -27,13 +31,13 @@ function isActivePath(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export default function PortalSidebar() {
+export default function PortalSidebar({ onNavigate }: PortalSidebarProps) {
   const pathname = usePathname();
 
   return (
     <aside className="flex h-full w-full flex-col border-r border-stone-200 bg-white">
       <div className="border-b border-stone-200 px-6 py-6">
-        <Link href="/portal" className="block">
+        <Link href="/portal" className="block" onClick={onNavigate}>
           <div className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">
             FertilityCareHub
           </div>
@@ -61,6 +65,7 @@ export default function PortalSidebar() {
               <li key={item.href}>
                 <Link
                   href={item.href}
+                  onClick={onNavigate}
                   aria-current={isActive ? "page" : undefined}
                   className={[
                     "group flex items-center justify-between rounded-xl px-4 py-3 text-sm font-medium transition-all",
