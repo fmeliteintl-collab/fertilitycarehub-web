@@ -28,6 +28,28 @@ const EMPTY_DOCUMENT_INPUT: UserDocumentInput = {
 
 const STATUS_OPTIONS: UserDocumentStatus[] = ["Uploaded", "Pending", "Draft"];
 
+function formatFileSize(fileSize: number | null): string {
+  if (fileSize === null || Number.isNaN(fileSize)) {
+    return "Unknown size";
+  }
+
+  if (fileSize < 1024) {
+    return `${fileSize} B`;
+  }
+
+  const kb = fileSize / 1024;
+  if (kb < 1024) {
+    return `${kb.toFixed(1)} KB`;
+  }
+
+  const mb = kb / 1024;
+  return `${mb.toFixed(1)} MB`;
+}
+
+function formatDate(value: string): string {
+  return new Date(value).toLocaleString();
+}
+
 export default function PortalDocumentsPage() {
   const [documents, setDocuments] = useState<UserDocument[]>([]);
   const [form, setForm] = useState<UserDocumentInput>(EMPTY_DOCUMENT_INPUT);
@@ -423,11 +445,19 @@ export default function PortalDocumentsPage() {
                       <span className="rounded-full border border-stone-300 px-3 py-1 text-xs font-medium text-stone-700">
                         {document.status}
                       </span>
+                      <span className="rounded-full border border-stone-300 px-3 py-1 text-xs font-medium text-stone-700">
+                        {document.file_path ? "Uploaded file" : "Metadata only"}
+                      </span>
                     </div>
 
                     <p className="mt-3 max-w-3xl text-sm leading-6 text-stone-600">
                       {document.note ?? "No note added yet."}
                     </p>
+
+                    <div className="mt-3 flex flex-wrap gap-4 text-xs text-stone-500">
+                      <span>Added: {formatDate(document.created_at)}</span>
+                      <span>Size: {formatFileSize(document.file_size)}</span>
+                    </div>
 
                     {document.file_path ? (
                       <p className="mt-2 text-xs text-stone-500">
