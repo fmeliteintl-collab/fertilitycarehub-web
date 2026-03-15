@@ -44,6 +44,14 @@ function normalizeUserPlan(row: UserPlan): UserPlan {
       ? row.shortlisted_countries
       : [],
     timeline_items: normalizeTimelineItems(row.timeline_items),
+    advisory_status:
+      typeof row.advisory_status === "string" ? row.advisory_status : null,
+    advisory_pathway:
+      typeof row.advisory_pathway === "string" ? row.advisory_pathway : null,
+    advisory_notes:
+      typeof row.advisory_notes === "string" ? row.advisory_notes : null,
+    advisory_next_step:
+      typeof row.advisory_next_step === "string" ? row.advisory_next_step : null,
   };
 }
 
@@ -105,6 +113,10 @@ export async function upsertCurrentUserPlan(
     constraints: input.constraints,
     shortlisted_countries: input.shortlisted_countries,
     timeline_items: input.timeline_items,
+    advisory_status: input.advisory_status,
+    advisory_pathway: input.advisory_pathway,
+    advisory_notes: input.advisory_notes,
+    advisory_next_step: input.advisory_next_step,
     target_timeline: input.target_timeline,
     budget_range: input.budget_range,
     notes: input.notes,

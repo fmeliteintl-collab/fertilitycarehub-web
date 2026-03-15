@@ -20,6 +20,10 @@ export type UserPlan = {
   constraints: string[];
   shortlisted_countries: string[];
   timeline_items: TimelineItem[];
+  advisory_status: string | null;
+  advisory_pathway: string | null;
+  advisory_notes: string | null;
+  advisory_next_step: string | null;
   target_timeline: string | null;
   budget_range: string | null;
   notes: string | null;
@@ -37,6 +41,10 @@ export type UserPlanInput = {
   constraints: string[];
   shortlisted_countries: string[];
   timeline_items: TimelineItem[];
+  advisory_status: string | null;
+  advisory_pathway: string | null;
+  advisory_notes: string | null;
+  advisory_next_step: string | null;
   target_timeline: string | null;
   budget_range: string | null;
   notes: string | null;
@@ -52,6 +60,10 @@ export const EMPTY_USER_PLAN_INPUT: UserPlanInput = {
   constraints: [],
   shortlisted_countries: [],
   timeline_items: [],
+  advisory_status: null,
+  advisory_pathway: null,
+  advisory_notes: null,
+  advisory_next_step: null,
   target_timeline: null,
   budget_range: null,
   notes: null,

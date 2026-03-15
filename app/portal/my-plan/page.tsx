@@ -42,6 +42,10 @@ export default function MyPlanPage() {
   target_timeline: existing.target_timeline,
   budget_range: existing.budget_range,
   notes: existing.notes,
+  advisory_status: existing.advisory_status ?? null,
+advisory_pathway: existing.advisory_pathway ?? null,
+advisory_notes: existing.advisory_notes ?? null,
+advisory_next_step: existing.advisory_next_step ?? null,
 });
 
           setLastSavedAt(
