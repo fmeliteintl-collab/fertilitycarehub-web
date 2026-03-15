@@ -239,6 +239,34 @@ export default function PortalDocumentsPage() {
     }
   }
 
+  async function handleDownloadFile(filePath: string | null) {
+    try {
+      setMessage(null);
+      setIsError(false);
+
+      if (!filePath) {
+        throw new Error("No file available for download.");
+      }
+
+      const signedUrl = await getCurrentUserDocumentSignedUrl(filePath);
+
+      const link = document.createElement("a");
+      link.href = signedUrl;
+      link.download = "";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error: unknown) {
+      console.error(error);
+      setIsError(true);
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Failed to download the file."
+      );
+    }
+  }
+
   if (loading) {
     return <div className="p-6">Loading your document vault...</div>;
   }
@@ -468,13 +496,23 @@ export default function PortalDocumentsPage() {
 
                   <div className="flex flex-wrap gap-3">
                     {document.file_path ? (
-                      <button
-                        type="button"
-                        onClick={() => handleViewFile(document.file_path)}
-                        className="rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
-                      >
-                        View File
-                      </button>
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => handleViewFile(document.file_path)}
+                          className="rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
+                        >
+                          View File
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDownloadFile(document.file_path)}
+                          className="rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
+                        >
+                          Download
+                        </button>
+                      </>
                     ) : null}
 
                     <select
