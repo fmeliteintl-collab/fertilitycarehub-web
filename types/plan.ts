@@ -1,3 +1,13 @@
+export type TimelineItemStatus = "Completed" | "In Progress" | "Upcoming";
+
+export type TimelineItem = {
+  id: string;
+  title: string;
+  category: string;
+  status: TimelineItemStatus;
+  description: string;
+};
+
 export type UserPlan = {
   id: string;
   user_id: string;
@@ -9,6 +19,7 @@ export type UserPlan = {
   priorities: string[];
   constraints: string[];
   shortlisted_countries: string[];
+  timeline_items: TimelineItem[];
   target_timeline: string | null;
   budget_range: string | null;
   notes: string | null;
@@ -25,6 +36,7 @@ export type UserPlanInput = {
   priorities: string[];
   constraints: string[];
   shortlisted_countries: string[];
+  timeline_items: TimelineItem[];
   target_timeline: string | null;
   budget_range: string | null;
   notes: string | null;
@@ -39,6 +51,7 @@ export const EMPTY_USER_PLAN_INPUT: UserPlanInput = {
   priorities: [],
   constraints: [],
   shortlisted_countries: [],
+  timeline_items: [],
   target_timeline: null,
   budget_range: null,
   notes: null,
