@@ -64,6 +64,12 @@ export default function PortalDocumentsPage() {
 
     async function loadDocuments() {
       try {
+        if (isMounted) {
+          setLoading(true);
+          setMessage(null);
+          setIsError(false);
+        }
+
         const rows = await getCurrentUserDocuments();
 
         if (!isMounted) {
@@ -71,10 +77,13 @@ export default function PortalDocumentsPage() {
         }
 
         setDocuments(rows);
+        setMessage(null);
+        setIsError(false);
       } catch (error: unknown) {
         console.error(error);
 
         if (isMounted) {
+          setDocuments([]);
           setIsError(true);
           setMessage("Failed to load your documents.");
         }
@@ -168,6 +177,7 @@ export default function PortalDocumentsPage() {
           ? "Document uploaded successfully."
           : "Document entry added successfully."
       );
+      setIsError(false);
     } catch (error: unknown) {
       console.error(error);
       setIsError(true);
@@ -191,6 +201,7 @@ export default function PortalDocumentsPage() {
       );
 
       setMessage("Document updated successfully.");
+      setIsError(false);
     } catch (error: unknown) {
       console.error(error);
       setIsError(true);
@@ -209,6 +220,7 @@ export default function PortalDocumentsPage() {
         current.filter((doc) => doc.id !== id)
       );
       setMessage("Document removed successfully.");
+      setIsError(false);
     } catch (error: unknown) {
       console.error(error);
       setIsError(true);
