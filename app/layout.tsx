@@ -64,7 +64,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }}
         />
       </head>
-      <body className="bg-[#F5F1E8] font-serif text-[#1A1A1A]">
+      <body
+  suppressHydrationWarning
+  className="bg-[#F5F1E8] font-serif text-[#1A1A1A]"
+>
         <header className="w-full border-b border-[#E5DDC8] py-6">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-6">
             <Link href="/" className="flex items-center gap-4">
