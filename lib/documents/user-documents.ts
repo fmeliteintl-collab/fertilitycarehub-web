@@ -36,9 +36,9 @@ async function getAuthenticatedUser() {
 
   try {
     const {
-      data: { user },
+      data: { session },
       error,
-    } = await supabase.auth.getUser();
+    } = await supabase.auth.getSession();
 
     if (error) {
       if (isMissingSessionError(error)) {
@@ -48,7 +48,7 @@ async function getAuthenticatedUser() {
       throw error;
     }
 
-    return { supabase, user: user ?? null };
+    return { supabase, user: session?.user ?? null };
   } catch (error) {
     if (isMissingSessionError(error)) {
       return { supabase, user: null };
