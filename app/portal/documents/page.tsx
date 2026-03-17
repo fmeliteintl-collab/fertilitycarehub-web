@@ -341,7 +341,7 @@ export default function PortalDocumentsPage() {
       <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
         <div>
           <h2 className="text-xl font-semibold text-stone-900">
-            Add Document Entry DOC-TEST
+            Add Document Entry
           </h2>
           <p className="mt-1 text-sm text-stone-600">
             You can either upload a real file now or create a structured document
