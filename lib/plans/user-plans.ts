@@ -55,17 +55,43 @@ function normalizeUserPlan(row: UserPlan): UserPlan {
   };
 }
 
-export async function getCurrentUserPlan(): Promise<UserPlan | null> {
+function isMissingSessionError(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    (error.name === "AuthSessionMissingError" ||
+      error.message.toLowerCase().includes("auth session missing"))
+  );
+}
+
+async function getAuthenticatedUser() {
   const supabase = getSupabaseBrowserClient();
 
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+  try {
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
-  if (userError) {
-    throw userError;
+    if (error) {
+      if (isMissingSessionError(error)) {
+        return { supabase, user: null };
+      }
+
+      throw error;
+    }
+
+    return { supabase, user: user ?? null };
+  } catch (error) {
+    if (isMissingSessionError(error)) {
+      return { supabase, user: null };
+    }
+
+    throw error;
   }
+}
+
+export async function getCurrentUserPlan(): Promise<UserPlan | null> {
+  const { supabase, user } = await getAuthenticatedUser();
 
   if (!user) {
     return null;
@@ -87,16 +113,7 @@ export async function getCurrentUserPlan(): Promise<UserPlan | null> {
 export async function upsertCurrentUserPlan(
   input: UserPlanInput
 ): Promise<UserPlan> {
-  const supabase = getSupabaseBrowserClient();
-
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError) {
-    throw userError;
-  }
+  const { supabase, user } = await getAuthenticatedUser();
 
   if (!user) {
     throw new Error("User is not authenticated.");

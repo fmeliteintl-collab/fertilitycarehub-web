@@ -42,13 +42,16 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  await supabase.auth.getUser();
+  try {
+    await supabase.auth.getUser();
+  } catch {
+    // Ignore missing-session errors here.
+    // Route protection is handled in app/portal/layout.tsx.
+  }
 
   return response;
 }
 
 export const config = {
-  matcher: [
-    "/portal/:path*",
-  ],
+  matcher: ["/portal/:path*"],
 };

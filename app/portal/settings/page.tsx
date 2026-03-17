@@ -12,6 +12,14 @@ type ProfileRow = {
   created_at: string | null;
 };
 
+function isMissingSessionError(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    (error.name === "AuthSessionMissingError" ||
+      error.message.toLowerCase().includes("auth session missing"))
+  );
+}
+
 export default function PortalSettingsPage() {
   const [profile, setProfile] = useState<ProfileRow | null>(null);
   const [fullName, setFullName] = useState("");
@@ -34,11 +42,25 @@ export default function PortalSettingsPage() {
         } = await supabase.auth.getUser();
 
         if (userError) {
+          if (isMissingSessionError(userError)) {
+            if (isMounted) {
+              setProfile(null);
+              setMessage("Your session has expired. Please sign in again.");
+              setIsError(true);
+            }
+            return;
+          }
+
           throw userError;
         }
 
         if (!user) {
-          throw new Error("User is not authenticated.");
+          if (isMounted) {
+            setProfile(null);
+            setMessage("Your session has expired. Please sign in again.");
+            setIsError(true);
+          }
+          return;
         }
 
         const { data, error } = await supabase
@@ -106,11 +128,15 @@ export default function PortalSettingsPage() {
       } = await supabase.auth.getUser();
 
       if (userError) {
+        if (isMissingSessionError(userError)) {
+          throw new Error("Your session has expired. Please sign in again.");
+        }
+
         throw userError;
       }
 
       if (!user) {
-        throw new Error("User is not authenticated.");
+        throw new Error("Your session has expired. Please sign in again.");
       }
 
       const trimmedFullName = fullName.trim();

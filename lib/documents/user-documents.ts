@@ -23,17 +23,43 @@ function normalizeUserDocument(row: UserDocument): UserDocument {
   };
 }
 
-export async function getCurrentUserDocuments(): Promise<UserDocument[]> {
+function isMissingSessionError(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    (error.name === "AuthSessionMissingError" ||
+      error.message.toLowerCase().includes("auth session missing"))
+  );
+}
+
+async function getAuthenticatedUser() {
   const supabase = getSupabaseBrowserClient();
 
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+  try {
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
-  if (userError) {
-    throw userError;
+    if (error) {
+      if (isMissingSessionError(error)) {
+        return { supabase, user: null };
+      }
+
+      throw error;
+    }
+
+    return { supabase, user: user ?? null };
+  } catch (error) {
+    if (isMissingSessionError(error)) {
+      return { supabase, user: null };
+    }
+
+    throw error;
   }
+}
+
+export async function getCurrentUserDocuments(): Promise<UserDocument[]> {
+  const { supabase, user } = await getAuthenticatedUser();
 
   if (!user) {
     return [];
@@ -57,16 +83,7 @@ export async function getCurrentUserDocuments(): Promise<UserDocument[]> {
 export async function createCurrentUserDocument(
   input: UserDocumentInput
 ): Promise<UserDocument> {
-  const supabase = getSupabaseBrowserClient();
-
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError) {
-    throw userError;
-  }
+  const { supabase, user } = await getAuthenticatedUser();
 
   if (!user) {
     throw new Error("User is not authenticated.");
@@ -124,10 +141,7 @@ export async function updateCurrentUserDocument(
 export async function deleteCurrentUserDocument(id: string): Promise<void> {
   const supabase = getSupabaseBrowserClient();
 
-  const { error } = await supabase
-    .from("user_documents")
-    .delete()
-    .eq("id", id);
+  const { error } = await supabase.from("user_documents").delete().eq("id", id);
 
   if (error) {
     throw error;
@@ -139,16 +153,7 @@ export async function uploadCurrentUserDocument(file: File): Promise<{
   fileSize: number;
   fileName: string;
 }> {
-  const supabase = getSupabaseBrowserClient();
-
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError) {
-    throw userError;
-  }
+  const { supabase, user } = await getAuthenticatedUser();
 
   if (!user) {
     throw new Error("User is not authenticated.");
