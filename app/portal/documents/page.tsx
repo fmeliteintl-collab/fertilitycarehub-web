@@ -80,14 +80,16 @@ export default function PortalDocumentsPage() {
         setMessage(null);
         setIsError(false);
       } catch (error: unknown) {
-        console.error(error);
+  console.error(error);
 
-        if (isMounted) {
-          setDocuments([]);
-          setIsError(true);
-          setMessage("Failed to load your documents.");
-        }
-      } finally {
+  if (isMounted) {
+    setDocuments([]);
+    setIsError(true);
+    setMessage(
+      error instanceof Error ? error.message : "Failed to load your documents."
+    );
+  }
+} finally {
         if (isMounted) {
           setLoading(false);
         }
