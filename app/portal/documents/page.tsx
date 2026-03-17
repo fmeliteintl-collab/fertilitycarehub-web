@@ -50,6 +50,24 @@ function formatDate(value: string): string {
   return new Date(value).toLocaleString();
 }
 
+function getErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof Error && error.message.trim().length > 0) {
+    return error.message;
+  }
+
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof error.message === "string" &&
+    error.message.trim().length > 0
+  ) {
+    return error.message;
+  }
+
+  return fallback;
+}
+
 export default function PortalDocumentsPage() {
   const [documents, setDocuments] = useState<UserDocument[]>([]);
   const [form, setForm] = useState<UserDocumentInput>(EMPTY_DOCUMENT_INPUT);
@@ -80,16 +98,14 @@ export default function PortalDocumentsPage() {
         setMessage(null);
         setIsError(false);
       } catch (error: unknown) {
-  console.error(error);
+        console.error(error);
 
-  if (isMounted) {
-    setDocuments([]);
-    setIsError(true);
-    setMessage(
-      error instanceof Error ? error.message : "Failed to load your documents."
-    );
-  }
-} finally {
+        if (isMounted) {
+          setDocuments([]);
+          setIsError(true);
+          setMessage(getErrorMessage(error, "Failed to load your documents."));
+        }
+      } finally {
         if (isMounted) {
           setLoading(false);
         }
@@ -183,9 +199,7 @@ export default function PortalDocumentsPage() {
     } catch (error: unknown) {
       console.error(error);
       setIsError(true);
-      setMessage(
-        error instanceof Error ? error.message : "Failed to add document."
-      );
+      setMessage(getErrorMessage(error, "Failed to add document."));
     } finally {
       setSaving(false);
     }
@@ -207,7 +221,7 @@ export default function PortalDocumentsPage() {
     } catch (error: unknown) {
       console.error(error);
       setIsError(true);
-      setMessage("Failed to update document.");
+      setMessage(getErrorMessage(error, "Failed to update document."));
     }
   }
 
@@ -226,7 +240,7 @@ export default function PortalDocumentsPage() {
     } catch (error: unknown) {
       console.error(error);
       setIsError(true);
-      setMessage("Failed to remove document.");
+      setMessage(getErrorMessage(error, "Failed to remove document."));
     }
   }
 
@@ -245,11 +259,7 @@ export default function PortalDocumentsPage() {
     } catch (error: unknown) {
       console.error(error);
       setIsError(true);
-      setMessage(
-        error instanceof Error
-          ? error.message
-          : "Failed to open the secure file link."
-      );
+      setMessage(getErrorMessage(error, "Failed to open the secure file link."));
     }
   }
 
@@ -273,11 +283,7 @@ export default function PortalDocumentsPage() {
     } catch (error: unknown) {
       console.error(error);
       setIsError(true);
-      setMessage(
-        error instanceof Error
-          ? error.message
-          : "Failed to download the file."
-      );
+      setMessage(getErrorMessage(error, "Failed to download the file."));
     }
   }
 
@@ -334,9 +340,9 @@ export default function PortalDocumentsPage() {
 
       <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
         <div>
-         <h2 className="text-xl font-semibold text-stone-900">
-  Add Document Entry DOC-TEST
-</h2>
+          <h2 className="text-xl font-semibold text-stone-900">
+            Add Document Entry DOC-TEST
+          </h2>
           <p className="mt-1 text-sm text-stone-600">
             You can either upload a real file now or create a structured document
             record first.
