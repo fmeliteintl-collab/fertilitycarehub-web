@@ -24,10 +24,25 @@ const AVAILABLE_COUNTRIES = [
   "US",
 ] as const;
 
-const COUNTRY_CONTENT: Record<
-  string,
-  { status: string; summary: string; notes: string }
-> = {
+type CountryName = (typeof AVAILABLE_COUNTRIES)[number];
+
+type CountryContent = {
+  status: string;
+  summary: string;
+  notes: string;
+};
+
+type RecommendationBadge = {
+  label: string;
+};
+
+type RecommendedCountry = {
+  name: CountryName;
+  score: number;
+  reasons: string[];
+};
+
+const COUNTRY_CONTENT: Record<CountryName, CountryContent> = {
   Spain: {
     status: "Strong fit",
     summary:
@@ -107,12 +122,192 @@ const COUNTRY_CONTENT: Record<
   },
 };
 
+function getErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof Error && error.message.trim().length > 0) {
+    return error.message;
+  }
+
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof error.message === "string" &&
+    error.message.trim().length > 0
+  ) {
+    return error.message;
+  }
+
+  return fallback;
+}
+
+
+
+function getPlanText(plan: UserPlanInput): string {
+  return [
+    plan.pathway_type,
+    plan.family_structure,
+    plan.treatment_goal,
+    plan.target_timeline,
+    plan.budget_range,
+    plan.notes,
+    ...(plan.priorities ?? []),
+    ...(plan.constraints ?? []),
+  ]
+    .filter((value): value is string => typeof value === "string")
+    .join(" ")
+    .toLowerCase();
+}
+
+function getPlanningBadges(plan: UserPlanInput): RecommendationBadge[] {
+  const badges: RecommendationBadge[] = [];
+
+  if (plan.pathway_type?.trim()) {
+    badges.push({ label: `Pathway: ${plan.pathway_type.trim()}` });
+  }
+
+  if (plan.family_structure?.trim()) {
+    badges.push({ label: `Family: ${plan.family_structure.trim()}` });
+  }
+
+  if (plan.donor_needed) {
+    badges.push({ label: "Donor review needed" });
+  }
+
+  if (plan.surrogate_needed) {
+    badges.push({ label: "Surrogacy review needed" });
+  }
+
+  if (plan.target_timeline?.trim()) {
+    badges.push({ label: `Timeline: ${plan.target_timeline.trim()}` });
+  }
+
+  if (plan.budget_range?.trim()) {
+    badges.push({ label: `Budget: ${plan.budget_range.trim()}` });
+  }
+
+  return badges;
+}
+
+function getRecommendedCountries(plan: UserPlanInput): RecommendedCountry[] {
+  const planText = getPlanText(plan);
+
+  const results = AVAILABLE_COUNTRIES.map((country) => {
+    let score = 0;
+    const reasons: string[] = [];
+
+    if (plan.shortlisted_countries.includes(country)) {
+      score += 10;
+      reasons.push("Already saved in your shortlist");
+    }
+
+    if (plan.donor_needed) {
+      if (
+        country === "Spain" ||
+        country === "Greece" ||
+        country === "Portugal" ||
+        country === "Czech Republic"
+      ) {
+        score += 3;
+        reasons.push("Matches donor-related planning review");
+      }
+    }
+
+    if (plan.surrogate_needed) {
+      if (country === "US" || country === "Mexico" || country === "Greece") {
+        score += 3;
+        reasons.push("Relevant to surrogate-related planning review");
+      }
+    }
+
+    if (
+      planText.includes("budget") ||
+      planText.includes("cost") ||
+      planText.includes("affordable") ||
+      planText.includes("lower cost")
+    ) {
+      if (
+        country === "India" ||
+        country === "Mexico" ||
+        country === "Turkey" ||
+        country === "Greece" ||
+        country === "Czech Republic" ||
+        country === "Portugal"
+      ) {
+        score += 2;
+        reasons.push("Worth reviewing for budget-sensitive planning");
+      }
+    }
+
+    if (
+      planText.includes("legal") ||
+      planText.includes("clarity") ||
+      planText.includes("regulation") ||
+      planText.includes("certainty")
+    ) {
+      if (
+        country === "UK" ||
+        country === "US" ||
+        country === "Spain" ||
+        country === "Portugal"
+      ) {
+        score += 2;
+        reasons.push("Worth reviewing for structure and planning clarity");
+      }
+    }
+
+    if (
+      planText.includes("timeline") ||
+      planText.includes("fast") ||
+      planText.includes("quick") ||
+      planText.includes("soon")
+    ) {
+      if (
+        country === "Spain" ||
+        country === "Greece" ||
+        country === "Mexico" ||
+        country === "Portugal"
+      ) {
+        score += 1;
+        reasons.push("May fit a shorter planning horizon");
+      }
+    }
+
+    if (
+      planText.includes("ivf") ||
+      planText.includes("donor") ||
+      planText.includes("embryo")
+    ) {
+      if (
+        country === "Spain" ||
+        country === "Greece" ||
+        country === "Portugal" ||
+        country === "Czech Republic"
+      ) {
+        score += 1;
+        reasons.push("Frequently compared in IVF-oriented planning");
+      }
+    }
+
+    return {
+      name: country,
+      score,
+      reasons: Array.from(new Set(reasons)),
+    };
+  });
+
+  return results
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
+}
+
 export default function PortalCountriesPage() {
   const [plan, setPlan] = useState<UserPlanInput>(EMPTY_USER_PLAN_INPUT);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [isError, setIsError] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -127,34 +322,47 @@ export default function PortalCountriesPage() {
 
         if (existing) {
           setPlan({
-  pathway_type: existing.pathway_type,
-  family_structure: existing.family_structure,
-  treatment_goal: existing.treatment_goal,
-  donor_needed: existing.donor_needed,
-  surrogate_needed: existing.surrogate_needed,
-  priorities: existing.priorities ?? [],
-  constraints: existing.constraints ?? [],
-  shortlisted_countries: existing.shortlisted_countries ?? [],
-  timeline_items: existing.timeline_items ?? [],
-  target_timeline: existing.target_timeline,
-  budget_range: existing.budget_range,
-  notes: existing.notes,
-  advisory_status: existing.advisory_status ?? null,
-advisory_pathway: existing.advisory_pathway ?? null,
-advisory_notes: existing.advisory_notes ?? null,
-advisory_next_step: existing.advisory_next_step ?? null,
-});
+            pathway_type: existing.pathway_type,
+            family_structure: existing.family_structure,
+            treatment_goal: existing.treatment_goal,
+            donor_needed: existing.donor_needed,
+            surrogate_needed: existing.surrogate_needed,
+            priorities: existing.priorities ?? [],
+            constraints: existing.constraints ?? [],
+            shortlisted_countries: existing.shortlisted_countries ?? [],
+            timeline_items: existing.timeline_items ?? [],
+            target_timeline: existing.target_timeline,
+            budget_range: existing.budget_range,
+            notes: existing.notes,
+            advisory_status: existing.advisory_status ?? null,
+            advisory_pathway: existing.advisory_pathway ?? null,
+            advisory_notes: existing.advisory_notes ?? null,
+            advisory_next_step: existing.advisory_next_step ?? null,
+          });
+
+          setLastSavedAt(
+            "updated_at" in existing && typeof existing.updated_at === "string"
+              ? existing.updated_at
+              : "created_at" in existing &&
+                  typeof existing.created_at === "string"
+                ? existing.created_at
+                : null
+          );
         }
+
+        setMessage(null);
+        setIsError(false);
       } catch (error: unknown) {
         console.error(error);
 
         if (isMounted) {
           setIsError(true);
-          setMessage("Failed to load your shortlist.");
+          setMessage(getErrorMessage(error, "Failed to load your shortlist."));
         }
       } finally {
         if (isMounted) {
           setLoading(false);
+          setHasUnsavedChanges(false);
         }
       }
     }
@@ -170,21 +378,59 @@ advisory_next_step: existing.advisory_next_step ?? null,
     () =>
       plan.shortlisted_countries.map((countryName) => ({
         name: countryName,
-        status: COUNTRY_CONTENT[countryName]?.status ?? "Saved",
+        status:
+          COUNTRY_CONTENT[countryName as CountryName]?.status ?? "Saved",
         summary:
-          COUNTRY_CONTENT[countryName]?.summary ??
+          COUNTRY_CONTENT[countryName as CountryName]?.summary ??
           "Saved to your personal shortlist for ongoing evaluation.",
         notes:
-          COUNTRY_CONTENT[countryName]?.notes ??
+          COUNTRY_CONTENT[countryName as CountryName]?.notes ??
           "Continue reviewing this jurisdiction against your legal, medical, and logistical needs.",
       })),
     [plan.shortlisted_countries]
   );
 
+  const recommendedCountries = useMemo(
+    () => getRecommendedCountries(plan),
+    [plan]
+  );
+
+  const recommendedCountryNames = useMemo(
+    () => new Set(recommendedCountries.map((country) => country.name)),
+    [recommendedCountries]
+  );
+
+  const sortedCountries = useMemo(() => {
+    return [...AVAILABLE_COUNTRIES].sort((a, b) => {
+      const aSelected = plan.shortlisted_countries.includes(a);
+      const bSelected = plan.shortlisted_countries.includes(b);
+
+      if (aSelected !== bSelected) {
+        return aSelected ? -1 : 1;
+      }
+
+      const aRecommendation =
+        recommendedCountries.find((country) => country.name === a)?.score ?? 0;
+      const bRecommendation =
+        recommendedCountries.find((country) => country.name === b)?.score ?? 0;
+
+      if (aRecommendation !== bRecommendation) {
+        return bRecommendation - aRecommendation;
+      }
+
+      return a.localeCompare(b);
+    });
+  }, [plan.shortlisted_countries, recommendedCountries]);
+
   const topPriority =
     shortlistedCountries.length > 0 ? shortlistedCountries[0].name : "None yet";
 
-  function toggleCountry(countryName: string) {
+  const planningBadges = useMemo(() => getPlanningBadges(plan), [plan]);
+
+  const formattedLastSaved =
+    lastSavedAt !== null ? new Date(lastSavedAt).toLocaleString() : null;
+
+  function toggleCountry(countryName: CountryName) {
     setMessage(null);
     setIsError(false);
 
@@ -201,6 +447,8 @@ advisory_next_step: existing.advisory_next_step ?? null,
           : [...current.shortlisted_countries, countryName],
       };
     });
+
+    setHasUnsavedChanges(true);
   }
 
   async function handleSaveShortlist() {
@@ -212,10 +460,12 @@ advisory_next_step: existing.advisory_next_step ?? null,
       await upsertCurrentUserPlan(plan);
 
       setMessage("Shortlist saved successfully.");
+      setHasUnsavedChanges(false);
+      setLastSavedAt(new Date().toISOString());
     } catch (error: unknown) {
       console.error(error);
       setIsError(true);
-      setMessage("Failed to save shortlist.");
+      setMessage(getErrorMessage(error, "Failed to save shortlist."));
     } finally {
       setSaving(false);
     }
@@ -294,6 +544,105 @@ advisory_next_step: existing.advisory_next_step ?? null,
       <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
         <div>
           <h2 className="text-xl font-semibold text-stone-900">
+            Planning Context
+          </h2>
+          <p className="mt-1 text-sm text-stone-600">
+            Your saved plan now shapes how this shortlist is organized and which
+            countries are surfaced first.
+          </p>
+        </div>
+
+        <div className="mt-5 flex flex-wrap gap-2">
+          {planningBadges.length > 0 ? (
+            planningBadges.map((badge) => (
+              <span
+                key={badge.label}
+                className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-700"
+              >
+                {badge.label}
+              </span>
+            ))
+          ) : (
+            <p className="text-sm text-stone-600">
+              Add more planning details in My Plan to improve shortlist guidance.
+            </p>
+          )}
+        </div>
+
+        <div className="mt-5 grid gap-4 lg:grid-cols-2">
+          <div className="rounded-xl bg-stone-50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+              Current Goal
+            </p>
+            <p className="mt-2 text-sm leading-6 text-stone-700">
+              {plan.treatment_goal?.trim() || "No treatment goal saved yet."}
+            </p>
+          </div>
+
+          <div className="rounded-xl bg-stone-50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+              Current Constraints
+            </p>
+            <p className="mt-2 text-sm leading-6 text-stone-700">
+              {plan.constraints.length > 0
+                ? plan.constraints.join(", ")
+                : "No constraints saved yet."}
+            </p>
+          </div>
+        </div>
+
+        {formattedLastSaved ? (
+          <p className="mt-4 text-xs text-stone-500">
+            Last shortlist-related plan save: {formattedLastSaved}
+          </p>
+        ) : null}
+      </section>
+
+      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+        <div>
+          <h2 className="text-xl font-semibold text-stone-900">
+            Suggested Countries from My Plan
+          </h2>
+          <p className="mt-1 text-sm text-stone-600">
+            These are soft recommendations inferred from your saved pathway,
+            timing, budget, and planning priorities.
+          </p>
+        </div>
+
+        {recommendedCountries.length === 0 ? (
+          <div className="mt-5 rounded-xl border border-dashed border-stone-300 bg-stone-50 p-4 text-sm text-stone-600">
+            Save more detail in My Plan to unlock stronger shortlist guidance.
+          </div>
+        ) : (
+          <div className="mt-5 grid gap-4 lg:grid-cols-2">
+            {recommendedCountries.slice(0, 4).map((country) => (
+              <div
+                key={country.name}
+                className="rounded-xl border border-stone-200 bg-stone-50 p-4"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <h3 className="text-lg font-semibold text-stone-900">
+                    {country.name}
+                  </h3>
+                  <span className="rounded-full bg-white px-3 py-1 text-xs font-medium text-stone-700">
+                    Suggested
+                  </span>
+                </div>
+
+                <ul className="mt-3 space-y-2 text-sm leading-6 text-stone-700">
+                  {country.reasons.map((reason) => (
+                    <li key={reason}>• {reason}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+        <div>
+          <h2 className="text-xl font-semibold text-stone-900">
             Manage Shortlist
           </h2>
           <p className="mt-1 text-sm text-stone-600">
@@ -303,8 +652,9 @@ advisory_next_step: existing.advisory_next_step ?? null,
         </div>
 
         <div className="mt-5 flex flex-wrap gap-3">
-          {AVAILABLE_COUNTRIES.map((country) => {
+          {sortedCountries.map((country) => {
             const isSelected = plan.shortlisted_countries.includes(country);
+            const isRecommended = recommendedCountryNames.has(country);
 
             return (
               <button
@@ -318,20 +668,33 @@ advisory_next_step: existing.advisory_next_step ?? null,
                 }`}
               >
                 {country}
+                {isRecommended ? " • Suggested" : ""}
               </button>
             );
           })}
         </div>
 
-        <div className="mt-6 flex items-center gap-3">
+        <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
           <button
             type="button"
             onClick={handleSaveShortlist}
-            disabled={saving}
+            disabled={saving || !hasUnsavedChanges}
             className="rounded-xl bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {saving ? "Saving..." : "Save Shortlist"}
+            {saving
+              ? "Saving..."
+              : hasUnsavedChanges
+                ? "Save Shortlist"
+                : "Saved"}
           </button>
+
+          <p
+            className={`text-sm ${
+              hasUnsavedChanges ? "text-amber-600" : "text-stone-500"
+            }`}
+          >
+            {hasUnsavedChanges ? "Unsaved changes" : "All changes saved"}
+          </p>
 
           {message ? (
             <p
@@ -386,7 +749,9 @@ advisory_next_step: existing.advisory_next_step ?? null,
 
                   <button
                     type="button"
-                    onClick={() => toggleCountry(country.name)}
+                    onClick={() =>
+                      toggleCountry(country.name as CountryName)
+                    }
                     className="rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
                   >
                     Remove
