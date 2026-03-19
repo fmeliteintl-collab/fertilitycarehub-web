@@ -7,6 +7,24 @@ import {
 } from "@/lib/plans/user-plans";
 import { EMPTY_USER_PLAN_INPUT, type UserPlanInput } from "@/types/plan";
 
+function getErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof Error && error.message.trim().length > 0) {
+    return error.message;
+  }
+
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof error.message === "string" &&
+    error.message.trim().length > 0
+  ) {
+    return error.message;
+  }
+
+  return fallback;
+}
+
 export default function MyPlanPage() {
   const [plan, setPlan] = useState<UserPlanInput>(EMPTY_USER_PLAN_INPUT);
   const [loading, setLoading] = useState(true);
@@ -30,38 +48,42 @@ export default function MyPlanPage() {
 
         if (existing) {
           setPlan({
-  pathway_type: existing.pathway_type,
-  family_structure: existing.family_structure,
-  treatment_goal: existing.treatment_goal,
-  donor_needed: existing.donor_needed,
-  surrogate_needed: existing.surrogate_needed,
-  priorities: existing.priorities ?? [],
-  constraints: existing.constraints ?? [],
-  shortlisted_countries: existing.shortlisted_countries ?? [],
-  timeline_items: existing.timeline_items ?? [],
-  target_timeline: existing.target_timeline,
-  budget_range: existing.budget_range,
-  notes: existing.notes,
-  advisory_status: existing.advisory_status ?? null,
-advisory_pathway: existing.advisory_pathway ?? null,
-advisory_notes: existing.advisory_notes ?? null,
-advisory_next_step: existing.advisory_next_step ?? null,
-});
+            pathway_type: existing.pathway_type,
+            family_structure: existing.family_structure,
+            treatment_goal: existing.treatment_goal,
+            donor_needed: existing.donor_needed,
+            surrogate_needed: existing.surrogate_needed,
+            priorities: existing.priorities ?? [],
+            constraints: existing.constraints ?? [],
+            shortlisted_countries: existing.shortlisted_countries ?? [],
+            timeline_items: existing.timeline_items ?? [],
+            target_timeline: existing.target_timeline,
+            budget_range: existing.budget_range,
+            notes: existing.notes,
+            advisory_status: existing.advisory_status ?? null,
+            advisory_pathway: existing.advisory_pathway ?? null,
+            advisory_notes: existing.advisory_notes ?? null,
+            advisory_next_step: existing.advisory_next_step ?? null,
+          });
 
           setLastSavedAt(
             "updated_at" in existing && typeof existing.updated_at === "string"
               ? existing.updated_at
-              : "created_at" in existing && typeof existing.created_at === "string"
+              : "created_at" in existing &&
+                  typeof existing.created_at === "string"
                 ? existing.created_at
                 : null
           );
         }
+
+        setMessage(null);
+        setIsError(false);
       } catch (error: unknown) {
         console.error(error);
 
         if (isMounted) {
           setIsError(true);
-          setMessage("Failed to load your plan.");
+          setMessage(getErrorMessage(error, "Failed to load your plan."));
         }
       } finally {
         if (isMounted) {
@@ -108,7 +130,7 @@ advisory_next_step: existing.advisory_next_step ?? null,
     } catch (error: unknown) {
       console.error(error);
       setIsError(true);
-      setMessage("Failed to save plan.");
+      setMessage(getErrorMessage(error, "Failed to save plan."));
     } finally {
       setSaving(false);
     }
