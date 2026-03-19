@@ -55,9 +55,39 @@ const STATUS_OPTIONS: TimelineItemStatus[] = [
   "Upcoming",
 ];
 
+function getDisplayValue(value: string | null | undefined, fallback: string) {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : fallback;
+}
+
 function createGeneratedTimeline(plan: UserPlanInput): TimelineItem[] {
   const items: TimelineItem[] = [];
   let index = 1;
+
+  const pathwayType = getDisplayValue(
+    plan.pathway_type,
+    "not yet specified"
+  );
+  const targetTimeline = getDisplayValue(
+    plan.target_timeline,
+    "not yet defined"
+  );
+  const budgetRange = getDisplayValue(
+    plan.budget_range,
+    "not yet defined"
+  );
+  const advisoryPathway = getDisplayValue(
+    plan.advisory_pathway,
+    "Undecided"
+  );
+  const advisoryNextStep = getDisplayValue(
+    plan.advisory_next_step,
+    "Clarify pathway questions and determine the best advisory format."
+  );
+
+  const shortlistedCountries = plan.shortlisted_countries ?? [];
+  const priorities = plan.priorities ?? [];
+  const constraints = plan.constraints ?? [];
 
   const addItem = (
     title: string,
@@ -78,23 +108,47 @@ function createGeneratedTimeline(plan: UserPlanInput): TimelineItem[] {
   addItem(
     "Clarify pathway direction",
     "Planning",
-    `Confirm the core pathway (${plan.pathway_type?.trim() || "not yet specified"}) and align it with your fertility planning goals.`,
+    `Confirm the core pathway (${pathwayType}) and align it with your fertility planning goals.`,
     "In Progress"
   );
+
+  if (priorities.length > 0) {
+    addItem(
+      "Validate planning priorities",
+      "Planning",
+      `Review whether your stated priorities still match your strategy direction: ${priorities.join(
+        ", "
+      )}.`
+    );
+  } else {
+    addItem(
+      "Define planning priorities",
+      "Planning",
+      "Identify the most important decision filters for your case, such as legal fit, timing, cost, treatment access, and logistics."
+    );
+  }
 
   addItem(
     "Define shortlist criteria",
     "Planning",
-    "Set the key filters for jurisdiction selection, including legal fit, medical structure, timing, budget, and logistics."
+    "Set the filters for jurisdiction selection, including legal fit, treatment structure, timing, budget, and logistics."
   );
 
-  if ((plan.shortlisted_countries ?? []).length > 0) {
+  if (shortlistedCountries.length > 0) {
     addItem(
       "Review shortlisted countries",
       "Research",
-      `Compare the currently shortlisted jurisdictions: ${plan.shortlisted_countries.join(
+      `Compare the currently shortlisted jurisdictions: ${shortlistedCountries.join(
         ", "
-      )}.`
+      )}. Focus on legal fit, treatment structure, timing, and travel practicality.`
+    );
+
+    addItem(
+      "Narrow shortlist to leading options",
+      "Research",
+      `Reduce the current shortlist (${shortlistedCountries.join(
+        ", "
+      )}) into the strongest near-term candidates for execution planning.`
     );
   } else {
     addItem(
@@ -120,6 +174,16 @@ function createGeneratedTimeline(plan: UserPlanInput): TimelineItem[] {
     );
   }
 
+  if (constraints.length > 0) {
+    addItem(
+      "Pressure-test planning constraints",
+      "Risk",
+      `Review your current constraints and how they affect execution: ${constraints.join(
+        ", "
+      )}.`
+    );
+  }
+
   addItem(
     "Gather medical records and case summary",
     "Documents",
@@ -127,37 +191,39 @@ function createGeneratedTimeline(plan: UserPlanInput): TimelineItem[] {
   );
 
   addItem(
-    "Prepare advisory questions",
+    "Prepare advisory review",
     "Advisory",
-    "Organize the main legal, medical, logistical, and budget questions to bring into an advisory review."
+    `Align your timeline with the selected advisory pathway (${advisoryPathway}) and organize the main questions needed for the next review step.`
   );
 
-  if (plan.target_timeline?.trim()) {
-    addItem(
-      "Validate target timeline",
-      "Timeline",
-      `Check whether your desired timeline (${plan.target_timeline}) is realistic given planning, travel, and treatment requirements.`
-    );
-  } else {
-    addItem(
-      "Set practical target timing",
-      "Timeline",
-      "Define a realistic planning window for research, advisory, logistics, and treatment execution."
-    );
-  }
+  addItem(
+    "Complete next advisory action",
+    "Advisory",
+    `Use the advisory workspace to execute the next step: ${advisoryNextStep}.`
+  );
 
-  if (plan.budget_range?.trim()) {
-    addItem(
-      "Pressure-test budget assumptions",
-      "Finance",
-      `Review whether your stated budget range (${plan.budget_range}) supports the pathway, jurisdictions, and planning complexity involved.`
-    );
-  }
+  addItem(
+    "Validate target timeline",
+    "Timeline",
+    `Check whether your desired timing (${targetTimeline}) is realistic given planning, travel, documentation, and treatment requirements.`
+  );
+
+  addItem(
+    "Pressure-test budget assumptions",
+    "Finance",
+    `Review whether your stated budget range (${budgetRange}) supports the pathway, jurisdictions, and planning complexity involved.`
+  );
+
+  addItem(
+    "Review travel and logistics readiness",
+    "Logistics",
+    "Outline documentation, travel sequencing, accommodation considerations, and potential timing risks for the leading jurisdictions."
+  );
 
   addItem(
     "Finalize next execution step",
     "Execution",
-    "Move from planning into action by choosing the highest-priority next step: shortlist refinement, advisory booking, or document preparation."
+    "Move from planning into action by choosing the highest-priority next step: shortlist refinement, advisory booking, document preparation, or timeline execution."
   );
 
   return items;
@@ -251,6 +317,27 @@ export default function PortalTimelinePage() {
     [timelineItems]
   );
 
+  const planningContext = useMemo(
+    () => ({
+      pathwayType: getDisplayValue(plan.pathway_type, "Not yet specified"),
+      shortlistedCountries:
+        (plan.shortlisted_countries ?? []).length > 0
+          ? plan.shortlisted_countries.join(", ")
+          : "No countries shortlisted yet",
+      targetTimeline: getDisplayValue(
+        plan.target_timeline,
+        "Not yet defined"
+      ),
+      budgetRange: getDisplayValue(plan.budget_range, "Not yet defined"),
+    }),
+    [
+      plan.pathway_type,
+      plan.shortlisted_countries,
+      plan.target_timeline,
+      plan.budget_range,
+    ]
+  );
+
   function updateTimelineItem(
     itemId: string,
     field: keyof TimelineItem,
@@ -309,7 +396,9 @@ export default function PortalTimelinePage() {
       timeline_items: generatedTimeline,
     }));
 
-    setMessage("Suggested timeline generated. Review and save it.");
+    setMessage(
+      "Suggested timeline generated from your saved planning, country, and advisory context. Review and save it."
+    );
   }
 
   async function handleSaveTimeline() {
@@ -345,10 +434,54 @@ export default function PortalTimelinePage() {
         </h1>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-stone-600">
           Organize your fertility planning process into clear stages, next
-          steps, and milestone checkpoints. This is now your saved working
-          execution timeline inside the portal.
+          steps, and milestone checkpoints. This timeline now reflects your
+          saved planning profile, shortlisted countries, and advisory context.
         </p>
       </div>
+
+      <section className="grid gap-6 lg:grid-cols-4">
+        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+          <p className="text-sm font-medium text-stone-500">Pathway</p>
+          <p className="mt-2 text-lg font-semibold text-stone-900">
+            {planningContext.pathwayType}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-stone-600">
+            Pulled from your saved planning profile.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+          <p className="text-sm font-medium text-stone-500">
+            Shortlisted Countries
+          </p>
+          <p className="mt-2 text-lg font-semibold text-stone-900">
+            {planningContext.shortlistedCountries}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-stone-600">
+            Used to shape research and execution steps.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+          <p className="text-sm font-medium text-stone-500">Target Timeline</p>
+          <p className="mt-2 text-lg font-semibold text-stone-900">
+            {planningContext.targetTimeline}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-stone-600">
+            Used to pressure-test planning speed and realism.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+          <p className="text-sm font-medium text-stone-500">Budget Range</p>
+          <p className="mt-2 text-lg font-semibold text-stone-900">
+            {planningContext.budgetRange}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-stone-600">
+            Used to shape practical execution expectations.
+          </p>
+        </div>
+      </section>
 
       <section className="grid gap-6 lg:grid-cols-3">
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
@@ -390,7 +523,8 @@ export default function PortalTimelinePage() {
             </h2>
             <p className="mt-1 text-sm text-stone-600">
               Update statuses, edit descriptions, add steps, or generate a
-              suggested timeline from your saved planning profile.
+              suggested timeline from your saved planning profile, countries,
+              and advisory data.
             </p>
           </div>
 
@@ -441,7 +575,8 @@ export default function PortalTimelinePage() {
             Current Timeline
           </h2>
           <p className="mt-1 text-sm text-stone-600">
-            These steps are now stored in your private planning workspace.
+            These steps are stored in your private planning workspace and can be
+            tailored to your real execution flow.
           </p>
         </div>
 
