@@ -62,163 +62,101 @@ function getDisplayValue(value: string | null | undefined, fallback: string) {
 
 function createGeneratedTimeline(plan: UserPlanInput): TimelineItem[] {
   const items: TimelineItem[] = [];
-  let index = 1;
-
-  const pathwayType = getDisplayValue(plan.pathway_type, "not yet specified");
-  const targetTimeline = getDisplayValue(
-    plan.target_timeline,
-    "not yet defined"
-  );
-  const budgetRange = getDisplayValue(plan.budget_range, "not yet defined");
-  const advisoryPathway = getDisplayValue(
-    plan.advisory_pathway,
-    "Undecided"
-  );
-  const advisoryNextStep = getDisplayValue(
-    plan.advisory_next_step,
-    "Clarify pathway questions and determine the best advisory format."
-  );
 
   const shortlistedCountries = plan.shortlisted_countries ?? [];
-  const priorities = plan.priorities ?? [];
-  const constraints = plan.constraints ?? [];
+  const donor = plan.donor_needed;
+  const surrogate = plan.surrogate_needed;
 
-  const addItem = (
-    title: string,
-    category: string,
-    description: string,
-    status: TimelineItemStatus = "Upcoming"
-  ) => {
-    items.push({
-      id: `timeline-generated-${index}`,
-      title,
-      category,
-      status,
-      description,
-    });
-    index += 1;
-  };
+  const countriesText =
+    shortlistedCountries.length > 0
+      ? shortlistedCountries.join(", ")
+      : "your shortlisted countries";
 
-  addItem(
-    "Clarify pathway direction",
-    "Planning",
-    `Confirm the core pathway (${pathwayType}) and align it with your fertility planning goals.`,
-    "In Progress"
-  );
-
-  if (priorities.length > 0) {
-    addItem(
-      "Validate planning priorities",
-      "Planning",
-      `Review whether your stated priorities still match your strategy direction: ${priorities.join(
-        ", "
-      )}.`
-    );
-  } else {
-    addItem(
-      "Define planning priorities",
-      "Planning",
-      "Identify the most important decision filters for your case, such as legal fit, timing, cost, treatment access, and logistics."
-    );
-  }
-
-  addItem(
-    "Define shortlist criteria",
-    "Planning",
-    "Set the filters for jurisdiction selection, including legal fit, treatment structure, timing, budget, and logistics."
-  );
+  items.push({
+    id: "t1",
+    title: "Lock pathway structure",
+    category: "Planning",
+    status: "In Progress",
+    description:
+      "Finalize your IVF + donor + surrogacy pathway structure and confirm how all components connect.",
+  });
 
   if (shortlistedCountries.length > 0) {
-    addItem(
-      "Review shortlisted countries",
-      "Research",
-      `Compare the currently shortlisted jurisdictions: ${shortlistedCountries.join(
-        ", "
-      )}. Focus on legal fit, treatment structure, timing, and travel practicality.`
-    );
-
-    addItem(
-      "Narrow shortlist to leading options",
-      "Research",
-      `Reduce the current shortlist (${shortlistedCountries.join(
-        ", "
-      )}) into the strongest near-term candidates for execution planning.`
-    );
+    items.push({
+      id: "t2",
+      title: "Validate shortlisted countries",
+      category: "Research",
+      status: "Upcoming",
+      description: `Compare ${countriesText} specifically for surrogacy legality, donor access, and execution complexity.`,
+    });
   } else {
-    addItem(
-      "Build first shortlist",
-      "Research",
-      "Identify the first set of countries worth comparing based on treatment fit, legal structure, and travel practicality."
-    );
+    items.push({
+      id: "t2",
+      title: "Build initial country shortlist",
+      category: "Research",
+      status: "Upcoming",
+      description:
+        "Identify 2–3 countries that support your required pathway and legal structure.",
+    });
   }
 
-  if (plan.donor_needed) {
-    addItem(
-      "Confirm donor pathway requirements",
-      "Research",
-      "Review donor eligibility, jurisdiction compatibility, and donor-related treatment constraints."
-    );
+  if (surrogate) {
+    items.push({
+      id: "t3",
+      title: "Assess surrogacy legal pathway",
+      category: "Legal",
+      status: "Upcoming",
+      description:
+        "Understand legal structure, parental rights, and cross-border execution risks for your chosen countries.",
+    });
   }
 
-  if (plan.surrogate_needed) {
-    addItem(
-      "Assess surrogacy pathway structure",
-      "Legal",
-      "Review surrogacy legality, process structure, and cross-border execution requirements."
-    );
+  if (donor) {
+    items.push({
+      id: "t4",
+      title: "Confirm donor pathway constraints",
+      category: "Medical",
+      status: "Upcoming",
+      description:
+        "Review donor eligibility, anonymity rules, and compatibility with your selected countries.",
+    });
   }
 
-  if (constraints.length > 0) {
-    addItem(
-      "Pressure-test planning constraints",
-      "Risk",
-      `Review your current constraints and how they affect execution: ${constraints.join(
-        ", "
-      )}.`
-    );
-  }
+  items.push({
+    id: "t5",
+    title: "Pressure-test execution timeline",
+    category: "Timeline",
+    status: "Upcoming",
+    description:
+      "Evaluate whether your desired timing is realistic given coordination between donor, surrogate, and travel.",
+  });
 
-  addItem(
-    "Gather medical records and case summary",
-    "Documents",
-    "Prepare the core medical summary, treatment history, and supporting records needed for planning and advisory review."
-  );
+  items.push({
+    id: "t6",
+    title: "Align budget with pathway complexity",
+    category: "Finance",
+    status: "Upcoming",
+    description:
+      "Validate that your budget supports donor + surrogacy across shortlisted countries including hidden costs.",
+  });
 
-  addItem(
-    "Prepare advisory review",
-    "Advisory",
-    `Align your timeline with the selected advisory pathway (${advisoryPathway}) and organize the main questions needed for the next review step.`
-  );
+  items.push({
+    id: "t7",
+    title: "Move into advisory decision stage",
+    category: "Advisory",
+    status: "Upcoming",
+    description:
+      "Use advisory to finalize country selection, legal structure, and execution plan before committing.",
+  });
 
-  addItem(
-    "Complete next advisory action",
-    "Advisory",
-    `Use the advisory workspace to execute the next step: ${advisoryNextStep}.`
-  );
-
-  addItem(
-    "Validate target timeline",
-    "Timeline",
-    `Check whether your desired timing (${targetTimeline}) is realistic given planning, travel, documentation, and treatment requirements.`
-  );
-
-  addItem(
-    "Pressure-test budget assumptions",
-    "Finance",
-    `Review whether your stated budget range (${budgetRange}) supports the pathway, jurisdictions, and planning complexity involved.`
-  );
-
-  addItem(
-    "Review travel and logistics readiness",
-    "Logistics",
-    "Outline documentation, travel sequencing, accommodation considerations, and potential timing risks for the leading jurisdictions."
-  );
-
-  addItem(
-    "Finalize next execution step",
-    "Execution",
-    "Move from planning into action by choosing the highest-priority next step: shortlist refinement, advisory booking, document preparation, or timeline execution."
-  );
+  items.push({
+    id: "t8",
+    title: "Prepare execution readiness",
+    category: "Execution",
+    status: "Upcoming",
+    description:
+      "Organize documents, medical records, and coordination steps required to begin the process.",
+  });
 
   return items;
 }
