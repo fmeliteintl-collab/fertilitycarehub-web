@@ -64,18 +64,12 @@ function createGeneratedTimeline(plan: UserPlanInput): TimelineItem[] {
   const items: TimelineItem[] = [];
   let index = 1;
 
-  const pathwayType = getDisplayValue(
-    plan.pathway_type,
-    "not yet specified"
-  );
+  const pathwayType = getDisplayValue(plan.pathway_type, "not yet specified");
   const targetTimeline = getDisplayValue(
     plan.target_timeline,
     "not yet defined"
   );
-  const budgetRange = getDisplayValue(
-    plan.budget_range,
-    "not yet defined"
-  );
+  const budgetRange = getDisplayValue(plan.budget_range, "not yet defined");
   const advisoryPathway = getDisplayValue(
     plan.advisory_pathway,
     "Undecided"
@@ -300,7 +294,10 @@ export default function PortalTimelinePage() {
     };
   }, []);
 
-  const timelineItems = plan.timeline_items;
+  const timelineItems = useMemo(
+    () => plan.timeline_items ?? [],
+    [plan.timeline_items]
+  );
 
   const completedCount = useMemo(
     () => timelineItems.filter((item) => item.status === "Completed").length,
@@ -397,7 +394,7 @@ export default function PortalTimelinePage() {
     }));
 
     setMessage(
-      "Suggested timeline generated from your saved planning, country, and advisory context. Review and save it."
+      "Timeline regenerated from your saved planning, country, and advisory context. Review the changes and save when ready."
     );
   }
 
@@ -434,10 +431,24 @@ export default function PortalTimelinePage() {
         </h1>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-stone-600">
           Organize your fertility planning process into clear stages, next
-          steps, and milestone checkpoints. This timeline now reflects your
-          saved planning profile, shortlisted countries, and advisory context.
+          steps, and milestone checkpoints. This timeline reflects your saved
+          planning profile, shortlisted countries, and advisory context.
         </p>
       </div>
+
+      <section className="rounded-2xl border border-stone-200 bg-amber-50 p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-stone-900">
+          How this timeline works
+        </h2>
+        <p className="mt-2 max-w-4xl text-sm leading-6 text-stone-700">
+          Your timeline can be generated from your saved planning inputs,
+          shortlisted countries, and advisory context. After generation, it
+          becomes your editable working plan. If you later update My Plan,
+          Countries, or Advisory, this timeline will not auto-change. Use
+          <span className="font-medium"> Regenerate Timeline </span>
+          whenever you want to refresh it from the latest saved portal data.
+        </p>
+      </section>
 
       <section className="grid gap-6 lg:grid-cols-4">
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
@@ -522,9 +533,9 @@ export default function PortalTimelinePage() {
               Manage Timeline
             </h2>
             <p className="mt-1 text-sm text-stone-600">
-              Update statuses, edit descriptions, add steps, or generate a
-              suggested timeline from your saved planning profile, countries,
-              and advisory data.
+              Update statuses, edit descriptions, add steps, or regenerate a
+              suggested timeline from your latest saved planning profile,
+              countries, and advisory data.
             </p>
           </div>
 
@@ -534,7 +545,7 @@ export default function PortalTimelinePage() {
               onClick={handleGenerateTimeline}
               className="rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
             >
-              Generate Suggested Timeline
+              Regenerate Timeline
             </button>
 
             <button

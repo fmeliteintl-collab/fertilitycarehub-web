@@ -5,7 +5,11 @@ import {
   getCurrentUserPlan,
   upsertCurrentUserPlan,
 } from "@/lib/plans/user-plans";
-import { EMPTY_USER_PLAN_INPUT, type UserPlanInput } from "@/types/plan";
+import {
+  EMPTY_USER_PLAN_INPUT,
+  type TimelineItem,
+  type UserPlanInput,
+} from "@/types/plan";
 
 export const runtime = "edge";
 
@@ -22,6 +26,52 @@ const ADVISORY_PATHWAY_OPTIONS = [
   "Comprehensive Advisory Package",
   "Undecided",
 ] as const;
+
+function getDisplayValue(value: string | null | undefined, fallback: string) {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : fallback;
+}
+
+function countTimelineItems(
+  timelineItems: TimelineItem[],
+  status: TimelineItem["status"]
+) {
+  return timelineItems.filter((item) => item.status === status).length;
+}
+
+function buildRecommendedFocus(plan: UserPlanInput) {
+  const shortlistedCountries = plan.shortlisted_countries ?? [];
+  const completedCount = countTimelineItems(
+    plan.timeline_items,
+    "Completed"
+  );
+  const inProgressCount = countTimelineItems(
+    plan.timeline_items,
+    "In Progress"
+  );
+
+  if (shortlistedCountries.length === 0) {
+    return "Build and refine a shortlist before moving deeper into advisory review.";
+  }
+
+  if (inProgressCount > 0) {
+    return "Use advisory time to resolve the active planning questions that are currently blocking execution.";
+  }
+
+  if (completedCount >= 3) {
+    return "Your planning base is becoming structured enough for a deeper comparative advisory review.";
+  }
+
+  if (plan.surrogate_needed) {
+    return "Focus advisory on legal structure, execution complexity, and cross-border coordination for a surrogacy pathway.";
+  }
+
+  if (plan.donor_needed) {
+    return "Focus advisory on donor-pathway compatibility, jurisdiction fit, and treatment constraints.";
+  }
+
+  return "Use advisory to pressure-test your shortlist, execution timing, and next strategic decision.";
+}
 
 export default function PortalAdvisoryPage() {
   const [plan, setPlan] = useState<UserPlanInput>(EMPTY_USER_PLAN_INPUT);
@@ -126,6 +176,29 @@ export default function PortalAdvisoryPage() {
     plan.advisory_next_step?.trim() ||
     "Clarify pathway questions and determine the best advisory format.";
 
+  const shortlistedCountries = plan.shortlisted_countries ?? [];
+  const timelineItems = useMemo(
+  () => plan.timeline_items ?? [],
+  [plan.timeline_items]
+);
+
+  const completedCount = useMemo(
+    () => countTimelineItems(timelineItems, "Completed"),
+    [timelineItems]
+  );
+
+  const inProgressCount = useMemo(
+    () => countTimelineItems(timelineItems, "In Progress"),
+    [timelineItems]
+  );
+
+  const upcomingCount = useMemo(
+    () => countTimelineItems(timelineItems, "Upcoming"),
+    [timelineItems]
+  );
+
+  const recommendedFocus = useMemo(() => buildRecommendedFocus(plan), [plan]);
+
   const advisoryItems = useMemo(
     () => [
       {
@@ -148,7 +221,7 @@ export default function PortalAdvisoryPage() {
         status: currentStatus,
         description:
           plan.advisory_notes?.trim() ||
-          "This area now reflects your saved advisory stage, notes, and next actions.",
+          "This area reflects your saved advisory stage, notes, and next actions.",
       },
     ],
     [currentPathway, currentStatus, plan.advisory_notes]
@@ -168,8 +241,9 @@ export default function PortalAdvisoryPage() {
           Advisory Workspace
         </h1>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-stone-600">
-          Track your advisory pathway, review support formats, and prepare for
-          structured fertility planning decisions with FertilityCareHub.
+          Track your advisory pathway, review support formats, and move from
+          planning into structured decision support using your saved portal
+          context.
         </p>
       </div>
 
@@ -197,13 +271,67 @@ export default function PortalAdvisoryPage() {
         </div>
 
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">Portal Role</p>
+          <p className="text-sm font-medium text-stone-500">
+            Recommended Advisory Focus
+          </p>
           <p className="mt-2 text-lg font-semibold text-stone-900">
-            Planning + decision support
+            {recommendedFocus}
           </p>
           <p className="mt-2 text-sm leading-6 text-stone-600">
-            This workspace now links saved portal planning with advisory
-            readiness and next actions.
+            This is generated from your current planning, shortlist, and
+            timeline state.
+          </p>
+        </div>
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-4">
+        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+          <p className="text-sm font-medium text-stone-500">
+            Shortlisted Countries
+          </p>
+          <p className="mt-2 text-lg font-semibold text-stone-900">
+            {shortlistedCountries.length > 0
+              ? shortlistedCountries.join(", ")
+              : "No shortlist yet"}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-stone-600">
+            Pulled directly from your saved country planning.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+          <p className="text-sm font-medium text-stone-500">
+            Timeline Completed
+          </p>
+          <p className="mt-2 text-3xl font-semibold text-stone-900">
+            {completedCount}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-stone-600">
+            Completed timeline milestones in your workspace.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+          <p className="text-sm font-medium text-stone-500">
+            Timeline In Progress
+          </p>
+          <p className="mt-2 text-3xl font-semibold text-stone-900">
+            {inProgressCount}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-stone-600">
+            Active planning items still being worked through.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+          <p className="text-sm font-medium text-stone-500">
+            Timeline Upcoming
+          </p>
+          <p className="mt-2 text-3xl font-semibold text-stone-900">
+            {upcomingCount}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-stone-600">
+            Remaining milestones still waiting for execution.
           </p>
         </div>
       </section>
@@ -324,7 +452,7 @@ export default function PortalAdvisoryPage() {
             Advisory Pathways
           </h2>
           <p className="mt-1 text-sm text-stone-600">
-            These cards now reflect your saved advisory workspace context.
+            These cards reflect your saved advisory workspace context.
           </p>
         </div>
 
@@ -352,6 +480,48 @@ export default function PortalAdvisoryPage() {
               </div>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-stone-900">
+          Planning Context Snapshot
+        </h2>
+        <p className="mt-1 text-sm text-stone-600">
+          This advisory layer is now informed by the rest of your portal
+          workspace.
+        </p>
+
+        <div className="mt-6 grid gap-4 lg:grid-cols-2">
+          <div className="rounded-xl border border-stone-200 bg-stone-50 p-4">
+            <p className="text-sm font-medium text-stone-500">Pathway</p>
+            <p className="mt-2 text-base font-semibold text-stone-900">
+              {getDisplayValue(plan.pathway_type, "Not yet specified")}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-stone-200 bg-stone-50 p-4">
+            <p className="text-sm font-medium text-stone-500">Target Timeline</p>
+            <p className="mt-2 text-base font-semibold text-stone-900">
+              {getDisplayValue(plan.target_timeline, "Not yet defined")}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-stone-200 bg-stone-50 p-4">
+            <p className="text-sm font-medium text-stone-500">Budget Range</p>
+            <p className="mt-2 text-base font-semibold text-stone-900">
+              {getDisplayValue(plan.budget_range, "Not yet defined")}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-stone-200 bg-stone-50 p-4">
+            <p className="text-sm font-medium text-stone-500">
+              Planning Notes
+            </p>
+            <p className="mt-2 text-base font-semibold text-stone-900">
+              {getDisplayValue(plan.notes, "No planning notes saved yet")}
+            </p>
+          </div>
         </div>
       </section>
     </div>
