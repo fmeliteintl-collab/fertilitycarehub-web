@@ -1,8 +1,8 @@
 export const runtime = "edge";
 
 import Link from "next/link";
-import { getCurrentUserPlan } from "@/lib/plans/user-plans";
-import { getCurrentUserDocuments } from "@/lib/documents/user-documents";
+import { getCurrentUserPlanServer } from "@/lib/plans/user-plans-server";
+import { getCurrentUserDocumentsServer } from "@/lib/documents/user-documents-server";
 
 const dashboardCards = [
   {
@@ -49,7 +49,7 @@ const dashboardCards = [
   },
 ];
 
-type PortalPlan = Awaited<ReturnType<typeof getCurrentUserPlan>>;
+type PortalPlan = Awaited<ReturnType<typeof getCurrentUserPlanServer>>;
 
 function getDisplayValue(value: string | null | undefined, fallback: string) {
   const trimmed = value?.trim();
@@ -341,10 +341,9 @@ function getReadinessSummary(plan: PortalPlan, documentCount: number) {
 
 export default async function PortalDashboardPage() {
   const [plan, documents] = await Promise.all([
-    getCurrentUserPlan(),
-    getCurrentUserDocuments(),
-  ]);
-
+  getCurrentUserPlanServer(),
+  getCurrentUserDocumentsServer(),
+]);
   const documentCount = documents.length;
   const shortlistedCountries = plan?.shortlisted_countries ?? [];
   const shortlistedCountriesText =
