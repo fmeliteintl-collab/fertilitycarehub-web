@@ -49,8 +49,85 @@ const dashboardCards = [
   },
 ];
 
-function getNextAction(plan: Awaited<ReturnType<typeof getCurrentUserPlan>>) {
-  if (!plan) {
+type PortalPlan = Awaited<ReturnType<typeof getCurrentUserPlan>>;
+
+function getDisplayValue(value: string | null | undefined, fallback: string) {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : fallback;
+}
+
+function getTimelineCounts(plan: PortalPlan) {
+  const timelineItems = plan?.timeline_items ?? [];
+
+  return {
+    total: timelineItems.length,
+    completed: timelineItems.filter((item) => item.status === "Completed")
+      .length,
+    inProgress: timelineItems.filter((item) => item.status === "In Progress")
+      .length,
+    upcoming: timelineItems.filter((item) => item.status === "Upcoming").length,
+  };
+}
+
+function getModuleStatuses(plan: PortalPlan, documentCount: number) {
+  const timelineCounts = getTimelineCounts(plan);
+
+  return [
+    {
+      label: "My Plan",
+      value:
+        plan?.pathway_type?.trim() ||
+        plan?.treatment_goal?.trim() ||
+        plan?.notes?.trim()
+          ? "Started"
+          : "Not started",
+      href: "/portal/my-plan",
+    },
+    {
+      label: "Countries",
+      value:
+        (plan?.shortlisted_countries ?? []).length > 0
+          ? `${plan?.shortlisted_countries?.length ?? 0} shortlisted`
+          : "No shortlist yet",
+      href: "/portal/countries",
+    },
+    {
+      label: "Timeline",
+      value:
+        timelineCounts.total > 0
+          ? `${timelineCounts.completed}/${timelineCounts.total} completed`
+          : "Not created",
+      href: "/portal/timeline",
+    },
+    {
+      label: "Documents",
+      value: documentCount > 0 ? `${documentCount} saved` : "No documents yet",
+      href: "/portal/documents",
+    },
+    {
+      label: "Advisory",
+      value: getDisplayValue(plan?.advisory_status, "Not set"),
+      href: "/portal/advisory",
+    },
+    {
+      label: "Settings",
+      value: "Available",
+      href: "/portal/settings",
+    },
+  ];
+}
+
+function getNextAction(plan: PortalPlan, documentCount: number) {
+  const shortlistCount = plan?.shortlisted_countries?.length ?? 0;
+  const timelineCounts = getTimelineCounts(plan);
+
+  const hasMyPlanBasics = Boolean(
+    plan?.pathway_type?.trim() ||
+      plan?.treatment_goal?.trim() ||
+      plan?.notes?.trim()
+  );
+
+  if (!hasMyPlanBasics) {
     return {
       title: "Start your planning workspace",
       body: "Complete My Plan first so the portal can begin reflecting your priorities, timing, and pathway direction.",
@@ -59,7 +136,7 @@ function getNextAction(plan: Awaited<ReturnType<typeof getCurrentUserPlan>>) {
     };
   }
 
-  if ((plan.shortlisted_countries ?? []).length === 0) {
+  if (shortlistCount === 0) {
     return {
       title: "Build your country shortlist",
       body: "Add your first shortlisted jurisdictions so your planning workspace can reflect real comparison options.",
@@ -68,27 +145,60 @@ function getNextAction(plan: Awaited<ReturnType<typeof getCurrentUserPlan>>) {
     };
   }
 
-  if ((plan.timeline_items ?? []).length === 0) {
+  if (timelineCounts.total === 0) {
     return {
       title: "Create your planning timeline",
-      body: "Add your first milestones so your portal starts tracking execution, not just research.",
+      body: "Generate or build your first timeline so the portal starts tracking execution, not just research.",
       href: "/portal/timeline",
       cta: "Open Timeline",
     };
   }
 
+  if (timelineCounts.inProgress === 0 && timelineCounts.upcoming > 0) {
+    return {
+      title: "Activate your timeline",
+      body: "Your timeline exists, but no steps are currently marked in progress. Review and update it so execution reflects your real next moves.",
+      href: "/portal/timeline",
+      cta: "Review Timeline",
+    };
+  }
+
+  if (documentCount === 0) {
+    return {
+      title: "Strengthen your document vault",
+      body: "Upload your essential planning documents so your workspace becomes a complete command center.",
+      href: "/portal/documents",
+      cta: "Open Documents",
+    };
+  }
+
+  if (!plan?.advisory_status?.trim()) {
+    return {
+      title: "Set your advisory direction",
+      body: "Save your current advisory status and pathway so the portal reflects where you are in the decision-support process.",
+      href: "/portal/advisory",
+      cta: "Open Advisory",
+    };
+  }
+
+  if (!plan?.advisory_next_step?.trim()) {
+    return {
+      title: "Define the next advisory action",
+      body: "Add a clear next advisory step so your planning and decision-support flow stays coordinated.",
+      href: "/portal/advisory",
+      cta: "Update Advisory",
+    };
+  }
+
   return {
-    title: "Strengthen your document vault",
-    body: "Upload or log your essential planning documents so your workspace becomes a complete command center.",
-    href: "/portal/documents",
-    cta: "Open Documents",
+    title: "Review system readiness",
+    body: "Your core planning workspace is established. Review your dashboard, timeline, and advisory flow to decide the most important next execution step.",
+    href: "/portal/timeline",
+    cta: "Review Timeline",
   };
 }
 
-function calculateProgress(
-  plan: Awaited<ReturnType<typeof getCurrentUserPlan>>,
-  documentCount: number
-) {
+function calculateProgress(plan: PortalPlan, documentCount: number) {
   let score = 0;
   const completed: string[] = [];
   const remaining: string[] = [];
@@ -100,7 +210,7 @@ function calculateProgress(
   );
 
   if (hasMyPlanBasics) {
-    score += 25;
+    score += 20;
     completed.push("My Plan started");
   } else {
     remaining.push("Complete My Plan");
@@ -121,7 +231,7 @@ function calculateProgress(
   }
 
   if (documentCount > 0) {
-    score += 20;
+    score += 15;
     completed.push("Documents added");
   } else {
     remaining.push("Add documents");
@@ -134,6 +244,13 @@ function calculateProgress(
     remaining.push("Set advisory status");
   }
 
+  if (plan?.advisory_next_step?.trim()) {
+    score += 10;
+    completed.push("Advisory next step defined");
+  } else {
+    remaining.push("Define advisory next step");
+  }
+
   return {
     score,
     completed,
@@ -141,10 +258,7 @@ function calculateProgress(
   };
 }
 
-function buildOnboardingChecklist(
-  plan: Awaited<ReturnType<typeof getCurrentUserPlan>>,
-  documentCount: number
-) {
+function buildOnboardingChecklist(plan: PortalPlan, documentCount: number) {
   return [
     {
       label: "Complete My Plan",
@@ -175,7 +289,54 @@ function buildOnboardingChecklist(
       done: Boolean(plan?.advisory_status?.trim()),
       href: "/portal/advisory",
     },
+    {
+      label: "Define advisory next step",
+      done: Boolean(plan?.advisory_next_step?.trim()),
+      href: "/portal/advisory",
+    },
   ];
+}
+
+function getReadinessSummary(plan: PortalPlan, documentCount: number) {
+  const shortlistCount = plan?.shortlisted_countries?.length ?? 0;
+  const timelineCounts = getTimelineCounts(plan);
+
+  if (
+    shortlistCount > 0 &&
+    timelineCounts.total > 0 &&
+    documentCount > 0 &&
+    plan?.advisory_status?.trim()
+  ) {
+    return {
+      title: "Core workspace established",
+      body: "Your planning, country shortlist, timeline, documents, and advisory layer are all active. The portal is now functioning as a real working system.",
+    };
+  }
+
+  if (shortlistCount > 0 && timelineCounts.total > 0) {
+    return {
+      title: "Planning structure established",
+      body: "You have a real shortlist and timeline in place. Strengthen the workspace further with documents and a defined advisory status.",
+    };
+  }
+
+  if (
+    Boolean(
+      plan?.pathway_type?.trim() ||
+        plan?.treatment_goal?.trim() ||
+        plan?.notes?.trim()
+    )
+  ) {
+    return {
+      title: "Planning foundation started",
+      body: "Your workspace has begun to take shape. The next gains come from shortlisting countries and turning planning into execution steps.",
+    };
+  }
+
+  return {
+    title: "Workspace not yet established",
+    body: "Start with My Plan to give the rest of the portal the context it needs to become useful and connected.",
+  };
 }
 
 export default async function PortalDashboardPage() {
@@ -184,27 +345,30 @@ export default async function PortalDashboardPage() {
     getCurrentUserDocuments(),
   ]);
 
-  const shortlistedCountriesCount = plan?.shortlisted_countries?.length ?? 0;
-  const timelineItems = plan?.timeline_items ?? [];
-
-  const completedCount = timelineItems.filter(
-    (item) => item.status === "Completed"
-  ).length;
-  const inProgressCount = timelineItems.filter(
-    (item) => item.status === "In Progress"
-  ).length;
-  const upcomingCount = timelineItems.filter(
-    (item) => item.status === "Upcoming"
-  ).length;
-
   const documentCount = documents.length;
-  const pathwayType = plan?.pathway_type?.trim() || "Not set yet";
+  const shortlistedCountries = plan?.shortlisted_countries ?? [];
+  const shortlistedCountriesText =
+    shortlistedCountries.length > 0
+      ? shortlistedCountries.join(", ")
+      : "No shortlisted countries yet";
+
+  const timelineCounts = getTimelineCounts(plan);
+  const pathwayType = getDisplayValue(plan?.pathway_type, "Not set yet");
+  const advisoryStatus = getDisplayValue(plan?.advisory_status, "Not set");
+  const advisoryPathway = getDisplayValue(plan?.advisory_pathway, "Undecided");
+  const advisoryNextStep = getDisplayValue(
+    plan?.advisory_next_step,
+    "No advisory next step saved yet"
+  );
   const planningNotes =
     plan?.notes?.trim() ||
     "No planning notes saved yet. Add your priorities and case context in My Plan.";
-  const nextAction = getNextAction(plan);
+
+  const nextAction = getNextAction(plan, documentCount);
   const progress = calculateProgress(plan, documentCount);
   const onboardingChecklist = buildOnboardingChecklist(plan, documentCount);
+  const readinessSummary = getReadinessSummary(plan, documentCount);
+  const moduleStatuses = getModuleStatuses(plan, documentCount);
 
   const completedChecklistCount = onboardingChecklist.filter(
     (item) => item.done
@@ -217,11 +381,15 @@ export default async function PortalDashboardPage() {
     },
     {
       label: "Shortlisted Countries",
-      value: String(shortlistedCountriesCount),
+      value: String(shortlistedCountries.length),
     },
     {
       label: "Documents",
       value: String(documentCount),
+    },
+    {
+      label: "Advisory Status",
+      value: advisoryStatus,
     },
   ];
 
@@ -242,7 +410,7 @@ export default async function PortalDashboardPage() {
         </p>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-3">
+      <section className="grid gap-6 lg:grid-cols-4">
         {quickStats.map((stat) => (
           <div
             key={stat.label}
@@ -254,6 +422,57 @@ export default async function PortalDashboardPage() {
             </p>
           </div>
         ))}
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+          <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
+            System Readiness
+          </p>
+          <h2 className="mt-2 text-2xl font-semibold text-stone-900">
+            {readinessSummary.title}
+          </h2>
+          <p className="mt-3 text-sm leading-6 text-stone-600">
+            {readinessSummary.body}
+          </p>
+
+          <div className="mt-6 grid gap-4 lg:grid-cols-2">
+            <div className="rounded-xl bg-stone-50 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+                Shortlist
+              </p>
+              <p className="mt-2 text-sm leading-6 text-stone-700">
+                {shortlistedCountriesText}
+              </p>
+            </div>
+
+            <div className="rounded-xl bg-stone-50 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+                Advisory Pathway
+              </p>
+              <p className="mt-2 text-sm leading-6 text-stone-700">
+                {advisoryPathway}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-stone-900">Next Action</h2>
+          <p className="mt-3 text-lg font-semibold text-stone-900">
+            {nextAction.title}
+          </p>
+          <p className="mt-3 text-sm leading-6 text-stone-600">
+            {nextAction.body}
+          </p>
+
+          <Link
+            href={nextAction.href}
+            className="mt-5 inline-flex rounded-xl bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-800"
+          >
+            {nextAction.cta}
+          </Link>
+        </div>
       </section>
 
       <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
@@ -366,7 +585,7 @@ export default async function PortalDashboardPage() {
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-stone-500">Timeline Completed</p>
           <p className="mt-2 text-3xl font-semibold text-stone-900">
-            {completedCount}
+            {timelineCounts.completed}
           </p>
           <p className="mt-2 text-sm leading-6 text-stone-600">
             Milestones already completed in your planning workflow.
@@ -376,7 +595,7 @@ export default async function PortalDashboardPage() {
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-stone-500">In Progress</p>
           <p className="mt-2 text-3xl font-semibold text-stone-900">
-            {inProgressCount}
+            {timelineCounts.inProgress}
           </p>
           <p className="mt-2 text-sm leading-6 text-stone-600">
             Active planning items currently being worked through.
@@ -386,7 +605,7 @@ export default async function PortalDashboardPage() {
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-stone-500">Upcoming</p>
           <p className="mt-2 text-3xl font-semibold text-stone-900">
-            {upcomingCount}
+            {timelineCounts.upcoming}
           </p>
           <p className="mt-2 text-sm leading-6 text-stone-600">
             Next-phase timeline items waiting to be executed.
@@ -394,7 +613,7 @@ export default async function PortalDashboardPage() {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
+      <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
           <h2 className="text-xl font-semibold text-stone-900">
             Planning Summary
@@ -402,6 +621,28 @@ export default async function PortalDashboardPage() {
           <p className="mt-3 text-sm leading-6 text-stone-600">
             {planningNotes}
           </p>
+
+          <div className="mt-6 grid gap-4 lg:grid-cols-2">
+            <div className="rounded-xl bg-stone-50 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+                Advisory Next Step
+              </p>
+              <p className="mt-2 text-sm leading-6 text-stone-700">
+                {advisoryNextStep}
+              </p>
+            </div>
+
+            <div className="rounded-xl bg-stone-50 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+                Timeline Summary
+              </p>
+              <p className="mt-2 text-sm leading-6 text-stone-700">
+                {timelineCounts.total > 0
+                  ? `${timelineCounts.completed} completed, ${timelineCounts.inProgress} in progress, ${timelineCounts.upcoming} upcoming`
+                  : "No timeline created yet"}
+              </p>
+            </div>
+          </div>
 
           <div className="mt-5 flex flex-wrap gap-3">
             <Link
@@ -416,24 +657,45 @@ export default async function PortalDashboardPage() {
             >
               Review Timeline
             </Link>
+            <Link
+              href="/portal/advisory"
+              className="inline-flex rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
+            >
+              Review Advisory
+            </Link>
           </div>
         </div>
 
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-stone-900">Next Action</h2>
-          <p className="mt-3 text-lg font-semibold text-stone-900">
-            {nextAction.title}
-          </p>
-          <p className="mt-3 text-sm leading-6 text-stone-600">
-            {nextAction.body}
+          <h2 className="text-xl font-semibold text-stone-900">
+            Module Status
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-stone-600">
+            Quick visibility into the current state of each major portal area.
           </p>
 
-          <Link
-            href={nextAction.href}
-            className="mt-5 inline-flex rounded-xl bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-800"
-          >
-            {nextAction.cta}
-          </Link>
+          <div className="mt-5 space-y-3">
+            {moduleStatuses.map((item) => (
+              <div
+                key={item.label}
+                className="flex items-center justify-between rounded-xl border border-stone-200 px-4 py-3"
+              >
+                <div>
+                  <p className="text-sm font-medium text-stone-900">
+                    {item.label}
+                  </p>
+                  <p className="text-sm text-stone-600">{item.value}</p>
+                </div>
+
+                <Link
+                  href={item.href}
+                  className="rounded-xl border border-stone-300 px-3 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
+                >
+                  Open
+                </Link>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
