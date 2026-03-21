@@ -69,135 +69,106 @@ function getTimelineCounts(plan: PortalPlan) {
   };
 }
 
-function getModuleStatuses(plan: PortalPlan, documentCount: number) {
-  const timelineCounts = getTimelineCounts(plan);
-
-  return [
-    {
-      label: "My Plan",
-      value:
-        plan?.pathway_type?.trim() ||
-        plan?.treatment_goal?.trim() ||
-        plan?.notes?.trim()
-          ? "Started"
-          : "Not started",
-      href: "/portal/my-plan",
-    },
-    {
-      label: "Countries",
-      value:
-        (plan?.shortlisted_countries ?? []).length > 0
-          ? `${plan?.shortlisted_countries?.length ?? 0} shortlisted`
-          : "No shortlist yet",
-      href: "/portal/countries",
-    },
-    {
-      label: "Timeline",
-      value:
-        timelineCounts.total > 0
-          ? `${timelineCounts.completed}/${timelineCounts.total} completed`
-          : "Not created",
-      href: "/portal/timeline",
-    },
-    {
-      label: "Documents",
-      value: documentCount > 0 ? `${documentCount} saved` : "No documents yet",
-      href: "/portal/documents",
-    },
-    {
-      label: "Advisory",
-      value: getDisplayValue(plan?.advisory_status, "Not set"),
-      href: "/portal/advisory",
-    },
-    {
-      label: "Settings",
-      value: "Available",
-      href: "/portal/settings",
-    },
-  ];
-}
-
 function getNextAction(plan: PortalPlan, documentCount: number) {
   const shortlistCount = plan?.shortlisted_countries?.length ?? 0;
   const timelineCounts = getTimelineCounts(plan);
 
-  const hasMyPlanBasics = Boolean(
-    plan?.pathway_type?.trim() ||
-      plan?.treatment_goal?.trim() ||
-      plan?.notes?.trim()
-  );
+  const hasPathway = Boolean(plan?.pathway_type?.trim());
+  const hasTreatmentGoal = Boolean(plan?.treatment_goal?.trim());
+  const hasNotes = Boolean(plan?.notes?.trim());
+  const hasMyPlanBasics = hasPathway || hasTreatmentGoal || hasNotes;
+
+  const hasAdvisoryStatus = Boolean(plan?.advisory_status?.trim());
+  const hasAdvisoryNextStep = Boolean(plan?.advisory_next_step?.trim());
+  const hasTimeline = timelineCounts.total > 0;
+  const hasActiveExecution =
+    timelineCounts.inProgress > 0 || timelineCounts.completed > 0;
 
   if (!hasMyPlanBasics) {
     return {
       title: "Start your planning workspace",
-      body: "Complete My Plan first so the portal can begin reflecting your priorities, timing, and pathway direction.",
+      body: "Complete My Plan first so the portal can begin reflecting your pathway, priorities, and case direction.",
       href: "/portal/my-plan",
       cta: "Start My Plan",
     };
   }
 
-  if (shortlistCount === 0) {
+  if (hasMyPlanBasics && shortlistCount === 0) {
     return {
-      title: "Build your country shortlist",
-      body: "Add your first shortlisted jurisdictions so your planning workspace can reflect real comparison options.",
+      title: "Build your first shortlist",
+      body: "Your planning profile exists, but the system needs shortlisted countries before comparison and execution guidance become meaningful.",
       href: "/portal/countries",
       cta: "Open Countries",
     };
   }
 
-  if (timelineCounts.total === 0) {
+  if (shortlistCount > 0 && !hasTimeline) {
     return {
-      title: "Create your planning timeline",
-      body: "Generate or build your first timeline so the portal starts tracking execution, not just research.",
+      title: "Turn research into execution",
+      body: "You now have a real shortlist. Generate or create your timeline so the workspace moves from comparison into planning action.",
       href: "/portal/timeline",
       cta: "Open Timeline",
     };
   }
 
-  if (timelineCounts.inProgress === 0 && timelineCounts.upcoming > 0) {
+  if (hasTimeline && !hasActiveExecution) {
     return {
-      title: "Activate your timeline",
-      body: "Your timeline exists, but no steps are currently marked in progress. Review and update it so execution reflects your real next moves.",
+      title: "Activate the planning timeline",
+      body: "Your timeline exists, but nothing is currently moving. Review the steps and mark the real next phase as in progress.",
       href: "/portal/timeline",
       cta: "Review Timeline",
     };
   }
 
-  if (documentCount === 0) {
+  if (hasTimeline && documentCount === 0) {
     return {
-      title: "Strengthen your document vault",
-      body: "Upload your essential planning documents so your workspace becomes a complete command center.",
+      title: "Support the plan with documents",
+      body: "Your execution structure is forming, but your document vault is still empty. Add core records so the workspace becomes operational.",
       href: "/portal/documents",
       cta: "Open Documents",
     };
   }
 
-  if (!plan?.advisory_status?.trim()) {
+  if (shortlistCount > 0 && hasTimeline && !hasAdvisoryStatus) {
     return {
-      title: "Set your advisory direction",
-      body: "Save your current advisory status and pathway so the portal reflects where you are in the decision-support process.",
+      title: "Define your advisory stage",
+      body: "You have enough planning structure in place to set your advisory direction and clarify where you are in the decision-support process.",
       href: "/portal/advisory",
       cta: "Open Advisory",
     };
   }
 
-  if (!plan?.advisory_next_step?.trim()) {
+  if (hasAdvisoryStatus && !hasAdvisoryNextStep) {
     return {
-      title: "Define the next advisory action",
-      body: "Add a clear next advisory step so your planning and decision-support flow stays coordinated.",
+      title: "Define the next decision step",
+      body: "Your advisory stage is saved, but the system still needs a concrete next action so planning, review, and execution stay aligned.",
       href: "/portal/advisory",
       cta: "Update Advisory",
     };
   }
 
+  if (
+    shortlistCount > 0 &&
+    hasTimeline &&
+    documentCount > 0 &&
+    hasAdvisoryStatus &&
+    hasAdvisoryNextStep
+  ) {
+    return {
+      title: "Review strategic readiness",
+      body: "Your core planning system is active. Review timeline progress, shortlist quality, and advisory direction to determine the highest-value next move.",
+      href: "/portal/timeline",
+      cta: "Review Timeline",
+    };
+  }
+
   return {
-    title: "Review system readiness",
-    body: "Your core planning workspace is established. Review your dashboard, timeline, and advisory flow to decide the most important next execution step.",
-    href: "/portal/timeline",
-    cta: "Review Timeline",
+    title: "Continue strengthening the workspace",
+    body: "Your portal is progressing well. Review the modules to identify the next missing dependency or execution gap.",
+    href: "/portal",
+    cta: "Review Dashboard",
   };
 }
-
 function calculateProgress(plan: PortalPlan, documentCount: number) {
   let score = 0;
   const completed: string[] = [];
@@ -362,7 +333,53 @@ export default async function PortalDashboardPage() {
   const planningNotes =
     plan?.notes?.trim() ||
     "No planning notes saved yet. Add your priorities and case context in My Plan.";
+function getModuleStatuses(plan: PortalPlan, documentCount: number) {
+  const timelineCounts = getTimelineCounts(plan);
 
+  return [
+    {
+      label: "My Plan",
+      value:
+        plan?.pathway_type?.trim() ||
+        plan?.treatment_goal?.trim() ||
+        plan?.notes?.trim()
+          ? "Started"
+          : "Not started",
+      href: "/portal/my-plan",
+    },
+    {
+      label: "Countries",
+      value:
+        (plan?.shortlisted_countries ?? []).length > 0
+          ? `${plan?.shortlisted_countries?.length ?? 0} shortlisted`
+          : "No shortlist yet",
+      href: "/portal/countries",
+    },
+    {
+      label: "Timeline",
+      value:
+        timelineCounts.total > 0
+          ? `${timelineCounts.completed}/${timelineCounts.total} completed`
+          : "Not created",
+      href: "/portal/timeline",
+    },
+    {
+      label: "Documents",
+      value: documentCount > 0 ? `${documentCount} saved` : "No documents yet",
+      href: "/portal/documents",
+    },
+    {
+      label: "Advisory",
+      value: getDisplayValue(plan?.advisory_status, "Not set"),
+      href: "/portal/advisory",
+    },
+    {
+      label: "Settings",
+      value: "Available",
+      href: "/portal/settings",
+    },
+  ];
+}
   const nextAction = getNextAction(plan, documentCount);
   const progress = calculateProgress(plan, documentCount);
   const onboardingChecklist = buildOnboardingChecklist(plan, documentCount);
@@ -674,7 +691,8 @@ export default async function PortalDashboardPage() {
           </p>
 
           <div className="mt-5 space-y-3">
-            {moduleStatuses.map((item) => (
+            {moduleStatuses.map(
+  (item: { label: string; value: string; href: string }) => (
               <div
                 key={item.label}
                 className="flex items-center justify-between rounded-xl border border-stone-200 px-4 py-3"
