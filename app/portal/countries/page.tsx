@@ -586,6 +586,9 @@ const countriesNextAction = useMemo(() => getCountriesNextAction(plan), [plan]);
 const shortlistReadiness = useMemo(() => getShortlistReadiness(plan), [plan]);
 const countrySignals = useMemo(() => getCountrySignals(plan), [plan]);
 const planningBadges = useMemo(() => getPlanningBadges(plan), [plan]);
+const shortlistReadyForTimeline =
+  plan.shortlisted_countries.length >= 2 &&
+  plan.shortlisted_countries.length <= 3;
 
 const formattedLastSaved =
   lastSavedAt !== null ? new Date(lastSavedAt).toLocaleString() : null;
@@ -812,6 +815,31 @@ const formattedLastSaved =
     </div>
   </div>
 </section>
+{shortlistReadyForTimeline && (
+  <section className="rounded-2xl border border-stone-900 bg-stone-900 p-6 text-white shadow-sm">
+    <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <div>
+        <p className="text-sm uppercase tracking-[0.18em] text-white/70">
+          Next Step
+        </p>
+        <h2 className="mt-2 text-xl font-semibold">
+          Your shortlist is ready for execution planning
+        </h2>
+        <p className="mt-2 text-sm text-white/80">
+          You now have a focused shortlist. Move to the timeline to start
+          structuring execution, logistics, and next actions.
+        </p>
+      </div>
+
+      <a
+        href="/portal/timeline"
+        className="inline-flex items-center justify-center rounded-xl bg-white px-4 py-2 text-sm font-medium text-stone-900 transition hover:bg-stone-100"
+      >
+        Open Timeline
+      </a>
+    </div>
+  </section>
+)}
 <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
   <div>
     <h2 className="text-xl font-semibold text-stone-900">
