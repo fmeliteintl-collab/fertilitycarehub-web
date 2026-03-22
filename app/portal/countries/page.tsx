@@ -299,7 +299,164 @@ function getRecommendedCountries(plan: UserPlanInput): RecommendedCountry[] {
     .filter((item) => item.score > 0)
     .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
 }
+function getCountriesNextAction(plan: UserPlanInput) {
+  const shortlistCount = plan.shortlisted_countries.length;
+  const hasPlanningBasics = Boolean(
+    plan.pathway_type?.trim() ||
+      plan.treatment_goal?.trim() ||
+      plan.notes?.trim()
+  );
 
+  if (!hasPlanningBasics) {
+    return {
+      title: "Strengthen planning inputs",
+      body: "Add more detail in My Plan so shortlist guidance becomes sharper and more relevant.",
+    };
+  }
+
+  if (shortlistCount === 0) {
+    return {
+      title: "Build your first shortlist",
+      body: "Select 2–3 countries that deserve deeper comparison based on fit, structure, and execution practicality.",
+    };
+  }
+
+  if (shortlistCount === 1) {
+    return {
+      title: "Pressure-test your lead country",
+      body: "Your shortlist is very narrow. Add one or two comparison countries to improve decision quality before committing.",
+    };
+  }
+
+  if (shortlistCount <= 3) {
+    return {
+      title: "Deepen shortlist comparison",
+      body: "Your shortlist is focused. This is the right stage to compare legal fit, treatment structure, timing, and logistics more seriously.",
+    };
+  }
+
+  return {
+    title: "Narrow shortlist complexity",
+    body: "Your shortlist is broad. Reduce it to 2–3 stronger candidates so planning becomes easier and more actionable.",
+  };
+}
+
+function getShortlistReadiness(plan: UserPlanInput) {
+  const shortlistCount = plan.shortlisted_countries.length;
+  const hasPlanningBasics = Boolean(
+    plan.pathway_type?.trim() ||
+      plan.treatment_goal?.trim() ||
+      plan.notes?.trim()
+  );
+
+  let score = 0;
+  const strengths: string[] = [];
+  const gaps: string[] = [];
+
+  if (hasPlanningBasics) {
+    score += 25;
+    strengths.push("Planning context is saved");
+  } else {
+    gaps.push("Add more planning detail in My Plan");
+  }
+
+  if (shortlistCount > 0) {
+    score += 25;
+    strengths.push("At least one country is shortlisted");
+  } else {
+    gaps.push("Create your shortlist");
+  }
+
+  if (shortlistCount >= 2 && shortlistCount <= 3) {
+    score += 30;
+    strengths.push("Shortlist is in a strong comparison range");
+  } else if (shortlistCount === 1) {
+    gaps.push("Add 1–2 comparison countries");
+  } else if (shortlistCount > 3) {
+    gaps.push("Narrow shortlist to 2–3 countries");
+  }
+
+  if (plan.donor_needed || plan.surrogate_needed) {
+    score += 20;
+    strengths.push("Pathway complexity is flagged for deeper review");
+  }
+
+  let label = "Low";
+  let summary =
+    "Your shortlist needs more structure before it becomes a strong decision set.";
+
+  if (score >= 70) {
+    label = "High";
+    summary =
+      "Your shortlist is in a strong range for serious comparison and deeper decision support.";
+  } else if (score >= 40) {
+    label = "Moderate";
+    summary =
+      "Your shortlist has a useful base, but it still needs refinement before it becomes fully decision-ready.";
+  }
+
+  return {
+    score,
+    label,
+    summary,
+    strengths,
+    gaps,
+  };
+}
+
+function getCountrySignals(plan: UserPlanInput) {
+  const signals: string[] = [];
+  const shortlistCount = plan.shortlisted_countries.length;
+  const hasPlanningBasics = Boolean(
+    plan.pathway_type?.trim() ||
+      plan.treatment_goal?.trim() ||
+      plan.notes?.trim()
+  );
+
+  if (!hasPlanningBasics) {
+    signals.push(
+      "Your shortlist guidance is limited because planning details are still thin."
+    );
+  }
+
+  if (shortlistCount === 0) {
+    signals.push(
+      "No countries are currently shortlisted. This page is still in exploration mode."
+    );
+  }
+
+  if (shortlistCount === 1) {
+    signals.push(
+      "Only one country is shortlisted. Add comparison options to improve decision quality."
+    );
+  }
+
+  if (shortlistCount >= 4) {
+    signals.push(
+      "Your shortlist is broad. Reducing it to 2–3 countries will make deeper comparison easier."
+    );
+  }
+
+  if (plan.donor_needed) {
+    signals.push(
+      "Donor pathway is part of this case. Country comparison should account for donor-related structure and constraints."
+    );
+  }
+
+  if (plan.surrogate_needed) {
+    signals.push(
+      "Surrogacy review is part of this case. Country selection should be pressure-tested for legal and execution complexity."
+    );
+  }
+
+  if (shortlistCount >= 2 && shortlistCount <= 3) {
+    signals.push(
+      "Your shortlist is in a strong range for deeper legal, timing, and logistics comparison."
+    );
+  }
+
+  return signals;
+}
 export default function PortalCountriesPage() {
   const [plan, setPlan] = useState<UserPlanInput>(EMPTY_USER_PLAN_INPUT);
   const [loading, setLoading] = useState(true);
@@ -423,13 +580,15 @@ export default function PortalCountriesPage() {
   }, [plan.shortlisted_countries, recommendedCountries]);
 
   const topPriority =
-    shortlistedCountries.length > 0 ? shortlistedCountries[0].name : "None yet";
+  shortlistedCountries.length > 0 ? shortlistedCountries[0].name : "None yet";
 
-  const planningBadges = useMemo(() => getPlanningBadges(plan), [plan]);
+const countriesNextAction = useMemo(() => getCountriesNextAction(plan), [plan]);
+const shortlistReadiness = useMemo(() => getShortlistReadiness(plan), [plan]);
+const countrySignals = useMemo(() => getCountrySignals(plan), [plan]);
+const planningBadges = useMemo(() => getPlanningBadges(plan), [plan]);
 
-  const formattedLastSaved =
-    lastSavedAt !== null ? new Date(lastSavedAt).toLocaleString() : null;
-
+const formattedLastSaved =
+  lastSavedAt !== null ? new Date(lastSavedAt).toLocaleString() : null;
   function toggleCountry(countryName: CountryName) {
     setMessage(null);
     setIsError(false);
@@ -532,12 +691,11 @@ export default function PortalCountriesPage() {
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-stone-500">Next Action</p>
           <p className="mt-2 text-lg font-semibold text-stone-900">
-            Refine your shortlist
-          </p>
-          <p className="mt-2 text-sm leading-6 text-stone-600">
-            Save only the countries that still match your legal fit, treatment
-            structure, logistics, and timing priorities.
-          </p>
+  {countriesNextAction.title}
+</p>
+<p className="mt-2 text-sm leading-6 text-stone-600">
+  {countriesNextAction.body}
+</p>
         </div>
       </section>
 
@@ -597,7 +755,91 @@ export default function PortalCountriesPage() {
           </p>
         ) : null}
       </section>
+      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+  <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <div>
+      <h2 className="text-xl font-semibold text-stone-900">
+        Shortlist Readiness
+      </h2>
+      <p className="mt-1 text-sm text-stone-600">
+        This score reflects how decision-ready your shortlist is based on
+        planning context, shortlist shape, and pathway complexity.
+      </p>
+    </div>
 
+    <div className="rounded-xl bg-stone-50 px-4 py-3 text-sm font-medium text-stone-700">
+      Readiness Level: {shortlistReadiness.label}
+    </div>
+  </div>
+
+  <div className="mt-5">
+    <p className="text-3xl font-semibold text-stone-900">
+      {shortlistReadiness.score}%
+    </p>
+    <p className="mt-2 text-sm leading-6 text-stone-600">
+      {shortlistReadiness.summary}
+    </p>
+  </div>
+
+  <div className="mt-5 h-3 w-full overflow-hidden rounded-full bg-stone-200">
+    <div
+      className="h-full rounded-full bg-stone-900 transition-all"
+      style={{ width: `${shortlistReadiness.score}%` }}
+    />
+  </div>
+
+  <div className="mt-5 grid gap-4 lg:grid-cols-2">
+    <div className="rounded-xl bg-stone-50 p-4">
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+        Supporting Signals
+      </p>
+      <p className="mt-2 text-sm leading-6 text-stone-700">
+        {shortlistReadiness.strengths.length > 0
+          ? shortlistReadiness.strengths.join(", ")
+          : "No strong shortlist signals detected yet."}
+      </p>
+    </div>
+
+    <div className="rounded-xl bg-stone-50 p-4">
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+        Gaps to Improve
+      </p>
+      <p className="mt-2 text-sm leading-6 text-stone-700">
+        {shortlistReadiness.gaps.length > 0
+          ? shortlistReadiness.gaps.join(", ")
+          : "No major shortlist gaps detected."}
+      </p>
+    </div>
+  </div>
+</section>
+<section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+  <div>
+    <h2 className="text-xl font-semibold text-stone-900">
+      Country Signals
+    </h2>
+    <p className="mt-1 text-sm text-stone-600">
+      These observations highlight important shortlist patterns and comparison
+      risks in your current planning state.
+    </p>
+  </div>
+
+  <div className="mt-5 space-y-3">
+    {countrySignals.length > 0 ? (
+      countrySignals.map((signal) => (
+        <div
+          key={signal}
+          className="rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-700"
+        >
+          {signal}
+        </div>
+      ))
+    ) : (
+      <p className="text-sm text-stone-500">
+        No major shortlist signals detected.
+      </p>
+    )}
+  </div>
+</section>
       <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
         <div>
           <h2 className="text-xl font-semibold text-stone-900">
