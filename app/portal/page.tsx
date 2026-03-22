@@ -334,43 +334,70 @@ function getSystemSignals(plan: PortalPlan, documentCount: number) {
   const hasAdvisoryStatus = Boolean(plan?.advisory_status?.trim());
   const hasAdvisoryNextStep = Boolean(plan?.advisory_next_step?.trim());
 
-  // 🔹 Shortlist signal
+  const pathway = plan?.pathway_type?.toLowerCase() ?? "";
+
+  // 🔹 Strategic shortlist signal
   if (shortlist.length >= 3) {
     signals.push(
-      "Your shortlist includes multiple countries. Consider narrowing to 2–3 for deeper comparison."
+      "Your shortlist spans multiple jurisdictions. Consider narrowing to 2–3 to reduce decision complexity and improve comparison depth."
     );
   }
 
-  // 🔹 Timeline signals
+  // 🔹 Legal/complexity signal (future-ready logic)
+  if (shortlist.length > 0 && pathway.includes("surrogate")) {
+    signals.push(
+      "Your pathway involves surrogacy. Ensure shortlisted countries are aligned with legal structure and cross-border requirements."
+    );
+  }
+
+  // 🔹 Timeline maturity
   if (hasTimeline && !hasActiveTimeline) {
     signals.push(
-      "Your timeline exists, but no step is currently active. Execution has not started."
+      "Your timeline is defined, but no step is currently active. Planning has not yet transitioned into execution."
     );
   }
 
+  // 🔹 Timeline missing
   if (!hasTimeline) {
     signals.push(
-      "You have not created a timeline yet. Planning is still in research phase."
+      "You have not yet created a timeline. Your planning is still in the research phase."
     );
   }
 
-  // 🔹 Documents signal
+  // 🔹 Documents maturity
   if (!hasDocuments) {
     signals.push(
-      "No documents have been uploaded. Your workspace is not yet operational."
+      "No documents are currently stored. This may slow down execution once you move forward."
+    );
+  } else if (documentCount < 2) {
+    signals.push(
+      "Only a limited number of documents are available. Consider expanding your document set to support planning decisions."
     );
   }
 
-  // 🔹 Advisory signals
+  // 🔹 Advisory clarity
   if (hasAdvisoryStatus && !hasAdvisoryNextStep) {
     signals.push(
-      "Advisory status is set, but no next step is defined."
+      "Your advisory stage is defined, but the next step is unclear. This may slow decision momentum."
     );
   }
 
   if (!hasAdvisoryStatus) {
     signals.push(
-      "Advisory stage is not yet defined."
+      "Advisory stage is not yet defined. This limits structured decision support."
+    );
+  }
+
+  // 🔹 High readiness insight (very important)
+  if (
+    shortlist.length > 0 &&
+    hasTimeline &&
+    hasDocuments &&
+    hasAdvisoryStatus &&
+    hasAdvisoryNextStep
+  ) {
+    signals.push(
+      "Your workspace is structurally complete. Focus should now shift to decision quality and execution readiness."
     );
   }
 
