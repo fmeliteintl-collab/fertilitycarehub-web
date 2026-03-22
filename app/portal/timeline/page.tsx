@@ -161,6 +161,259 @@ function createGeneratedTimeline(plan: UserPlanInput): TimelineItem[] {
   return items;
 }
 
+// Intelligence calculation functions
+function calculateTimelineReadiness(
+  plan: UserPlanInput,
+  timelineItems: TimelineItem[]
+): {
+  score: number;
+  label: string;
+  description: string;
+} {
+  const hasPathway = !!plan.pathway_type?.trim();
+  const hasCountries = (plan.shortlisted_countries ?? []).length > 0;
+  const hasTimelineItems = timelineItems.length > 0;
+  const hasInProgress = timelineItems.some((i) => i.status === "In Progress");
+  const hasCompleted = timelineItems.some((i) => i.status === "Completed");
+  const allCompleted = timelineItems.length > 0 && timelineItems.every((i) => i.status === "Completed");
+
+  if (allCompleted && hasTimelineItems) {
+    return {
+      score: 100,
+      label: "Execution Ready",
+      description: "All timeline items completed. Ready to transition to execution phase.",
+    };
+  }
+
+  if (hasCompleted && hasInProgress && hasCountries) {
+    return {
+      score: 75,
+      label: "Well Structured",
+      description: "Timeline in progress with completed milestones and country context established.",
+    };
+  }
+
+  if (hasInProgress && hasTimelineItems) {
+    return {
+      score: 50,
+      label: "In Progress",
+      description: "Timeline active but still building momentum. Consider finalizing country shortlist.",
+    };
+  }
+
+  if (hasTimelineItems && !hasInProgress && !hasCompleted) {
+    return {
+      score: 25,
+      label: "Not Started",
+      description: "Timeline exists but no items in progress. Select a starting point to begin.",
+    };
+  }
+
+  if (!hasTimelineItems && hasPathway) {
+    return {
+      score: 10,
+      label: "Needs Generation",
+      description: "Planning context exists but no timeline generated yet.",
+    };
+  }
+
+  return {
+    score: 0,
+    label: "Not Established",
+    description: "Generate a timeline from your planning context to begin execution planning.",
+  };
+}
+
+function detectTimelineSignals(
+  plan: UserPlanInput,
+  timelineItems: TimelineItem[]
+): Array<{ type: "info" | "attention" | "action"; message: string }> {
+  const signals: Array<{ type: "info" | "attention" | "action"; message: string }> = [];
+  
+  const hasPathway = !!plan.pathway_type?.trim();
+  const hasCountries = (plan.shortlisted_countries ?? []).length > 0;
+  const hasAdvisoryNextStep = !!plan.advisory_next_step?.trim();
+  const hasInProgress = timelineItems.some((i) => i.status === "In Progress");
+  const hasCompleted = timelineItems.some((i) => i.status === "Completed");
+  const allUpcoming = timelineItems.length > 0 && timelineItems.every((i) => i.status === "Upcoming");
+
+  // Inactive timeline detection
+  if (timelineItems.length > 0 && allUpcoming) {
+    signals.push({
+      type: "attention",
+      message: "Timeline inactive — no items currently in progress. Select a starting point to activate.",
+    });
+  }
+
+  // Stalled timeline detection
+  if (hasCompleted && !hasInProgress && timelineItems.some((i) => i.status === "Upcoming")) {
+    signals.push({
+      type: "attention",
+      message: "Timeline stalled — completed items exist but nothing currently active. Mark next item as In Progress.",
+    });
+  }
+
+  // Missing country context
+  if (hasPathway && !hasCountries && timelineItems.length > 0) {
+    signals.push({
+      type: "action",
+      message: "Country shortlist missing — timeline generated but no countries selected. Visit Countries page to shortlist.",
+    });
+  }
+
+  // Advisory gap
+  if (hasCountries && !hasAdvisoryNextStep && hasInProgress) {
+    signals.push({
+      type: "info",
+      message: "Consider advisory input — you have active timeline items and shortlisted countries. Advisory can help validate execution approach.",
+    });
+  }
+
+  // Execution readiness
+  const executionItems = timelineItems.filter((i) => i.category === "Execution" && i.status === "Completed");
+  if (executionItems.length > 0) {
+    signals.push({
+      type: "info",
+      message: "Execution preparation underway — document and logistics items progressing well.",
+    });
+  }
+
+  return signals;
+}
+
+function getNextTimelineAction(
+  plan: UserPlanInput,
+  timelineItems: TimelineItem[]
+): {
+  action: string;
+  context: string;
+  cta?: { label: string; href: string };
+} {
+  const hasPathway = !!plan.pathway_type?.trim();
+  const hasCountries = (plan.shortlisted_countries ?? []).length > 0;
+  const hasAdvisoryNextStep = !!plan.advisory_next_step?.trim();
+  
+  const inProgressItem = timelineItems.find((i) => i.status === "In Progress");
+  const firstUpcoming = timelineItems.find((i) => i.status === "Upcoming");
+  const allUpcoming = timelineItems.length > 0 && timelineItems.every((i) => i.status === "Upcoming");
+
+  // Priority 1: Generate timeline if missing
+  if (timelineItems.length === 0 && hasPathway) {
+    return {
+      action: "Generate your timeline",
+      context: "Your planning context is saved but no timeline exists. Generate to create execution roadmap.",
+      cta: { label: "Regenerate Timeline", href: "#timeline-management" },
+    };
+  }
+
+  // Priority 2: Start the timeline
+  if (allUpcoming && timelineItems.length > 0) {
+    return {
+      action: `Begin with: ${timelineItems[0].title}`,
+      context: "Your timeline is ready but inactive. Mark the first item as In Progress to begin execution planning.",
+    };
+  }
+
+  // Priority 3: Continue current item
+  if (inProgressItem) {
+    return {
+      action: `Continue: ${inProgressItem.title}`,
+      context: `Active ${inProgressItem.category.toLowerCase()} item in progress. Complete this before moving to next phase.`,
+    };
+  }
+
+  // Priority 4: Move to next item
+  if (firstUpcoming) {
+    return {
+      action: `Start next: ${firstUpcoming.title}`,
+      context: "Previous items completed. Mark the next item as In Progress to maintain momentum.",
+    };
+  }
+
+  // Priority 5: Advisory connection
+  if (hasCountries && !hasAdvisoryNextStep) {
+    return {
+      action: "Schedule advisory consultation",
+      context: "Timeline structure complete. Advisory input recommended before finalizing execution approach.",
+      cta: { label: "Go to Advisory", href: "/portal/advisory" },
+    };
+  }
+
+  // Default
+  return {
+    action: "Review timeline structure",
+    context: "Ensure your timeline reflects current planning priorities and execution readiness.",
+  };
+}
+
+function getExecutionStage(
+  plan: UserPlanInput,
+  timelineItems: TimelineItem[]
+): {
+  stage: string;
+  description: string;
+  indicators: string[];
+} {
+  const completedCount = timelineItems.filter((i) => i.status === "Completed").length;
+  const totalCount = timelineItems.length;
+  const hasCountries = (plan.shortlisted_countries ?? []).length > 0;
+  const planningCategories = ["Planning", "Research"];
+  const executionCategories = ["Execution", "Logistics", "Legal"];
+  
+  const planningCompleted = timelineItems
+    .filter((i) => planningCategories.includes(i.category))
+    .every((i) => i.status === "Completed");
+  
+  const executionStarted = timelineItems
+    .some((i) => executionCategories.includes(i.category) && (i.status === "In Progress" || i.status === "Completed"));
+
+  if (completedCount === 0 && totalCount > 0) {
+    return {
+      stage: "Foundation",
+      description: "Timeline established but execution not yet initiated. Focus on completing initial planning items.",
+      indicators: ["Timeline generated", "No items completed", "Building context"],
+    };
+  }
+
+  if (!planningCompleted && !executionStarted) {
+    return {
+      stage: "Planning Phase",
+      description: "Active planning and research phase. Continue building country knowledge and pathway clarity.",
+      indicators: ["Planning items active", "Research underway", "Country selection pending"],
+    };
+  }
+
+  if (planningCompleted && !executionStarted && hasCountries) {
+    return {
+      stage: "Transition Ready",
+      description: "Planning foundation complete. Ready to shift from research to execution preparation.",
+      indicators: ["Planning complete", "Countries shortlisted", "Execution pending"],
+    };
+  }
+
+  if (executionStarted) {
+    return {
+      stage: "Execution Phase",
+      description: "Active execution preparation. Focus on documentation, logistics, and legal readiness.",
+      indicators: ["Execution items active", "Documentation in progress", "Implementation focus"],
+    };
+  }
+
+  if (completedCount === totalCount && totalCount > 0) {
+    return {
+      stage: "Execution Ready",
+      description: "All timeline milestones completed. Ready to initiate actual treatment process.",
+      indicators: ["All items complete", "Full context established", "Ready to proceed"],
+    };
+  }
+
+  return {
+    stage: "Establishing",
+    description: "Building initial timeline structure from planning context.",
+    indicators: ["Timeline generation needed", "Context being established"],
+  };
+}
+
 export default function PortalTimelinePage() {
   const [plan, setPlan] = useState<UserPlanInput>(EMPTY_USER_PLAN_INPUT);
   const [loading, setLoading] = useState(true);
@@ -235,6 +488,27 @@ export default function PortalTimelinePage() {
   const timelineItems = useMemo(
     () => plan.timeline_items ?? [],
     [plan.timeline_items]
+  );
+
+  // Intelligence calculations
+  const readiness = useMemo(
+    () => calculateTimelineReadiness(plan, timelineItems),
+    [plan, timelineItems]
+  );
+
+  const signals = useMemo(
+    () => detectTimelineSignals(plan, timelineItems),
+    [plan, timelineItems]
+  );
+
+  const nextAction = useMemo(
+    () => getNextTimelineAction(plan, timelineItems),
+    [plan, timelineItems]
+  );
+
+  const executionStage = useMemo(
+    () => getExecutionStage(plan, timelineItems),
+    [plan, timelineItems]
   );
 
   const completedCount = useMemo(
@@ -374,6 +648,80 @@ export default function PortalTimelinePage() {
         </p>
       </div>
 
+      {/* Intelligence Section */}
+      <section className="grid gap-6 lg:grid-cols-3">
+        {/* Timeline Readiness */}
+        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium text-stone-500">Timeline Readiness</p>
+            <span className="text-2xl font-semibold text-stone-900">{readiness.score}%</span>
+          </div>
+          <p className="mt-2 text-base font-semibold text-stone-900">{readiness.label}</p>
+          <p className="mt-2 text-sm leading-6 text-stone-600">{readiness.description}</p>
+          <div className="mt-4 h-2 w-full rounded-full bg-stone-100">
+            <div
+              className="h-2 rounded-full bg-stone-600 transition-all"
+              style={{ width: `${readiness.score}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Next Action */}
+        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+          <p className="text-sm font-medium text-stone-500">Next Action</p>
+          <p className="mt-2 text-base font-semibold text-stone-900">{nextAction.action}</p>
+          <p className="mt-2 text-sm leading-6 text-stone-600">{nextAction.context}</p>
+          {nextAction.cta && (
+            <a
+              href={nextAction.cta.href}
+              className="mt-4 inline-block rounded-xl bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-800"
+            >
+              {nextAction.cta.label}
+            </a>
+          )}
+        </div>
+
+        {/* Execution Stage */}
+        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+          <p className="text-sm font-medium text-stone-500">Execution Stage</p>
+          <p className="mt-2 text-base font-semibold text-stone-900">{executionStage.stage}</p>
+          <p className="mt-2 text-sm leading-6 text-stone-600">{executionStage.description}</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {executionStage.indicators.map((indicator, idx) => (
+              <span
+                key={idx}
+                className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600"
+              >
+                {indicator}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Signals Section */}
+      {signals.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="text-lg font-semibold text-stone-900">Timeline Signals</h2>
+          <div className="space-y-3">
+            {signals.map((signal, idx) => (
+              <div
+                key={idx}
+                className={`rounded-xl border p-4 ${
+                  signal.type === "attention"
+                    ? "border-amber-200 bg-amber-50"
+                    : signal.type === "action"
+                    ? "border-stone-300 bg-stone-50"
+                    : "border-stone-200 bg-white"
+                }`}
+              >
+                <p className="text-sm text-stone-800">{signal.message}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       <section className="rounded-2xl border border-stone-200 bg-amber-50 p-6 shadow-sm">
         <h2 className="text-xl font-semibold text-stone-900">
           How this timeline works
@@ -464,7 +812,7 @@ export default function PortalTimelinePage() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+      <section id="timeline-management" className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h2 className="text-xl font-semibold text-stone-900">
