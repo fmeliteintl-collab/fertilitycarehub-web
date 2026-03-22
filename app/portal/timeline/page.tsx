@@ -11,6 +11,12 @@ import {
   type TimelineItemStatus,
   type UserPlanInput,
 } from "@/types/plan";
+import {
+  calculateTimelineReadiness,
+  getTimelineCounts,
+  determineExecutionStage,
+  getDisplayValue,
+} from "@/lib/intelligence/plan-intelligence";
 
 export const runtime = "edge";
 
@@ -54,11 +60,6 @@ const STATUS_OPTIONS: TimelineItemStatus[] = [
   "In Progress",
   "Upcoming",
 ];
-
-function getDisplayValue(value: string | null | undefined, fallback: string) {
-  const trimmed = value?.trim();
-  return trimmed ? trimmed : fallback;
-}
 
 function createGeneratedTimeline(plan: UserPlanInput): TimelineItem[] {
   const items: TimelineItem[] = [];
@@ -161,69 +162,7 @@ function createGeneratedTimeline(plan: UserPlanInput): TimelineItem[] {
   return items;
 }
 
-// Intelligence calculation functions
-function calculateTimelineReadiness(
-  plan: UserPlanInput,
-  timelineItems: TimelineItem[]
-): {
-  score: number;
-  label: string;
-  description: string;
-} {
-  const hasPathway = !!plan.pathway_type?.trim();
-  const hasCountries = (plan.shortlisted_countries ?? []).length > 0;
-  const hasTimelineItems = timelineItems.length > 0;
-  const hasInProgress = timelineItems.some((i) => i.status === "In Progress");
-  const hasCompleted = timelineItems.some((i) => i.status === "Completed");
-  const allCompleted = timelineItems.length > 0 && timelineItems.every((i) => i.status === "Completed");
-
-  if (allCompleted && hasTimelineItems) {
-    return {
-      score: 100,
-      label: "Execution Ready",
-      description: "All timeline items completed. Ready to transition to execution phase.",
-    };
-  }
-
-  if (hasCompleted && hasInProgress && hasCountries) {
-    return {
-      score: 75,
-      label: "Well Structured",
-      description: "Timeline in progress with completed milestones and country context established.",
-    };
-  }
-
-  if (hasInProgress && hasTimelineItems) {
-    return {
-      score: 50,
-      label: "In Progress",
-      description: "Timeline active but still building momentum. Consider finalizing country shortlist.",
-    };
-  }
-
-  if (hasTimelineItems && !hasInProgress && !hasCompleted) {
-    return {
-      score: 25,
-      label: "Not Started",
-      description: "Timeline exists but no items in progress. Select a starting point to begin.",
-    };
-  }
-
-  if (!hasTimelineItems && hasPathway) {
-    return {
-      score: 10,
-      label: "Needs Generation",
-      description: "Planning context exists but no timeline generated yet.",
-    };
-  }
-
-  return {
-    score: 0,
-    label: "Not Established",
-    description: "Generate a timeline from your planning context to begin execution planning.",
-  };
-}
-
+// Timeline-specific signal detection (context-specific, not in shared module)
 function detectTimelineSignals(
   plan: UserPlanInput,
   timelineItems: TimelineItem[]
@@ -281,6 +220,7 @@ function detectTimelineSignals(
   return signals;
 }
 
+// Timeline-specific next action (more granular than global next action)
 function getNextTimelineAction(
   plan: UserPlanInput,
   timelineItems: TimelineItem[]
@@ -343,74 +283,6 @@ function getNextTimelineAction(
   return {
     action: "Review timeline structure",
     context: "Ensure your timeline reflects current planning priorities and execution readiness.",
-  };
-}
-
-function getExecutionStage(
-  plan: UserPlanInput,
-  timelineItems: TimelineItem[]
-): {
-  stage: string;
-  description: string;
-  indicators: string[];
-} {
-  const completedCount = timelineItems.filter((i) => i.status === "Completed").length;
-  const totalCount = timelineItems.length;
-  const hasCountries = (plan.shortlisted_countries ?? []).length > 0;
-  const planningCategories = ["Planning", "Research"];
-  const executionCategories = ["Execution", "Logistics", "Legal"];
-  
-  const planningCompleted = timelineItems
-    .filter((i) => planningCategories.includes(i.category))
-    .every((i) => i.status === "Completed");
-  
-  const executionStarted = timelineItems
-    .some((i) => executionCategories.includes(i.category) && (i.status === "In Progress" || i.status === "Completed"));
-
-  if (completedCount === 0 && totalCount > 0) {
-    return {
-      stage: "Foundation",
-      description: "Timeline established but execution not yet initiated. Focus on completing initial planning items.",
-      indicators: ["Timeline generated", "No items completed", "Building context"],
-    };
-  }
-
-  if (!planningCompleted && !executionStarted) {
-    return {
-      stage: "Planning Phase",
-      description: "Active planning and research phase. Continue building country knowledge and pathway clarity.",
-      indicators: ["Planning items active", "Research underway", "Country selection pending"],
-    };
-  }
-
-  if (planningCompleted && !executionStarted && hasCountries) {
-    return {
-      stage: "Transition Ready",
-      description: "Planning foundation complete. Ready to shift from research to execution preparation.",
-      indicators: ["Planning complete", "Countries shortlisted", "Execution pending"],
-    };
-  }
-
-  if (executionStarted) {
-    return {
-      stage: "Execution Phase",
-      description: "Active execution preparation. Focus on documentation, logistics, and legal readiness.",
-      indicators: ["Execution items active", "Documentation in progress", "Implementation focus"],
-    };
-  }
-
-  if (completedCount === totalCount && totalCount > 0) {
-    return {
-      stage: "Execution Ready",
-      description: "All timeline milestones completed. Ready to initiate actual treatment process.",
-      indicators: ["All items complete", "Full context established", "Ready to proceed"],
-    };
-  }
-
-  return {
-    stage: "Establishing",
-    description: "Building initial timeline structure from planning context.",
-    indicators: ["Timeline generation needed", "Context being established"],
   };
 }
 
@@ -490,10 +362,10 @@ export default function PortalTimelinePage() {
     [plan.timeline_items]
   );
 
-  // Intelligence calculations
+  // Intelligence calculations using shared module
   const readiness = useMemo(
-    () => calculateTimelineReadiness(plan, timelineItems),
-    [plan, timelineItems]
+    () => calculateTimelineReadiness(plan),
+    [plan]
   );
 
   const signals = useMemo(
@@ -506,23 +378,13 @@ export default function PortalTimelinePage() {
     [plan, timelineItems]
   );
 
-  const executionStage = useMemo(
-    () => getExecutionStage(plan, timelineItems),
-    [plan, timelineItems]
+  const executionStageResult = useMemo(
+    () => determineExecutionStage(plan),
+    [plan]
   );
 
-  const completedCount = useMemo(
-    () => timelineItems.filter((item) => item.status === "Completed").length,
-    [timelineItems]
-  );
-
-  const inProgressCount = useMemo(
-    () => timelineItems.filter((item) => item.status === "In Progress").length,
-    [timelineItems]
-  );
-
-  const upcomingCount = useMemo(
-    () => timelineItems.filter((item) => item.status === "Upcoming").length,
+  const timelineCounts = useMemo(
+    () => getTimelineCounts(timelineItems),
     [timelineItems]
   );
 
@@ -654,14 +516,18 @@ export default function PortalTimelinePage() {
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-stone-500">Timeline Readiness</p>
-            <span className="text-2xl font-semibold text-stone-900">{readiness.score}%</span>
+            <span className="text-2xl font-semibold text-stone-900">{readiness.percentage}%</span>
           </div>
-          <p className="mt-2 text-base font-semibold text-stone-900">{readiness.label}</p>
-          <p className="mt-2 text-sm leading-6 text-stone-600">{readiness.description}</p>
+          <p className="mt-2 text-base font-semibold text-stone-900 capitalize">{readiness.stage}</p>
+          <p className="mt-2 text-sm leading-6 text-stone-600">
+            {readiness.ready.length > 0 
+              ? `${readiness.ready.length} items ready, ${readiness.missing.length} items pending`
+              : "Generate timeline to begin execution planning"}
+          </p>
           <div className="mt-4 h-2 w-full rounded-full bg-stone-100">
             <div
               className="h-2 rounded-full bg-stone-600 transition-all"
-              style={{ width: `${readiness.score}%` }}
+              style={{ width: `${readiness.percentage}%` }}
             />
           </div>
         </div>
@@ -684,10 +550,10 @@ export default function PortalTimelinePage() {
         {/* Execution Stage */}
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-stone-500">Execution Stage</p>
-          <p className="mt-2 text-base font-semibold text-stone-900">{executionStage.stage}</p>
-          <p className="mt-2 text-sm leading-6 text-stone-600">{executionStage.description}</p>
+          <p className="mt-2 text-base font-semibold text-stone-900 capitalize">{executionStageResult.stage.replace(/-/g, " ")}</p>
+          <p className="mt-2 text-sm leading-6 text-stone-600">{executionStageResult.description}</p>
           <div className="mt-4 flex flex-wrap gap-2">
-            {executionStage.indicators.map((indicator, idx) => (
+            {executionStageResult.nextActions.slice(0, 3).map((indicator, idx) => (
               <span
                 key={idx}
                 className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600"
@@ -784,7 +650,7 @@ export default function PortalTimelinePage() {
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-stone-500">Completed</p>
           <p className="mt-2 text-3xl font-semibold text-stone-900">
-            {completedCount}
+            {timelineCounts.completed}
           </p>
           <p className="mt-2 text-sm leading-6 text-stone-600">
             Timeline milestones you have already completed.
@@ -794,7 +660,7 @@ export default function PortalTimelinePage() {
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-stone-500">In Progress</p>
           <p className="mt-2 text-3xl font-semibold text-stone-900">
-            {inProgressCount}
+            {timelineCounts.inProgress}
           </p>
           <p className="mt-2 text-sm leading-6 text-stone-600">
             Active planning items currently being worked through.
@@ -804,7 +670,7 @@ export default function PortalTimelinePage() {
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-stone-500">Upcoming</p>
           <p className="mt-2 text-3xl font-semibold text-stone-900">
-            {upcomingCount}
+            {timelineCounts.upcoming}
           </p>
           <p className="mt-2 text-sm leading-6 text-stone-600">
             Next-phase items still waiting to be executed.

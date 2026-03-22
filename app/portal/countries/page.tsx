@@ -8,6 +8,7 @@ import {
 } from "@/lib/plans/user-plans";
 import { EMPTY_USER_PLAN_INPUT, type UserPlanInput } from "@/types/plan";
 
+
 export const runtime = "edge";
 
 const AVAILABLE_COUNTRIES = [
@@ -139,8 +140,6 @@ function getErrorMessage(error: unknown, fallback: string): string {
 
   return fallback;
 }
-
-
 
 function getPlanText(plan: UserPlanInput): string {
   return [
@@ -299,7 +298,9 @@ function getRecommendedCountries(plan: UserPlanInput): RecommendedCountry[] {
     .filter((item) => item.score > 0)
     .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
 }
-function getCountriesNextAction(plan: UserPlanInput) {
+
+// Countries-specific next action (contextual to shortlist management)
+function getCountriesNextAction(plan: UserPlanInput): NextAction {
   const shortlistCount = plan.shortlisted_countries.length;
   const hasPlanningBasics = Boolean(
     plan.pathway_type?.trim() ||
@@ -311,6 +312,9 @@ function getCountriesNextAction(plan: UserPlanInput) {
     return {
       title: "Strengthen planning inputs",
       body: "Add more detail in My Plan so shortlist guidance becomes sharper and more relevant.",
+      href: "/portal/my-plan",
+      cta: "Go to My Plan",
+      priority: "medium",
     };
   }
 
@@ -318,6 +322,9 @@ function getCountriesNextAction(plan: UserPlanInput) {
     return {
       title: "Build your first shortlist",
       body: "Select 2–3 countries that deserve deeper comparison based on fit, structure, and execution practicality.",
+      href: "#manage-shortlist",
+      cta: "Select Countries",
+      priority: "high",
     };
   }
 
@@ -325,6 +332,9 @@ function getCountriesNextAction(plan: UserPlanInput) {
     return {
       title: "Pressure-test your lead country",
       body: "Your shortlist is very narrow. Add one or two comparison countries to improve decision quality before committing.",
+      href: "#manage-shortlist",
+      cta: "Add Countries",
+      priority: "medium",
     };
   }
 
@@ -332,15 +342,22 @@ function getCountriesNextAction(plan: UserPlanInput) {
     return {
       title: "Deepen shortlist comparison",
       body: "Your shortlist is focused. This is the right stage to compare legal fit, treatment structure, timing, and logistics more seriously.",
+      href: "/portal/timeline",
+      cta: "Open Timeline",
+      priority: "low",
     };
   }
 
   return {
     title: "Narrow shortlist complexity",
     body: "Your shortlist is broad. Reduce it to 2–3 stronger candidates so planning becomes easier and more actionable.",
+    href: "#manage-shortlist",
+    cta: "Refine Shortlist",
+    priority: "medium",
   };
 }
 
+// Countries-specific readiness scoring
 function getShortlistReadiness(plan: UserPlanInput) {
   const shortlistCount = plan.shortlisted_countries.length;
   const hasPlanningBasics = Boolean(
@@ -457,6 +474,7 @@ function getCountrySignals(plan: UserPlanInput) {
 
   return signals;
 }
+
 export default function PortalCountriesPage() {
   const [plan, setPlan] = useState<UserPlanInput>(EMPTY_USER_PLAN_INPUT);
   const [loading, setLoading] = useState(true);
@@ -580,18 +598,20 @@ export default function PortalCountriesPage() {
   }, [plan.shortlisted_countries, recommendedCountries]);
 
   const topPriority =
-  shortlistedCountries.length > 0 ? shortlistedCountries[0].name : "None yet";
+    shortlistedCountries.length > 0 ? shortlistedCountries[0].name : "None yet";
 
-const countriesNextAction = useMemo(() => getCountriesNextAction(plan), [plan]);
-const shortlistReadiness = useMemo(() => getShortlistReadiness(plan), [plan]);
-const countrySignals = useMemo(() => getCountrySignals(plan), [plan]);
-const planningBadges = useMemo(() => getPlanningBadges(plan), [plan]);
-const shortlistReadyForTimeline =
-  plan.shortlisted_countries.length >= 2 &&
-  plan.shortlisted_countries.length <= 3;
+  const countriesNextAction = useMemo(() => getCountriesNextAction(plan), [plan]);
+  const shortlistReadiness = useMemo(() => getShortlistReadiness(plan), [plan]);
+  const countrySignals = useMemo(() => getCountrySignals(plan), [plan]);
+  const planningBadges = useMemo(() => getPlanningBadges(plan), [plan]);
+  
+  const shortlistReadyForTimeline =
+    plan.shortlisted_countries.length >= 2 &&
+    plan.shortlisted_countries.length <= 3;
 
-const formattedLastSaved =
-  lastSavedAt !== null ? new Date(lastSavedAt).toLocaleString() : null;
+  const formattedLastSaved =
+    lastSavedAt !== null ? new Date(lastSavedAt).toLocaleString() : null;
+
   function toggleCountry(countryName: CountryName) {
     setMessage(null);
     setIsError(false);
@@ -694,11 +714,19 @@ const formattedLastSaved =
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-stone-500">Next Action</p>
           <p className="mt-2 text-lg font-semibold text-stone-900">
-  {countriesNextAction.title}
-</p>
-<p className="mt-2 text-sm leading-6 text-stone-600">
-  {countriesNextAction.body}
-</p>
+            {countriesNextAction.title}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-stone-600">
+            {countriesNextAction.body}
+          </p>
+          {countriesNextAction.cta && (
+            <a
+              href={countriesNextAction.href}
+              className="mt-4 inline-block rounded-xl bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-800"
+            >
+              {countriesNextAction.cta}
+            </a>
+          )}
         </div>
       </section>
 
@@ -758,116 +786,120 @@ const formattedLastSaved =
           </p>
         ) : null}
       </section>
+
       <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-  <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-    <div>
-      <h2 className="text-xl font-semibold text-stone-900">
-        Shortlist Readiness
-      </h2>
-      <p className="mt-1 text-sm text-stone-600">
-        This score reflects how decision-ready your shortlist is based on
-        planning context, shortlist shape, and pathway complexity.
-      </p>
-    </div>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-stone-900">
+              Shortlist Readiness
+            </h2>
+            <p className="mt-1 text-sm text-stone-600">
+              This score reflects how decision-ready your shortlist is based on
+              planning context, shortlist shape, and pathway complexity.
+            </p>
+          </div>
 
-    <div className="rounded-xl bg-stone-50 px-4 py-3 text-sm font-medium text-stone-700">
-      Readiness Level: {shortlistReadiness.label}
-    </div>
-  </div>
-
-  <div className="mt-5">
-    <p className="text-3xl font-semibold text-stone-900">
-      {shortlistReadiness.score}%
-    </p>
-    <p className="mt-2 text-sm leading-6 text-stone-600">
-      {shortlistReadiness.summary}
-    </p>
-  </div>
-
-  <div className="mt-5 h-3 w-full overflow-hidden rounded-full bg-stone-200">
-    <div
-      className="h-full rounded-full bg-stone-900 transition-all"
-      style={{ width: `${shortlistReadiness.score}%` }}
-    />
-  </div>
-
-  <div className="mt-5 grid gap-4 lg:grid-cols-2">
-    <div className="rounded-xl bg-stone-50 p-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-        Supporting Signals
-      </p>
-      <p className="mt-2 text-sm leading-6 text-stone-700">
-        {shortlistReadiness.strengths.length > 0
-          ? shortlistReadiness.strengths.join(", ")
-          : "No strong shortlist signals detected yet."}
-      </p>
-    </div>
-
-    <div className="rounded-xl bg-stone-50 p-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-        Gaps to Improve
-      </p>
-      <p className="mt-2 text-sm leading-6 text-stone-700">
-        {shortlistReadiness.gaps.length > 0
-          ? shortlistReadiness.gaps.join(", ")
-          : "No major shortlist gaps detected."}
-      </p>
-    </div>
-  </div>
-</section>
-{shortlistReadyForTimeline && (
-  <section className="rounded-2xl border border-stone-900 bg-stone-900 p-6 text-white shadow-sm">
-    <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-      <div>
-        <p className="text-sm uppercase tracking-[0.18em] text-white/70">
-          Next Step
-        </p>
-        <h2 className="mt-2 text-xl font-semibold">
-          Your shortlist is ready for execution planning
-        </h2>
-        <p className="mt-2 text-sm text-white/80">
-          You now have a focused shortlist. Move to the timeline to start
-          structuring execution, logistics, and next actions.
-        </p>
-      </div>
-
-      <a
-        href="/portal/timeline"
-        className="inline-flex items-center justify-center rounded-xl bg-white px-4 py-2 text-sm font-medium text-stone-900 transition hover:bg-stone-100"
-      >
-        Open Timeline
-      </a>
-    </div>
-  </section>
-)}
-<section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-  <div>
-    <h2 className="text-xl font-semibold text-stone-900">
-      Country Signals
-    </h2>
-    <p className="mt-1 text-sm text-stone-600">
-      These observations highlight important shortlist patterns and comparison
-      risks in your current planning state.
-    </p>
-  </div>
-
-  <div className="mt-5 space-y-3">
-    {countrySignals.length > 0 ? (
-      countrySignals.map((signal) => (
-        <div
-          key={signal}
-          className="rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-700"
-        >
-          {signal}
+          <div className="rounded-xl bg-stone-50 px-4 py-3 text-sm font-medium text-stone-700">
+            Readiness Level: {shortlistReadiness.label}
+          </div>
         </div>
-      ))
-    ) : (
-      <p className="text-sm text-stone-500">
-        No major shortlist signals detected.
-      </p>
-    )}
-  </div>
-</section>
+
+        <div className="mt-5">
+          <p className="text-3xl font-semibold text-stone-900">
+            {shortlistReadiness.score}%
+          </p>
+          <p className="mt-2 text-sm leading-6 text-stone-600">
+            {shortlistReadiness.summary}
+          </p>
+        </div>
+
+        <div className="mt-5 h-3 w-full overflow-hidden rounded-full bg-stone-200">
+          <div
+            className="h-full rounded-full bg-stone-900 transition-all"
+            style={{ width: `${shortlistReadiness.score}%` }}
+          />
+        </div>
+
+        <div className="mt-5 grid gap-4 lg:grid-cols-2">
+          <div className="rounded-xl bg-stone-50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+              Supporting Signals
+            </p>
+            <p className="mt-2 text-sm leading-6 text-stone-700">
+              {shortlistReadiness.strengths.length > 0
+                ? shortlistReadiness.strengths.join(", ")
+                : "No strong shortlist signals detected yet."}
+            </p>
+          </div>
+
+          <div className="rounded-xl bg-stone-50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+              Gaps to Improve
+            </p>
+            <p className="mt-2 text-sm leading-6 text-stone-700">
+              {shortlistReadiness.gaps.length > 0
+                ? shortlistReadiness.gaps.join(", ")
+                : "No major shortlist gaps detected."}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {shortlistReadyForTimeline && (
+        <section className="rounded-2xl border border-stone-900 bg-stone-900 p-6 text-white shadow-sm">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-sm uppercase tracking-[0.18em] text-white/70">
+                Next Step
+              </p>
+              <h2 className="mt-2 text-xl font-semibold">
+                Your shortlist is ready for execution planning
+              </h2>
+              <p className="mt-2 text-sm text-white/80">
+                You now have a focused shortlist. Move to the timeline to start
+                structuring execution, logistics, and next actions.
+              </p>
+            </div>
+
+            <a
+              href="/portal/timeline"
+              className="inline-flex items-center justify-center rounded-xl bg-white px-4 py-2 text-sm font-medium text-stone-900 transition hover:bg-stone-100"
+            >
+              Open Timeline
+            </a>
+          </div>
+        </section>
+      )}
+
+      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+        <div>
+          <h2 className="text-xl font-semibold text-stone-900">
+            Country Signals
+          </h2>
+          <p className="mt-1 text-sm text-stone-600">
+            These observations highlight important shortlist patterns and comparison
+            risks in your current planning state.
+          </p>
+        </div>
+
+        <div className="mt-5 space-y-3">
+          {countrySignals.length > 0 ? (
+            countrySignals.map((signal) => (
+              <div
+                key={signal}
+                className="rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-700"
+              >
+                {signal}
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-stone-500">
+              No major shortlist signals detected.
+            </p>
+          )}
+        </div>
+      </section>
+
       <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
         <div>
           <h2 className="text-xl font-semibold text-stone-900">
@@ -910,7 +942,7 @@ const formattedLastSaved =
         )}
       </section>
 
-      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+      <section id="manage-shortlist" className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
         <div>
           <h2 className="text-xl font-semibold text-stone-900">
             Manage Shortlist
