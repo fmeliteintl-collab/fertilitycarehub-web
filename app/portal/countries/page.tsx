@@ -8,7 +8,7 @@ import {
 } from "@/lib/plans/user-plans";
 import { EMPTY_USER_PLAN_INPUT, type UserPlanInput } from "@/types/plan";
 
-
+import type { NextAction } from "@/lib/intelligence/plan-intelligence";
 export const runtime = "edge";
 
 const AVAILABLE_COUNTRIES = [
