@@ -320,6 +320,62 @@ function calculateAdvisoryReadiness(plan: PortalPlan, documentCount: number) {
     missing,
   };
 }
+function getSystemSignals(plan: PortalPlan, documentCount: number) {
+  const signals: string[] = [];
+
+  const shortlist = plan?.shortlisted_countries ?? [];
+  const timelineCounts = getTimelineCounts(plan);
+
+  const hasTimeline = timelineCounts.total > 0;
+  const hasActiveTimeline =
+    timelineCounts.inProgress > 0 || timelineCounts.completed > 0;
+
+  const hasDocuments = documentCount > 0;
+  const hasAdvisoryStatus = Boolean(plan?.advisory_status?.trim());
+  const hasAdvisoryNextStep = Boolean(plan?.advisory_next_step?.trim());
+
+  // 🔹 Shortlist signal
+  if (shortlist.length >= 3) {
+    signals.push(
+      "Your shortlist includes multiple countries. Consider narrowing to 2–3 for deeper comparison."
+    );
+  }
+
+  // 🔹 Timeline signals
+  if (hasTimeline && !hasActiveTimeline) {
+    signals.push(
+      "Your timeline exists, but no step is currently active. Execution has not started."
+    );
+  }
+
+  if (!hasTimeline) {
+    signals.push(
+      "You have not created a timeline yet. Planning is still in research phase."
+    );
+  }
+
+  // 🔹 Documents signal
+  if (!hasDocuments) {
+    signals.push(
+      "No documents have been uploaded. Your workspace is not yet operational."
+    );
+  }
+
+  // 🔹 Advisory signals
+  if (hasAdvisoryStatus && !hasAdvisoryNextStep) {
+    signals.push(
+      "Advisory status is set, but no next step is defined."
+    );
+  }
+
+  if (!hasAdvisoryStatus) {
+    signals.push(
+      "Advisory stage is not yet defined."
+    );
+  }
+
+  return signals;
+}
 function buildOnboardingChecklist(plan: PortalPlan, documentCount: number) {
   return [
     {
@@ -474,6 +530,7 @@ function getModuleStatuses(plan: PortalPlan, documentCount: number) {
   const nextAction = getNextAction(plan, documentCount);
 const progress = calculateProgress(plan, documentCount);
 const advisoryReadiness = calculateAdvisoryReadiness(plan, documentCount);
+const systemSignals = getSystemSignals(plan, documentCount);
 const onboardingChecklist = buildOnboardingChecklist(plan, documentCount);
 const readinessSummary = getReadinessSummary(plan, documentCount);
 const moduleStatuses = getModuleStatuses(plan, documentCount);
@@ -684,6 +741,36 @@ const moduleStatuses = getModuleStatuses(plan, documentCount);
           : "No major advisory readiness gaps detected."}
       </p>
     </div>
+  </div>
+</section>
+<section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+  <div>
+    <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
+      System Signals
+    </p>
+    <h2 className="mt-2 text-xl font-semibold text-stone-900">
+      Key Observations
+    </h2>
+    <p className="mt-2 text-sm text-stone-600">
+      These signals highlight important patterns or gaps in your current planning workspace.
+    </p>
+  </div>
+
+  <div className="mt-5 space-y-3">
+    {systemSignals.length > 0 ? (
+      systemSignals.map((signal, index) => (
+        <div
+          key={index}
+          className="rounded-xl border border-stone-200 px-4 py-3 text-sm text-stone-700 bg-stone-50"
+        >
+          {signal}
+        </div>
+      ))
+    ) : (
+      <p className="text-sm text-stone-500">
+        No major signals detected. Your workspace is well-structured.
+      </p>
+    )}
   </div>
 </section>
       <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
