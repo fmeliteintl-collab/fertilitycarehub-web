@@ -228,7 +228,98 @@ function calculateProgress(plan: PortalPlan, documentCount: number) {
     remaining,
   };
 }
+function calculateAdvisoryReadiness(plan: PortalPlan, documentCount: number) {
+  const shortlistCount = plan?.shortlisted_countries?.length ?? 0;
+  const timelineCounts = getTimelineCounts(plan);
 
+  const hasPathway = Boolean(plan?.pathway_type?.trim());
+  const hasTreatmentGoal = Boolean(plan?.treatment_goal?.trim());
+  const hasNotes = Boolean(plan?.notes?.trim());
+  const hasMyPlanBasics = hasPathway || hasTreatmentGoal || hasNotes;
+
+  const hasShortlist = shortlistCount > 0;
+  const hasTimeline = timelineCounts.total > 0;
+  const hasActiveTimeline =
+    timelineCounts.inProgress > 0 || timelineCounts.completed > 0;
+  const hasDocuments = documentCount > 0;
+  const hasAdvisoryStatus = Boolean(plan?.advisory_status?.trim());
+  const hasAdvisoryNextStep = Boolean(plan?.advisory_next_step?.trim());
+
+  let score = 0;
+  const ready: string[] = [];
+  const missing: string[] = [];
+
+  if (hasMyPlanBasics) {
+    score += 20;
+    ready.push("Planning basics saved");
+  } else {
+    missing.push("Complete My Plan basics");
+  }
+
+  if (hasShortlist) {
+    score += 20;
+    ready.push("Shortlist established");
+  } else {
+    missing.push("Create country shortlist");
+  }
+
+  if (hasTimeline) {
+    score += 15;
+    ready.push("Timeline created");
+  } else {
+    missing.push("Create planning timeline");
+  }
+
+  if (hasActiveTimeline) {
+    score += 15;
+    ready.push("Timeline has active progress");
+  } else {
+    missing.push("Mark timeline steps in progress");
+  }
+
+  if (hasDocuments) {
+    score += 10;
+    ready.push("Documents added");
+  } else {
+    missing.push("Upload key documents");
+  }
+
+  if (hasAdvisoryStatus) {
+    score += 10;
+    ready.push("Advisory status defined");
+  } else {
+    missing.push("Set advisory status");
+  }
+
+  if (hasAdvisoryNextStep) {
+    score += 10;
+    ready.push("Advisory next step defined");
+  } else {
+    missing.push("Define advisory next step");
+  }
+
+  let label = "Low";
+  let summary =
+    "Your workspace needs more planning structure before advisory is fully supported.";
+
+  if (score >= 80) {
+    label = "High";
+    summary =
+      "Your workspace is well-prepared for advisory and strategic decision support.";
+  } else if (score >= 50) {
+    label = "Moderate";
+    summary =
+      "Your workspace has a good base, but a few missing elements still limit advisory readiness.";
+  }
+
+  return {
+    score,
+    label,
+    summary,
+    ready,
+    missing,
+  };
+}
 function buildOnboardingChecklist(plan: PortalPlan, documentCount: number) {
   return [
     {
@@ -381,10 +472,11 @@ function getModuleStatuses(plan: PortalPlan, documentCount: number) {
   ];
 }
   const nextAction = getNextAction(plan, documentCount);
-  const progress = calculateProgress(plan, documentCount);
-  const onboardingChecklist = buildOnboardingChecklist(plan, documentCount);
-  const readinessSummary = getReadinessSummary(plan, documentCount);
-  const moduleStatuses = getModuleStatuses(plan, documentCount);
+const progress = calculateProgress(plan, documentCount);
+const advisoryReadiness = calculateAdvisoryReadiness(plan, documentCount);
+const onboardingChecklist = buildOnboardingChecklist(plan, documentCount);
+const readinessSummary = getReadinessSummary(plan, documentCount);
+const moduleStatuses = getModuleStatuses(plan, documentCount);
 
   const completedChecklistCount = onboardingChecklist.filter(
     (item) => item.done
@@ -544,7 +636,56 @@ function getModuleStatuses(plan: PortalPlan, documentCount: number) {
           </div>
         </div>
       </section>
+<section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+  <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <div>
+      <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
+        Advisory Readiness
+      </p>
+      <h2 className="mt-2 text-3xl font-semibold text-stone-900">
+        {advisoryReadiness.score}%
+      </h2>
+      <p className="mt-2 text-sm leading-6 text-stone-600">
+        {advisoryReadiness.summary}
+      </p>
+    </div>
 
+    <div className="rounded-xl bg-stone-50 px-4 py-3 text-sm font-medium text-stone-700">
+      Readiness Level: {advisoryReadiness.label}
+    </div>
+  </div>
+
+  <div className="mt-5 h-3 w-full overflow-hidden rounded-full bg-stone-200">
+    <div
+      className="h-full rounded-full bg-stone-900 transition-all"
+      style={{ width: `${advisoryReadiness.score}%` }}
+    />
+  </div>
+
+  <div className="mt-5 grid gap-4 lg:grid-cols-2">
+    <div className="rounded-xl bg-stone-50 p-4">
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+        Supporting Signals
+      </p>
+      <p className="mt-2 text-sm leading-6 text-stone-700">
+        {advisoryReadiness.ready.length > 0
+          ? advisoryReadiness.ready.join(", ")
+          : "No supporting signals yet."}
+      </p>
+    </div>
+
+    <div className="rounded-xl bg-stone-50 p-4">
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+        Missing Before Strong Advisory Readiness
+      </p>
+      <p className="mt-2 text-sm leading-6 text-stone-700">
+        {advisoryReadiness.missing.length > 0
+          ? advisoryReadiness.missing.join(", ")
+          : "No major advisory readiness gaps detected."}
+      </p>
+    </div>
+  </div>
+</section>
       <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
