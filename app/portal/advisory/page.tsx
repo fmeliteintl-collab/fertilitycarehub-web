@@ -458,7 +458,7 @@ export default function PortalAdvisoryPage() {
 
   const advisoryReadiness = useMemo(() => calculateAdvisoryReadiness(plan), [plan]);
   const advisorySignals = useMemo(() => generateAdvisorySignals(plan), [plan]);
-  const executionStage = useMemo(() => determineExecutionStage(plan), [plan]);
+    const executionStage = useMemo(() => determineExecutionStage(plan), [plan]);
   const smartNextStep = useMemo(() => buildSmartNextStep(plan), [plan]);
   const recommendedFocus = useMemo(() => buildRecommendedFocus(plan), [plan]);
 

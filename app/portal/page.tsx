@@ -1,1074 +1,632 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import {
+  getCurrentUserPlan,
+  upsertCurrentUserPlan,
+} from "@/lib/plans/user-plans";
+import {
+  EMPTY_USER_PLAN_INPUT,
+  type UserPlanInput,
+} from "@/types/plan";
+import {
+  calculateAdvisoryReadiness,
+  determineExecutionStage,
+  buildSmartNextStep,
+  buildRecommendedFocus,
+  generateAdvisorySignals,
+  getGlobalNextAction,
+  getTimelineCounts,
+  getDisplayValue,
+  type AdvisorySignal,
+} from "@/lib/intelligence/plan-intelligence";
+
 export const runtime = "edge";
 
-import Link from "next/link";
-import { getCurrentUserPlanServer } from "@/lib/plans/user-plans-server";
-import { getCurrentUserDocumentsServer } from "@/lib/documents/user-documents-server";
+const ADVISORY_STATUS_OPTIONS = [
+  "Not Started",
+  "Considering",
+  "Ready for Strategy Session",
+  "In Advisory",
+  "Completed",
+] as const;
 
-const dashboardCards = [
-  {
-    title: "My Plan",
-    description:
-      "Capture fertility pathway priorities, constraints, timeline goals, and planning notes.",
-    href: "/portal/my-plan",
-    cta: "Open My Plan",
-  },
-  {
-    title: "Countries",
-    description:
-      "Review your shortlist, compare jurisdiction fit, and organize country-level planning notes.",
-    href: "/portal/countries",
-    cta: "View Countries",
-  },
-  {
-    title: "Timeline",
-    description:
-      "Track the planning journey from research and advisory steps to logistics and execution.",
-    href: "/portal/timeline",
-    cta: "View Timeline",
-  },
-  {
-    title: "Documents",
-    description:
-      "Prepare your document vault for identity records, medical summaries, and advisory notes.",
-    href: "/portal/documents",
-    cta: "Open Documents",
-  },
-  {
-    title: "Advisory",
-    description:
-      "Review available advisory pathways and prepare for structured support and decision guidance.",
-    href: "/portal/advisory",
-    cta: "Open Advisory",
-  },
-  {
-    title: "Settings",
-    description:
-      "Manage your account area and prepare for future profile and portal preferences.",
-    href: "/portal/settings",
-    cta: "Open Settings",
-  },
-];
+const ADVISORY_PATHWAY_OPTIONS = [
+  "Strategy Session",
+  "Comprehensive Advisory Package",
+  "Undecided",
+] as const;
 
-type PortalPlan = Awaited<ReturnType<typeof getCurrentUserPlanServer>>;
+export default function PortalAdvisoryPage() {
+  const [plan, setPlan] = useState<UserPlanInput>(EMPTY_USER_PLAN_INPUT);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [isError, setIsError] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [hasLoadedInitialData, setHasLoadedInitialData] = useState(false);
 
-function getDisplayValue(value: string | null | undefined, fallback: string) {
-  const trimmed = value?.trim();
-  return trimmed ? trimmed : fallback;
-}
+  useEffect(() => {
+    let isMounted = true;
 
-function getTimelineCounts(plan: PortalPlan) {
-  const timelineItems = plan?.timeline_items ?? [];
+    async function loadPlan() {
+      try {
+        const existing = await getCurrentUserPlan();
 
-  return {
-    total: timelineItems.length,
-    completed: timelineItems.filter((item) => item.status === "Completed")
-      .length,
-    inProgress: timelineItems.filter((item) => item.status === "In Progress")
-      .length,
-    upcoming: timelineItems.filter((item) => item.status === "Upcoming").length,
-  };
-}
+        if (!isMounted) return;
 
-function getNextAction(plan: PortalPlan, documentCount: number) {
-  const shortlistCount = plan?.shortlisted_countries?.length ?? 0;
-  const timelineCounts = getTimelineCounts(plan);
+        if (existing) {
+          setPlan({
+            pathway_type: existing.pathway_type,
+            family_structure: existing.family_structure,
+            treatment_goal: existing.treatment_goal,
+            donor_needed: existing.donor_needed,
+            surrogate_needed: existing.surrogate_needed,
+            priorities: existing.priorities ?? [],
+            constraints: existing.constraints ?? [],
+            shortlisted_countries: existing.shortlisted_countries ?? [],
+            timeline_items: existing.timeline_items ?? [],
+            advisory_status: existing.advisory_status ?? null,
+            advisory_pathway: existing.advisory_pathway ?? null,
+            advisory_notes: existing.advisory_notes ?? null,
+            advisory_next_step: existing.advisory_next_step ?? null,
+            target_timeline: existing.target_timeline,
+            budget_range: existing.budget_range,
+            notes: existing.notes,
+          });
+        }
+      } catch (error: unknown) {
+        console.error(error);
+        if (isMounted) {
+          setIsError(true);
+          setMessage("Failed to load advisory workspace.");
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+          setHasLoadedInitialData(true);
+        }
+      }
+    }
 
-  const hasPathway = Boolean(plan?.pathway_type?.trim());
-  const hasTreatmentGoal = Boolean(plan?.treatment_goal?.trim());
-  const hasNotes = Boolean(plan?.notes?.trim());
-  const hasMyPlanBasics = hasPathway || hasTreatmentGoal || hasNotes;
+    void loadPlan();
 
-  const hasAdvisoryStatus = Boolean(plan?.advisory_status?.trim());
-  const hasAdvisoryNextStep = Boolean(plan?.advisory_next_step?.trim());
-  const hasTimeline = timelineCounts.total > 0;
-  const hasActiveExecution =
-    timelineCounts.inProgress > 0 || timelineCounts.completed > 0;
-
-  if (!hasMyPlanBasics) {
-    return {
-      title: "Start your planning workspace",
-      body: "Complete My Plan first so the portal can begin reflecting your pathway, priorities, and case direction.",
-      href: "/portal/my-plan",
-      cta: "Start My Plan",
+    return () => {
+      isMounted = false;
     };
-  }
+  }, []);
 
-  if (hasMyPlanBasics && shortlistCount === 0) {
-    return {
-      title: "Build your first shortlist",
-      body: "Your planning profile exists, but the system needs shortlisted countries before comparison and execution guidance become meaningful.",
-      href: "/portal/countries",
-      cta: "Open Countries",
-    };
-  }
-
-  if (shortlistCount > 0 && !hasTimeline) {
-    return {
-      title: "Turn research into execution",
-      body: "You now have a real shortlist. Generate or create your timeline so the workspace moves from comparison into planning action.",
-      href: "/portal/timeline",
-      cta: "Open Timeline",
-    };
-  }
-
-  if (hasTimeline && !hasActiveExecution) {
-    return {
-      title: "Activate the planning timeline",
-      body: "Your timeline exists, but nothing is currently moving. Review the steps and mark the real next phase as in progress.",
-      href: "/portal/timeline",
-      cta: "Review Timeline",
-    };
-  }
-
-  if (hasTimeline && documentCount === 0) {
-    return {
-      title: "Support the plan with documents",
-      body: "Your execution structure is forming, but your document vault is still empty. Add core records so the workspace becomes operational.",
-      href: "/portal/documents",
-      cta: "Open Documents",
-    };
-  }
-
-  if (shortlistCount > 0 && hasTimeline && !hasAdvisoryStatus) {
-    return {
-      title: "Define your advisory stage",
-      body: "You have enough planning structure in place to set your advisory direction and clarify where you are in the decision-support process.",
-      href: "/portal/advisory",
-      cta: "Open Advisory",
-    };
-  }
-
-  if (hasAdvisoryStatus && !hasAdvisoryNextStep) {
-    return {
-      title: "Define the next decision step",
-      body: "Your advisory stage is saved, but the system still needs a concrete next action so planning, review, and execution stay aligned.",
-      href: "/portal/advisory",
-      cta: "Update Advisory",
-    };
-  }
-
-  if (
-    shortlistCount > 0 &&
-    hasTimeline &&
-    documentCount > 0 &&
-    hasAdvisoryStatus &&
-    hasAdvisoryNextStep
+  function updatePlanField<K extends keyof UserPlanInput>(
+    field: K,
+    value: UserPlanInput[K]
   ) {
-    return {
-      title: "Review strategic readiness",
-      body: "Your core planning system is active. Review timeline progress, shortlist quality, and advisory direction to determine the highest-value next move.",
-      href: "/portal/timeline",
-      cta: "Review Timeline",
-    };
+    setPlan((current) => ({
+      ...current,
+      [field]: value,
+    }));
+
+    if (hasLoadedInitialData) {
+      setHasUnsavedChanges(true);
+      setMessage(null);
+      setIsError(false);
+    }
   }
 
-  return {
-    title: "Continue strengthening the workspace",
-    body: "Your portal is progressing well. Review the modules to identify the next missing dependency or execution gap.",
-    href: "/portal",
-    cta: "Review Dashboard",
-  };
-}
-function calculateProgress(plan: PortalPlan, documentCount: number) {
-  let score = 0;
-  const completed: string[] = [];
-  const remaining: string[] = [];
+  async function handleSave() {
+    try {
+      setSaving(true);
+      setMessage(null);
+      setIsError(false);
 
-  const hasMyPlanBasics = Boolean(
-    plan?.pathway_type?.trim() ||
-      plan?.treatment_goal?.trim() ||
-      plan?.notes?.trim()
+      await upsertCurrentUserPlan(plan);
+
+      setHasUnsavedChanges(false);
+      setMessage("Advisory workspace saved successfully.");
+    } catch (error: unknown) {
+      console.error(error);
+      setIsError(true);
+      setMessage("Failed to save advisory workspace.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  // Use shared intelligence functions
+  const currentStatus = plan.advisory_status ?? "Not Started";
+  const currentPathway = plan.advisory_pathway ?? "Undecided";
+
+  const timelineItems = useMemo(() => plan.timeline_items ?? [], [plan.timeline_items]);
+  const timelineCounts = useMemo(() => getTimelineCounts(timelineItems), [timelineItems]);
+
+  const advisoryReadiness = useMemo(() => calculateAdvisoryReadiness(plan, 0), [plan]);
+  const advisorySignals = useMemo(() => generateAdvisorySignals(plan), [plan]);
+  const executionStage = determineExecutionStage(plan);
+  const smartNextStep = useMemo(() => buildSmartNextStep(plan), [plan]);
+  const recommendedFocus = useMemo(() => buildRecommendedFocus(plan), [plan]);
+  
+  // Get global next action for cross-module consistency
+  const globalNextAction = useMemo(() => getGlobalNextAction(plan, 0), [plan]);
+
+  const shortlistedCountries = plan.shortlisted_countries ?? [];
+
+  const blockingSignals = advisorySignals.filter((s: AdvisorySignal) => s.type === "blocking");
+  const attentionSignals = advisorySignals.filter((s: AdvisorySignal) => s.type === "attention");
+  const readySignals = advisorySignals.filter((s: AdvisorySignal) => s.type === "ready");
+
+  const advisoryItems = useMemo(
+    () => [
+      {
+        title: "Strategy Session",
+        status: currentPathway === "Strategy Session" ? "Selected" : "Available",
+        description:
+          "A focused advisory session to clarify pathway direction, shortlist logic, and next-step planning priorities.",
+        recommended: executionStage.stage === "sequencing" && currentPathway === "Undecided",
+      },
+      {
+        title: "Comprehensive Advisory Package",
+        status: currentPathway === "Comprehensive Advisory Package" ? "Selected" : "Core Offer",
+        description:
+          "A more structured advisory pathway designed for deeper planning, comparative review, and guided decision support.",
+        recommended: executionStage.stage === "advisory-active" && currentPathway === "Undecided",
+      },
+      {
+        title: "Current Advisory Status",
+        status: currentStatus,
+        description:
+          plan.advisory_notes?.trim() ||
+          "This area reflects your saved advisory stage, notes, and next actions.",
+        recommended: false,
+      },
+    ],
+    [currentPathway, currentStatus, plan.advisory_notes, executionStage.stage]
   );
 
-  if (hasMyPlanBasics) {
-    score += 20;
-    completed.push("My Plan started");
-  } else {
-    remaining.push("Complete My Plan");
+  if (loading) {
+    return <div className="p-6">Loading advisory workspace...</div>;
   }
-
-  if ((plan?.shortlisted_countries ?? []).length > 0) {
-    score += 20;
-    completed.push("Countries shortlisted");
-  } else {
-    remaining.push("Add shortlisted countries");
-  }
-
-  if ((plan?.timeline_items ?? []).length > 0) {
-    score += 20;
-    completed.push("Timeline created");
-  } else {
-    remaining.push("Create timeline");
-  }
-
-  if (documentCount > 0) {
-    score += 15;
-    completed.push("Documents added");
-  } else {
-    remaining.push("Add documents");
-  }
-
-  if (plan?.advisory_status?.trim()) {
-    score += 15;
-    completed.push("Advisory status saved");
-  } else {
-    remaining.push("Set advisory status");
-  }
-
-  if (plan?.advisory_next_step?.trim()) {
-    score += 10;
-    completed.push("Advisory next step defined");
-  } else {
-    remaining.push("Define advisory next step");
-  }
-
-  return {
-    score,
-    completed,
-    remaining,
-  };
-}
-function calculateAdvisoryReadiness(plan: PortalPlan, documentCount: number) {
-  const shortlistCount = plan?.shortlisted_countries?.length ?? 0;
-  const timelineCounts = getTimelineCounts(plan);
-
-  const hasPathway = Boolean(plan?.pathway_type?.trim());
-  const hasTreatmentGoal = Boolean(plan?.treatment_goal?.trim());
-  const hasNotes = Boolean(plan?.notes?.trim());
-  const hasMyPlanBasics = hasPathway || hasTreatmentGoal || hasNotes;
-
-  const hasShortlist = shortlistCount > 0;
-  const hasTimeline = timelineCounts.total > 0;
-  const hasActiveTimeline =
-    timelineCounts.inProgress > 0 || timelineCounts.completed > 0;
-  const hasDocuments = documentCount > 0;
-  const hasAdvisoryStatus = Boolean(plan?.advisory_status?.trim());
-  const hasAdvisoryNextStep = Boolean(plan?.advisory_next_step?.trim());
-
-  let score = 0;
-  const ready: string[] = [];
-  const missing: string[] = [];
-
-  if (hasMyPlanBasics) {
-    score += 20;
-    ready.push("Planning basics saved");
-  } else {
-    missing.push("Complete My Plan basics");
-  }
-
-  if (hasShortlist) {
-    score += 20;
-    ready.push("Shortlist established");
-  } else {
-    missing.push("Create country shortlist");
-  }
-
-  if (hasTimeline) {
-    score += 15;
-    ready.push("Timeline created");
-  } else {
-    missing.push("Create planning timeline");
-  }
-
-  if (hasActiveTimeline) {
-    score += 15;
-    ready.push("Timeline has active progress");
-  } else {
-    missing.push("Mark timeline steps in progress");
-  }
-
-  if (hasDocuments) {
-    score += 10;
-    ready.push("Documents added");
-  } else {
-    missing.push("Upload key documents");
-  }
-
-  if (hasAdvisoryStatus) {
-    score += 10;
-    ready.push("Advisory status defined");
-  } else {
-    missing.push("Set advisory status");
-  }
-
-  if (hasAdvisoryNextStep) {
-    score += 10;
-    ready.push("Advisory next step defined");
-  } else {
-    missing.push("Define advisory next step");
-  }
-
-  let label = "Low";
-  let summary =
-    "Your workspace needs more planning structure before advisory is fully supported.";
-
-  if (score >= 80) {
-    label = "High";
-    summary =
-      "Your workspace is well-prepared for advisory and strategic decision support.";
-  } else if (score >= 50) {
-    label = "Moderate";
-    summary =
-      "Your workspace has a good base, but a few missing elements still limit advisory readiness.";
-  }
-
-  return {
-    score,
-    label,
-    summary,
-    ready,
-    missing,
-  };
-}
-function getSystemSignals(plan: PortalPlan, documentCount: number) {
-  const signals: string[] = [];
-
-  const shortlist = plan?.shortlisted_countries ?? [];
-  const timelineCounts = getTimelineCounts(plan);
-
-  const hasTimeline = timelineCounts.total > 0;
-  const hasActiveTimeline =
-    timelineCounts.inProgress > 0 || timelineCounts.completed > 0;
-
-  const hasDocuments = documentCount > 0;
-  const hasAdvisoryStatus = Boolean(plan?.advisory_status?.trim());
-  const hasAdvisoryNextStep = Boolean(plan?.advisory_next_step?.trim());
-
-  const pathway = plan?.pathway_type?.toLowerCase() ?? "";
-
-  // 🔹 Strategic shortlist signal
-  if (shortlist.length >= 3) {
-    signals.push(
-      "Your shortlist spans multiple jurisdictions. Consider narrowing to 2–3 to reduce decision complexity and improve comparison depth."
-    );
-  }
-
-  // 🔹 Legal/complexity signal (future-ready logic)
-  if (shortlist.length > 0 && pathway.includes("surrogate")) {
-    signals.push(
-      "Your pathway involves surrogacy. Ensure shortlisted countries are aligned with legal structure and cross-border requirements."
-    );
-  }
-
-  // 🔹 Timeline maturity
-  if (hasTimeline && !hasActiveTimeline) {
-    signals.push(
-      "Your timeline is defined, but no step is currently active. Planning has not yet transitioned into execution."
-    );
-  }
-
-  // 🔹 Timeline missing
-  if (!hasTimeline) {
-    signals.push(
-      "You have not yet created a timeline. Your planning is still in the research phase."
-    );
-  }
-
-  // 🔹 Documents maturity
-  if (!hasDocuments) {
-    signals.push(
-      "No documents are currently stored. This may slow down execution once you move forward."
-    );
-  } else if (documentCount < 2) {
-    signals.push(
-      "Only a limited number of documents are available. Consider expanding your document set to support planning decisions."
-    );
-  }
-
-  // 🔹 Advisory clarity
-  if (hasAdvisoryStatus && !hasAdvisoryNextStep) {
-    signals.push(
-      "Your advisory stage is defined, but the next step is unclear. This may slow decision momentum."
-    );
-  }
-
-  if (!hasAdvisoryStatus) {
-    signals.push(
-      "Advisory stage is not yet defined. This limits structured decision support."
-    );
-  }
-
-  // 🔹 High readiness insight (very important)
-  if (
-    shortlist.length > 0 &&
-    hasTimeline &&
-    hasDocuments &&
-    hasAdvisoryStatus &&
-    hasAdvisoryNextStep
-  ) {
-    signals.push(
-      "Your workspace is structurally complete. Focus should now shift to decision quality and execution readiness."
-    );
-  }
-
-  return signals;
-}
-function buildOnboardingChecklist(plan: PortalPlan, documentCount: number) {
-  return [
-    {
-      label: "Complete My Plan",
-      done: Boolean(
-        plan?.pathway_type?.trim() ||
-          plan?.treatment_goal?.trim() ||
-          plan?.notes?.trim()
-      ),
-      href: "/portal/my-plan",
-    },
-    {
-      label: "Add shortlisted countries",
-      done: (plan?.shortlisted_countries ?? []).length > 0,
-      href: "/portal/countries",
-    },
-    {
-      label: "Generate or create timeline",
-      done: (plan?.timeline_items ?? []).length > 0,
-      href: "/portal/timeline",
-    },
-    {
-      label: "Add at least one document",
-      done: documentCount > 0,
-      href: "/portal/documents",
-    },
-    {
-      label: "Save advisory status",
-      done: Boolean(plan?.advisory_status?.trim()),
-      href: "/portal/advisory",
-    },
-    {
-      label: "Define advisory next step",
-      done: Boolean(plan?.advisory_next_step?.trim()),
-      href: "/portal/advisory",
-    },
-  ];
-}
-
-function getReadinessSummary(plan: PortalPlan, documentCount: number) {
-  const shortlistCount = plan?.shortlisted_countries?.length ?? 0;
-  const timelineCounts = getTimelineCounts(plan);
-
-  if (
-    shortlistCount > 0 &&
-    timelineCounts.total > 0 &&
-    documentCount > 0 &&
-    plan?.advisory_status?.trim()
-  ) {
-    return {
-      title: "Core workspace established",
-      body: "Your planning, country shortlist, timeline, documents, and advisory layer are all active. The portal is now functioning as a real working system.",
-    };
-  }
-
-  if (shortlistCount > 0 && timelineCounts.total > 0) {
-    return {
-      title: "Planning structure established",
-      body: "You have a real shortlist and timeline in place. Strengthen the workspace further with documents and a defined advisory status.",
-    };
-  }
-
-  if (
-    Boolean(
-      plan?.pathway_type?.trim() ||
-        plan?.treatment_goal?.trim() ||
-        plan?.notes?.trim()
-    )
-  ) {
-    return {
-      title: "Planning foundation started",
-      body: "Your workspace has begun to take shape. The next gains come from shortlisting countries and turning planning into execution steps.",
-    };
-  }
-
-  return {
-    title: "Workspace not yet established",
-    body: "Start with My Plan to give the rest of the portal the context it needs to become useful and connected.",
-  };
-}
-
-export default async function PortalDashboardPage() {
-  const [plan, documents] = await Promise.all([
-  getCurrentUserPlanServer(),
-  getCurrentUserDocumentsServer(),
-]);
-  const documentCount = documents.length;
-  const shortlistedCountries = plan?.shortlisted_countries ?? [];
-  const shortlistedCountriesText =
-    shortlistedCountries.length > 0
-      ? shortlistedCountries.join(", ")
-      : "No shortlisted countries yet";
-
-  const timelineCounts = getTimelineCounts(plan);
-  const pathwayType = getDisplayValue(plan?.pathway_type, "Not set yet");
-  const advisoryStatus = getDisplayValue(plan?.advisory_status, "Not set");
-  const advisoryPathway = getDisplayValue(plan?.advisory_pathway, "Undecided");
-  const advisoryNextStep = getDisplayValue(
-    plan?.advisory_next_step,
-    "No advisory next step saved yet"
-  );
-  const planningNotes =
-    plan?.notes?.trim() ||
-    "No planning notes saved yet. Add your priorities and case context in My Plan.";
-function getModuleStatuses(plan: PortalPlan, documentCount: number) {
-  const timelineCounts = getTimelineCounts(plan);
-
-  return [
-    {
-      label: "My Plan",
-      value:
-        plan?.pathway_type?.trim() ||
-        plan?.treatment_goal?.trim() ||
-        plan?.notes?.trim()
-          ? "Started"
-          : "Not started",
-      href: "/portal/my-plan",
-    },
-    {
-      label: "Countries",
-      value:
-        (plan?.shortlisted_countries ?? []).length > 0
-          ? `${plan?.shortlisted_countries?.length ?? 0} shortlisted`
-          : "No shortlist yet",
-      href: "/portal/countries",
-    },
-    {
-      label: "Timeline",
-      value:
-        timelineCounts.total > 0
-          ? `${timelineCounts.completed}/${timelineCounts.total} completed`
-          : "Not created",
-      href: "/portal/timeline",
-    },
-    {
-      label: "Documents",
-      value: documentCount > 0 ? `${documentCount} saved` : "No documents yet",
-      href: "/portal/documents",
-    },
-    {
-      label: "Advisory",
-      value: getDisplayValue(plan?.advisory_status, "Not set"),
-      href: "/portal/advisory",
-    },
-    {
-      label: "Settings",
-      value: "Available",
-      href: "/portal/settings",
-    },
-  ];
-}
-  const nextAction = getNextAction(plan, documentCount);
-const progress = calculateProgress(plan, documentCount);
-const advisoryReadiness = calculateAdvisoryReadiness(plan, documentCount);
-const systemSignals = getSystemSignals(plan, documentCount);
-const onboardingChecklist = buildOnboardingChecklist(plan, documentCount);
-const readinessSummary = getReadinessSummary(plan, documentCount);
-const moduleStatuses = getModuleStatuses(plan, documentCount);
-
-  const completedChecklistCount = onboardingChecklist.filter(
-    (item) => item.done
-  ).length;
-
-  const quickStats = [
-    {
-      label: "Pathway Type",
-      value: pathwayType,
-    },
-    {
-      label: "Shortlisted Countries",
-      value: String(shortlistedCountries.length),
-    },
-    {
-      label: "Documents",
-      value: String(documentCount),
-    },
-    {
-      label: "Advisory Status",
-      value: advisoryStatus,
-    },
-  ];
 
   return (
     <div className="space-y-8">
-      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+      {/* Header */}
+      <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
         <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
-          Dashboard
+          Advisory
         </p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight text-stone-900">
-          Planning Workspace Overview
+          Advisory Workspace
         </h1>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-stone-600">
-          This portal is now structured as your private fertility planning
-          workspace. Use it to organize your planning profile, shortlist
-          countries, track milestones, prepare documents, and manage advisory
-          next steps.
+          Track your advisory pathway, review support formats, and move from planning into structured decision support.
+        </p>
+      </div>
+
+      {/* Global Next Action Banner - Cross-module consistency */}
+      {globalNextAction.href !== "/portal/advisory" && (
+        <section className="rounded-2xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-sm font-medium text-stone-500">Current Global Priority</p>
+              <p className="mt-1 text-lg font-semibold text-stone-900">{globalNextAction.title}</p>
+              <p className="mt-1 text-sm text-stone-600">{globalNextAction.body}</p>
+            </div>
+            <Link
+              href={globalNextAction.href}
+              className="inline-flex rounded-xl bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-800 shrink-0"
+            >
+              {globalNextAction.cta}
+            </Link>
+          </div>
+        </section>
+      )}
+
+      {/* Advisory Readiness Score */}
+      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-stone-900">Advisory Readiness</h2>
+            <p className="mt-1 text-sm text-stone-600">
+              Measures planning maturity for meaningful advisory engagement
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <p className="text-3xl font-semibold text-stone-900">
+                {advisoryReadiness.percentage}%
+              </p>
+              <p className="text-sm text-stone-500 capitalize">
+                {advisoryReadiness.stage} stage
+              </p>
+            </div>
+            <div className="h-16 w-16 rounded-full border-4 border-stone-100 flex items-center justify-center">
+              <div
+                className={`h-12 w-12 rounded-full flex items-center justify-center text-xs font-medium ${
+                  advisoryReadiness.stage === "optimal"
+                    ? "bg-green-100 text-green-800"
+                    : advisoryReadiness.stage === "ready"
+                    ? "bg-blue-100 text-blue-800"
+                    : advisoryReadiness.stage === "developing"
+                    ? "bg-amber-100 text-amber-800"
+                    : "bg-stone-100 text-stone-600"
+                }`}
+              >
+                {advisoryReadiness.score}/{advisoryReadiness.maxScore}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 h-2 w-full rounded-full bg-stone-100">
+          <div
+            className={`h-2 rounded-full transition-all ${
+              advisoryReadiness.stage === "optimal"
+                ? "bg-green-500"
+                : advisoryReadiness.stage === "ready"
+                ? "bg-blue-500"
+                : advisoryReadiness.stage === "developing"
+                ? "bg-amber-500"
+                : "bg-stone-400"
+            }`}
+            style={{ width: `${advisoryReadiness.percentage}%` }}
+          />
+        </div>
+      </section>
+
+      {/* Advisory Signals */}
+      {advisorySignals.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="text-lg font-semibold text-stone-900">Advisory Signals</h2>
+          
+          {blockingSignals.length > 0 && (
+            <div className="space-y-2">
+              {blockingSignals.map((signal, idx) => (
+                <div
+                  key={`blocking-${idx}`}
+                  className="rounded-xl border border-red-200 bg-red-50 p-4"
+                >
+                  <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+                    <div>
+                      <p className="font-medium text-red-900">{signal.message}</p>
+                      {signal.action && (
+                        <p className="text-sm text-red-700 mt-1">{signal.action}</p>
+                      )}
+                    </div>
+                    {signal.link && (
+                      <Link
+                        href={signal.link}
+                        className="text-sm font-medium text-red-800 underline hover:text-red-900"
+                      >
+                        Go to module →
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {attentionSignals.length > 0 && (
+            <div className="space-y-2">
+              {attentionSignals.map((signal, idx) => (
+                <div
+                  key={`attention-${idx}`}
+                  className="rounded-xl border border-amber-200 bg-amber-50 p-4"
+                >
+                  <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+                    <div>
+                      <p className="font-medium text-amber-900">{signal.message}</p>
+                      {signal.action && (
+                        <p className="text-sm text-amber-700 mt-1">{signal.action}</p>
+                      )}
+                    </div>
+                    {signal.link && (
+                      <Link
+                        href={signal.link}
+                        className="text-sm font-medium text-amber-800 underline hover:text-amber-900"
+                      >
+                        Go to module →
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {readySignals.length > 0 && (
+            <div className="space-y-2">
+              {readySignals.map((signal, idx) => (
+                <div
+                  key={`ready-${idx}`}
+                  className="rounded-xl border border-green-200 bg-green-50 p-4"
+                >
+                  <p className="font-medium text-green-900">{signal.message}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* Execution Stage */}
+      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+        <div className="flex items-start gap-4">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-xl">
+            {executionStage.stage === "foundation" && "🏗️"}
+            {executionStage.stage === "shortlist" && "🌍"}
+            {executionStage.stage === "sequencing" && "⚡"}
+            {executionStage.stage === "advisory-active" && "🎯"}
+            {executionStage.stage === "completion" && "✅"}
+          </div>
+          <div className="flex-1">
+            <h2 className="text-lg font-semibold text-stone-900">
+              Execution Stage: <span className="capitalize">{executionStage.stage.replace("-", " ")}</span>
+            </h2>
+            <p className="mt-1 text-sm text-stone-600">{executionStage.description}</p>
+            
+            <div className="mt-4">
+              <p className="text-sm font-medium text-stone-700">Recommended Actions:</p>
+              <ul className="mt-2 space-y-1">
+                {executionStage.nextActions.map((action, idx) => (
+                  <li key={idx} className="flex items-start gap-2 text-sm text-stone-600">
+                    <span className="text-stone-400">•</span>
+                    {action}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Smart Next Step */}
+      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-sm font-medium text-stone-500">Smart Next Step</p>
+            <p className="mt-1 text-lg font-semibold text-stone-900">{smartNextStep.step}</p>
+            <p className="mt-1 text-sm text-stone-600">{smartNextStep.context}</p>
+          </div>
+          <span
+            className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
+              smartNextStep.priority === "high"
+                ? "bg-red-100 text-red-800"
+                : smartNextStep.priority === "medium"
+                ? "bg-amber-100 text-amber-800"
+                : "bg-stone-100 text-stone-600"
+            }`}
+          >
+            {smartNextStep.priority} priority
+          </span>
+        </div>
+      </section>
+
+      {/* Recommended Focus */}
+      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+        <p className="text-sm font-medium text-stone-500">Recommended Advisory Focus</p>
+        <p className="mt-2 text-lg font-semibold text-stone-900">{recommendedFocus}</p>
+        <p className="mt-2 text-sm text-stone-600">
+          Generated from your current planning, shortlist, and timeline state.
         </p>
       </section>
 
+      {/* Cross-Module Context */}
       <section className="grid gap-6 lg:grid-cols-4">
-        {quickStats.map((stat) => (
-          <div
-            key={stat.label}
-            className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm"
-          >
-            <p className="text-sm font-medium text-stone-500">{stat.label}</p>
-            <p className="mt-2 text-3xl font-semibold text-stone-900">
-              {stat.value}
-            </p>
-          </div>
-        ))}
-      </section>
-
-      <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
-            System Readiness
+          <p className="text-sm font-medium text-stone-500">Shortlisted Countries</p>
+          <p className="mt-2 text-lg font-semibold text-stone-900">
+            {shortlistedCountries.length > 0 ? shortlistedCountries.join(", ") : "No shortlist yet"}
           </p>
-          <h2 className="mt-2 text-2xl font-semibold text-stone-900">
-            {readinessSummary.title}
-          </h2>
-          <p className="mt-3 text-sm leading-6 text-stone-600">
-            {readinessSummary.body}
-          </p>
-
-          <div className="mt-6 grid gap-4 lg:grid-cols-2">
-            <div className="rounded-xl bg-stone-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-                Shortlist
-              </p>
-              <p className="mt-2 text-sm leading-6 text-stone-700">
-                {shortlistedCountriesText}
-              </p>
-            </div>
-
-            <div className="rounded-xl bg-stone-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-                Advisory Pathway
-              </p>
-              <p className="mt-2 text-sm leading-6 text-stone-700">
-                {advisoryPathway}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-stone-900">Next Action</h2>
-          <p className="mt-3 text-lg font-semibold text-stone-900">
-            {nextAction.title}
-          </p>
-          <p className="mt-3 text-sm leading-6 text-stone-600">
-            {nextAction.body}
-          </p>
-
-          <Link
-            href={nextAction.href}
-            className="mt-5 inline-flex rounded-xl bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-800"
-          >
-            {nextAction.cta}
-          </Link>
-        </div>
-      </section>
-
-      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
-              Planning Progress
-            </p>
-            <h2 className="mt-2 text-3xl font-semibold text-stone-900">
-              {progress.score}%
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-stone-600">
-              Your workspace completion score based on planning data already
-              saved across the portal.
-            </p>
-          </div>
-
-          <div className="max-w-xl text-sm text-stone-600">
-            {progress.remaining.length > 0
-              ? `Still to complete: ${progress.remaining.join(", ")}.`
-              : "Your core planning workspace is fully established."}
-          </div>
-        </div>
-
-        <div className="mt-5 h-3 w-full overflow-hidden rounded-full bg-stone-200">
-          <div
-            className="h-full rounded-full bg-stone-900 transition-all"
-            style={{ width: `${progress.score}%` }}
-          />
-        </div>
-
-        <div className="mt-5 grid gap-4 lg:grid-cols-2">
-          <div className="rounded-xl bg-stone-50 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-              Completed
-            </p>
-            <p className="mt-2 text-sm leading-6 text-stone-700">
-              {progress.completed.length > 0
-                ? progress.completed.join(", ")
-                : "Nothing completed yet."}
-            </p>
-          </div>
-
-          <div className="rounded-xl bg-stone-50 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-              Missing
-            </p>
-            <p className="mt-2 text-sm leading-6 text-stone-700">
-              {progress.remaining.length > 0
-                ? progress.remaining.join(", ")
-                : "No major gaps detected in the core workflow."}
-            </p>
-          </div>
-        </div>
-      </section>
-<section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-  <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-    <div>
-      <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
-        Advisory Readiness
-      </p>
-      <h2 className="mt-2 text-3xl font-semibold text-stone-900">
-        {advisoryReadiness.score}%
-      </h2>
-      <p className="mt-2 text-sm leading-6 text-stone-600">
-        {advisoryReadiness.summary}
-      </p>
-    </div>
-
-    <div className="rounded-xl bg-stone-50 px-4 py-3 text-sm font-medium text-stone-700">
-      Readiness Level: {advisoryReadiness.label}
-    </div>
-  </div>
-
-  <div className="mt-5 h-3 w-full overflow-hidden rounded-full bg-stone-200">
-    <div
-      className="h-full rounded-full bg-stone-900 transition-all"
-      style={{ width: `${advisoryReadiness.score}%` }}
-    />
-  </div>
-
-  <div className="mt-5 grid gap-4 lg:grid-cols-2">
-    <div className="rounded-xl bg-stone-50 p-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-        Supporting Signals
-      </p>
-      <p className="mt-2 text-sm leading-6 text-stone-700">
-        {advisoryReadiness.ready.length > 0
-          ? advisoryReadiness.ready.join(", ")
-          : "No supporting signals yet."}
-      </p>
-    </div>
-
-    <div className="rounded-xl bg-stone-50 p-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-        Missing Before Strong Advisory Readiness
-      </p>
-      <p className="mt-2 text-sm leading-6 text-stone-700">
-        {advisoryReadiness.missing.length > 0
-          ? advisoryReadiness.missing.join(", ")
-          : "No major advisory readiness gaps detected."}
-      </p>
-    </div>
-  </div>
-</section>
-<section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-  <div>
-    <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
-      System Signals
-    </p>
-    <h2 className="mt-2 text-xl font-semibold text-stone-900">
-      Key Observations
-    </h2>
-    <p className="mt-2 text-sm text-stone-600">
-      These signals highlight important patterns or gaps in your current planning workspace.
-    </p>
-  </div>
-
-  <div className="mt-5 space-y-3">
-    {systemSignals.length > 0 ? (
-      systemSignals.map((signal, index) => (
-        <div
-          key={index}
-          className="rounded-xl border border-stone-200 px-4 py-3 text-sm text-stone-700 bg-stone-50"
-        >
-          {signal}
-        </div>
-      ))
-    ) : (
-      <p className="text-sm text-stone-500">
-        No major signals detected. Your workspace is well-structured.
-      </p>
-    )}
-  </div>
-</section>
-      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
-              First-Run Guidance
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold text-stone-900">
-              Onboarding Checklist
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-stone-600">
-              Complete the core setup steps to turn this workspace into a fully
-              functioning planning environment.
-            </p>
-          </div>
-
-          <div className="text-sm text-stone-600">
-            {completedChecklistCount} of {onboardingChecklist.length} completed
-          </div>
-        </div>
-
-        <div className="mt-6 grid gap-4">
-          {onboardingChecklist.map((item) => (
-            <div
-              key={item.label}
-              className="flex flex-col gap-3 rounded-xl border border-stone-200 p-4 lg:flex-row lg:items-center lg:justify-between"
-            >
-              <div className="flex items-center gap-3">
-                <span
-                  className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${
-                    item.done
-                      ? "bg-stone-900 text-white"
-                      : "border border-stone-300 bg-white text-stone-700"
-                  }`}
-                >
-                  {item.done ? "✓" : ""}
-                </span>
-                <p className="text-sm font-medium text-stone-900">
-                  {item.label}
-                </p>
-              </div>
-
-              <Link
-                href={item.href}
-                className="inline-flex rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
-              >
-                {item.done ? "Review" : "Complete"}
+          <p className="mt-2 text-sm leading-6 text-stone-600">
+            {shortlistedCountries.length === 0 ? (
+              <Link href="/portal/countries" className="text-stone-900 underline">
+                Build shortlist →
               </Link>
-            </div>
-          ))}
+            ) : (
+              "Pulled from your saved country planning."
+            )}
+          </p>
         </div>
-      </section>
-      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-  <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-    <div>
-      <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
-        Advisory Readiness
-      </p>
-      <h2 className="mt-2 text-3xl font-semibold text-stone-900">
-        {advisoryReadiness.score}%
-      </h2>
-      <p className="mt-2 text-sm leading-6 text-stone-600">
-        {advisoryReadiness.summary}
-      </p>
-    </div>
 
-    <div className="rounded-xl bg-stone-50 px-4 py-3 text-sm font-medium text-stone-700">
-      Readiness Level: {advisoryReadiness.label}
-    </div>
-  </div>
-
-  <div className="mt-5 h-3 w-full overflow-hidden rounded-full bg-stone-200">
-    <div
-      className="h-full rounded-full bg-stone-900 transition-all"
-      style={{ width: `${advisoryReadiness.score}%` }}
-    />
-  </div>
-
-  <div className="mt-5 grid gap-4 lg:grid-cols-2">
-    <div className="rounded-xl bg-stone-50 p-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-        Supporting Signals
-      </p>
-      <p className="mt-2 text-sm leading-6 text-stone-700">
-        {advisoryReadiness.ready.join(", ")}
-      </p>
-    </div>
-
-    <div className="rounded-xl bg-stone-50 p-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-        Missing Before Strong Advisory Readiness
-      </p>
-      <p className="mt-2 text-sm leading-6 text-stone-700">
-        {advisoryReadiness.missing.join(", ")}
-      </p>
-    </div>
-  </div>
-</section>
-<section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-  <div>
-    <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
-      System Signals
-    </p>
-    <h2 className="mt-2 text-xl font-semibold text-stone-900">
-      Key Observations
-    </h2>
-  </div>
-
-  <div className="mt-5 space-y-3">
-    {systemSignals.map((signal, index) => (
-      <div
-        key={index}
-        className="rounded-xl border border-stone-200 px-4 py-3 text-sm text-stone-700 bg-stone-50"
-      >
-        {signal}
-      </div>
-    ))}
-  </div>
-</section>
-      <section className="grid gap-6 lg:grid-cols-3">
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-stone-500">Timeline Completed</p>
-          <p className="mt-2 text-3xl font-semibold text-stone-900">
-            {timelineCounts.completed}
-          </p>
+          <p className="mt-2 text-3xl font-semibold text-stone-900">{timelineCounts.completed}</p>
           <p className="mt-2 text-sm leading-6 text-stone-600">
-            Milestones already completed in your planning workflow.
+            {timelineCounts.completed === 0 && timelineCounts.total === 0 ? (
+              <Link href="/portal/timeline" className="text-stone-900 underline">
+                Generate timeline →
+              </Link>
+            ) : (
+              "Completed milestones."
+            )}
           </p>
         </div>
 
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">In Progress</p>
-          <p className="mt-2 text-3xl font-semibold text-stone-900">
-            {timelineCounts.inProgress}
-          </p>
-          <p className="mt-2 text-sm leading-6 text-stone-600">
-            Active planning items currently being worked through.
-          </p>
+          <p className="text-sm font-medium text-stone-500">Timeline In Progress</p>
+          <p className="mt-2 text-3xl font-semibold text-stone-900">{timelineCounts.inProgress}</p>
+          <p className="mt-2 text-sm leading-6 text-stone-600">Active planning items.</p>
         </div>
 
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">Upcoming</p>
-          <p className="mt-2 text-3xl font-semibold text-stone-900">
-            {timelineCounts.upcoming}
-          </p>
-          <p className="mt-2 text-sm leading-6 text-stone-600">
-            Next-phase timeline items waiting to be executed.
-          </p>
+          <p className="text-sm font-medium text-stone-500">Timeline Upcoming</p>
+          <p className="mt-2 text-3xl font-semibold text-stone-900">{timelineCounts.upcoming}</p>
+          <p className="mt-2 text-sm leading-6 text-stone-600">Remaining milestones.</p>
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-stone-900">
-            Planning Summary
-          </h2>
-          <p className="mt-3 text-sm leading-6 text-stone-600">
-            {planningNotes}
+      {/* Advisory Settings Form */}
+      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+        <div>
+          <h2 className="text-xl font-semibold text-stone-900">Advisory Settings</h2>
+          <p className="mt-1 text-sm text-stone-600">
+            Save your current advisory stage, preferred pathway, notes, and next action.
           </p>
+        </div>
 
-          <div className="mt-6 grid gap-4 lg:grid-cols-2">
-            <div className="rounded-xl bg-stone-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-                Advisory Next Step
-              </p>
-              <p className="mt-2 text-sm leading-6 text-stone-700">
-                {advisoryNextStep}
-              </p>
-            </div>
-
-            <div className="rounded-xl bg-stone-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-                Timeline Summary
-              </p>
-              <p className="mt-2 text-sm leading-6 text-stone-700">
-                {timelineCounts.total > 0
-                  ? `${timelineCounts.completed} completed, ${timelineCounts.inProgress} in progress, ${timelineCounts.upcoming} upcoming`
-                  : "No timeline created yet"}
-              </p>
-            </div>
+        <div className="mt-6 grid gap-4 lg:grid-cols-2">
+          <div>
+            <label className="mb-1 block text-sm font-medium text-stone-700">
+              Advisory Status
+            </label>
+            <select
+              className="w-full rounded-xl border border-stone-300 px-3 py-2 text-sm text-stone-900"
+              value={plan.advisory_status ?? "Not Started"}
+              onChange={(e) => updatePlanField("advisory_status", e.target.value)}
+            >
+              {ADVISORY_STATUS_OPTIONS.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
           </div>
 
-          <div className="mt-5 flex flex-wrap gap-3">
-            <Link
-              href="/portal/my-plan"
-              className="inline-flex rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
+          <div>
+            <label className="mb-1 block text-sm font-medium text-stone-700">
+              Preferred Advisory Pathway
+            </label>
+            <select
+              className="w-full rounded-xl border border-stone-300 px-3 py-2 text-sm text-stone-900"
+              value={plan.advisory_pathway ?? "Undecided"}
+              onChange={(e) => updatePlanField("advisory_pathway", e.target.value)}
             >
-              Update My Plan
-            </Link>
-            <Link
-              href="/portal/timeline"
-              className="inline-flex rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
-            >
-              Review Timeline
-            </Link>
-            <Link
-              href="/portal/advisory"
-              className="inline-flex rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
-            >
-              Review Advisory
-            </Link>
+              {ADVISORY_PATHWAY_OPTIONS.map((pathway) => (
+                <option key={pathway} value={pathway}>
+                  {pathway}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="lg:col-span-2">
+            <label className="mb-1 block text-sm font-medium text-stone-700">
+              Advisory Notes
+            </label>
+            <textarea
+              className="w-full rounded-xl border border-stone-300 px-3 py-2 text-sm text-stone-900"
+              rows={4}
+              value={plan.advisory_notes ?? ""}
+              onChange={(e) => updatePlanField("advisory_notes", e.target.value)}
+              placeholder="Add pathway questions, strategic concerns, legal or logistical issues, or case context for advisory review."
+            />
+          </div>
+
+          <div className="lg:col-span-2">
+            <label className="mb-1 block text-sm font-medium text-stone-700">
+              Next Advisory Step
+            </label>
+            <input
+              className="w-full rounded-xl border border-stone-300 px-3 py-2 text-sm text-stone-900"
+              value={plan.advisory_next_step ?? ""}
+              onChange={(e) => updatePlanField("advisory_next_step", e.target.value)}
+              placeholder="Clarify pathway questions / Book strategy session / Compare shortlisted countries"
+            />
           </div>
         </div>
 
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-stone-900">
-            Module Status
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-stone-600">
-            Quick visibility into the current state of each major portal area.
-          </p>
+        <div className="mt-6 flex items-center gap-3">
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving || !hasUnsavedChanges}
+            className="rounded-xl bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {saving ? "Saving..." : hasUnsavedChanges ? "Save Advisory" : "Saved"}
+          </button>
 
-          <div className="mt-5 space-y-3">
-            {moduleStatuses.map(
-  (item: { label: string; value: string; href: string }) => (
-              <div
-                key={item.label}
-                className="flex items-center justify-between rounded-xl border border-stone-200 px-4 py-3"
-              >
-                <div>
-                  <p className="text-sm font-medium text-stone-900">
-                    {item.label}
-                  </p>
-                  <p className="text-sm text-stone-600">{item.value}</p>
-                </div>
-
-                <Link
-                  href={item.href}
-                  className="rounded-xl border border-stone-300 px-3 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
-                >
-                  Open
-                </Link>
-              </div>
-            ))}
-          </div>
+          {message ? (
+            <p className={`text-sm ${isError ? "text-red-600" : "text-green-700"}`}>
+              {message}
+            </p>
+          ) : (
+            <p className="text-sm text-stone-500">
+              {hasUnsavedChanges ? "Unsaved changes" : "All changes saved"}
+            </p>
+          )}
         </div>
       </section>
 
+      {/* Advisory Pathways */}
       <section className="space-y-4">
         <div>
-          <h2 className="text-xl font-semibold text-stone-900">
-            Portal Modules
-          </h2>
+          <h2 className="text-xl font-semibold text-stone-900">Advisory Pathways</h2>
           <p className="mt-1 text-sm text-stone-600">
-            Your core planning modules are now connected to real user data and
-            can be used as an active private workspace.
+            These cards reflect your saved advisory workspace context.
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {dashboardCards.map((card) => (
+        <div className="space-y-4">
+          {advisoryItems.map((item) => (
             <article
-              key={card.title}
-              className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm"
+              key={item.title}
+              className={`rounded-2xl border p-6 shadow-sm ${
+                item.recommended
+                  ? "border-stone-900 bg-stone-50"
+                  : "border-stone-200 bg-white"
+              }`}
             >
-              <h3 className="text-lg font-semibold text-stone-900">
-                {card.title}
-              </h3>
-              <p className="mt-3 text-sm leading-6 text-stone-600">
-                {card.description}
-              </p>
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <div>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <h3 className="text-lg font-semibold text-stone-900">
+                      {item.title}
+                    </h3>
+                    <span className="rounded-full border border-stone-300 px-3 py-1 text-xs font-medium text-stone-700">
+                      {item.status}
+                    </span>
+                    {item.recommended && (
+                      <span className="rounded-full bg-stone-900 px-3 py-1 text-xs font-medium text-white">
+                        Recommended
+                      </span>
+                    )}
+                  </div>
 
-              <Link
-                href={card.href}
-                className="mt-5 inline-flex rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
-              >
-                {card.cta}
-              </Link>
+                  <p className="mt-3 max-w-3xl text-sm leading-6 text-stone-600">
+                    {item.description}
+                  </p>
+                </div>
+              </div>
             </article>
           ))}
+        </div>
+      </section>
+
+      {/* Planning Context Snapshot */}
+      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-stone-900">Planning Context Snapshot</h2>
+        <p className="mt-1 text-sm text-stone-600">
+          This advisory layer is now informed by the rest of your portal workspace.
+        </p>
+
+        <div className="mt-6 grid gap-4 lg:grid-cols-2">
+          <div className="rounded-xl border border-stone-200 bg-stone-50 p-4">
+            <p className="text-sm font-medium text-stone-500">Pathway</p>
+            <p className="mt-2 text-base font-semibold text-stone-900">
+              {getDisplayValue(plan.pathway_type, "Not yet specified")}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-stone-200 bg-stone-50 p-4">
+            <p className="text-sm font-medium text-stone-500">Target Timeline</p>
+            <p className="mt-2 text-base font-semibold text-stone-900">
+              {getDisplayValue(plan.target_timeline, "Not yet defined")}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-stone-200 bg-stone-50 p-4">
+            <p className="text-sm font-medium text-stone-500">Budget Range</p>
+            <p className="mt-2 text-base font-semibold text-stone-900">
+              {getDisplayValue(plan.budget_range, "Not yet defined")}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-stone-200 bg-stone-50 p-4">
+            <p className="text-sm font-medium text-stone-500">Planning Notes</p>
+            <p className="mt-2 text-base font-semibold text-stone-900">
+              {getDisplayValue(plan.notes, "No planning notes saved yet")}
+            </p>
+          </div>
         </div>
       </section>
     </div>
