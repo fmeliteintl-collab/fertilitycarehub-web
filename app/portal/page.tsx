@@ -21,6 +21,7 @@ import {
   getDisplayValue,
   type AdvisorySignal,
 } from "@/lib/intelligence/plan-intelligence";
+import { DashboardSkeleton } from "@/app/components/skeletons";
 
 export const runtime = "edge";
 
@@ -132,43 +133,89 @@ export default function PortalAdvisoryPage() {
     }
   }
 
-  // Use shared intelligence functions
   const currentStatus = plan.advisory_status ?? "Not Started";
   const currentPathway = plan.advisory_pathway ?? "Undecided";
 
-  const timelineItems = useMemo(() => plan.timeline_items ?? [], [plan.timeline_items]);
-  const timelineCounts = useMemo(() => getTimelineCounts(timelineItems), [timelineItems]);
+  const timelineItems = useMemo(
+    () => plan.timeline_items ?? [],
+    [plan.timeline_items]
+  );
 
-  const advisoryReadiness = useMemo(() => calculateAdvisoryReadiness(plan, 0), [plan]);
-  const advisorySignals = useMemo(() => generateAdvisorySignals(plan), [plan]);
-  const executionStage = determineExecutionStage(plan);
-  const smartNextStep = useMemo(() => buildSmartNextStep(plan), [plan]);
-  const recommendedFocus = useMemo(() => buildRecommendedFocus(plan), [plan]);
-  
-  // Get global next action for cross-module consistency
-  const globalNextAction = useMemo(() => getGlobalNextAction(plan, 0), [plan]);
+  const timelineCounts = useMemo(
+    () => getTimelineCounts(timelineItems),
+    [timelineItems]
+  );
+
+  const advisoryReadiness = useMemo(
+    () => calculateAdvisoryReadiness(plan, 0),
+    [plan]
+  );
+
+  const advisorySignals = useMemo(
+    () => generateAdvisorySignals(plan),
+    [plan]
+  );
+
+  const executionStage = useMemo(
+    () => determineExecutionStage(plan),
+    [plan]
+  );
+
+  const smartNextStep = useMemo(
+    () => buildSmartNextStep(plan),
+    [plan]
+  );
+
+  const recommendedFocus = useMemo(
+    () => buildRecommendedFocus(plan),
+    [plan]
+  );
+
+  const globalNextAction = useMemo(
+    () => getGlobalNextAction(plan, 0),
+    [plan]
+  );
 
   const shortlistedCountries = plan.shortlisted_countries ?? [];
 
-  const blockingSignals = advisorySignals.filter((s: AdvisorySignal) => s.type === "blocking");
-  const attentionSignals = advisorySignals.filter((s: AdvisorySignal) => s.type === "attention");
-  const readySignals = advisorySignals.filter((s: AdvisorySignal) => s.type === "ready");
+  const blockingSignals = useMemo(
+    () => advisorySignals.filter((s: AdvisorySignal) => s.type === "blocking"),
+    [advisorySignals]
+  );
+
+  const attentionSignals = useMemo(
+    () => advisorySignals.filter((s: AdvisorySignal) => s.type === "attention"),
+    [advisorySignals]
+  );
+
+  const readySignals = useMemo(
+    () => advisorySignals.filter((s: AdvisorySignal) => s.type === "ready"),
+    [advisorySignals]
+  );
 
   const advisoryItems = useMemo(
     () => [
       {
         title: "Strategy Session",
-        status: currentPathway === "Strategy Session" ? "Selected" : "Available",
+        status:
+          currentPathway === "Strategy Session" ? "Selected" : "Available",
         description:
           "A focused advisory session to clarify pathway direction, shortlist logic, and next-step planning priorities.",
-        recommended: executionStage.stage === "sequencing" && currentPathway === "Undecided",
+        recommended:
+          executionStage.stage === "sequencing" &&
+          currentPathway === "Undecided",
       },
       {
         title: "Comprehensive Advisory Package",
-        status: currentPathway === "Comprehensive Advisory Package" ? "Selected" : "Core Offer",
+        status:
+          currentPathway === "Comprehensive Advisory Package"
+            ? "Selected"
+            : "Core Offer",
         description:
           "A more structured advisory pathway designed for deeper planning, comparative review, and guided decision support.",
-        recommended: executionStage.stage === "advisory-active" && currentPathway === "Undecided",
+        recommended:
+          executionStage.stage === "advisory-active" &&
+          currentPathway === "Undecided",
       },
       {
         title: "Current Advisory Status",
@@ -183,12 +230,11 @@ export default function PortalAdvisoryPage() {
   );
 
   if (loading) {
-    return <div className="p-6">Loading advisory workspace...</div>;
+    return <DashboardSkeleton />;
   }
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
         <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
           Advisory
@@ -197,22 +243,28 @@ export default function PortalAdvisoryPage() {
           Advisory Workspace
         </h1>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-stone-600">
-          Track your advisory pathway, review support formats, and move from planning into structured decision support.
+          Track your advisory pathway, review support formats, and move from
+          planning into structured decision support.
         </p>
       </div>
 
-      {/* Global Next Action Banner - Cross-module consistency */}
       {globalNextAction.href !== "/portal/advisory" && (
         <section className="rounded-2xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-sm font-medium text-stone-500">Current Global Priority</p>
-              <p className="mt-1 text-lg font-semibold text-stone-900">{globalNextAction.title}</p>
-              <p className="mt-1 text-sm text-stone-600">{globalNextAction.body}</p>
+              <p className="text-sm font-medium text-stone-500">
+                Current Global Priority
+              </p>
+              <p className="mt-1 text-lg font-semibold text-stone-900">
+                {globalNextAction.title}
+              </p>
+              <p className="mt-1 text-sm text-stone-600">
+                {globalNextAction.body}
+              </p>
             </div>
             <Link
               href={globalNextAction.href}
-              className="inline-flex rounded-xl bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-800 shrink-0"
+              className="inline-flex shrink-0 rounded-xl bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-800"
             >
               {globalNextAction.cta}
             </Link>
@@ -220,11 +272,12 @@ export default function PortalAdvisoryPage() {
         </section>
       )}
 
-      {/* Advisory Readiness Score */}
       <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-stone-900">Advisory Readiness</h2>
+            <h2 className="text-lg font-semibold text-stone-900">
+              Advisory Readiness
+            </h2>
             <p className="mt-1 text-sm text-stone-600">
               Measures planning maturity for meaningful advisory engagement
             </p>
@@ -234,13 +287,13 @@ export default function PortalAdvisoryPage() {
               <p className="text-3xl font-semibold text-stone-900">
                 {advisoryReadiness.percentage}%
               </p>
-              <p className="text-sm text-stone-500 capitalize">
+              <p className="text-sm capitalize text-stone-500">
                 {advisoryReadiness.stage} stage
               </p>
             </div>
-            <div className="h-16 w-16 rounded-full border-4 border-stone-100 flex items-center justify-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-stone-100">
               <div
-                className={`h-12 w-12 rounded-full flex items-center justify-center text-xs font-medium ${
+                className={`flex h-12 w-12 items-center justify-center rounded-full text-xs font-medium ${
                   advisoryReadiness.stage === "optimal"
                     ? "bg-green-100 text-green-800"
                     : advisoryReadiness.stage === "ready"
@@ -272,11 +325,12 @@ export default function PortalAdvisoryPage() {
         </div>
       </section>
 
-      {/* Advisory Signals */}
       {advisorySignals.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-lg font-semibold text-stone-900">Advisory Signals</h2>
-          
+          <h2 className="text-lg font-semibold text-stone-900">
+            Advisory Signals
+          </h2>
+
           {blockingSignals.length > 0 && (
             <div className="space-y-2">
               {blockingSignals.map((signal, idx) => (
@@ -286,9 +340,13 @@ export default function PortalAdvisoryPage() {
                 >
                   <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
                     <div>
-                      <p className="font-medium text-red-900">{signal.message}</p>
+                      <p className="font-medium text-red-900">
+                        {signal.message}
+                      </p>
                       {signal.action && (
-                        <p className="text-sm text-red-700 mt-1">{signal.action}</p>
+                        <p className="mt-1 text-sm text-red-700">
+                          {signal.action}
+                        </p>
                       )}
                     </div>
                     {signal.link && (
@@ -314,9 +372,13 @@ export default function PortalAdvisoryPage() {
                 >
                   <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
                     <div>
-                      <p className="font-medium text-amber-900">{signal.message}</p>
+                      <p className="font-medium text-amber-900">
+                        {signal.message}
+                      </p>
                       {signal.action && (
-                        <p className="text-sm text-amber-700 mt-1">{signal.action}</p>
+                        <p className="mt-1 text-sm text-amber-700">
+                          {signal.action}
+                        </p>
                       )}
                     </div>
                     {signal.link && (
@@ -340,7 +402,9 @@ export default function PortalAdvisoryPage() {
                   key={`ready-${idx}`}
                   className="rounded-xl border border-green-200 bg-green-50 p-4"
                 >
-                  <p className="font-medium text-green-900">{signal.message}</p>
+                  <p className="font-medium text-green-900">
+                    {signal.message}
+                  </p>
                 </div>
               ))}
             </div>
@@ -348,7 +412,6 @@ export default function PortalAdvisoryPage() {
         </section>
       )}
 
-      {/* Execution Stage */}
       <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
         <div className="flex items-start gap-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-xl">
@@ -360,15 +423,25 @@ export default function PortalAdvisoryPage() {
           </div>
           <div className="flex-1">
             <h2 className="text-lg font-semibold text-stone-900">
-              Execution Stage: <span className="capitalize">{executionStage.stage.replace("-", " ")}</span>
+              Execution Stage:{" "}
+              <span className="capitalize">
+                {executionStage.stage.replace("-", " ")}
+              </span>
             </h2>
-            <p className="mt-1 text-sm text-stone-600">{executionStage.description}</p>
-            
+            <p className="mt-1 text-sm text-stone-600">
+              {executionStage.description}
+            </p>
+
             <div className="mt-4">
-              <p className="text-sm font-medium text-stone-700">Recommended Actions:</p>
+              <p className="text-sm font-medium text-stone-700">
+                Recommended Actions:
+              </p>
               <ul className="mt-2 space-y-1">
                 {executionStage.nextActions.map((action, idx) => (
-                  <li key={idx} className="flex items-start gap-2 text-sm text-stone-600">
+                  <li
+                    key={idx}
+                    className="flex items-start gap-2 text-sm text-stone-600"
+                  >
                     <span className="text-stone-400">•</span>
                     {action}
                   </li>
@@ -379,13 +452,18 @@ export default function PortalAdvisoryPage() {
         </div>
       </section>
 
-      {/* Smart Next Step */}
       <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-sm font-medium text-stone-500">Smart Next Step</p>
-            <p className="mt-1 text-lg font-semibold text-stone-900">{smartNextStep.step}</p>
-            <p className="mt-1 text-sm text-stone-600">{smartNextStep.context}</p>
+            <p className="text-sm font-medium text-stone-500">
+              Smart Next Step
+            </p>
+            <p className="mt-1 text-lg font-semibold text-stone-900">
+              {smartNextStep.step}
+            </p>
+            <p className="mt-1 text-sm text-stone-600">
+              {smartNextStep.context}
+            </p>
           </div>
           <span
             className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
@@ -401,21 +479,27 @@ export default function PortalAdvisoryPage() {
         </div>
       </section>
 
-      {/* Recommended Focus */}
       <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-        <p className="text-sm font-medium text-stone-500">Recommended Advisory Focus</p>
-        <p className="mt-2 text-lg font-semibold text-stone-900">{recommendedFocus}</p>
+        <p className="text-sm font-medium text-stone-500">
+          Recommended Advisory Focus
+        </p>
+        <p className="mt-2 text-lg font-semibold text-stone-900">
+          {recommendedFocus}
+        </p>
         <p className="mt-2 text-sm text-stone-600">
           Generated from your current planning, shortlist, and timeline state.
         </p>
       </section>
 
-      {/* Cross-Module Context */}
       <section className="grid gap-6 lg:grid-cols-4">
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">Shortlisted Countries</p>
+          <p className="text-sm font-medium text-stone-500">
+            Shortlisted Countries
+          </p>
           <p className="mt-2 text-lg font-semibold text-stone-900">
-            {shortlistedCountries.length > 0 ? shortlistedCountries.join(", ") : "No shortlist yet"}
+            {shortlistedCountries.length > 0
+              ? shortlistedCountries.join(", ")
+              : "No shortlist yet"}
           </p>
           <p className="mt-2 text-sm leading-6 text-stone-600">
             {shortlistedCountries.length === 0 ? (
@@ -429,8 +513,12 @@ export default function PortalAdvisoryPage() {
         </div>
 
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">Timeline Completed</p>
-          <p className="mt-2 text-3xl font-semibold text-stone-900">{timelineCounts.completed}</p>
+          <p className="text-sm font-medium text-stone-500">
+            Timeline Completed
+          </p>
+          <p className="mt-2 text-3xl font-semibold text-stone-900">
+            {timelineCounts.completed}
+          </p>
           <p className="mt-2 text-sm leading-6 text-stone-600">
             {timelineCounts.completed === 0 && timelineCounts.total === 0 ? (
               <Link href="/portal/timeline" className="text-stone-900 underline">
@@ -443,24 +531,38 @@ export default function PortalAdvisoryPage() {
         </div>
 
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">Timeline In Progress</p>
-          <p className="mt-2 text-3xl font-semibold text-stone-900">{timelineCounts.inProgress}</p>
-          <p className="mt-2 text-sm leading-6 text-stone-600">Active planning items.</p>
+          <p className="text-sm font-medium text-stone-500">
+            Timeline In Progress
+          </p>
+          <p className="mt-2 text-3xl font-semibold text-stone-900">
+            {timelineCounts.inProgress}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-stone-600">
+            Active planning items.
+          </p>
         </div>
 
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">Timeline Upcoming</p>
-          <p className="mt-2 text-3xl font-semibold text-stone-900">{timelineCounts.upcoming}</p>
-          <p className="mt-2 text-sm leading-6 text-stone-600">Remaining milestones.</p>
+          <p className="text-sm font-medium text-stone-500">
+            Timeline Upcoming
+          </p>
+          <p className="mt-2 text-3xl font-semibold text-stone-900">
+            {timelineCounts.upcoming}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-stone-600">
+            Remaining milestones.
+          </p>
         </div>
       </section>
 
-      {/* Advisory Settings Form */}
       <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
         <div>
-          <h2 className="text-xl font-semibold text-stone-900">Advisory Settings</h2>
+          <h2 className="text-xl font-semibold text-stone-900">
+            Advisory Settings
+          </h2>
           <p className="mt-1 text-sm text-stone-600">
-            Save your current advisory stage, preferred pathway, notes, and next action.
+            Save your current advisory stage, preferred pathway, notes, and next
+            action.
           </p>
         </div>
 
@@ -472,7 +574,9 @@ export default function PortalAdvisoryPage() {
             <select
               className="w-full rounded-xl border border-stone-300 px-3 py-2 text-sm text-stone-900"
               value={plan.advisory_status ?? "Not Started"}
-              onChange={(e) => updatePlanField("advisory_status", e.target.value)}
+              onChange={(e) =>
+                updatePlanField("advisory_status", e.target.value)
+              }
             >
               {ADVISORY_STATUS_OPTIONS.map((status) => (
                 <option key={status} value={status}>
@@ -489,7 +593,9 @@ export default function PortalAdvisoryPage() {
             <select
               className="w-full rounded-xl border border-stone-300 px-3 py-2 text-sm text-stone-900"
               value={plan.advisory_pathway ?? "Undecided"}
-              onChange={(e) => updatePlanField("advisory_pathway", e.target.value)}
+              onChange={(e) =>
+                updatePlanField("advisory_pathway", e.target.value)
+              }
             >
               {ADVISORY_PATHWAY_OPTIONS.map((pathway) => (
                 <option key={pathway} value={pathway}>
@@ -519,7 +625,9 @@ export default function PortalAdvisoryPage() {
             <input
               className="w-full rounded-xl border border-stone-300 px-3 py-2 text-sm text-stone-900"
               value={plan.advisory_next_step ?? ""}
-              onChange={(e) => updatePlanField("advisory_next_step", e.target.value)}
+              onChange={(e) =>
+                updatePlanField("advisory_next_step", e.target.value)
+              }
               placeholder="Clarify pathway questions / Book strategy session / Compare shortlisted countries"
             />
           </div>
@@ -547,10 +655,11 @@ export default function PortalAdvisoryPage() {
         </div>
       </section>
 
-      {/* Advisory Pathways */}
       <section className="space-y-4">
         <div>
-          <h2 className="text-xl font-semibold text-stone-900">Advisory Pathways</h2>
+          <h2 className="text-xl font-semibold text-stone-900">
+            Advisory Pathways
+          </h2>
           <p className="mt-1 text-sm text-stone-600">
             These cards reflect your saved advisory workspace context.
           </p>
@@ -592,9 +701,10 @@ export default function PortalAdvisoryPage() {
         </div>
       </section>
 
-      {/* Planning Context Snapshot */}
       <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-stone-900">Planning Context Snapshot</h2>
+        <h2 className="text-xl font-semibold text-stone-900">
+          Planning Context Snapshot
+        </h2>
         <p className="mt-1 text-sm text-stone-600">
           This advisory layer is now informed by the rest of your portal workspace.
         </p>
