@@ -53,6 +53,246 @@ function PriorityBadge({ priority }: { priority: string }) {
   );
 }
 
+// Guided Flow Step component
+interface FlowStep {
+  id: string;
+  number: number;
+  title: string;
+  module: "my-plan" | "countries" | "timeline" | "documents" | "advisory";
+  status: "complete" | "active" | "locked";
+  description: string;
+  blockers?: string[];
+  cta?: { label: string; href: string };
+  unlocks?: string[];
+}
+
+function GuidedFlowStep({
+  step,
+  isLast,
+}: {
+  step: FlowStep;
+  isLast: boolean;
+}) {
+  const statusStyles = {
+    complete: {
+      circle: "bg-[#6a7a6a] text-white",
+      line: "bg-[#6a7a6a]",
+      title: "text-stone-500 line-through",
+      bg: "bg-stone-50",
+    },
+    active: {
+      circle: "bg-[#3a3a3a] text-white ring-2 ring-[#3a3a3a] ring-offset-2",
+      line: "bg-stone-300",
+      title: "text-stone-900",
+      bg: "bg-white border-[#3a3a3a]",
+    },
+    locked: {
+      circle: "bg-stone-200 text-stone-400",
+      line: "bg-stone-200",
+      title: "text-stone-400",
+      bg: "bg-stone-50",
+    },
+  };
+
+  const style = statusStyles[step.status];
+
+  return (
+    <div className="flex gap-4">
+      {/* Timeline connector */}
+      <div className="flex flex-col items-center">
+        <div
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${style.circle}`}
+        >
+          {step.status === "complete" ? "✓" : step.number}
+        </div>
+        {!isLast && (
+          <div className={`mt-2 w-0.5 flex-1 ${style.line}`} />
+        )}
+      </div>
+
+      {/* Content */}
+      <div className={`flex-1 rounded-xl border p-5 ${style.bg} ${step.status === "active" ? "border-2" : "border-stone-200"}`}>
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div className="flex-1">
+            <h3 className={`text-lg font-semibold ${style.title}`}>
+              {step.title}
+              {step.status === "active" && (
+                <span className="ml-2 text-sm font-normal text-[#d4c4a8]">
+                  ← You are here
+                </span>
+              )}
+            </h3>
+            <p className="mt-1 text-sm text-stone-600">{step.description}</p>
+
+            {/* Blockers */}
+            {step.blockers && step.blockers.length > 0 && (
+              <div className="mt-3 rounded-lg bg-stone-100 px-3 py-2">
+                <p className="text-xs font-medium text-stone-500 uppercase tracking-wider">
+                  Blocking:
+                </p>
+                <ul className="mt-1 space-y-1">
+                  {step.blockers.map((blocker, idx) => (
+                    <li key={idx} className="text-sm text-stone-600">
+                      • {blocker}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Unlocks */}
+            {step.unlocks && step.unlocks.length > 0 && step.status !== "complete" && (
+              <div className="mt-3">
+                <p className="text-xs font-medium text-[#4a5a4a] uppercase tracking-wider">
+                  Unlocks:
+                </p>
+                <p className="text-sm text-stone-600">{step.unlocks.join(" • ")}</p>
+              </div>
+            )}
+          </div>
+
+          {/* CTA */}
+          {step.cta && step.status !== "complete" && (
+            <Link
+              href={step.cta.href}
+              className={`mt-3 inline-flex shrink-0 rounded-xl px-4 py-2 text-sm font-medium transition lg:mt-0 ${
+                step.status === "active"
+                  ? "bg-[#3a3a3a] text-white hover:bg-[#2a2a2a]"
+                  : "border border-stone-300 text-stone-600 hover:bg-stone-100"
+              }`}
+            >
+              {step.cta.label} →
+            </Link>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Compute guided flow steps based on plan state
+function computeFlowSteps(plan: UserPlanInput): FlowStep[] {
+  const hasPathway = !!plan.pathway_type?.trim();
+  const hasCountries = (plan.shortlisted_countries || []).length > 0;
+  const hasTimeline = (plan.timeline_items || []).length > 0;
+  const hasInProgressTimeline = plan.timeline_items?.some(
+    (i) => i.status === "In Progress"
+  );
+  const timelineCompleted =
+    hasTimeline &&
+    plan.timeline_items?.every((i) => i.status === "Completed");
+  const advisoryReady = calculateAdvisoryReadiness(plan, 0).percentage >= 70;
+
+  const steps: FlowStep[] = [
+    {
+      id: "my-plan",
+      number: 1,
+      title: "Complete My Plan",
+      module: "my-plan",
+      status: hasPathway ? "complete" : "active",
+      description: hasPathway
+        ? "Foundation set — pathway defined"
+        : "Define your treatment pathway, family structure, and goals",
+      cta: hasPathway
+        ? undefined
+        : { label: "Start Planning", href: "/portal/my-plan" },
+      unlocks: hasPathway ? undefined : ["Country selection", "Timeline generation"],
+    },
+    {
+      id: "countries",
+      number: 2,
+      title: "Select Countries",
+      module: "countries",
+      status: hasCountries
+        ? "complete"
+        : hasPathway
+        ? "active"
+        : "locked",
+      description: hasCountries
+        ? `${plan.shortlisted_countries?.length} countries shortlisted`
+        : "Identify 2-3 jurisdictions that match your pathway",
+      blockers:
+        !hasPathway && !hasCountries ? ["Complete My Plan first"] : undefined,
+      cta:
+        hasCountries || !hasPathway
+          ? undefined
+          : { label: "Build Shortlist", href: "/portal/countries" },
+      unlocks: hasCountries ? undefined : ["Phase-based timeline", "Legal pathway analysis"],
+    },
+    {
+      id: "timeline",
+      number: 3,
+      title: "Build Timeline",
+      module: "timeline",
+      status: timelineCompleted
+        ? "complete"
+        : hasInProgressTimeline
+        ? "active"
+        : hasTimeline
+        ? "active"
+        : hasCountries
+        ? "active"
+        : "locked",
+      description: timelineCompleted
+        ? "All phases complete — execution ready"
+        : hasInProgressTimeline
+        ? "Execution planning in progress"
+        : hasTimeline
+        ? "Timeline generated — activate your first task"
+        : "Create your phase-based execution roadmap",
+      blockers: !hasCountries
+        ? ["Select countries first"]
+        : undefined,
+      cta:
+        hasTimeline || !hasCountries
+          ? undefined
+          : { label: "Generate Timeline", href: "/portal/timeline" },
+      unlocks:
+        hasTimeline && !timelineCompleted
+          ? ["Document preparation", "Advisory engagement"]
+          : undefined,
+    },
+    {
+      id: "documents",
+      number: 4,
+      title: "Prepare Documents",
+      module: "documents",
+      status: "locked", // Future implementation
+      description: "Organize medical records, legal forms, and travel documents",
+      blockers: !hasInProgressTimeline
+        ? ["Activate timeline first"]
+        : undefined,
+      unlocks: ["Execution readiness", "Clinic coordination"],
+    },
+    {
+      id: "advisory",
+      number: 5,
+      title: "Enter Advisory / Execution",
+      module: "advisory",
+      status: timelineCompleted
+        ? "active"
+        : advisoryReady
+        ? "active"
+        : "locked",
+      description: timelineCompleted
+        ? "Ready for execution — schedule advisory"
+        : advisoryReady
+        ? "Timeline progressing well — advisory recommended"
+        : "Requires 70% timeline readiness",
+      blockers:
+        !advisoryReady && !timelineCompleted
+          ? [`${70 - calculateAdvisoryReadiness(plan, 0).percentage}% more timeline completion needed`]
+          : undefined,
+      cta:
+        advisoryReady || timelineCompleted
+          ? { label: "Explore Advisory", href: "/portal/advisory" }
+          : undefined,
+    },
+  ];
+
+  return steps;
+}
+
 export default function PortalDashboardPage() {
   const [plan, setPlan] = useState<UserPlanInput>(EMPTY_USER_PLAN_INPUT);
   const [loading, setLoading] = useState(true);
@@ -131,6 +371,9 @@ export default function PortalDashboardPage() {
     () => determineExecutionStage(plan),
     [plan]
   );
+
+  // NEW: Guided Flow steps
+  const flowSteps = useMemo(() => computeFlowSteps(plan), [plan]);
 
   // NEW: Use enhanced next action with context
   const nextAction = useMemo(
@@ -284,6 +527,30 @@ export default function PortalDashboardPage() {
               ))}
             </ul>
           </div>
+        </div>
+      </section>
+
+      {/* TIER 1: Guided Flow - YOUR PATH FORWARD */}
+      <section className="rounded-2xl border border-stone-300 bg-white p-8 shadow-sm">
+        <div className="mb-6">
+          <p className="text-sm font-medium uppercase tracking-wider text-stone-500">
+            Your Path Forward
+          </p>
+          <h2 className="mt-2 text-2xl font-semibold text-stone-900">
+            Step-by-Step Journey
+          </h2>
+          <p className="mt-2 text-sm text-stone-600">
+            Complete each step to unlock the next phase of your fertility planning
+          </p>
+        </div>
+        <div className="space-y-4">
+          {flowSteps.map((step, idx) => (
+            <GuidedFlowStep
+              key={step.id}
+              step={step}
+              isLast={idx === flowSteps.length - 1}
+            />
+          ))}
         </div>
       </section>
 
