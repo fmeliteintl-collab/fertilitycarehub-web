@@ -1,4 +1,11 @@
-export type TimelineItemStatus = "Completed" | "In Progress" | "Upcoming";
+export type TimelineItemStatus = "Completed" | "In Progress" | "Upcoming" | "Blocked";
+
+export type TimelinePhase = 
+  | "planning" 
+  | "preparation" 
+  | "pre-treatment" 
+  | "treatment" 
+  | "post-treatment";
 
 export type TimelineItem = {
   id: string;
@@ -6,7 +13,25 @@ export type TimelineItem = {
   category: string;
   status: TimelineItemStatus;
   description: string;
+  phase: TimelinePhase;
+  priority: "high" | "medium" | "low";
+  dependencies: string[];
+  isLocked: boolean;
+  lockReason?: string;
+  estimatedDuration?: string;
 };
+
+export interface PhaseMeta {
+  id: TimelinePhase;
+  name: string;
+  order: number;
+  description: string;
+  isLocked: boolean;
+  lockReason?: string;
+  unlocksDescription: string;
+  completionPercentage: number;
+  items: TimelineItem[];
+}
 
 export type UserPlan = {
   id: string;
@@ -70,4 +95,35 @@ export const EMPTY_USER_PLAN_INPUT: UserPlanInput = {
   target_timeline: null,
   budget_range: null,
   notes: null,
+};
+
+export const PHASE_ORDER: TimelinePhase[] = [
+  "planning",
+  "preparation",
+  "pre-treatment",
+  "treatment",
+  "post-treatment",
+];
+
+export const PHASE_METADATA: Record<TimelinePhase, { name: string; description: string }> = {
+  planning: {
+    name: "Planning & Decision",
+    description: "Define your pathway, compare countries, and lock your strategic direction",
+  },
+  preparation: {
+    name: "Preparation",
+    description: "Clinic identification, legal consultation, and initial medical review",
+  },
+  "pre-treatment": {
+    name: "Pre-Treatment",
+    description: "Travel planning, documentation preparation, and cycle scheduling",
+  },
+  treatment: {
+    name: "Treatment",
+    description: "Begin treatment cycle, monitoring, procedures, and embryo transfer",
+  },
+  "post-treatment": {
+    name: "Post-Treatment",
+    description: "Recovery, follow-up, legal registration, and return planning",
+  },
 };

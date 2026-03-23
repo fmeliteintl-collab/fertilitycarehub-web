@@ -16,10 +16,25 @@ function normalizeTimelineItems(value: unknown): TimelineItem[] {
       if (
         item.status === "Completed" ||
         item.status === "In Progress" ||
-        item.status === "Upcoming"
+        item.status === "Upcoming" ||
+        item.status === "Blocked"
       ) {
         status = item.status;
       }
+
+      // Handle new phase-based fields with defaults for backward compatibility
+      const phase = (item.phase as TimelineItem["phase"]) || "planning";
+      const priority = (item.priority as TimelineItem["priority"]) || "medium";
+      const dependencies = Array.isArray(item.dependencies)
+        ? item.dependencies.filter((d): d is string => typeof d === "string")
+        : [];
+      const isLocked = typeof item.isLocked === "boolean" ? item.isLocked : false;
+      const lockReason =
+        typeof item.lockReason === "string" ? item.lockReason : undefined;
+      const estimatedDuration =
+        typeof item.estimatedDuration === "string"
+          ? item.estimatedDuration
+          : undefined;
 
       return {
         id:
@@ -30,6 +45,12 @@ function normalizeTimelineItems(value: unknown): TimelineItem[] {
         category: typeof item.category === "string" ? item.category : "Planning",
         status,
         description: typeof item.description === "string" ? item.description : "",
+        phase,
+        priority,
+        dependencies,
+        isLocked,
+        lockReason,
+        estimatedDuration,
       };
     })
     .filter((item) => item.title.length > 0);
