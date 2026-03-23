@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import {
   getCurrentUserPlan,
@@ -60,6 +61,11 @@ const STATUS_OPTIONS: TimelineItemStatus[] = [
   "In Progress",
   "Upcoming",
 ];
+
+type TimelineSignal = {
+  type: "blocking" | "attention" | "ready";
+  message: string;
+};
 
 function createGeneratedTimeline(plan: UserPlanInput): TimelineItem[] {
   const items: TimelineItem[] = [];
@@ -162,65 +168,96 @@ function createGeneratedTimeline(plan: UserPlanInput): TimelineItem[] {
   return items;
 }
 
-// Timeline-specific signal detection (context-specific, not in shared module)
 function detectTimelineSignals(
   plan: UserPlanInput,
   timelineItems: TimelineItem[]
-): Array<{ type: "info" | "attention" | "action"; message: string }> {
-  const signals: Array<{ type: "info" | "attention" | "action"; message: string }> = [];
-  
+): TimelineSignal[] {
+  const signals: TimelineSignal[] = [];
+
   const hasPathway = !!plan.pathway_type?.trim();
   const hasCountries = (plan.shortlisted_countries ?? []).length > 0;
   const hasAdvisoryNextStep = !!plan.advisory_next_step?.trim();
-  const hasInProgress = timelineItems.some((i) => i.status === "In Progress");
-  const hasCompleted = timelineItems.some((i) => i.status === "Completed");
-  const allUpcoming = timelineItems.length > 0 && timelineItems.every((i) => i.status === "Upcoming");
+  const hasInProgress = timelineItems.some((item) => item.status === "In Progress");
+  const hasCompleted = timelineItems.some((item) => item.status === "Completed");
+  const allUpcoming =
+    timelineItems.length > 0 &&
+    timelineItems.every((item) => item.status === "Upcoming");
 
-  // Inactive timeline detection
+  if (!hasPathway && timelineItems.length > 0) {
+    signals.push({
+      type: "blocking",
+      message:
+        "Planning context missing — timeline exists without a defined pathway. Return to My Plan to define your case.",
+    });
+  }
+
   if (timelineItems.length > 0 && allUpcoming) {
     signals.push({
       type: "attention",
-      message: "Timeline inactive — no items currently in progress. Select a starting point to activate.",
+      message:
+        "Timeline inactive — no items currently in progress. Select a starting point to activate.",
     });
   }
 
-  // Stalled timeline detection
-  if (hasCompleted && !hasInProgress && timelineItems.some((i) => i.status === "Upcoming")) {
+  if (
+    hasCompleted &&
+    !hasInProgress &&
+    timelineItems.some((item) => item.status === "Upcoming")
+  ) {
     signals.push({
       type: "attention",
-      message: "Timeline stalled — completed items exist but nothing currently active. Mark next item as In Progress.",
+      message:
+        "Timeline stalled — completed items exist but nothing currently active. Mark next item as In Progress.",
     });
   }
 
-  // Missing country context
+  if (timelineItems.length > 6 && allUpcoming) {
+    signals.push({
+      type: "attention",
+      message:
+        "Timeline overloaded — too many upcoming items without activation. Focus on 1–2 starting points.",
+    });
+  }
+
   if (hasPathway && !hasCountries && timelineItems.length > 0) {
     signals.push({
-      type: "action",
-      message: "Country shortlist missing — timeline generated but no countries selected. Visit Countries page to shortlist.",
+      type: "blocking",
+      message:
+        "Country shortlist missing — timeline generated but no countries selected. Visit Countries to shortlist before execution planning.",
     });
   }
 
-  // Advisory gap
   if (hasCountries && !hasAdvisoryNextStep && hasInProgress) {
     signals.push({
-      type: "info",
-      message: "Consider advisory input — you have active timeline items and shortlisted countries. Advisory can help validate execution approach.",
+      type: "attention",
+      message:
+        "Advisory gap detected — you have active timeline items and shortlisted countries, but no advisory next step is saved.",
     });
   }
 
-  // Execution readiness
-  const executionItems = timelineItems.filter((i) => i.category === "Execution" && i.status === "Completed");
-  if (executionItems.length > 0) {
+  const executionItemsCompleted = timelineItems.filter(
+    (item) => item.category === "Execution" && item.status === "Completed"
+  );
+
+  if (executionItemsCompleted.length > 0) {
     signals.push({
-      type: "info",
-      message: "Execution preparation underway — document and logistics items progressing well.",
+      type: "ready",
+      message:
+        "Execution preparation underway — document and logistics items are progressing well.",
+    });
+  }
+
+  if (hasPathway && hasCountries && hasInProgress) {
+    signals.push({
+      type: "ready",
+      message:
+        "Timeline is active — your pathway, shortlist, and current execution steps are aligned.",
     });
   }
 
   return signals;
 }
 
-// Timeline-specific next action (more granular than global next action)
 function getNextTimelineAction(
   plan: UserPlanInput,
   timelineItems: TimelineItem[]
@@ -232,57 +269,71 @@ function getNextTimelineAction(
   const hasPathway = !!plan.pathway_type?.trim();
   const hasCountries = (plan.shortlisted_countries ?? []).length > 0;
   const hasAdvisoryNextStep = !!plan.advisory_next_step?.trim();
-  
-  const inProgressItem = timelineItems.find((i) => i.status === "In Progress");
-  const firstUpcoming = timelineItems.find((i) => i.status === "Upcoming");
-  const allUpcoming = timelineItems.length > 0 && timelineItems.every((i) => i.status === "Upcoming");
 
-  // Priority 1: Generate timeline if missing
+  const inProgressItem = timelineItems.find(
+    (item) => item.status === "In Progress"
+  );
+  const firstUpcoming = timelineItems.find(
+    (item) => item.status === "Upcoming"
+  );
+  const allUpcoming =
+    timelineItems.length > 0 &&
+    timelineItems.every((item) => item.status === "Upcoming");
+
+  if (!hasPathway) {
+    return {
+      action: "Define your pathway first",
+      context:
+        "Timeline cannot be executed without a defined treatment pathway.",
+      cta: { label: "Go to My Plan", href: "/portal/my-plan" },
+    };
+  }
+
   if (timelineItems.length === 0 && hasPathway) {
     return {
       action: "Generate your timeline",
-      context: "Your planning context is saved but no timeline exists. Generate to create execution roadmap.",
+      context:
+        "Your planning context is saved but no timeline exists. Generate it to create an execution roadmap.",
       cta: { label: "Regenerate Timeline", href: "#timeline-management" },
     };
   }
 
-  // Priority 2: Start the timeline
   if (allUpcoming && timelineItems.length > 0) {
     return {
       action: `Begin with: ${timelineItems[0].title}`,
-      context: "Your timeline is ready but inactive. Mark the first item as In Progress to begin execution planning.",
+      context:
+        "Your timeline is ready but inactive. Mark the first item as In Progress to begin execution planning.",
     };
   }
 
-  // Priority 3: Continue current item
   if (inProgressItem) {
     return {
       action: `Continue: ${inProgressItem.title}`,
-      context: `Active ${inProgressItem.category.toLowerCase()} item in progress. Complete this before moving to next phase.`,
+      context: `Active ${inProgressItem.category.toLowerCase()} item in progress. Complete this before moving to the next phase.`,
     };
   }
 
-  // Priority 4: Move to next item
   if (firstUpcoming) {
     return {
       action: `Start next: ${firstUpcoming.title}`,
-      context: "Previous items completed. Mark the next item as In Progress to maintain momentum.",
+      context:
+        "Previous items are complete. Mark the next item as In Progress to maintain momentum.",
     };
   }
 
-  // Priority 5: Advisory connection
   if (hasCountries && !hasAdvisoryNextStep) {
     return {
       action: "Schedule advisory consultation",
-      context: "Timeline structure complete. Advisory input recommended before finalizing execution approach.",
+      context:
+        "Timeline structure is complete. Advisory input is recommended before finalizing the execution approach.",
       cta: { label: "Go to Advisory", href: "/portal/advisory" },
     };
   }
 
-  // Default
   return {
     action: "Review timeline structure",
-    context: "Ensure your timeline reflects current planning priorities and execution readiness.",
+    context:
+      "Ensure your timeline reflects current planning priorities and execution readiness.",
   };
 }
 
@@ -362,11 +413,7 @@ export default function PortalTimelinePage() {
     [plan.timeline_items]
   );
 
-  // Intelligence calculations using shared module
-  const readiness = useMemo(
-    () => calculateTimelineReadiness(plan),
-    [plan]
-  );
+  const readiness = useMemo(() => calculateTimelineReadiness(plan), [plan]);
 
   const signals = useMemo(
     () => detectTimelineSignals(plan, timelineItems),
@@ -388,6 +435,18 @@ export default function PortalTimelinePage() {
     [timelineItems]
   );
 
+  const momentum = useMemo(() => {
+    const total = timelineItems.length;
+    const inProgress = timelineCounts.inProgress;
+    const completed = timelineCounts.completed;
+
+    if (total === 0) {
+      return 0;
+    }
+
+    return Math.round(((inProgress * 2 + completed) / (total * 2)) * 100);
+  }, [timelineItems, timelineCounts]);
+
   const planningContext = useMemo(
     () => ({
       pathwayType: getDisplayValue(plan.pathway_type, "Not yet specified"),
@@ -407,6 +466,21 @@ export default function PortalTimelinePage() {
       plan.target_timeline,
       plan.budget_range,
     ]
+  );
+
+  const blockingSignals = useMemo(
+    () => signals.filter((signal) => signal.type === "blocking"),
+    [signals]
+  );
+
+  const attentionSignals = useMemo(
+    () => signals.filter((signal) => signal.type === "attention"),
+    [signals]
+  );
+
+  const readySignals = useMemo(
+    () => signals.filter((signal) => signal.type === "ready"),
+    [signals]
   );
 
   function updateTimelineItem(
@@ -510,17 +584,21 @@ export default function PortalTimelinePage() {
         </p>
       </div>
 
-      {/* Intelligence Section */}
       <section className="grid gap-6 lg:grid-cols-3">
-        {/* Timeline Readiness */}
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-stone-500">Timeline Readiness</p>
-            <span className="text-2xl font-semibold text-stone-900">{readiness.percentage}%</span>
+            <p className="text-sm font-medium text-stone-500">
+              Timeline Readiness
+            </p>
+            <span className="text-2xl font-semibold text-stone-900">
+              {readiness.percentage}%
+            </span>
           </div>
-          <p className="mt-2 text-base font-semibold text-stone-900 capitalize">{readiness.stage}</p>
+          <p className="mt-2 text-base font-semibold capitalize text-stone-900">
+            {readiness.stage}
+          </p>
           <p className="mt-2 text-sm leading-6 text-stone-600">
-            {readiness.ready.length > 0 
+            {readiness.ready.length > 0
               ? `${readiness.ready.length} items ready, ${readiness.missing.length} items pending`
               : "Generate timeline to begin execution planning"}
           </p>
@@ -530,32 +608,59 @@ export default function PortalTimelinePage() {
               style={{ width: `${readiness.percentage}%` }}
             />
           </div>
+
+          <div className="mt-4 grid grid-cols-3 gap-4">
+            <div className="text-center">
+              <p className="text-xs text-stone-500">Momentum</p>
+              <p className="text-lg font-semibold text-stone-900">
+                {momentum}%
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-stone-500">Active Items</p>
+              <p className="text-lg font-semibold text-stone-900">
+                {timelineCounts.inProgress}
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-stone-500">Completion</p>
+              <p className="text-lg font-semibold text-stone-900">
+                {timelineCounts.completed}
+              </p>
+            </div>
+          </div>
         </div>
 
-        {/* Next Action */}
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-stone-500">Next Action</p>
-          <p className="mt-2 text-base font-semibold text-stone-900">{nextAction.action}</p>
-          <p className="mt-2 text-sm leading-6 text-stone-600">{nextAction.context}</p>
-          {nextAction.cta && (
-            <a
+          <p className="mt-2 text-base font-semibold text-stone-900">
+            {nextAction.action}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-stone-600">
+            {nextAction.context}
+          </p>
+          {nextAction.cta ? (
+            <Link
               href={nextAction.cta.href}
-              className="mt-4 inline-block rounded-xl bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-800"
+              className="mt-4 inline-flex rounded-xl bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-800"
             >
               {nextAction.cta.label}
-            </a>
-          )}
+            </Link>
+          ) : null}
         </div>
 
-        {/* Execution Stage */}
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-stone-500">Execution Stage</p>
-          <p className="mt-2 text-base font-semibold text-stone-900 capitalize">{executionStageResult.stage.replace(/-/g, " ")}</p>
-          <p className="mt-2 text-sm leading-6 text-stone-600">{executionStageResult.description}</p>
+          <p className="mt-2 text-base font-semibold capitalize text-stone-900">
+            {executionStageResult.stage.replace(/-/g, " ")}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-stone-600">
+            {executionStageResult.description}
+          </p>
           <div className="mt-4 flex flex-wrap gap-2">
-            {executionStageResult.nextActions.slice(0, 3).map((indicator, idx) => (
+            {executionStageResult.nextActions.slice(0, 3).map((indicator) => (
               <span
-                key={idx}
+                key={indicator}
                 className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600"
               >
                 {indicator}
@@ -565,28 +670,52 @@ export default function PortalTimelinePage() {
         </div>
       </section>
 
-      {/* Signals Section */}
-      {signals.length > 0 && (
+      {signals.length > 0 ? (
         <section className="space-y-3">
-          <h2 className="text-lg font-semibold text-stone-900">Timeline Signals</h2>
-          <div className="space-y-3">
-            {signals.map((signal, idx) => (
-              <div
-                key={idx}
-                className={`rounded-xl border p-4 ${
-                  signal.type === "attention"
-                    ? "border-amber-200 bg-amber-50"
-                    : signal.type === "action"
-                    ? "border-stone-300 bg-stone-50"
-                    : "border-stone-200 bg-white"
-                }`}
-              >
-                <p className="text-sm text-stone-800">{signal.message}</p>
-              </div>
-            ))}
-          </div>
+          <h2 className="text-lg font-semibold text-stone-900">
+            Timeline Signals
+          </h2>
+
+          {blockingSignals.length > 0 ? (
+            <div className="space-y-2">
+              {blockingSignals.map((signal, index) => (
+                <div
+                  key={`blocking-${index}`}
+                  className="rounded-xl border border-stone-300 bg-stone-50 p-4"
+                >
+                  <p className="text-sm text-stone-800">{signal.message}</p>
+                </div>
+              ))}
+            </div>
+          ) : null}
+
+          {attentionSignals.length > 0 ? (
+            <div className="space-y-2">
+              {attentionSignals.map((signal, index) => (
+                <div
+                  key={`attention-${index}`}
+                  className="rounded-xl border border-amber-200 bg-amber-50 p-4"
+                >
+                  <p className="text-sm text-stone-800">{signal.message}</p>
+                </div>
+              ))}
+            </div>
+          ) : null}
+
+          {readySignals.length > 0 ? (
+            <div className="space-y-2">
+              {readySignals.map((signal, index) => (
+                <div
+                  key={`ready-${index}`}
+                  className="rounded-xl border border-stone-200 bg-white p-4"
+                >
+                  <p className="text-sm text-stone-800">{signal.message}</p>
+                </div>
+              ))}
+            </div>
+          ) : null}
         </section>
-      )}
+      ) : null}
 
       <section className="rounded-2xl border border-stone-200 bg-amber-50 p-6 shadow-sm">
         <h2 className="text-xl font-semibold text-stone-900">
@@ -678,7 +807,10 @@ export default function PortalTimelinePage() {
         </div>
       </section>
 
-      <section id="timeline-management" className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+      <section
+        id="timeline-management"
+        className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm"
+      >
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h2 className="text-xl font-semibold text-stone-900">
