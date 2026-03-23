@@ -64,6 +64,7 @@ export default function MyPlanPage() {
             advisory_pathway: existing.advisory_pathway ?? null,
             advisory_notes: existing.advisory_notes ?? null,
             advisory_next_step: existing.advisory_next_step ?? null,
+            advisory_stage: existing.advisory_stage,
           });
 
           setLastSavedAt(
