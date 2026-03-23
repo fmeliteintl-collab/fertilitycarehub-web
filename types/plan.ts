@@ -24,6 +24,7 @@ export type UserPlan = {
   advisory_pathway: string | null;
   advisory_notes: string | null;
   advisory_next_step: string | null;
+  advisory_stage: string | null;  // <-- ADD THIS (line 27)
   target_timeline: string | null;
   budget_range: string | null;
   notes: string | null;
@@ -45,6 +46,7 @@ export type UserPlanInput = {
   advisory_pathway: string | null;
   advisory_notes: string | null;
   advisory_next_step: string | null;
+  advisory_stage: string | null;  // <-- ADD THIS (line 48)
   target_timeline: string | null;
   budget_range: string | null;
   notes: string | null;
@@ -64,6 +66,7 @@ export const EMPTY_USER_PLAN_INPUT: UserPlanInput = {
   advisory_pathway: null,
   advisory_notes: null,
   advisory_next_step: null,
+  advisory_stage: null,  // <-- ADD THIS (line 63)
   target_timeline: null,
   budget_range: null,
   notes: null,

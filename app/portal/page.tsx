@@ -82,6 +82,7 @@ export default function PortalDashboardPage() {
             advisory_pathway: existing.advisory_pathway ?? null,
             advisory_notes: existing.advisory_notes ?? null,
             advisory_next_step: existing.advisory_next_step ?? null,
+            advisory_stage: existing.advisory_stage ?? null,
             target_timeline: existing.target_timeline,
             budget_range: existing.budget_range,
             notes: existing.notes,
@@ -262,8 +263,8 @@ export default function PortalDashboardPage() {
           {/* Stakes */}
           <div className="rounded-xl border border-[#c4a7a7] bg-[#faf6f6] p-5">
             <h3 className="text-sm font-semibold text-[#5c3a3a] uppercase tracking-wider mb-2">
-  What&apos;s at stake
-</h3>
+              What&apos;s at stake
+            </h3>
             <p className="text-base text-[#5c3a3a] leading-relaxed">
               {nextAction.stakes}
             </p>

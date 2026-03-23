@@ -1036,6 +1036,71 @@ export function getReadinessSummary(
   };
 }
 
+// ==================== ADVISORY STAGE INTELLIGENCE (NEW) ====================
+
+export type AdvisoryStage = "intake" | "strategy" | "decision" | "execution" | null;
+
+export function getCurrentAdvisoryStage(plan: PlanData): AdvisoryStage {
+  const stage = plan?.advisory_stage;
+  if (stage === "intake" || stage === "strategy" || stage === "decision" || stage === "execution") {
+    return stage;
+  }
+  return null;
+}
+
+export function getAdvisoryStageProgress(plan: PlanData): {
+  current: AdvisoryStage;
+  next: AdvisoryStage;
+  canAdvance: boolean;
+} {
+  const current = getCurrentAdvisoryStage(plan);
+  const stages: Array<"intake" | "strategy" | "decision" | "execution"> = ["intake", "strategy", "decision", "execution"];
+  
+  if (!current) {
+    return { current: null, next: "intake", canAdvance: false };
+  }
+  
+  const currentIndex = stages.indexOf(current);
+  const next = currentIndex < stages.length - 1 ? stages[currentIndex + 1] : null;
+  
+  // Can advance if readiness is sufficient
+  const readiness = calculateAdvisoryReadiness(plan, 0);
+  const canAdvance = readiness.percentage >= 70;
+  
+  return { current, next, canAdvance };
+}
+
+export function getDefaultTasksForStage(stage: AdvisoryStage): Array<{
+  title: string;
+  description: string;
+  stage: AdvisoryStage;
+}> {
+  const defaults: Record<string, Array<{ title: string; description: string; stage: AdvisoryStage }>> = {
+    intake: [
+      { title: "Confirm fertility pathway", description: "Validate your selected pathway aligns with goals", stage: "intake" },
+      { title: "Define family structure", description: "Document current family composition and plans", stage: "intake" },
+      { title: "List constraints", description: "Identify legal, financial, and timeline constraints", stage: "intake" },
+    ],
+    strategy: [
+      { title: "Validate country shortlist", description: "Review shortlisted countries for pathway compatibility", stage: "strategy" },
+      { title: "Generate execution timeline", description: "Create structured timeline for selected countries", stage: "strategy" },
+      { title: "Identify risk factors", description: "Document potential risks and mitigation strategies", stage: "strategy" },
+    ],
+    decision: [
+      { title: "Narrow to final country", description: "Select primary and backup jurisdiction", stage: "decision" },
+      { title: "Finalize clinic selection", description: "Identify preferred clinics in selected countries", stage: "decision" },
+      { title: "Confirm budget allocation", description: "Validate budget range and payment sequencing", stage: "decision" },
+    ],
+    execution: [
+      { title: "Prepare document package", description: "Compile required identity and medical records", stage: "execution" },
+      { title: "Initiate clinic contact", description: "Begin formal engagement with selected clinics", stage: "execution" },
+      { title: "Track timeline milestones", description: "Monitor progress against planned sequence", stage: "execution" },
+    ],
+  };
+  
+  return stage ? (defaults[stage] ?? []) : [];
+}
+
 // ==================== ENHANCED DECISION INTELLIGENCE (NEW) ====================
 
 export interface NextActionWithContext {
@@ -1220,4 +1285,5 @@ export function getDecisionSummary(plan: PlanData, documentCount: number) {
     warnings: signals.filter(s => s.type === "attention"),
     canProceed: readiness.percentage >= 60 && signals.filter(s => s.type === "blocking").length === 0,
   };
+  
 }

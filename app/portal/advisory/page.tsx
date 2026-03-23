@@ -7,9 +7,17 @@ import {
   upsertCurrentUserPlan,
 } from "@/lib/plans/user-plans";
 import {
+  getUserAdvisoryTasks,
+  createAdvisoryTask,
+  updateAdvisoryTaskStatus,
+  deleteAdvisoryTask,
+} from "@/lib/advisory/tasks";
+import { getAdvisoryStage, updateAdvisoryStage } from "@/lib/advisory/stage";
+import {
   EMPTY_USER_PLAN_INPUT,
   type UserPlanInput,
 } from "@/types/plan";
+import { ADVISORY_STAGES, type AdvisoryTask, type AdvisoryStage } from "@/types/advisory";
 import {
   calculateAdvisoryReadiness,
   determineExecutionStage,
@@ -18,6 +26,7 @@ import {
   generateAdvisorySignals,
   getTimelineCounts,
   getDisplayValue,
+  getDefaultTasksForStage,
   type AdvisorySignal,
 } from "@/lib/intelligence/plan-intelligence";
 import { DashboardSkeleton } from "@/app/components/skeletons";
@@ -64,6 +73,13 @@ export default function PortalAdvisoryPage() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [hasLoadedInitialData, setHasLoadedInitialData] = useState(false);
 
+  // NEW: Advisory stage and tasks state
+  const [advisoryStage, setAdvisoryStage] = useState<AdvisoryStage>(null);
+  const [tasks, setTasks] = useState<AdvisoryTask[]>([]);
+  const [loadingTasks, setLoadingTasks] = useState(false);
+  const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [newTaskDescription, setNewTaskDescription] = useState("");
+
   useEffect(() => {
     let isMounted = true;
 
@@ -88,6 +104,7 @@ export default function PortalAdvisoryPage() {
             advisory_pathway: existing.advisory_pathway ?? null,
             advisory_notes: existing.advisory_notes ?? null,
             advisory_next_step: existing.advisory_next_step ?? null,
+            advisory_stage: existing.advisory_stage ?? null,
             target_timeline: existing.target_timeline,
             budget_range: existing.budget_range,
             notes: existing.notes,
@@ -113,6 +130,29 @@ export default function PortalAdvisoryPage() {
       isMounted = false;
     };
   }, []);
+
+  // NEW: Load advisory stage and tasks when advisory is active
+  useEffect(() => {
+    async function loadAdvisoryData() {
+      if (plan.advisory_status !== "In Advisory") return;
+
+      setLoadingTasks(true);
+      try {
+        const [stage, userTasks] = await Promise.all([
+          getAdvisoryStage(),
+          getUserAdvisoryTasks(),
+        ]);
+        setAdvisoryStage(stage);
+        setTasks(userTasks);
+      } catch (error) {
+        console.error("Failed to load advisory data:", error);
+      } finally {
+        setLoadingTasks(false);
+      }
+    }
+
+    loadAdvisoryData();
+  }, [plan.advisory_status]);
 
   function updatePlanField<K extends keyof UserPlanInput>(
     field: K,
@@ -146,6 +186,81 @@ export default function PortalAdvisoryPage() {
       setMessage("Failed to save advisory workspace.");
     } finally {
       setSaving(false);
+    }
+  }
+
+  // NEW: Handle stage change
+  async function handleStageChange(newStage: AdvisoryStage) {
+    try {
+      await updateAdvisoryStage(newStage);
+      setAdvisoryStage(newStage);
+    } catch (error) {
+      console.error("Failed to update stage:", error);
+    }
+  }
+
+  // NEW: Add default tasks for current stage
+  async function handleAddDefaultTasks() {
+    if (!advisoryStage) return;
+
+    try {
+      const defaults = getDefaultTasksForStage(advisoryStage);
+      for (const task of defaults) {
+        await createAdvisoryTask({
+          stage: task.stage,
+          title: task.title,
+          description: task.description,
+          status: "pending",
+          sort_order: 0,
+        });
+      }
+      const updated = await getUserAdvisoryTasks();
+      setTasks(updated);
+    } catch (error) {
+      console.error("Failed to add default tasks:", error);
+    }
+  }
+
+  // NEW: Create custom task
+  async function handleCreateTask(e: React.FormEvent) {
+    e.preventDefault();
+    if (!advisoryStage || !newTaskTitle.trim()) return;
+
+    try {
+      await createAdvisoryTask({
+        stage: advisoryStage,
+        title: newTaskTitle,
+        description: newTaskDescription,
+        status: "pending",
+        sort_order: tasks.length,
+      });
+      setNewTaskTitle("");
+      setNewTaskDescription("");
+      const updated = await getUserAdvisoryTasks();
+      setTasks(updated);
+    } catch (error) {
+      console.error("Failed to create task:", error);
+    }
+  }
+
+  // NEW: Toggle task status
+  async function handleToggleTask(taskId: string, currentStatus: string) {
+    const newStatus = currentStatus === "done" ? "pending" : "done";
+    try {
+      await updateAdvisoryTaskStatus(taskId, newStatus as AdvisoryTask["status"]);
+      setTasks(tasks.map(t => t.id === taskId ? { ...t, status: newStatus as AdvisoryTask["status"] } : t));
+    } catch (error) {
+      console.error("Failed to update task:", error);
+    }
+  }
+
+  // NEW: Delete task
+  async function handleDeleteTask(taskId: string) {
+    try {
+      await deleteAdvisoryTask(taskId);
+      setTasks(tasks.filter(t => t.id !== taskId));
+    } catch (error) {
+      console.error("Failed to delete task:", error);
     }
   }
 
@@ -238,11 +353,23 @@ export default function PortalAdvisoryPage() {
     [currentPathway, currentStatus, plan.advisory_notes, executionStage.stage]
   );
 
+  // Filter tasks for current stage
+  const currentStageTasks = useMemo(() => 
+    tasks.filter(t => t.stage === advisoryStage),
+    [tasks, advisoryStage]
+  );
+
+  // Calculate task progress
+  const taskProgress = useMemo(() => {
+    const total = currentStageTasks.length;
+    const done = currentStageTasks.filter(t => t.status === "done").length;
+    return { total, done, percentage: total > 0 ? Math.round((done / total) * 100) : 0 };
+  }, [currentStageTasks]);
+
   if (loading) {
     return <DashboardSkeleton />;
   }
 
-  // Priority color mapping to muted institutional palette
   const priorityStyles = {
     high: "bg-[#c4a7a7] text-[#5c3a3a]",
     medium: "bg-[#d4c4a8] text-[#5c4a3a]",
@@ -274,6 +401,152 @@ export default function PortalAdvisoryPage() {
           </Link>
         </div>
       </div>
+
+      {/* NEW: Advisory Active Mode - Stage Header */}
+      {plan.advisory_status === "In Advisory" && (
+        <section className="rounded-2xl border-2 border-[#3a3a3a] bg-stone-100 p-8 shadow-md">
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <p className="text-sm font-medium uppercase tracking-wider text-stone-500">
+                  Active Advisory Engagement
+                </p>
+                <h2 className="mt-2 text-3xl font-semibold text-stone-900">
+                  {advisoryStage ? ADVISORY_STAGES.find(s => s.key === advisoryStage)?.label : "Select Your Stage"}
+                </h2>
+                <p className="mt-2 text-base text-stone-600">
+                  {advisoryStage ? ADVISORY_STAGES.find(s => s.key === advisoryStage)?.description : "Choose your current advisory stage to see relevant tasks"}
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <select
+                  value={advisoryStage ?? ""}
+                  onChange={(e) => handleStageChange(e.target.value as AdvisoryStage)}
+                  className="rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm font-medium text-stone-900 focus:border-stone-500 focus:outline-none min-w-[200px]"
+                >
+                  <option value="">Select stage...</option>
+                  {ADVISORY_STAGES.map((stage) => (
+                    <option key={stage.key} value={stage.key}>
+                      {stage.label}
+                    </option>
+                  ))}
+                </select>
+
+                {taskProgress.total > 0 && (
+                  <div className="flex items-center gap-2 text-sm text-stone-600">
+                    <div className="h-2 w-24 rounded-full bg-stone-200">
+                      <div 
+                        className="h-2 rounded-full bg-[#6a7a6a]"
+                        style={{ width: `${taskProgress.percentage}%` }}
+                      />
+                    </div>
+                    <span>{taskProgress.done}/{taskProgress.total} tasks</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* NEW: Advisory Tasks Section */}
+      {plan.advisory_status === "In Advisory" && advisoryStage && (
+        <section className="rounded-2xl border border-stone-300 bg-white p-8 shadow-sm">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-xl font-semibold text-stone-900">
+                Stage Tasks
+              </h2>
+              <p className="mt-1 text-sm text-stone-600">
+                Complete these tasks to progress through {ADVISORY_STAGES.find(s => s.key === advisoryStage)?.label}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={handleAddDefaultTasks}
+                className="rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
+              >
+                Add Defaults
+              </button>
+            </div>
+          </div>
+
+          {/* Task List */}
+          <div className="space-y-3 mb-6">
+            {loadingTasks ? (
+              <p className="text-stone-500 text-sm">Loading tasks...</p>
+            ) : currentStageTasks.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-stone-300 bg-stone-50 p-6 text-center">
+                <p className="text-stone-600">No tasks for this stage yet.</p>
+                <p className="text-stone-500 text-sm mt-1">Add default tasks or create custom ones below.</p>
+              </div>
+            ) : (
+              currentStageTasks.map((task) => (
+                <div
+                  key={task.id}
+                  className={`rounded-xl border p-4 flex items-start gap-4 transition-all ${
+                    task.status === "done"
+                      ? "border-[#8a9a8a] bg-[#f6f8f6]"
+                      : "border-stone-200 bg-white"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={task.status === "done"}
+                    onChange={() => handleToggleTask(task.id, task.status)}
+                    className="h-5 w-5 rounded border-stone-300 text-[#6a7a6a] focus:ring-[#6a7a6a] mt-0.5"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className={`font-medium ${task.status === "done" ? "line-through text-stone-500" : "text-stone-900"}`}>
+                      {task.title}
+                    </p>
+                    {task.description && (
+                      <p className={`text-sm mt-1 ${task.status === "done" ? "text-stone-400" : "text-stone-600"}`}>
+                        {task.description}
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => handleDeleteTask(task.id)}
+                    className="text-sm text-[#5c3a3a] hover:text-[#3a2a2a] shrink-0"
+                  >
+                    Delete
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Add Custom Task Form */}
+          <form onSubmit={handleCreateTask} className="pt-6 border-t border-stone-200">
+            <h3 className="text-sm font-medium text-stone-700 mb-3">Add Custom Task</h3>
+            <div className="grid gap-3 lg:grid-cols-2">
+              <input
+                type="text"
+                value={newTaskTitle}
+                onChange={(e) => setNewTaskTitle(e.target.value)}
+                placeholder="Task title..."
+                className="rounded-xl border border-stone-300 px-4 py-2 text-sm text-stone-900 focus:border-stone-500 focus:outline-none"
+              />
+              <input
+                type="text"
+                value={newTaskDescription}
+                onChange={(e) => setNewTaskDescription(e.target.value)}
+                placeholder="Description (optional)..."
+                className="rounded-xl border border-stone-300 px-4 py-2 text-sm text-stone-900 focus:border-stone-500 focus:outline-none"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={!newTaskTitle.trim()}
+              className="mt-3 rounded-xl bg-[#3a3a3a] px-4 py-2 text-sm font-medium text-white hover:bg-[#2a2a2a] disabled:opacity-50"
+            >
+              Add Task
+            </button>
+          </form>
+        </section>
+      )}
 
       {/* TIER 1: Advisory Readiness */}
       <section className="rounded-2xl border border-stone-300 bg-stone-100 p-8 shadow-sm">
@@ -329,7 +602,7 @@ export default function PortalAdvisoryPage() {
         </div>
       </section>
 
-      {/* TIER 1: Advisory Signals - Muted institutional colors */}
+      {/* TIER 1: Advisory Signals */}
       {advisorySignals.length > 0 && (
         <section className="space-y-4">
           <h2 className="text-lg font-semibold text-stone-900">
@@ -415,7 +688,7 @@ export default function PortalAdvisoryPage() {
         </section>
       )}
 
-      {/* TIER 2: Execution Stage - Numbered badge */}
+      {/* TIER 2: Execution Stage */}
       <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
         <div className="flex items-start gap-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-stone-100">
@@ -464,7 +737,7 @@ export default function PortalAdvisoryPage() {
         </p>
       </section>
 
-      {/* TIER 1: Advisory Pathways - PREMIUM, CENTRAL, DOMINANT */}
+      {/* TIER 1: Advisory Pathways */}
       <section className="space-y-6">
         <div className="border-b border-stone-200 pb-4">
           <h2 className="text-2xl font-semibold text-stone-900">
@@ -553,7 +826,7 @@ export default function PortalAdvisoryPage() {
         </div>
       </section>
 
-      {/* TIER 2: Advisory Settings - Split into two groups */}
+      {/* TIER 2: Advisory Settings */}
       <section className="rounded-2xl border border-stone-300 bg-stone-100 p-8 shadow-sm">
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-stone-900">
@@ -677,7 +950,7 @@ export default function PortalAdvisoryPage() {
         </div>
       </section>
 
-      {/* TIER 3: Cross-Module Context - Quieter */}
+      {/* TIER 3: Cross-Module Context */}
       <section className="grid gap-6 lg:grid-cols-4">
         <div className="rounded-2xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
           <p className="text-sm font-medium text-stone-500">
@@ -740,7 +1013,7 @@ export default function PortalAdvisoryPage() {
         </div>
       </section>
 
-      {/* TIER 3: Planning Context Snapshot - Quietest */}
+      {/* TIER 3: Planning Context Snapshot */}
       <section className="rounded-2xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-stone-900">
           Planning Context Snapshot
