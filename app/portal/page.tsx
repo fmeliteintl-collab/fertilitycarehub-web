@@ -10,9 +10,8 @@ import {
 import {
   calculateAdvisoryReadiness,
   determineExecutionStage,
-  buildSmartNextStep,
+  buildNextActionWithContext,
   generateAdvisorySignals,
-  getGlobalNextAction,
   getTimelineCounts,
   getDisplayValue,
   type AdvisorySignal,
@@ -34,6 +33,22 @@ function StageBadge({ stage }: { stage: string }) {
   return (
     <span className="inline-flex items-center justify-center rounded-lg bg-stone-200 px-3 py-1.5 text-xs font-semibold tracking-wider text-stone-700">
       STAGE {stageNum}
+    </span>
+  );
+}
+
+// Priority badge with muted institutional colors
+function PriorityBadge({ priority }: { priority: string }) {
+  const styles = {
+    critical: "bg-[#c4a7a7] text-[#5c3a3a]",
+    high: "bg-[#d4c4a8] text-[#5c4a3a]",
+    medium: "bg-[#e8e0d0] text-[#6a5a4a]",
+    low: "bg-stone-200 text-stone-600",
+  };
+
+  return (
+    <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider ${styles[priority as keyof typeof styles]}`}>
+      {priority} Priority
     </span>
   );
 }
@@ -116,14 +131,10 @@ export default function PortalDashboardPage() {
     [plan]
   );
 
-  const smartNextStep = useMemo(
-    () => buildSmartNextStep(plan),
+  // NEW: Use enhanced next action with context
+  const nextAction = useMemo(
+    () => buildNextActionWithContext(plan),
     [plan]
-  );
-
-  const globalNextAction = useMemo(
-    () => getGlobalNextAction(plan, advisoryReadiness.score),
-    [plan, advisoryReadiness.score]
   );
 
   const shortlistedCountries = plan.shortlisted_countries ?? [];
@@ -142,27 +153,13 @@ export default function PortalDashboardPage() {
     return score;
   }, [plan]);
 
-  // Execution Risk Detection
-  const riskSignals = useMemo(() => {
-    const risks: string[] = [];
-
-    if (!plan.pathway_type) {
-      risks.push("No defined pathway — planning cannot proceed.");
-    }
-
-    if ((plan.shortlisted_countries ?? []).length === 0) {
-      risks.push("No shortlisted countries — decision layer incomplete.");
-    }
-
-    if ((plan.timeline_items ?? []).length === 0) {
-      risks.push("No execution timeline — no structured plan exists.");
-    }
-
-    return risks;
-  }, [plan]);
-
   const blockingSignals = useMemo(
     () => advisorySignals.filter((s: AdvisorySignal) => s.type === "blocking"),
+    [advisorySignals]
+  );
+
+  const attentionSignals = useMemo(
+    () => advisorySignals.filter((s: AdvisorySignal) => s.type === "attention"),
     [advisorySignals]
   );
 
@@ -178,16 +175,9 @@ export default function PortalDashboardPage() {
     );
   }
 
-  // Determine priority color using muted institutional palette
-  const priorityStyles = {
-    high: "bg-[#c4a7a7] text-[#5c3a3a]",     // Dusty clay
-    medium: "bg-[#d4c4a8] text-[#5c4a3a]",    // Soft sand
-    low: "bg-stone-200 text-stone-700",
-  };
-
   return (
     <div className="space-y-10">
-      {/* TIER 1: Executive Header - Darker, more prominent */}
+      {/* TIER 1: Executive Header */}
       <div className="rounded-2xl border border-stone-300 bg-stone-100 p-8 shadow-sm">
         <p className="text-sm font-medium uppercase tracking-[0.2em] text-stone-500">
           Dashboard
@@ -201,7 +191,7 @@ export default function PortalDashboardPage() {
         </p>
       </div>
 
-      {/* TIER 1: System Status - Primary decision layer */}
+      {/* TIER 1: System Status */}
       <section className="rounded-2xl border border-stone-300 bg-stone-100 p-8 shadow-sm">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex-1">
@@ -232,54 +222,77 @@ export default function PortalDashboardPage() {
         </div>
       </section>
 
-      {/* TIER 1: Next Action - MERGED Current Priority + Smart Next Step */}
-      {globalNextAction.href !== "/portal" && (
-        <section className="rounded-2xl border border-stone-300 bg-stone-100 p-8 shadow-sm">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+      {/* TIER 1: Next Action with Full Context - THE DECISION ENGINE */}
+      <section className="rounded-2xl border-2 border-[#3a3a3a] bg-stone-100 p-8 shadow-md">
+        <div className="flex flex-col gap-6">
+          {/* Header row */}
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="flex-1">
-              <p className="text-sm font-medium uppercase tracking-wider text-stone-500">
-                Next Action
-              </p>
-              <p className="mt-2 text-2xl font-semibold text-stone-900">
-                {globalNextAction.title}
-              </p>
+              <div className="flex items-center gap-3 mb-3">
+                <PriorityBadge priority={nextAction.priority} />
+                <span className="text-sm font-medium text-stone-500 uppercase tracking-wider">
+                  {nextAction.module}
+                </span>
+              </div>
+              <h2 className="text-2xl font-semibold text-stone-900">
+                {nextAction.title}
+              </h2>
               <p className="mt-2 text-base text-stone-600">
-                {globalNextAction.body}
-              </p>
-              <p className="mt-3 text-sm text-stone-500">
-                {smartNextStep.context}
+                {nextAction.body}
               </p>
             </div>
-            <div className="flex flex-col items-start gap-3 lg:items-end">
-              <span className={`rounded-full px-4 py-1.5 text-xs font-semibold ${priorityStyles[smartNextStep.priority as keyof typeof priorityStyles]}`}>
-                {smartNextStep.priority.toUpperCase()} PRIORITY
-              </span>
-              <Link
-                href={globalNextAction.href}
-                className="inline-flex rounded-xl bg-[#3a3a3a] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#2a2a2a]"
-              >
-                {globalNextAction.cta}
-              </Link>
-            </div>
+            <Link
+              href={nextAction.href}
+              className="inline-flex rounded-xl bg-[#3a3a3a] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#2a2a2a] shrink-0"
+            >
+              {nextAction.cta}
+            </Link>
           </div>
-        </section>
-      )}
 
-      {/* TIER 1: Execution Risks - Merged with Action Required, muted clay styling */}
-      {(riskSignals.length > 0 || blockingSignals.length > 0) && (
+          {/* Explanation */}
+          <div className="pt-6 border-t border-stone-300">
+            <h3 className="text-sm font-semibold text-stone-700 uppercase tracking-wider mb-2">
+              Why this matters
+            </h3>
+            <p className="text-base text-stone-600 leading-relaxed">
+              {nextAction.explanation}
+            </p>
+          </div>
+
+          {/* Stakes */}
+          <div className="rounded-xl border border-[#c4a7a7] bg-[#faf6f6] p-5">
+            <h3 className="text-sm font-semibold text-[#5c3a3a] uppercase tracking-wider mb-2">
+  What&apos;s at stake
+</h3>
+            <p className="text-base text-[#5c3a3a] leading-relaxed">
+              {nextAction.stakes}
+            </p>
+          </div>
+
+          {/* Unlocks */}
+          <div className="pt-2">
+            <h3 className="text-sm font-semibold text-[#4a5a4a] uppercase tracking-wider mb-3">
+              Completing this unlocks
+            </h3>
+            <ul className="grid gap-2 lg:grid-cols-2">
+              {nextAction.unlocks.map((unlock, idx) => (
+                <li key={idx} className="flex items-start gap-2 text-sm text-stone-700">
+                  <span className="text-[#6a7a6a] font-bold mt-0.5">→</span>
+                  {unlock}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* TIER 1: Execution Risks */}
+      {(blockingSignals.length > 0 || attentionSignals.length > 0) && (
         <section className="space-y-4">
           <h2 className="text-lg font-semibold text-stone-900">
             Execution Risks
           </h2>
           <div className="space-y-3">
-            {riskSignals.map((risk, idx) => (
-              <div
-                key={`risk-${idx}`}
-                className="rounded-xl border border-[#c4a7a7] bg-[#faf6f6] p-5"
-              >
-                <p className="text-sm text-[#5c3a3a]">{risk}</p>
-              </div>
-            ))}
             {blockingSignals.map((signal, idx) => (
               <div
                 key={`blocking-${idx}`}
@@ -295,9 +308,32 @@ export default function PortalDashboardPage() {
                   {signal.link && (
                     <Link
                       href={signal.link}
-                      className="text-sm font-medium text-[#5c3a3a] underline hover:text-[#3a2a2a]"
+                      className="text-sm font-medium text-[#5c3a3a] underline hover:text-[#3a2a2a] shrink-0"
                     >
-                      Go to module →
+                      Resolve →
+                    </Link>
+                  )}
+                </div>
+              </div>
+            ))}
+            {attentionSignals.map((signal, idx) => (
+              <div
+                key={`attention-${idx}`}
+                className="rounded-xl border border-[#d4c4a8] bg-[#faf8f3] p-5"
+              >
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                  <div>
+                    <p className="font-medium text-[#5c4a3a]">{signal.message}</p>
+                    {signal.action && (
+                      <p className="mt-1 text-sm text-[#7a6a5a]">{signal.action}</p>
+                    )}
+                  </div>
+                  {signal.link && (
+                    <Link
+                      href={signal.link}
+                      className="text-sm font-medium text-[#5c4a3a] underline hover:text-[#3a2a2a] shrink-0"
+                    >
+                      Address →
                     </Link>
                   )}
                 </div>
@@ -307,7 +343,7 @@ export default function PortalDashboardPage() {
         </section>
       )}
 
-      {/* TIER 1: Advisory Readiness - Primary metric */}
+      {/* TIER 1: Advisory Readiness */}
       <section className="rounded-2xl border border-stone-300 bg-stone-100 p-8 shadow-sm">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -360,7 +396,7 @@ export default function PortalDashboardPage() {
         </div>
       </section>
 
-      {/* TIER 2: Execution Stage - Secondary context, numbered badge */}
+      {/* TIER 2: Execution Stage */}
       <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
         <div className="flex items-start gap-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-stone-100">
@@ -379,9 +415,8 @@ export default function PortalDashboardPage() {
         </div>
       </section>
 
-      {/* TIER 2: Quick Stats - Timeline Progress dominant */}
+      {/* TIER 2: Quick Stats */}
       <section className="grid gap-6 lg:grid-cols-4">
-        {/* Timeline Progress - DOMINANT (2x width) */}
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm lg:col-span-2">
           <p className="text-sm font-medium text-stone-500">Timeline Progress</p>
           <div className="mt-4 flex items-baseline gap-3">
@@ -404,7 +439,6 @@ export default function PortalDashboardPage() {
           </p>
         </div>
 
-        {/* Pathway - Small */}
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-stone-500">Pathway</p>
           <p className="mt-3 text-lg font-semibold text-stone-900">
@@ -412,11 +446,8 @@ export default function PortalDashboardPage() {
           </p>
         </div>
 
-        {/* Countries - Small */}
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">
-            Shortlisted
-          </p>
+          <p className="text-sm font-medium text-stone-500">Shortlisted</p>
           <p className="mt-3 text-lg font-semibold text-stone-900">
             {shortlistedCountries.length > 0
               ? `${shortlistedCountries.length} countries`
@@ -432,7 +463,7 @@ export default function PortalDashboardPage() {
         </div>
       </section>
 
-      {/* TIER 3: Advisory Snapshot - Quieter, supporting info */}
+      {/* TIER 3: Advisory Snapshot */}
       <section className="rounded-2xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -453,14 +484,6 @@ export default function PortalDashboardPage() {
             Manage Advisory →
           </Link>
         </div>
-        {plan.advisory_next_step && (
-          <div className="mt-4 rounded-xl border border-stone-200 bg-white p-3">
-            <p className="text-sm text-stone-600">
-              <span className="font-medium">Next step:</span>{" "}
-              {plan.advisory_next_step}
-            </p>
-          </div>
-        )}
       </section>
     </div>
   );
