@@ -1285,5 +1285,154 @@ export function getDecisionSummary(plan: PlanData, documentCount: number) {
     warnings: signals.filter(s => s.type === "attention"),
     canProceed: readiness.percentage >= 60 && signals.filter(s => s.type === "blocking").length === 0,
   };
-  
+}
+
+// ==================== PRIMARY GUIDANCE (NEW) ====================
+
+export interface PrimaryGuidance {
+  headline: string;
+  explanation: string;
+  consequence: string;
+  nextStagePreview: string;
+  priority: "critical" | "high" | "medium" | "low";
+  relatedTasks: string[];
+  actionCta: string;
+  actionHref: string;
+}
+
+export function getPrimaryGuidance(
+  plan: PlanData,
+  currentStage: AdvisoryStage
+): PrimaryGuidance {
+  const shortlistCount = plan?.shortlisted_countries?.length ?? 0;
+  const hasTimeline = (plan?.timeline_items ?? []).length > 0;
+  const hasPathway = Boolean(plan?.pathway_type?.trim());
+
+  // INTAKE STAGE
+  if (currentStage === "intake" || !currentStage) {
+    if (!hasPathway) {
+      return {
+        headline: "Define your fertility pathway",
+        explanation: "Pathway selection determines every downstream decision: legal jurisdiction availability, timeline constraints, and cost structure.",
+        consequence: "Without this foundation, country recommendations and timeline estimates will lack strategic coherence.",
+        nextStagePreview: "Once defined, you'll move to Strategy stage to build your country shortlist.",
+        priority: "critical",
+        relatedTasks: ["Confirm fertility pathway", "Define family structure", "List constraints"],
+        actionCta: "Complete Pathway Setup →",
+        actionHref: "/portal/my-plan",
+      };
+    }
+    return {
+      headline: "Complete your planning foundation",
+      explanation: "Family structure and constraints define the boundaries for all subsequent decisions.",
+      consequence: "Incomplete foundation leads to mismatched country recommendations and timeline conflicts.",
+      nextStagePreview: "Once complete, you'll advance to Strategy stage for country selection.",
+      priority: "high",
+      relatedTasks: ["Define family structure", "List constraints", "Set target timeline"],
+      actionCta: "Complete My Plan →",
+      actionHref: "/portal/my-plan",
+    };
+  }
+
+  // STRATEGY STAGE
+  if (currentStage === "strategy") {
+    if (shortlistCount === 0) {
+      return {
+        headline: "Build your country shortlist",
+        explanation: "Jurisdiction selection is required for legal and logistical planning. Each country has distinct frameworks for your pathway.",
+        consequence: "Without jurisdiction comparison, you risk selecting a destination that conflicts with your legal needs or budget.",
+        nextStagePreview: "Once shortlisted, you'll generate your execution timeline.",
+        priority: "critical",
+        relatedTasks: ["Validate country shortlist", "Research legal frameworks", "Compare costs"],
+        actionCta: "Research Countries →",
+        actionHref: "/portal/countries",
+      };
+    }
+    if (shortlistCount === 1) {
+      return {
+        headline: "Expand your country shortlist",
+        explanation: "Single-jurisdiction planning creates vulnerability. A 2-3 country shortlist provides optionality and negotiating leverage.",
+        consequence: "No fallback if your chosen jurisdiction becomes unavailable or unsuitable.",
+        nextStagePreview: "With 2+ countries, you'll generate your execution timeline.",
+        priority: "high",
+        relatedTasks: ["Add comparison countries", "Validate pathway compatibility", "Assess risk factors"],
+        actionCta: "Add Countries →",
+        actionHref: "/portal/countries",
+      };
+    }
+    if (!hasTimeline) {
+      return {
+        headline: "Generate your execution timeline",
+        explanation: "Timeline structure enables clinic coordination and legal sequencing across jurisdictions.",
+        consequence: "Without structured timeline, clinic appointments cannot be booked and budget flows cannot be planned.",
+        nextStagePreview: "Once timeline is set, you'll move to Decision stage for final selection.",
+        priority: "critical",
+        relatedTasks: ["Generate execution timeline", "Identify risk factors", "Map legal sequencing"],
+        actionCta: "Build Timeline →",
+        actionHref: "/portal/timeline",
+      };
+    }
+    return {
+      headline: "Validate your strategy foundation",
+      explanation: "Review shortlisted countries and timeline for pathway compatibility before committing to decisions.",
+      consequence: "Unvalidated strategy leads to costly mid-process changes.",
+      nextStagePreview: "Once validated, you'll advance to Decision stage.",
+      priority: "medium",
+      relatedTasks: ["Validate country shortlist", "Review timeline feasibility", "Confirm budget allocation"],
+      actionCta: "Review Strategy →",
+      actionHref: "/portal/advisory",
+    };
+  }
+
+  // DECISION STAGE
+  if (currentStage === "decision") {
+    if (shortlistCount > 1) {
+      return {
+        headline: "Narrow to your final country",
+        explanation: "Select primary and backup jurisdiction based on validated criteria: legal fit, cost, timeline, and clinic quality.",
+        consequence: "Indecision delays execution and may result in lost clinic availability or changed legal frameworks.",
+        nextStagePreview: "Once selected, you'll move to Execution stage for document preparation and clinic contact.",
+        priority: "critical",
+        relatedTasks: ["Narrow to final country", "Finalize clinic selection", "Confirm budget allocation"],
+        actionCta: "Finalize Selection →",
+        actionHref: "/portal/countries",
+      };
+    }
+    return {
+      headline: "Finalize clinic and legal sequencing",
+      explanation: "Identify preferred clinics and confirm documentation requirements for your selected jurisdiction.",
+      consequence: "Incomplete preparation causes delays and compliance gaps.",
+      nextStagePreview: "Once finalized, you'll begin execution with document preparation.",
+      priority: "high",
+      relatedTasks: ["Finalize clinic selection", "Confirm legal documentation", "Validate budget sequencing"],
+      actionCta: "Complete Decision →",
+      actionHref: "/portal/advisory",
+    };
+  }
+
+  // EXECUTION STAGE
+  if (currentStage === "execution") {
+    return {
+      headline: "Execute your plan",
+      explanation: "Begin formal clinic engagement and track progress against your planned sequence.",
+      consequence: "Poor execution coordination wastes planning investment.",
+      nextStagePreview: "Track milestones and adjust as circumstances evolve.",
+      priority: "medium",
+      relatedTasks: ["Prepare document package", "Initiate clinic contact", "Track timeline milestones"],
+      actionCta: "View Timeline →",
+      actionHref: "/portal/timeline",
+    };
+  }
+
+  // Fallback
+  return {
+    headline: "Review and refine your plan",
+    explanation: "Your planning foundation is established. Regular review ensures continued alignment.",
+    consequence: "Static planning becomes outdated as circumstances change.",
+    nextStagePreview: "Continue optimizing your plan.",
+    priority: "low",
+    relatedTasks: ["Review plan alignment", "Update priorities", "Check timeline"],
+    actionCta: "Review Plan →",
+    actionHref: "/portal/my-plan",
+  };
 }
