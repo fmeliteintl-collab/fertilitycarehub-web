@@ -14,14 +14,13 @@ import {
   generateAdvisorySignals,
   getTimelineCounts,
   getDisplayValue,
-
   type AdvisorySignal,
 } from "@/lib/intelligence/plan-intelligence";
 import { DashboardSkeleton } from "@/app/components/skeletons";
 
 export const runtime = "edge";
 
-// === DIRECTIVE TONE COMPONENTS ===
+// === UTILITY COMPONENTS ===
 
 function StageBadge({ stage }: { stage: string }) {
   const stageNum = {
@@ -54,59 +53,7 @@ function PriorityBadge({ priority }: { priority: string }) {
   );
 }
 
-// Readiness score with real breakdown
-function ReadinessBreakdown({ 
-  hasPathway, 
-  hasCountries, 
-  hasTimeline, 
-  timelineProgress 
-}: { 
-  hasPathway: boolean; 
-  hasCountries: boolean; 
-  hasTimeline: boolean;
-  timelineProgress: number;
-}) {
-  const items = [
-    { label: "Pathway defined", value: hasPathway, points: 25 },
-    { label: "Countries selected", value: hasCountries, points: 25 },
-    { label: "Timeline generated", value: hasTimeline, points: 25 },
-    { label: "Timeline progress", value: timelineProgress >= 50, points: 25, isProgress: true, progressValue: timelineProgress },
-  ];
-
-  const total = items.reduce((acc, item) => {
-    if (item.isProgress && item.progressValue !== undefined) {
-      return acc + (item.progressValue * item.points / 100);
-    }
-    return acc + (item.value ? item.points : 0);
-  }, 0);
-
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-stone-600">Planning Readiness</span>
-        <span className="text-2xl font-bold text-stone-900">{Math.round(total)}%</span>
-      </div>
-      <div className="h-2 w-full rounded-full bg-stone-200">
-        <div 
-          className="h-2 rounded-full bg-[#4a5a4a] transition-all duration-500"
-          style={{ width: `${total}%` }}
-        />
-      </div>
-      <div className="grid grid-cols-2 gap-2 text-xs">
-        {items.map((item, idx) => (
-          <div key={idx} className="flex items-center gap-2">
-            <div className={`h-1.5 w-1.5 rounded-full ${item.value ? "bg-[#6a7a6a]" : "bg-stone-300"}`} />
-            <span className={item.value ? "text-stone-700" : "text-stone-400"}>
-              {item.label}: {item.isProgress ? `${Math.round(item.progressValue ?? 0)}%` : item.value ? "✓" : "—"}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// === GUIDED FLOW WITH DIRECTIVE TONE ===
+// === GUIDED FLOW COMPONENTS ===
 
 interface FlowStep {
   id: string;
@@ -114,13 +61,14 @@ interface FlowStep {
   title: string;
   module: "my-plan" | "countries" | "timeline" | "documents" | "advisory";
   status: "complete" | "active" | "locked";
-  description: string;
   directive: string;
   whyMatters: string;
-  blockers?: string[];
+  statusLabel: string;
+  systemInsight: string;
+  riskIfDelayed?: string;
+  estimatedEffort?: string;
   cta?: { label: string; href: string; variant: "primary" | "secondary" };
   unlocks?: string[];
-  ignoredConsequences?: string;
 }
 
 function GuidedFlowStep({
@@ -173,8 +121,8 @@ function GuidedFlowStep({
                 {step.title}
               </h3>
               {step.status === "active" && (
-                <span className="rounded-full bg-[#3a3a3a] px-2 py-0.5 text-xs font-bold text-white">
-                  REQUIRED NOW
+                <span className="rounded-full bg-[#c4a7a7] px-2 py-0.5 text-xs font-bold text-[#5c3a3a]">
+                  {step.statusLabel}
                 </span>
               )}
               {step.status === "locked" && (
@@ -188,37 +136,32 @@ function GuidedFlowStep({
               {step.directive}
             </p>
 
-            <div className="mt-3">
+            <div className="mt-3 rounded-lg bg-stone-50 border border-stone-200 p-3">
               <p className="text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">
-                Why this matters
+                System Insight
               </p>
-              <p className="text-sm text-stone-600">{step.whyMatters}</p>
+              <p className="text-sm text-stone-600">{step.systemInsight}</p>
             </div>
 
-            {step.blockers && step.blockers.length > 0 && (
-              <div className="mt-4 rounded-lg bg-[#faf6f6] border border-[#e8d8d8] px-4 py-3">
-                <p className="text-xs font-bold text-[#8a6a6a] uppercase tracking-wider mb-2">
-                  ⚠️ Blocking your progress
+            {step.riskIfDelayed && step.status !== "complete" && (
+              <div className="mt-3 rounded-lg bg-[#faf6f6] border border-[#e8d8d8] px-3 py-2">
+                <p className="text-xs font-bold text-[#8a6a6a] uppercase tracking-wider">
+                  Risk if delayed
                 </p>
-                <ul className="space-y-1">
-                  {step.blockers.map((blocker, idx) => (
-                    <li key={idx} className="text-sm text-[#6a4a4a]">
-                      • {blocker}
-                    </li>
-                  ))}
-                </ul>
-                {step.ignoredConsequences && (
-                  <p className="mt-2 text-xs text-[#8a6a6a] italic border-t border-[#e8d8d8] pt-2">
-                    If ignored: {step.ignoredConsequences}
-                  </p>
-                )}
+                <p className="text-sm text-[#6a4a4a] mt-1">{step.riskIfDelayed}</p>
               </div>
+            )}
+
+            {step.estimatedEffort && step.status === "active" && (
+              <p className="mt-3 text-xs text-stone-500">
+                Estimated effort: {step.estimatedEffort}
+              </p>
             )}
 
             {step.unlocks && step.unlocks.length > 0 && step.status !== "complete" && (
               <div className="mt-4">
                 <p className="text-xs font-bold uppercase tracking-wider text-[#4a5a4a] mb-2">
-                  ✓ Completing this unlocks
+                  ✓ Unlocks
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {step.unlocks.map((unlock, idx) => (
@@ -249,14 +192,13 @@ function GuidedFlowStep({
   );
 }
 
-// === COMPUTED FLOW WITH DIRECTIVE LOGIC ===
+// === FLOW LOGIC ===
 
 function computeFlowSteps(plan: UserPlanInput): FlowStep[] {
   const hasPathway = !!plan.pathway_type?.trim();
   const hasCountries = (plan.shortlisted_countries || []).length > 0;
   const countryCount = plan.shortlisted_countries?.length || 0;
   const hasTimeline = (plan.timeline_items || []).length > 0;
-  const hasInProgressTimeline = plan.timeline_items?.some((i) => i.status === "In Progress");
   const timelineCompleted = hasTimeline && plan.timeline_items?.every((i) => i.status === "Completed");
   const timelineProgress = hasTimeline 
     ? Math.round((plan.timeline_items?.filter(i => i.status === "Completed").length || 0) / (plan.timeline_items?.length || 1) * 100)
@@ -270,16 +212,16 @@ function computeFlowSteps(plan: UserPlanInput): FlowStep[] {
       title: "Define Your Pathway",
       module: "my-plan",
       status: hasPathway ? "complete" : "active",
-      description: hasPathway ? "Foundation established" : "Required foundation",
+      statusLabel: "REQUIRED NOW",
       directive: hasPathway 
-        ? "Pathway locked — proceed to country selection" 
-        : "You must define your treatment pathway before any planning can begin",
-      whyMatters: "Your pathway determines legal eligibility, cost structures, and which countries are viable options. Without this, all downstream decisions are guesswork.",
+        ? "Pathway defined — foundation established" 
+        : "Define your treatment pathway to begin planning",
+      whyMatters: "Your pathway determines legal eligibility, cost structures, and which countries are viable options.",
+      systemInsight: "All downstream decisions depend on this foundation. Without pathway clarity, country matching and timeline generation are disabled.",
       cta: hasPathway 
         ? undefined 
-        : { label: "Define Pathway Now", href: "/portal/my-plan", variant: "primary" },
+        : { label: "Define Pathway", href: "/portal/my-plan", variant: "primary" },
       unlocks: hasPathway ? undefined : ["Country matching engine", "Legal pathway analysis", "Cost modeling"],
-      ignoredConsequences: hasPathway ? undefined : "You cannot proceed to country selection or timeline generation. System remains locked.",
     },
     {
       id: "countries",
@@ -287,21 +229,17 @@ function computeFlowSteps(plan: UserPlanInput): FlowStep[] {
       title: "Select Countries",
       module: "countries",
       status: hasCountries ? "complete" : hasPathway ? "active" : "locked",
-      description: hasCountries ? `${countryCount} countries selected` : "Required selection",
+      statusLabel: "REQUIRED NOW",
       directive: hasCountries
-        ? `Countries locked (${countryCount}) — proceed to timeline generation`
-        : hasPathway 
-          ? "Select 2-3 countries to unlock timeline generation"
-          : "Complete Step 1 first",
-      whyMatters: "Jurisdiction determines your legal rights, timeline speed, donor availability, and total cost. This is the most consequential decision in your plan.",
-      blockers: !hasPathway && !hasCountries ? ["Pathway must be defined first"] : undefined,
+        ? `${countryCount} countries selected — ready for timeline`
+        : "Select jurisdictions for your treatment plan",
+      whyMatters: "Jurisdiction determines your legal rights, timeline speed, donor availability, and total cost.",
+      systemInsight: "Country selection activates the timeline generation engine. Each jurisdiction has unique legal requirements that affect document preparation and clinic eligibility.",
+      riskIfDelayed: "Limited clinic availability in preferred jurisdictions; legal pathway complexity increases with delayed decisions.",
       cta: hasCountries || !hasPathway
         ? undefined
-        : { label: "Select Countries Now", href: "/portal/countries", variant: "primary" },
+        : { label: "Select Countries", href: "/portal/countries", variant: "primary" },
       unlocks: hasCountries ? undefined : ["Phase-based timeline", "Document requirements", "Legal pathway mapping"],
-      ignoredConsequences: !hasPathway 
-        ? "System remains locked. No planning possible." 
-        : "Timeline generation blocked. You cannot proceed to execution planning.",
     },
     {
       id: "timeline",
@@ -309,43 +247,44 @@ function computeFlowSteps(plan: UserPlanInput): FlowStep[] {
       title: "Build Execution Timeline",
       module: "timeline",
       status: timelineCompleted ? "complete" : hasTimeline ? "active" : hasCountries ? "active" : "locked",
-      description: timelineCompleted 
-        ? "Execution ready" 
-        : hasTimeline 
-          ? `${timelineProgress}% complete` 
-          : "Required roadmap",
+      statusLabel: "REQUIRED NOW",
       directive: timelineCompleted
-        ? "Timeline complete — advisory unlocked"
+        ? "Timeline complete — execution ready"
         : hasTimeline
-          ? "Continue executing timeline tasks"
-          : hasCountries
-            ? "Generate your phase-based execution roadmap now"
-            : "Complete Step 2 first",
-      whyMatters: "Without a structured timeline, you miss critical deadlines, underestimate preparation time, and risk treatment delays that can cost months.",
-      blockers: !hasCountries ? ["Countries must be selected first"] : undefined,
+          ? `Timeline in progress (${timelineProgress}%)`
+          : "Initiate execution timeline — blocking all downstream phases",
+      whyMatters: "Without a structured timeline, treatment scheduling, legal preparation, and clinic coordination remain unstructured and prone to delays.",
+      systemInsight: "Execution cannot begin without a structured timeline. All downstream phases — documentation, advisory, and treatment coordination — depend on this step.",
+      riskIfDelayed: "Treatment scheduling delays of 3–8 weeks are common without early timeline structuring. Missed scheduling windows and underestimated preparation time increase risk of delays (weeks to months).",
+      estimatedEffort: "15–20 minutes to initialize timeline",
       cta: hasTimeline || !hasCountries
         ? hasTimeline && !timelineCompleted 
           ? { label: "Continue Timeline", href: "/portal/timeline", variant: "primary" }
           : undefined
-        : { label: "Generate Timeline Now", href: "/portal/timeline", variant: "primary" },
+        : { label: "Start Timeline Execution", href: "/portal/timeline", variant: "primary" },
       unlocks: hasTimeline && !timelineCompleted
         ? ["Document preparation system", "Advisory eligibility", "Execution tracking"]
         : undefined,
-      ignoredConsequences: !hasCountries
-        ? "No roadmap possible. You risk missing critical preparation windows."
-        : "Execution planning blocked. Treatment start date remains unknown.",
     },
     {
       id: "documents",
       number: 4,
       title: "Prepare Documentation",
       module: "documents",
-      status: "locked",
-      description: "Execution preparation",
-      directive: "Document preparation unlocks after timeline activation",
-      whyMatters: "Medical records, legal forms, and travel documents require lead time. Delays here directly delay treatment start.",
-      blockers: !hasInProgressTimeline ? ["Timeline must be activated first"] : undefined,
-      ignoredConsequences: "You risk arriving at clinics unprepared, delaying treatment cycles, or missing legal filing deadlines.",
+      status: timelineCompleted ? "active" : hasTimeline ? "active" : "locked",
+      statusLabel: timelineCompleted ? "READY" : "LOCKED",
+      directive: timelineCompleted
+        ? "Document preparation ready — requirements generated"
+        : hasTimeline
+          ? "Complete timeline to unlock document requirements"
+          : "Timeline must be initiated before document requirements are generated",
+      whyMatters: "Document requirements vary by jurisdiction and pathway. Premature preparation leads to incomplete or incorrect documentation.",
+      systemInsight: "Document requirements are dynamically generated based on your selected countries and pathway. Requirements include medical records, legal forms, and travel documentation with jurisdiction-specific variations.",
+      riskIfDelayed: "Arriving at clinics unprepared delays treatment cycles; missing legal filing deadlines can block treatment entirely.",
+      cta: timelineCompleted
+        ? { label: "Prepare Documents", href: "/portal/documents", variant: "primary" }
+        : undefined,
+      unlocks: timelineCompleted ? ["Clinic application readiness", "Legal process initiation", "Travel preparation"] : undefined,
     },
     {
       id: "advisory",
@@ -353,28 +292,74 @@ function computeFlowSteps(plan: UserPlanInput): FlowStep[] {
       title: "Advisory & Execution",
       module: "advisory",
       status: timelineCompleted ? "active" : advisoryReady ? "active" : "locked",
-      description: timelineCompleted 
-        ? "Ready for execution" 
-        : advisoryReady 
-          ? "Advisory recommended" 
-          : "Requires readiness",
+      statusLabel: timelineCompleted ? "RECOMMENDED" : advisoryReady ? "AVAILABLE" : "LOCKED",
       directive: timelineCompleted
-        ? "Enter advisory for final execution validation"
+        ? "Validate strategy with advisory before execution"
         : advisoryReady
-          ? "Advisory recommended — validate your plan before proceeding"
-          : `Complete ${70 - Math.min(70, timelineProgress)}% more timeline progress`,
+          ? "Advisory available — validate your plan"
+          : "Complete timeline setup to unlock advisory",
       whyMatters: "At this stage, incorrect decisions cost months and thousands. Advisory validates your country choice, legal pathway, and clinic strategy.",
-      blockers: !advisoryReady && !timelineCompleted
-        ? [`Timeline ${70 - Math.min(70, timelineProgress)}% incomplete`] 
-        : undefined,
+      systemInsight: "Advisory becomes high-value after timeline and country decisions are structured. Incorrect jurisdiction or clinic decisions at this stage can result in financial loss, legal complications, and delays of several months.",
+      riskIfDelayed: "Proceeding without validation risks choosing wrong jurisdiction, underestimating costs, or selecting incompatible clinics.",
       cta: advisoryReady || timelineCompleted
-        ? { label: "Enter Advisory", href: "/portal/advisory", variant: "primary" }
+        ? { label: "Validate Strategy with Advisory", href: "/portal/advisory", variant: "primary" }
         : undefined,
-      ignoredConsequences: "Proceeding without validation risks choosing wrong jurisdiction, underestimating costs, or selecting incompatible clinics.",
+      unlocks: ["Expert validation", "Clinic matching", "Execution roadmap refinement"],
     },
   ];
 
   return steps;
+}
+
+// === READINESS BREAKDOWN ===
+
+interface ReadinessItem {
+  label: string;
+  complete: boolean;
+  points: number;
+}
+
+function ReadinessBreakdown({ 
+  items,
+  total,
+}: { 
+  items: ReadinessItem[];
+  total: number;
+}) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium text-stone-400 uppercase tracking-wider">Advisory Readiness</span>
+        <span className="text-3xl font-bold text-white">{Math.round(total)}%</span>
+      </div>
+      <div className="h-2 w-full rounded-full bg-stone-700">
+        <div 
+          className="h-2 rounded-full bg-[#6a7a6a] transition-all duration-500"
+          style={{ width: `${total}%` }}
+        />
+      </div>
+      <div className="space-y-2 text-sm">
+        {items.map((item, idx) => (
+          <div key={idx} className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className={`h-2 w-2 rounded-full ${item.complete ? "bg-[#6a7a6a]" : "bg-stone-600"}`} />
+              <span className={item.complete ? "text-stone-300" : "text-stone-500"}>
+                {item.label}
+              </span>
+            </div>
+            <span className={item.complete ? "text-stone-300 text-xs" : "text-stone-600 text-xs"}>
+              {item.complete ? "Complete" : "Not started"}
+            </span>
+          </div>
+        ))}
+      </div>
+      {total < 70 && (
+        <p className="text-xs text-stone-400 mt-2 pt-2 border-t border-stone-700">
+          Threshold for optimal advisory: 70%
+        </p>
+      )}
+    </div>
+  );
 }
 
 // === MAIN DASHBOARD ===
@@ -439,6 +424,17 @@ export default function PortalDashboardPage() {
     ? Math.round(timelineCounts.completed / timelineCounts.total * 100) 
     : 0;
 
+  const readinessItems: ReadinessItem[] = [
+    { label: "Pathway clarity", complete: hasPathway, points: 25 },
+    { label: "Country selection", complete: hasCountries, points: 25 },
+    { label: "Timeline readiness", complete: hasTimeline, points: 25 },
+    { label: "Timeline progress", complete: timelineProgress >= 50, points: 25 },
+  ];
+
+  const readinessTotal = readinessItems.reduce((acc, item) => {
+    return acc + (item.complete ? item.points : 0);
+  }, 0);
+
   const blockingSignals = useMemo(
     () => advisorySignals.filter((s: AdvisorySignal) => s.type === "blocking"),
     [advisorySignals]
@@ -448,6 +444,65 @@ export default function PortalDashboardPage() {
     () => advisorySignals.filter((s: AdvisorySignal) => s.type === "attention"),
     [advisorySignals]
   );
+
+  // Determine next action display based on directive logic
+  const getNextActionDisplay = () => {
+    if (!hasTimeline) {
+      return {
+        priority: "critical" as const,
+        label: "REQUIRED ACTION — EXECUTION BLOCKED",
+        title: "Initiate Execution Timeline",
+        body: "Your plan cannot progress to execution without a structured timeline.",
+        explanation: "Without a defined timeline, treatment scheduling, legal preparation, and clinic coordination remain unstructured and prone to delays.",
+        stakes: "Missed scheduling windows, underestimated preparation time, increased risk of treatment delays (weeks to months).",
+        unlocks: ["Document preparation system", "Advisory eligibility", "Execution tracking"],
+        cta: "Start Timeline Execution",
+        href: "/portal/timeline",
+      };
+    }
+
+    if (timelineProgress > 30 && timelineProgress < 100) {
+      return {
+        priority: "high" as const,
+        label: "REQUIRED ACTION — CONTINUE EXECUTION",
+        title: "Continue Timeline Execution",
+        body: `Your timeline is ${timelineProgress}% complete. Continue execution to unlock advisory and documentation phases.`,
+        explanation: "Completing timeline tasks builds execution momentum and prepares you for advisory validation.",
+        stakes: "Incomplete timeline blocks document preparation system and delays advisory eligibility.",
+        unlocks: ["Document preparation system", "Advisory eligibility", "Execution tracking"],
+        cta: "Continue Timeline",
+        href: "/portal/timeline",
+      };
+    }
+
+    if (readinessTotal >= 70) {
+      return {
+        priority: "high" as const,
+        label: "RECOMMENDED — VALIDATE STRATEGY",
+        title: "Validate Your Strategy",
+        body: "Your plan has reached advisory readiness threshold. Validate jurisdiction, legal pathway, and clinic strategy before execution.",
+        explanation: "At this stage, incorrect decisions cost months and thousands. Advisory validates your country choice, legal pathway, and clinic strategy.",
+        stakes: "Proceeding without validation risks choosing wrong jurisdiction, underestimating costs, or selecting incompatible clinics.",
+        unlocks: ["Expert validation", "Clinic matching", "Execution roadmap refinement"],
+        cta: "Validate Your Strategy",
+        href: "/portal/advisory",
+      };
+    }
+
+    return {
+      priority: nextAction.priority as "critical" | "high" | "medium" | "low",
+      label: "REQUIRED ACTION",
+      title: nextAction.title,
+      body: nextAction.body,
+      explanation: nextAction.explanation,
+      stakes: nextAction.stakes,
+      unlocks: nextAction.unlocks,
+      cta: nextAction.cta,
+      href: nextAction.href,
+    };
+  };
+
+  const nextActionDisplay = getNextActionDisplay();
 
   if (loading) return <DashboardSkeleton />;
   if (isError) {
@@ -460,59 +515,75 @@ export default function PortalDashboardPage() {
 
   return (
     <div className="space-y-8">
-      
-      {/* === TIER 1: EXECUTIVE AUTHORITY HEADER === */}
+
+      {/* === 1. COMMAND HEADER (HERO) === */}
       <div className="rounded-2xl border-2 border-[#3a3a3a] bg-[#3a3a3a] p-8 text-white shadow-xl">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div>
+          <div className="flex-1">
             <p className="text-sm font-medium uppercase tracking-[0.2em] text-stone-400">
               FertilityCareHub Planning System
             </p>
             <h1 className="mt-2 text-3xl font-bold tracking-tight">
-              {hasPathway ? "Your Planning Command Center" : "Begin Your Planning Journey"}
+              Your Planning System Is Active
             </h1>
             <p className="mt-3 max-w-2xl text-stone-300 leading-relaxed">
-              {hasPathway 
-                ? "Track execution readiness, manage dependencies, and navigate toward treatment with precision."
-                : "Most patients choose the wrong fertility path. We built a system to prevent that. Start by defining your pathway below."}
+              Complete required steps to unlock execution, reduce delays, and move toward treatment with precision.
             </p>
+            <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+              <div className="flex items-center gap-2">
+                <div className={`h-2 w-2 rounded-full ${hasPathway ? "bg-[#6a7a6a]" : "bg-stone-600"}`} />
+                <span className={hasPathway ? "text-stone-300" : "text-stone-500"}>
+                  Pathway {hasPathway ? "defined" : "not defined"}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className={`h-2 w-2 rounded-full ${hasCountries ? "bg-[#6a7a6a]" : "bg-stone-600"}`} />
+                <span className={hasCountries ? "text-stone-300" : "text-stone-500"}>
+                  Countries {hasCountries ? "selected" : "not selected"}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className={`h-2 w-2 rounded-full ${hasTimeline ? "bg-[#6a7a6a]" : "bg-[#c4a7a7]"}`} />
+                <span className={hasTimeline ? "text-stone-300" : "text-[#c4a7a7]"}>
+                  Timeline {hasTimeline ? "initiated" : "not initiated (blocking execution)"}
+                </span>
+              </div>
+            </div>
           </div>
-          <div className="lg:border-l lg:border-stone-600 lg:pl-8">
+          <div className="lg:border-l lg:border-stone-600 lg:pl-8 lg:min-w-[280px]">
             <ReadinessBreakdown 
-              hasPathway={hasPathway} 
-              hasCountries={hasCountries} 
-              hasTimeline={hasTimeline}
-              timelineProgress={timelineProgress}
+              items={readinessItems}
+              total={readinessTotal}
             />
           </div>
         </div>
       </div>
 
-      {/* === TIER 1: NEXT REQUIRED ACTION - THE COMMAND === */}
+      {/* === 2. NEXT ACTION (PRIMARY DRIVER) === */}
       <section className="rounded-2xl border-2 border-[#c4a7a7] bg-white p-8 shadow-lg relative overflow-hidden">
         <div className="absolute top-0 left-0 w-1 h-full bg-[#c4a7a7]" />
-        
+
         <div className="flex flex-col gap-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-3">
-                <PriorityBadge priority={nextAction.priority} />
+                <PriorityBadge priority={nextActionDisplay.priority} />
                 <span className="text-sm font-bold text-[#c4a7a7] uppercase tracking-wider">
-                  Required Action
+                  {nextActionDisplay.label}
                 </span>
               </div>
               <h2 className="text-2xl font-bold text-stone-900">
-                {nextAction.title}
+                {nextActionDisplay.title}
               </h2>
               <p className="mt-2 text-lg text-stone-700 font-medium">
-                {nextAction.body}
+                {nextActionDisplay.body}
               </p>
             </div>
             <Link
-              href={nextAction.href}
+              href={nextActionDisplay.href}
               className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#3a3a3a] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#2a2a2a] shadow-lg shadow-stone-900/20"
             >
-              {nextAction.cta} →
+              {nextActionDisplay.cta} →
             </Link>
           </div>
 
@@ -522,25 +593,25 @@ export default function PortalDashboardPage() {
                 Why this matters
               </h3>
               <p className="text-sm text-stone-600 leading-relaxed">
-                {nextAction.explanation}
+                {nextActionDisplay.explanation}
               </p>
             </div>
             <div className="rounded-lg bg-[#faf6f6] border border-[#e8d8d8] p-4">
               <h3 className="text-xs font-bold uppercase tracking-wider text-[#8a6a6a] mb-2">
-                ⚠️ If ignored
+                If ignored
               </h3>
               <p className="text-sm text-[#6a4a4a] leading-relaxed">
-                {nextAction.stakes}
+                {nextActionDisplay.stakes}
               </p>
             </div>
             <div>
               <h3 className="text-xs font-bold uppercase tracking-wider text-[#4a5a4a] mb-2">
-                ✓ Unlocks
+                This will unlock
               </h3>
               <ul className="space-y-1">
-                {nextAction.unlocks.map((unlock, idx) => (
+                {nextActionDisplay.unlocks.map((unlock, idx) => (
                   <li key={idx} className="text-sm text-stone-700 flex items-center gap-2">
-                    <span className="text-[#6a7a6a]">→</span>
+                    <span className="text-[#6a7a6a]">✓</span>
                     {unlock}
                   </li>
                 ))}
@@ -550,17 +621,17 @@ export default function PortalDashboardPage() {
         </div>
       </section>
 
-      {/* === TIER 1: GUIDED FLOW - THE DECISION JOURNEY === */}
+      {/* === 3. EXECUTION PATH (GUIDED FLOW) === */}
       <section className="rounded-2xl border border-stone-300 bg-white p-8 shadow-sm">
         <div className="mb-8">
           <p className="text-sm font-bold uppercase tracking-wider text-stone-500">
-            Your Decision Journey
+            Execution Path
           </p>
           <h2 className="mt-2 text-2xl font-bold text-stone-900">
             Step-by-Step Execution Path
           </h2>
           <p className="mt-2 text-stone-600">
-            Complete each required step to unlock the next phase. Skipping steps blocks downstream progress.
+            Complete each required step to unlock the next phase. Dependencies enforce proper sequencing.
           </p>
         </div>
         <div className="space-y-6">
@@ -570,69 +641,142 @@ export default function PortalDashboardPage() {
         </div>
       </section>
 
-      {/* === TIER 2: EXECUTION RISKS === */}
-      {(blockingSignals.length > 0 || attentionSignals.length > 0) && (
-        <section className="space-y-4">
-          <h2 className="text-lg font-bold text-stone-900 flex items-center gap-2">
-            <span className="text-[#c4a7a7]">⚠️</span> Execution Risks Requiring Action
+      {/* === 4. SYSTEM SIGNALS (BLOCKERS) === */}
+      {(blockingSignals.length > 0 || attentionSignals.length > 0 || !hasTimeline) && (
+        <section className="rounded-2xl border border-stone-300 bg-white p-8 shadow-sm">
+          <h2 className="text-lg font-bold text-stone-900 mb-6 flex items-center gap-2">
+            <span className="text-[#c4a7a7]">⚠</span> System Signals
           </h2>
-          <div className="space-y-3">
-            {blockingSignals.map((signal, idx) => (
-              <div key={`blocking-${idx}`} className="rounded-xl border-2 border-[#c4a7a7] bg-[#faf6f6] p-5">
-                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                  <div>
-                    <p className="font-bold text-[#5c3a3a]">{signal.message}</p>
-                    {signal.action && <p className="mt-1 text-sm text-[#7a5a5a]">{signal.action}</p>}
-                  </div>
-                  {signal.link && (
-                    <Link href={signal.link} className="text-sm font-bold text-[#5c3a3a] underline hover:text-[#3a2a2a] shrink-0">
-                      Resolve Immediately →
-                    </Link>
-                  )}
+          <div className="space-y-4">
+            {!hasTimeline && (
+              <div className="flex gap-3 items-start">
+                <span className="text-[#c4a7a7] font-bold">⚠</span>
+                <div>
+                  <p className="font-medium text-stone-900">Timeline not initiated</p>
+                  <p className="text-sm text-stone-600">→ Blocking execution phases</p>
                 </div>
+              </div>
+            )}
+            {hasTimeline && timelineProgress < 30 && (
+              <div className="flex gap-3 items-start">
+                <span className="text-[#d4c4a8] font-bold">⚠</span>
+                <div>
+                  <p className="font-medium text-stone-900">Documents not yet structured</p>
+                  <p className="text-sm text-stone-600">→ Will delay clinic applications once timeline begins</p>
+                </div>
+              </div>
+            )}
+            {hasCountries && (
+              <div className="flex gap-3 items-start">
+                <span className="text-[#6a7a6a] font-bold">✓</span>
+                <div>
+                  <p className="font-medium text-stone-900">Country shortlist established ({plan.shortlisted_countries?.length} selected)</p>
+                  <p className="text-sm text-stone-600">→ Strong foundation for execution</p>
+                </div>
+              </div>
+            )}
+            {blockingSignals.map((signal, idx) => (
+              <div key={`blocking-${idx}`} className="flex gap-3 items-start">
+                <span className="text-[#c4a7a7] font-bold">⚠</span>
+                <div className="flex-1">
+                  <p className="font-medium text-stone-900">{signal.message}</p>
+                  {signal.action && <p className="text-sm text-stone-600">→ {signal.action}</p>}
+                </div>
+                {signal.link && (
+                  <Link href={signal.link} className="text-sm font-bold text-[#5c3a3a] underline hover:text-[#3a2a2a] shrink-0">
+                    Resolve →
+                  </Link>
+                )}
               </div>
             ))}
             {attentionSignals.map((signal, idx) => (
-              <div key={`attention-${idx}`} className="rounded-xl border border-[#d4c4a8] bg-[#faf8f3] p-5">
-                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                  <div>
-                    <p className="font-bold text-[#5c4a3a]">{signal.message}</p>
-                    {signal.action && <p className="mt-1 text-sm text-[#7a6a5a]">{signal.action}</p>}
-                  </div>
-                  {signal.link && (
-                    <Link href={signal.link} className="text-sm font-bold text-[#5c4a3a] underline hover:text-[#3a2a2a] shrink-0">
-                      Address →
-                    </Link>
-                  )}
+              <div key={`attention-${idx}`} className="flex gap-3 items-start">
+                <span className="text-[#d4c4a8] font-bold">⚠</span>
+                <div className="flex-1">
+                  <p className="font-medium text-stone-900">{signal.message}</p>
+                  {signal.action && <p className="text-sm text-stone-600">→ {signal.action}</p>}
                 </div>
+                {signal.link && (
+                  <Link href={signal.link} className="text-sm font-bold text-[#5c4a3a] underline hover:text-[#3a2a2a] shrink-0">
+                    Address →
+                  </Link>
+                )}
               </div>
             ))}
+            <div className="mt-4 pt-4 border-t border-stone-200">
+              <p className="text-sm font-bold text-stone-900">
+                Next system priority: <span className="text-[#c4a7a7]">{!hasTimeline ? "Initiate timeline" : timelineProgress < 50 ? "Continue timeline execution" : "Complete timeline for advisory"}</span>
+              </p>
+            </div>
           </div>
         </section>
       )}
 
-      {/* === TIER 2: ADVISORY READINESS === */}
+      {/* === 5. ADVISORY READINESS === */}
       <section className="rounded-2xl border border-stone-300 bg-stone-100 p-8 shadow-sm">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div>
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+          <div className="flex-1">
             <p className="text-sm font-bold uppercase tracking-wider text-stone-500">
               Advisory Readiness
             </p>
             <p className="mt-1 text-sm text-stone-600">
-              Planning maturity required for meaningful advisory engagement
+              Current readiness: {readinessTotal}%
             </p>
+            <div className="mt-4 space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-2">
+                  <span className={hasPathway ? "text-[#6a7a6a]" : "text-stone-400"}>✓</span>
+                  <span className={hasPathway ? "text-stone-700" : "text-stone-400"}>Pathway clarity</span>
+                </span>
+                <span className={hasPathway ? "text-[#6a7a6a] text-xs" : "text-stone-400 text-xs"}>
+                  {hasPathway ? "Complete" : "Not started"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-2">
+                  <span className={hasCountries ? "text-[#6a7a6a]" : "text-stone-400"}>✓</span>
+                  <span className={hasCountries ? "text-stone-700" : "text-stone-400"}>Country selection</span>
+                </span>
+                <span className={hasCountries ? "text-[#6a7a6a] text-xs" : "text-stone-400 text-xs"}>
+                  {hasCountries ? "Strong" : "Not started"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-2">
+                  <span className={hasTimeline ? "text-[#6a7a6a]" : "text-[#c4a7a7]"}>✗</span>
+                  <span className={hasTimeline ? "text-stone-700" : "text-stone-500"}>Timeline readiness</span>
+                </span>
+                <span className={hasTimeline ? "text-[#6a7a6a] text-xs" : "text-[#c4a7a7] text-xs"}>
+                  {hasTimeline ? "In progress" : "Not started"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-2">
+                  <span className={timelineProgress > 0 ? "text-[#6a7a6a]" : "text-[#c4a7a7]"}>✗</span>
+                  <span className={timelineProgress > 0 ? "text-stone-700" : "text-stone-500"}>Document readiness</span>
+                </span>
+                <span className={timelineProgress > 0 ? "text-[#6a7a6a] text-xs" : "text-[#c4a7a7] text-xs"}>
+                  {timelineProgress > 0 ? "In progress" : "Not started"}
+                </span>
+              </div>
+            </div>
+            {readinessTotal < 70 && (
+              <p className="mt-4 text-sm text-[#8a6a6a]">
+                System Recommendation: Complete timeline setup before entering advisory to maximize value and avoid premature strategy decisions.
+              </p>
+            )}
           </div>
           <div className="flex items-center gap-6">
             <div className="text-right">
-              <p className={`text-4xl font-bold ${advisoryReadiness.percentage >= 70 ? "text-[#4a5a4a]" : "text-stone-900"}`}>
-                {advisoryReadiness.percentage}%
+              <p className={`text-4xl font-bold ${readinessTotal >= 70 ? "text-[#4a5a4a]" : "text-stone-900"}`}>
+                {readinessTotal}%
               </p>
               <p className="text-sm font-bold uppercase text-stone-500">
                 {advisoryReadiness.stage} stage
               </p>
             </div>
             <div className={`flex h-20 w-20 items-center justify-center rounded-full border-4 ${
-              advisoryReadiness.percentage >= 70 ? "border-[#6a7a6a]" : "border-stone-300"
+              readinessTotal >= 70 ? "border-[#6a7a6a]" : "border-stone-300"
             }`}>
               <div className={`flex h-14 w-14 items-center justify-center rounded-full text-sm font-bold ${
                 advisoryReadiness.stage === "optimal" ? "bg-[#8a9a8a] text-white" :
@@ -648,7 +792,7 @@ export default function PortalDashboardPage() {
         <div className="mt-6">
           <div className="flex items-center justify-between text-sm mb-2">
             <span className="text-stone-600">Progress to advisory eligibility</span>
-            <span className="font-bold text-stone-900">{advisoryReadiness.percentage}% / 70% required</span>
+            <span className="font-bold text-stone-900">{readinessTotal}% / 70% required</span>
           </div>
           <div className="h-3 w-full rounded-full bg-stone-200">
             <div className={`h-3 rounded-full transition-all ${
@@ -656,32 +800,31 @@ export default function PortalDashboardPage() {
               advisoryReadiness.stage === "ready" ? "bg-[#6a7a6a]" :
               advisoryReadiness.stage === "developing" ? "bg-[#d4c4a8]" :
               "bg-stone-400"
-            }`} style={{ width: `${advisoryReadiness.percentage}%` }} />
+            }`} style={{ width: `${readinessTotal}%` }} />
           </div>
-          {advisoryReadiness.percentage < 70 && (
-            <p className="mt-3 text-sm text-[#8a6a6a]">
-              Complete more timeline tasks to unlock advisory. At this stage, incorrect decisions cost months and thousands.
-            </p>
-          )}
+          <p className="mt-3 text-xs text-stone-500">
+            Threshold for optimal advisory: 70%
+          </p>
         </div>
       </section>
 
-      {/* === TIER 3: QUICK STATS === */}
-      <section className="grid gap-6 lg:grid-cols-4">
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm lg:col-span-2">
-          <p className="text-sm font-bold text-stone-500 uppercase tracking-wider">Timeline Execution</p>
-          <div className="mt-4 flex items-baseline gap-3">
-            <p className="text-4xl font-bold text-stone-900">{timelineCounts.completed}</p>
-            <span className="text-2xl text-stone-400">/</span>
-            <p className="text-2xl font-medium text-stone-500">{timelineCounts.total}</p>
+      {/* === 6. METRICS (LIGHT) === */}
+      <section className="grid gap-6 lg:grid-cols-3">
+        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+          <p className="text-sm font-bold text-stone-500 uppercase tracking-wider">Execution Progress</p>
+          <div className="mt-4">
+            <p className="text-4xl font-bold text-stone-900">{timelineProgress}%</p>
           </div>
           <p className="mt-3 text-sm text-stone-600">
-            {timelineCounts.total === 0 ? (
-              <span className="text-[#8a6a6a] font-medium">Timeline not generated — countries required</span>
-            ) : (
+            {hasTimeline ? (
               <span>{timelineCounts.inProgress} in progress • {timelineCounts.upcoming} upcoming</span>
+            ) : (
+              <span className="text-[#8a6a6a] font-medium">Not initiated</span>
             )}
           </p>
+          {!hasTimeline && (
+            <p className="mt-2 text-xs text-[#8a6a6a]">Blocking: All execution phases</p>
+          )}
         </div>
 
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
@@ -689,62 +832,65 @@ export default function PortalDashboardPage() {
           <p className="mt-3 text-lg font-bold text-stone-900">
             {getDisplayValue(plan.pathway_type, "Not defined")}
           </p>
-          {!hasPathway && (
-            <p className="mt-2 text-xs text-[#8a6a6a]">Required — blocks all planning</p>
+          {hasPathway && (
+            <p className="mt-2 text-xs text-[#6a7a6a]">Confidence: High</p>
           )}
         </div>
 
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-bold text-stone-500 uppercase tracking-wider">Countries</p>
+          <p className="text-sm font-bold text-stone-500 uppercase tracking-wider">Country Selection</p>
           <p className="mt-3 text-lg font-bold text-stone-900">
-            {hasCountries ? `${plan.shortlisted_countries?.length} selected` : "None"}
+            {hasCountries ? `${plan.shortlisted_countries?.length} shortlisted` : "None"}
           </p>
-          {!hasCountries && hasPathway && (
-            <p className="mt-2 text-xs text-[#8a6a6a]">Required — unlocks timeline</p>
+          {hasCountries && (
+            <p className="mt-2 text-xs text-[#6a7a6a]">Ready for execution planning</p>
           )}
         </div>
       </section>
 
-      {/* === TIER 3: EXECUTION STAGE === */}
+      {/* === 7. SUPPORTING (STAGE / STATUS) === */}
       <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
         <div className="flex items-start gap-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-stone-100">
             <StageBadge stage={executionStage.stage} />
           </div>
           <div className="flex-1">
-            <h2 className="text-lg font-bold text-stone-900 capitalize">
-              {executionStage.stage.replace("-", " ")} Phase
+            <h2 className="text-lg font-bold text-stone-900">
+              Stage 02 — Planning Consolidation
             </h2>
-            <p className="mt-1 text-sm text-stone-600">{executionStage.description}</p>
+            <p className="mt-1 text-sm text-stone-600">
+              <span className="font-medium">Objective:</span> Transition from planning to execution by structuring timeline and preparing documentation.
+            </p>
+            <p className="mt-2 text-sm text-stone-600">
+              <span className="font-medium">System Focus:</span> Build execution momentum before entering advisory
+            </p>
           </div>
         </div>
       </section>
 
-      {/* === TIER 3: ADVISORY SNAPSHOT === */}
+      {/* === ADVISORY CTA (UPGRADED) === */}
       <section className="rounded-2xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-sm font-bold text-stone-500 uppercase tracking-wider">Advisory Status</p>
             <p className="mt-1 text-lg font-bold text-stone-900">
-              {plan.advisory_status || "Not Started"}
+              {readinessTotal >= 70 ? "Ready for validation" : "Complete timeline first"}
             </p>
             <p className="mt-1 text-sm text-stone-600">
-              {plan.advisory_pathway && plan.advisory_pathway !== "Undecided"
-                ? `Pathway: ${plan.advisory_pathway}`
-                : advisoryReadiness.percentage >= 70 
-                  ? "Ready for advisory engagement"
-                  : "Complete timeline progress first"}
+              {readinessTotal >= 70 
+                ? "Ensure jurisdiction, legal pathway, and clinic strategy are correct before execution."
+                : `Complete ${70 - readinessTotal}% more to unlock advisory eligibility`}
             </p>
           </div>
           <Link
             href="/portal/advisory"
             className={`inline-flex shrink-0 rounded-xl px-4 py-2 text-sm font-bold transition ${
-              advisoryReadiness.percentage >= 70
+              readinessTotal >= 70
                 ? "bg-[#3a3a3a] text-white hover:bg-[#2a2a2a]"
                 : "border-2 border-stone-300 text-stone-400 cursor-not-allowed"
             }`}
           >
-            {advisoryReadiness.percentage >= 70 ? "Enter Advisory →" : "Locked"}
+            {readinessTotal >= 70 ? "Validate Your Strategy →" : "Locked"}
           </Link>
         </div>
       </section>
