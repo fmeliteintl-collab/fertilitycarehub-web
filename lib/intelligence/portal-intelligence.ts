@@ -1,4 +1,5 @@
-"use server";
+// Regular utility module - no "use server" needed
+// This is imported by Client Components, so it must be client-safe
 
 import type { UserPlan, UserPlanInput } from "@/types/plan";
 import {
