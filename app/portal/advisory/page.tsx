@@ -91,24 +91,25 @@ export default function PortalAdvisoryPage() {
 
         if (existing) {
           setPlan({
-            pathway_type: existing.pathway_type,
-            family_structure: existing.family_structure,
-            treatment_goal: existing.treatment_goal,
-            donor_needed: existing.donor_needed,
-            surrogate_needed: existing.surrogate_needed,
-            priorities: existing.priorities ?? [],
-            constraints: existing.constraints ?? [],
-            shortlisted_countries: existing.shortlisted_countries ?? [],
-            timeline_items: existing.timeline_items ?? [],
-            advisory_status: existing.advisory_status ?? null,
-            advisory_pathway: existing.advisory_pathway ?? null,
-            advisory_notes: existing.advisory_notes ?? null,
-            advisory_next_step: existing.advisory_next_step ?? null,
-            advisory_stage: existing.advisory_stage ?? null,
-            target_timeline: existing.target_timeline,
-            budget_range: existing.budget_range,
-            notes: existing.notes,
-          });
+  pathway_type: existing.pathway_type,
+  family_structure: existing.family_structure,
+  treatment_goal: existing.treatment_goal,
+  donor_needed: existing.donor_needed,
+  surrogate_needed: existing.surrogate_needed,
+  priorities: existing.priorities ?? [],
+  constraints: existing.constraints ?? [],
+  primary_country: existing.primary_country ?? null,
+  shortlisted_countries: existing.shortlisted_countries ?? [],
+  timeline_items: existing.timeline_items ?? [],
+  advisory_status: existing.advisory_status ?? null,
+  advisory_pathway: existing.advisory_pathway ?? null,
+  advisory_notes: existing.advisory_notes ?? null,
+  advisory_next_step: existing.advisory_next_step ?? null,
+  advisory_stage: existing.advisory_stage ?? null,
+  target_timeline: existing.target_timeline,
+  budget_range: existing.budget_range,
+  notes: existing.notes,
+});
         }
       } catch (error: unknown) {
         console.error(error);
