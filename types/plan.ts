@@ -44,6 +44,7 @@ export type UserPlan = {
   priorities: string[];
   constraints: string[];
   shortlisted_countries: string[];
+  primary_country: string | null; // ADDED: Committed jurisdiction for execution
   timeline_items: TimelineItem[];
   advisory_status: string | null;
   advisory_pathway: string | null;
@@ -66,6 +67,7 @@ export type UserPlanInput = {
   priorities: string[];
   constraints: string[];
   shortlisted_countries: string[];
+  primary_country: string | null; // ADDED: Committed jurisdiction for execution
   timeline_items: TimelineItem[];
   advisory_status: string | null;
   advisory_pathway: string | null;
@@ -86,6 +88,7 @@ export const EMPTY_USER_PLAN_INPUT: UserPlanInput = {
   priorities: [],
   constraints: [],
   shortlisted_countries: [],
+  primary_country: null, // ADDED
   timeline_items: [],
   advisory_status: null,
   advisory_pathway: null,
