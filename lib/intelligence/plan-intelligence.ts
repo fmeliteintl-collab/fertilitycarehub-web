@@ -1115,10 +1115,9 @@ export interface NextActionWithContext {
   module: "plan" | "countries" | "timeline" | "advisory" | "documents";
 }
 
-export function buildNextActionWithContext(plan: PlanData): NextActionWithContext {
+export function buildNextActionWithContext(plan: PlanData, documentCount = 0): NextActionWithContext {
   const shortlistCount = plan?.shortlisted_countries?.length ?? 0;
   const timelineCounts = getTimelineCounts(plan?.timeline_items);
-  const documentCount = 0; // Will be passed as param in real implementation
 
   const hasPathway = Boolean(plan?.pathway_type?.trim());
   const hasCountries = shortlistCount > 0;
@@ -1434,5 +1433,64 @@ export function getPrimaryGuidance(
     relatedTasks: ["Review plan alignment", "Update priorities", "Check timeline"],
     actionCta: "Review Plan →",
     actionHref: "/portal/my-plan",
+  };
+}
+
+// ==================== READINESS BREAKDOWN FOR DASHBOARD ====================
+
+export interface ReadinessBreakdownItem {
+  label: string;
+  value: boolean;
+  points: number;
+  isProgress?: boolean;
+  progressValue?: number;
+}
+
+export interface ReadinessBreakdownResult {
+  items: ReadinessBreakdownItem[];
+  total: number;
+  hasPathway: boolean;
+  hasCountries: boolean;
+  hasTimeline: boolean;
+  timelineProgress: number;
+}
+
+export function getReadinessBreakdown(plan: PlanData): ReadinessBreakdownResult {
+  const hasPathway = Boolean(plan?.pathway_type?.trim());
+  const hasCountries = (plan?.shortlisted_countries ?? []).length > 0;
+  const hasTimeline = (plan?.timeline_items ?? []).length > 0;
+  
+  const timelineItems = plan?.timeline_items ?? [];
+  const totalItems = timelineItems.length;
+  const completedItems = timelineItems.filter(i => i.status === "Completed").length;
+  const timelineProgress = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+
+  const items: ReadinessBreakdownItem[] = [
+    { label: "Pathway defined", value: hasPathway, points: 25 },
+    { label: "Countries selected", value: hasCountries, points: 25 },
+    { label: "Timeline generated", value: hasTimeline, points: 25 },
+    { 
+      label: "Timeline progress", 
+      value: timelineProgress >= 50, 
+      points: 25,
+      isProgress: true,
+      progressValue: timelineProgress
+    },
+  ];
+
+  const total = items.reduce((acc, item) => {
+    if (item.isProgress && item.progressValue !== undefined) {
+      return acc + (item.progressValue * item.points / 100);
+    }
+    return acc + (item.value ? item.points : 0);
+  }, 0);
+
+  return {
+    items,
+    total: Math.round(total),
+    hasPathway,
+    hasCountries,
+    hasTimeline,
+    timelineProgress,
   };
 }
