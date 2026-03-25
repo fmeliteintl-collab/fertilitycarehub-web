@@ -138,6 +138,7 @@ export async function upsertCurrentUserPlan(
 
   if (!user) {
     throw new Error("User is not authenticated.");
+    console.log("SAVE USER", { id: user.id, email: user.email });
   }
 
   const payload = {

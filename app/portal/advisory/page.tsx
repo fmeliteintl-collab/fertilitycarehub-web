@@ -31,6 +31,27 @@ import {
 } from "@/lib/intelligence/plan-intelligence";
 import { DashboardSkeleton } from "@/app/components/skeletons";
 
+// NOTE: Run this command to install icons:
+// npm install lucide-react
+import { 
+  Globe, 
+  Target, 
+  CheckCircle2, 
+  ArrowRight, 
+  Sparkles,
+  TrendingUp,
+  MapPin,
+  Calendar,
+  FileText,
+  ChevronRight,
+  Plus,
+  Trash2,
+  Flag,
+  Compass,
+  Award,
+  Zap
+} from "lucide-react";
+
 export const runtime = "edge";
 
 const ADVISORY_STATUS_OPTIONS = [
@@ -47,20 +68,117 @@ const ADVISORY_PATHWAY_OPTIONS = [
   "Undecided",
 ] as const;
 
-// Stage badge component for institutional tone
-function StageBadge({ stage }: { stage: string }) {
-  const stageNum = {
-    foundation: "01",
-    shortlist: "02",
-    sequencing: "03",
-    "advisory-active": "04",
-    completion: "05",
-  }[stage] || "01";
+// Stage configuration with icons and colors
+const STAGE_CONFIG: Record<string, { 
+  num: string; 
+  icon: React.ElementType; 
+  color: string;
+  bgColor: string;
+  borderColor: string;
+}> = {
+  foundation: { 
+    num: "01", 
+    icon: Compass, 
+    color: "text-stone-600",
+    bgColor: "bg-stone-100",
+    borderColor: "border-stone-200"
+  },
+  shortlist: { 
+    num: "02", 
+    icon: Globe, 
+    color: "text-[#5a6a5a]",
+    bgColor: "bg-[#f0f4f0]",
+    borderColor: "border-[#d0d8d0]"
+  },
+  sequencing: { 
+    num: "03", 
+    icon: TrendingUp, 
+    color: "text-[#8a7a5a]",
+    bgColor: "bg-[#faf8f3]",
+    borderColor: "border-[#e8e4d8]"
+  },
+  "advisory-active": { 
+    num: "04", 
+    icon: Target, 
+    color: "text-[#6a5a5a]",
+    bgColor: "bg-[#faf6f6]",
+    borderColor: "border-[#e8e0e0]"
+  },
+  completion: { 
+    num: "05", 
+    icon: Award, 
+    color: "text-[#4a6a5a]",
+    bgColor: "bg-[#f6faf8]",
+    borderColor: "border-[#d8e8e0]"
+  },
+};
+
+// Premium stage badge with icon
+function StageBadge({ stage, showIcon = false }: { stage: string; showIcon?: boolean }) {
+  const config = STAGE_CONFIG[stage] || STAGE_CONFIG.foundation;
+  const Icon = config.icon;
+  
+  return (
+    <div className={`inline-flex items-center gap-2 rounded-full ${config.bgColor} ${config.borderColor} border px-3 py-1.5`}>
+      {showIcon && <Icon className={`w-3.5 h-3.5 ${config.color}`} />}
+      <span className="text-[10px] font-bold tracking-[0.15em] text-stone-500 uppercase">Stage</span>
+      <span className={`text-xs font-bold ${config.color}`}>{config.num}</span>
+    </div>
+  );
+}
+
+// Premium circular progress with icon
+function ProgressRing({ 
+  percentage, 
+  score, 
+  maxScore, 
+  stage 
+}: { 
+  percentage: number; 
+  score: number; 
+  maxScore: number; 
+  stage: string;
+}) {
+  const circumference = 2 * Math.PI * 26;
+  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+  
+  const stageColors = {
+    optimal: "stroke-[#6a7a6a]",
+    ready: "stroke-[#7a8a7a]",
+    developing: "stroke-[#c4b49a]",
+    early: "stroke-stone-400",
+  };
 
   return (
-    <span className="inline-flex items-center justify-center rounded-lg bg-stone-200 px-3 py-1.5 text-xs font-semibold tracking-wider text-stone-700">
-      STAGE {stageNum}
-    </span>
+    <div className="relative flex items-center justify-center">
+      <svg className="transform -rotate-90 w-20 h-20">
+        <circle
+          cx="40"
+          cy="40"
+          r="26"
+          stroke="currentColor"
+          strokeWidth="3"
+          fill="transparent"
+          className="text-stone-200"
+        />
+        <circle
+          cx="40"
+          cy="40"
+          r="26"
+          stroke="currentColor"
+          strokeWidth="3"
+          fill="transparent"
+          strokeDasharray={circumference}
+          strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round"
+          className={`${stageColors[stage as keyof typeof stageColors] || stageColors.early} transition-all duration-1000 ease-out`}
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-lg font-bold text-stone-800">{score}</span>
+        <span className="text-[10px] text-stone-400 font-medium">/{maxScore}</span>
+      </div>
+    </div>
   );
 }
 
@@ -73,7 +191,6 @@ export default function PortalAdvisoryPage() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [hasLoadedInitialData, setHasLoadedInitialData] = useState(false);
 
-  // NEW: Advisory stage and tasks state
   const [advisoryStage, setAdvisoryStage] = useState<AdvisoryStage>(null);
   const [tasks, setTasks] = useState<AdvisoryTask[]>([]);
   const [loadingTasks, setLoadingTasks] = useState(false);
@@ -91,25 +208,25 @@ export default function PortalAdvisoryPage() {
 
         if (existing) {
           setPlan({
-  pathway_type: existing.pathway_type,
-  family_structure: existing.family_structure,
-  treatment_goal: existing.treatment_goal,
-  donor_needed: existing.donor_needed,
-  surrogate_needed: existing.surrogate_needed,
-  priorities: existing.priorities ?? [],
-  constraints: existing.constraints ?? [],
-  primary_country: existing.primary_country ?? null,
-  shortlisted_countries: existing.shortlisted_countries ?? [],
-  timeline_items: existing.timeline_items ?? [],
-  advisory_status: existing.advisory_status ?? null,
-  advisory_pathway: existing.advisory_pathway ?? null,
-  advisory_notes: existing.advisory_notes ?? null,
-  advisory_next_step: existing.advisory_next_step ?? null,
-  advisory_stage: existing.advisory_stage ?? null,
-  target_timeline: existing.target_timeline,
-  budget_range: existing.budget_range,
-  notes: existing.notes,
-});
+            pathway_type: existing.pathway_type,
+            family_structure: existing.family_structure,
+            treatment_goal: existing.treatment_goal,
+            donor_needed: existing.donor_needed,
+            surrogate_needed: existing.surrogate_needed,
+            priorities: existing.priorities ?? [],
+            constraints: existing.constraints ?? [],
+            primary_country: existing.primary_country ?? null,
+            shortlisted_countries: existing.shortlisted_countries ?? [],
+            timeline_items: existing.timeline_items ?? [],
+            advisory_status: existing.advisory_status ?? null,
+            advisory_pathway: existing.advisory_pathway ?? null,
+            advisory_notes: existing.advisory_notes ?? null,
+            advisory_next_step: existing.advisory_next_step ?? null,
+            advisory_stage: existing.advisory_stage ?? null,
+            target_timeline: existing.target_timeline,
+            budget_range: existing.budget_range,
+            notes: existing.notes,
+          });
         }
       } catch (error: unknown) {
         console.error(error);
@@ -132,7 +249,6 @@ export default function PortalAdvisoryPage() {
     };
   }, []);
 
-  // NEW: Load advisory stage and tasks when advisory is active
   useEffect(() => {
     async function loadAdvisoryData() {
       if (plan.advisory_status !== "In Advisory") return;
@@ -190,7 +306,6 @@ export default function PortalAdvisoryPage() {
     }
   }
 
-  // NEW: Handle stage change
   async function handleStageChange(newStage: AdvisoryStage) {
     try {
       await updateAdvisoryStage(newStage);
@@ -200,7 +315,6 @@ export default function PortalAdvisoryPage() {
     }
   }
 
-  // NEW: Add default tasks for current stage
   async function handleAddDefaultTasks() {
     if (!advisoryStage) return;
 
@@ -222,7 +336,6 @@ export default function PortalAdvisoryPage() {
     }
   }
 
-  // NEW: Create custom task
   async function handleCreateTask(e: React.FormEvent) {
     e.preventDefault();
     if (!advisoryStage || !newTaskTitle.trim()) return;
@@ -244,7 +357,6 @@ export default function PortalAdvisoryPage() {
     }
   }
 
-  // NEW: Toggle task status
   async function handleToggleTask(taskId: string, currentStatus: string) {
     const newStatus = currentStatus === "done" ? "pending" : "done";
     try {
@@ -255,7 +367,6 @@ export default function PortalAdvisoryPage() {
     }
   }
 
-  // NEW: Delete task
   async function handleDeleteTask(taskId: string) {
     try {
       await deleteAdvisoryTask(taskId);
@@ -354,95 +465,108 @@ export default function PortalAdvisoryPage() {
     [currentPathway, currentStatus, plan.advisory_notes, executionStage.stage]
   );
 
-  // Filter tasks for current stage
   const currentStageTasks = useMemo(() => 
     tasks.filter(t => t.stage === advisoryStage),
     [tasks, advisoryStage]
   );
 
-  // Calculate task progress
   const taskProgress = useMemo(() => {
     const total = currentStageTasks.length;
     const done = currentStageTasks.filter(t => t.status === "done").length;
     return { total, done, percentage: total > 0 ? Math.round((done / total) * 100) : 0 };
   }, [currentStageTasks]);
 
+  const stageConfig = STAGE_CONFIG[executionStage.stage] || STAGE_CONFIG.foundation;
+  const StageIcon = stageConfig.icon;
+
   if (loading) {
     return <DashboardSkeleton />;
   }
 
-  const priorityStyles = {
-    high: "bg-[#c4a7a7] text-[#5c3a3a]",
-    medium: "bg-[#d4c4a8] text-[#5c4a3a]",
-    low: "bg-stone-200 text-stone-700",
+  // FIXED: Added 'critical' to priorityStyles to handle all PriorityLevel types
+  const priorityStyles: Record<string, string> = {
+    critical: "bg-rose-100 text-rose-700 border-rose-200",
+    high: "bg-rose-100 text-rose-700 border-rose-200",
+    medium: "bg-amber-100 text-amber-700 border-amber-200",
+    low: "bg-stone-100 text-stone-600 border-stone-200",
   };
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       {/* TIER 1: Executive Header */}
-      <div className="rounded-2xl border border-stone-300 bg-stone-100 p-8 shadow-sm">
+      <div className="rounded-2xl border border-stone-200 bg-white p-8 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-sm font-medium uppercase tracking-[0.2em] text-stone-500">
-              Advisory
-            </p>
-            <h1 className="mt-3 text-4xl font-semibold tracking-tight text-stone-900">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-[10px] font-bold tracking-[0.2em] text-stone-400 uppercase">Advisory</span>
+              <span className="w-8 h-px bg-stone-300"></span>
+            </div>
+            <h1 className="text-3xl font-semibold tracking-tight text-stone-900">
               Advisory Workspace
             </h1>
-            <p className="mt-4 max-w-3xl text-base leading-7 text-stone-600">
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-stone-500">
               Manage your advisory pathway, review support formats, and move from
               planning into structured decision support.
             </p>
           </div>
           <Link
             href="/portal"
-            className="inline-flex shrink-0 rounded-xl border border-stone-400 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-200"
+            className="group inline-flex items-center gap-2 rounded-full border border-stone-300 px-4 py-2 text-sm font-medium text-stone-600 transition hover:border-stone-400 hover:text-stone-900 hover:bg-stone-50"
           >
-            ← Back to Dashboard
+            <ArrowRight className="w-4 h-4 rotate-180 group-hover:-translate-x-0.5 transition-transform" />
+            Back to Dashboard
           </Link>
         </div>
       </div>
 
       {/* NEW: Advisory Active Mode - Stage Header */}
       {plan.advisory_status === "In Advisory" && (
-        <section className="rounded-2xl border-2 border-[#3a3a3a] bg-stone-100 p-8 shadow-md">
+        <section className="rounded-2xl border border-stone-800 bg-gradient-to-br from-stone-900 to-stone-800 p-8 shadow-lg text-white">
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div>
-                <p className="text-sm font-medium uppercase tracking-wider text-stone-500">
-                  Active Advisory Engagement
-                </p>
-                <h2 className="mt-2 text-3xl font-semibold text-stone-900">
-                  {advisoryStage ? ADVISORY_STAGES.find(s => s.key === advisoryStage)?.label : "Select Your Stage"}
-                </h2>
-                <p className="mt-2 text-base text-stone-600">
-                  {advisoryStage ? ADVISORY_STAGES.find(s => s.key === advisoryStage)?.description : "Choose your current advisory stage to see relevant tasks"}
-                </p>
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center">
+                  <Zap className="w-6 h-6 text-amber-400" />
+                </div>
+                <div>
+                  <p className="text-xs font-medium tracking-wider text-stone-400 uppercase">
+                    Active Advisory Engagement
+                  </p>
+                  <h2 className="mt-1 text-2xl font-semibold text-white">
+                    {advisoryStage ? ADVISORY_STAGES.find(s => s.key === advisoryStage)?.label : "Select Your Stage"}
+                  </h2>
+                  <p className="mt-1 text-sm text-stone-400 max-w-lg">
+                    {advisoryStage ? ADVISORY_STAGES.find(s => s.key === advisoryStage)?.description : "Choose your current advisory stage to see relevant tasks"}
+                  </p>
+                </div>
               </div>
 
-              <div className="flex flex-col gap-3">
-                <select
-                  value={advisoryStage ?? ""}
-                  onChange={(e) => handleStageChange(e.target.value as AdvisoryStage)}
-                  className="rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm font-medium text-stone-900 focus:border-stone-500 focus:outline-none min-w-[200px]"
-                >
-                  <option value="">Select stage...</option>
-                  {ADVISORY_STAGES.map((stage) => (
-                    <option key={stage.key} value={stage.key}>
-                      {stage.label}
-                    </option>
-                  ))}
-                </select>
+              <div className="flex flex-col gap-3 min-w-[220px]">
+                <div className="relative">
+                  <select
+                    value={advisoryStage ?? ""}
+                    onChange={(e) => handleStageChange(e.target.value as AdvisoryStage)}
+                    className="w-full appearance-none rounded-xl bg-white/10 border border-white/20 px-4 py-3 text-sm font-medium text-white focus:outline-none focus:border-white/40 cursor-pointer"
+                  >
+                    <option value="" className="bg-stone-800 text-stone-300">Select stage...</option>
+                    {ADVISORY_STAGES.map((stage) => (
+                      <option key={stage.key} value={stage.key} className="bg-stone-800 text-white">
+                        {stage.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 rotate-90 pointer-events-none" />
+                </div>
 
                 {taskProgress.total > 0 && (
-                  <div className="flex items-center gap-2 text-sm text-stone-600">
-                    <div className="h-2 w-24 rounded-full bg-stone-200">
+                  <div className="flex items-center gap-3 px-1">
+                    <div className="flex-1 h-1.5 rounded-full bg-white/10 overflow-hidden">
                       <div 
-                        className="h-2 rounded-full bg-[#6a7a6a]"
+                        className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-500"
                         style={{ width: `${taskProgress.percentage}%` }}
                       />
                     </div>
-                    <span>{taskProgress.done}/{taskProgress.total} tasks</span>
+                    <span className="text-xs text-stone-400 tabular-nums">{taskProgress.done}/{taskProgress.total}</span>
                   </div>
                 )}
               </div>
@@ -453,74 +577,84 @@ export default function PortalAdvisoryPage() {
 
       {/* NEW: Advisory Tasks Section */}
       {plan.advisory_status === "In Advisory" && advisoryStage && (
-        <section className="rounded-2xl border border-stone-300 bg-white p-8 shadow-sm">
+        <section className="rounded-2xl border border-stone-200 bg-white p-8 shadow-sm">
           <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-xl font-semibold text-stone-900">
-                Stage Tasks
-              </h2>
-              <p className="mt-1 text-sm text-stone-600">
-                Complete these tasks to progress through {ADVISORY_STAGES.find(s => s.key === advisoryStage)?.label}
-              </p>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-stone-100 flex items-center justify-center">
+                <CheckCircle2 className="w-5 h-5 text-stone-600" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-stone-900">
+                  Stage Tasks
+                </h2>
+                <p className="text-sm text-stone-500">
+                  Complete these tasks to progress through {ADVISORY_STAGES.find(s => s.key === advisoryStage)?.label}
+                </p>
+              </div>
             </div>
-            <div className="flex gap-2">
-              <button
-                onClick={handleAddDefaultTasks}
-                className="rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
-              >
-                Add Defaults
-              </button>
-            </div>
+            <button
+              onClick={handleAddDefaultTasks}
+              className="inline-flex items-center gap-2 rounded-full border border-stone-300 px-4 py-2 text-sm font-medium text-stone-600 hover:border-stone-400 hover:bg-stone-50 transition"
+            >
+              <Plus className="w-4 h-4" />
+              Add Defaults
+            </button>
           </div>
 
-          {/* Task List */}
           <div className="space-y-3 mb-6">
             {loadingTasks ? (
-              <p className="text-stone-500 text-sm">Loading tasks...</p>
+              <div className="flex items-center justify-center py-8 text-stone-500">
+                <div className="w-5 h-5 border-2 border-stone-300 border-t-stone-600 rounded-full animate-spin mr-2"></div>
+                Loading tasks...
+              </div>
             ) : currentStageTasks.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-stone-300 bg-stone-50 p-6 text-center">
-                <p className="text-stone-600">No tasks for this stage yet.</p>
-                <p className="text-stone-500 text-sm mt-1">Add default tasks or create custom ones below.</p>
+              <div className="rounded-xl border border-dashed border-stone-300 bg-stone-50 p-8 text-center">
+                <Target className="w-8 h-8 text-stone-300 mx-auto mb-3" />
+                <p className="text-stone-600 font-medium">No tasks for this stage yet.</p>
+                <p className="text-stone-400 text-sm mt-1">Add default tasks or create custom ones below.</p>
               </div>
             ) : (
               currentStageTasks.map((task) => (
                 <div
                   key={task.id}
-                  className={`rounded-xl border p-4 flex items-start gap-4 transition-all ${
+                  className={`group rounded-xl border p-4 flex items-start gap-4 transition-all hover:shadow-sm ${
                     task.status === "done"
-                      ? "border-[#8a9a8a] bg-[#f6f8f6]"
-                      : "border-stone-200 bg-white"
+                      ? "border-emerald-200 bg-emerald-50/50"
+                      : "border-stone-200 bg-white hover:border-stone-300"
                   }`}
                 >
-                  <input
-                    type="checkbox"
-                    checked={task.status === "done"}
-                    onChange={() => handleToggleTask(task.id, task.status)}
-                    className="h-5 w-5 rounded border-stone-300 text-[#6a7a6a] focus:ring-[#6a7a6a] mt-0.5"
-                  />
+                  <button
+                    onClick={() => handleToggleTask(task.id, task.status)}
+                    className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                      task.status === "done"
+                        ? "bg-emerald-500 border-emerald-500 text-white"
+                        : "border-stone-300 hover:border-stone-400 text-transparent"
+                    }`}
+                  >
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                  </button>
                   <div className="flex-1 min-w-0">
-                    <p className={`font-medium ${task.status === "done" ? "line-through text-stone-500" : "text-stone-900"}`}>
+                    <p className={`font-medium text-sm ${task.status === "done" ? "line-through text-stone-400" : "text-stone-900"}`}>
                       {task.title}
                     </p>
                     {task.description && (
-                      <p className={`text-sm mt-1 ${task.status === "done" ? "text-stone-400" : "text-stone-600"}`}>
+                      <p className={`text-sm mt-1 ${task.status === "done" ? "text-stone-300" : "text-stone-500"}`}>
                         {task.description}
                       </p>
                     )}
                   </div>
                   <button
                     onClick={() => handleDeleteTask(task.id)}
-                    className="text-sm text-[#5c3a3a] hover:text-[#3a2a2a] shrink-0"
+                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-stone-400 hover:text-rose-500 hover:bg-rose-50 transition-all"
                   >
-                    Delete
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               ))
             )}
           </div>
 
-          {/* Add Custom Task Form */}
-          <form onSubmit={handleCreateTask} className="pt-6 border-t border-stone-200">
+          <form onSubmit={handleCreateTask} className="pt-6 border-t border-stone-100">
             <h3 className="text-sm font-medium text-stone-700 mb-3">Add Custom Task</h3>
             <div className="grid gap-3 lg:grid-cols-2">
               <input
@@ -528,21 +662,22 @@ export default function PortalAdvisoryPage() {
                 value={newTaskTitle}
                 onChange={(e) => setNewTaskTitle(e.target.value)}
                 placeholder="Task title..."
-                className="rounded-xl border border-stone-300 px-4 py-2 text-sm text-stone-900 focus:border-stone-500 focus:outline-none"
+                className="rounded-xl border border-stone-200 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-stone-400 focus:ring-4 focus:ring-stone-100 transition-all"
               />
               <input
                 type="text"
                 value={newTaskDescription}
                 onChange={(e) => setNewTaskDescription(e.target.value)}
                 placeholder="Description (optional)..."
-                className="rounded-xl border border-stone-300 px-4 py-2 text-sm text-stone-900 focus:border-stone-500 focus:outline-none"
+                className="rounded-xl border border-stone-200 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-stone-400 focus:ring-4 focus:ring-stone-100 transition-all"
               />
             </div>
             <button
               type="submit"
               disabled={!newTaskTitle.trim()}
-              className="mt-3 rounded-xl bg-[#3a3a3a] px-4 py-2 text-sm font-medium text-white hover:bg-[#2a2a2a] disabled:opacity-50"
+              className="mt-3 inline-flex items-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-stone-800 disabled:opacity-40 transition-all"
             >
+              <Plus className="w-4 h-4" />
               Add Task
             </button>
           </form>
@@ -550,52 +685,46 @@ export default function PortalAdvisoryPage() {
       )}
 
       {/* TIER 1: Advisory Readiness */}
-      <section className="rounded-2xl border border-stone-300 bg-stone-100 p-8 shadow-sm">
+      <section className="rounded-2xl border border-stone-200 bg-white p-8 shadow-sm">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-sm font-medium uppercase tracking-wider text-stone-500">
-              Advisory Readiness
-            </p>
-            <p className="mt-1 text-sm text-stone-600">
+            <div className="flex items-center gap-2 mb-2">
+              <Award className="w-4 h-4 text-stone-400" />
+              <p className="text-xs font-bold tracking-[0.15em] text-stone-400 uppercase">
+                Advisory Readiness
+              </p>
+            </div>
+            <p className="text-sm text-stone-500">
               Measures planning maturity for meaningful advisory engagement
             </p>
           </div>
           <div className="flex items-center gap-6">
             <div className="text-right">
-              <p className="text-4xl font-semibold text-stone-900">
+              <p className="text-4xl font-semibold text-stone-900 tabular-nums">
                 {advisoryReadiness.percentage}%
               </p>
-              <p className="text-sm capitalize text-stone-500">
+              <p className="text-sm font-medium text-stone-400 capitalize">
                 {advisoryReadiness.stage} stage
               </p>
             </div>
-            <div className="flex h-20 w-20 items-center justify-center rounded-full border-4 border-stone-200">
-              <div
-                className={`flex h-14 w-14 items-center justify-center rounded-full text-sm font-semibold ${
-                  advisoryReadiness.stage === "optimal"
-                    ? "bg-[#8a9a8a] text-white"
-                    : advisoryReadiness.stage === "ready"
-                    ? "bg-[#6a7a6a] text-white"
-                    : advisoryReadiness.stage === "developing"
-                    ? "bg-[#d4c4a8] text-[#5c4a3a]"
-                    : "bg-stone-300 text-stone-600"
-                }`}
-              >
-                {advisoryReadiness.score}/{advisoryReadiness.maxScore}
-              </div>
-            </div>
+            <ProgressRing 
+              percentage={advisoryReadiness.percentage}
+              score={advisoryReadiness.score}
+              maxScore={advisoryReadiness.maxScore}
+              stage={advisoryReadiness.stage}
+            />
           </div>
         </div>
 
-        <div className="mt-6 h-2.5 w-full rounded-full bg-stone-200">
+        <div className="mt-6 h-2 w-full rounded-full bg-stone-100 overflow-hidden">
           <div
-            className={`h-2.5 rounded-full transition-all ${
+            className={`h-full rounded-full transition-all duration-1000 ${
               advisoryReadiness.stage === "optimal"
-                ? "bg-[#8a9a8a]"
+                ? "bg-gradient-to-r from-emerald-500 to-emerald-400"
                 : advisoryReadiness.stage === "ready"
-                ? "bg-[#6a7a6a]"
+                ? "bg-gradient-to-r from-[#6a7a6a] to-[#8a9a8a]"
                 : advisoryReadiness.stage === "developing"
-                ? "bg-[#d4c4a8]"
+                ? "bg-gradient-to-r from-amber-400 to-amber-300"
                 : "bg-stone-400"
             }`}
             style={{ width: `${advisoryReadiness.percentage}%` }}
@@ -606,34 +735,42 @@ export default function PortalAdvisoryPage() {
       {/* TIER 1: Advisory Signals */}
       {advisorySignals.length > 0 && (
         <section className="space-y-4">
-          <h2 className="text-lg font-semibold text-stone-900">
-            Advisory Signals
-          </h2>
+          <div className="flex items-center gap-2 px-1">
+            <Sparkles className="w-4 h-4 text-stone-400" />
+            <h2 className="text-sm font-bold tracking-[0.15em] text-stone-400 uppercase">
+              Advisory Signals
+            </h2>
+          </div>
 
           {blockingSignals.length > 0 && (
             <div className="space-y-3">
               {blockingSignals.map((signal, idx) => (
                 <div
                   key={`blocking-${idx}`}
-                  className="rounded-xl border border-[#c4a7a7] bg-[#faf6f6] p-5"
+                  className="rounded-xl border-l-4 border-rose-400 bg-rose-50/50 p-5"
                 >
                   <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                    <div>
-                      <p className="font-medium text-[#5c3a3a]">
-                        {signal.message}
-                      </p>
-                      {signal.action && (
-                        <p className="mt-1 text-sm text-[#7a5a5a]">
-                          {signal.action}
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center shrink-0">
+                        <Flag className="w-4 h-4 text-rose-600" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-rose-900 text-sm">
+                          {signal.message}
                         </p>
-                      )}
+                        {signal.action && (
+                          <p className="mt-0.5 text-sm text-rose-700/70">
+                            {signal.action}
+                          </p>
+                        )}
+                      </div>
                     </div>
                     {signal.link && (
                       <Link
                         href={signal.link}
-                        className="text-sm font-medium text-[#5c3a3a] underline hover:text-[#3a2a2a]"
+                        className="inline-flex items-center gap-1 text-sm font-medium text-rose-700 hover:text-rose-900 transition"
                       >
-                        Go to module →
+                        Go to module <ArrowRight className="w-3.5 h-3.5" />
                       </Link>
                     )}
                   </div>
@@ -647,25 +784,30 @@ export default function PortalAdvisoryPage() {
               {attentionSignals.map((signal, idx) => (
                 <div
                   key={`attention-${idx}`}
-                  className="rounded-xl border border-[#d4c4a8] bg-[#faf8f3] p-5"
+                  className="rounded-xl border-l-4 border-amber-400 bg-amber-50/50 p-5"
                 >
                   <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                    <div>
-                      <p className="font-medium text-[#5c4a3a]">
-                        {signal.message}
-                      </p>
-                      {signal.action && (
-                        <p className="mt-1 text-sm text-[#7a6a5a]">
-                          {signal.action}
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
+                        <Sparkles className="w-4 h-4 text-amber-600" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-amber-900 text-sm">
+                          {signal.message}
                         </p>
-                      )}
+                        {signal.action && (
+                          <p className="mt-0.5 text-sm text-amber-700/70">
+                            {signal.action}
+                          </p>
+                        )}
+                      </div>
                     </div>
                     {signal.link && (
                       <Link
                         href={signal.link}
-                        className="text-sm font-medium text-[#5c4a3a] underline hover:text-[#3a2a2a]"
+                        className="inline-flex items-center gap-1 text-sm font-medium text-amber-700 hover:text-amber-900 transition"
                       >
-                        Go to module →
+                        Go to module <ArrowRight className="w-3.5 h-3.5" />
                       </Link>
                     )}
                   </div>
@@ -679,9 +821,14 @@ export default function PortalAdvisoryPage() {
               {readySignals.map((signal, idx) => (
                 <div
                   key={`ready-${idx}`}
-                  className="rounded-xl border border-[#8a9a8a] bg-[#f6f8f6] p-5"
+                  className="rounded-xl border-l-4 border-emerald-400 bg-emerald-50/50 p-5"
                 >
-                  <p className="font-medium text-[#4a5a4a]">{signal.message}</p>
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    </div>
+                    <p className="font-semibold text-emerald-900 text-sm pt-1.5">{signal.message}</p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -690,105 +837,132 @@ export default function PortalAdvisoryPage() {
       )}
 
       {/* TIER 2: Execution Stage */}
-      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+      <section className={`rounded-2xl border ${stageConfig.borderColor} ${stageConfig.bgColor} p-6`}>
         <div className="flex items-start gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-stone-100">
-            <StageBadge stage={executionStage.stage} />
+          <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm ${stageConfig.borderColor} border`}>
+            <StageIcon className={`w-7 h-7 ${stageConfig.color}`} />
           </div>
-          <div className="flex-1">
-            <h2 className="text-lg font-semibold text-stone-900">
-              <span className="capitalize">
-                {executionStage.stage.replace("-", " ")}
-              </span>
+          <div className="flex-1 pt-1">
+            <StageBadge stage={executionStage.stage} />
+            <h2 className="mt-2 text-xl font-semibold text-stone-900 capitalize">
+              {executionStage.stage.replace("-", " ")}
             </h2>
-            <p className="mt-1 text-sm text-stone-600">
+            <p className="mt-1 text-sm text-stone-600 leading-relaxed">
               {executionStage.description}
             </p>
 
             <div className="mt-4">
-              <p className="text-sm font-medium text-stone-700">
-                Recommended Actions:
+              <p className="text-xs font-bold tracking-wide text-stone-400 uppercase mb-2">
+                Recommended Actions
               </p>
-              <ul className="mt-2 space-y-1">
+              <div className="flex flex-wrap gap-2">
                 {executionStage.nextActions.map((action, idx) => (
-                  <li
+                  <span
                     key={idx}
-                    className="flex items-start gap-2 text-sm text-stone-600"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-stone-200 text-sm text-stone-700 shadow-sm"
                   >
-                    <span className="text-stone-400">•</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-stone-400"></span>
                     {action}
-                  </li>
+                  </span>
                 ))}
-              </ul>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* TIER 2: Recommended Focus */}
-      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-        <p className="text-sm font-medium text-stone-500">
-          Recommended Advisory Focus
-        </p>
-        <p className="mt-2 text-lg font-semibold text-stone-900">
-          {recommendedFocus}
-        </p>
-        <p className="mt-2 text-sm text-stone-600">
-          Generated from your current planning, shortlist, and timeline state.
-        </p>
-      </section>
+      {/* TIER 2: Recommended Focus & Smart Next Step */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center gap-2 mb-3">
+            <Compass className="w-4 h-4 text-stone-400" />
+            <p className="text-xs font-bold tracking-[0.15em] text-stone-400 uppercase">
+              Recommended Focus
+            </p>
+          </div>
+          <p className="text-lg font-semibold text-stone-900 leading-snug">
+            {recommendedFocus}
+          </p>
+          <p className="mt-2 text-sm text-stone-500">
+            Generated from your current planning, shortlist, and timeline state.
+          </p>
+        </section>
+
+        <section className="rounded-2xl border border-stone-800 bg-gradient-to-br from-stone-900 to-stone-800 p-6 text-white shadow-lg">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4 text-amber-400" />
+              <p className="text-xs font-bold tracking-[0.15em] text-stone-400 uppercase">
+                Smart Next Step
+              </p>
+            </div>
+            {/* FIXED: Using Record<string, string> type with fallback */}
+            <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${
+              priorityStyles[smartNextStep.priority] || priorityStyles.medium
+            }`}>
+              {smartNextStep.priority}
+            </span>
+          </div>
+          <p className="text-lg font-semibold leading-snug">
+            {smartNextStep.step}
+          </p>
+          <p className="mt-2 text-sm text-stone-400">
+            {smartNextStep.context}
+          </p>
+        </section>
+      </div>
 
       {/* TIER 1: Advisory Pathways */}
       <section className="space-y-6">
-        <div className="border-b border-stone-200 pb-4">
-          <h2 className="text-2xl font-semibold text-stone-900">
+        <div className="flex items-center gap-2 px-1">
+          <MapPin className="w-4 h-4 text-stone-400" />
+          <h2 className="text-sm font-bold tracking-[0.15em] text-stone-400 uppercase">
             Advisory Pathways
           </h2>
-          <p className="mt-2 text-base text-stone-600">
-            Choose your advisory model based on your current planning state.
-          </p>
+          <span className="flex-1 h-px bg-stone-200 ml-2"></span>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-6 lg:grid-cols-2">
           {advisoryItems.slice(0, 2).map((item) => (
             <article
               key={item.title}
-              className={`rounded-2xl border p-8 shadow-sm transition-all ${
+              className={`group rounded-2xl border p-6 transition-all duration-300 hover:shadow-md ${
                 item.recommended
-                  ? "border-[#3a3a3a] bg-stone-100 ring-1 ring-[#3a3a3a]"
+                  ? "border-amber-300 bg-gradient-to-br from-amber-50/50 to-white shadow-sm"
                   : item.status === "Selected"
-                  ? "border-[#6a7a6a] bg-[#f6f8f6]"
-                  : "border-stone-200 bg-white"
+                  ? "border-emerald-300 bg-emerald-50/30"
+                  : "border-stone-200 bg-white hover:border-stone-300"
               }`}
             >
               <div className="flex flex-col h-full">
                 <div className="flex items-start justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-stone-900">
+                  <h3 className="text-lg font-semibold text-stone-900">
                     {item.title}
                   </h3>
                   <div className="flex flex-col items-end gap-2">
-                    <span className={`rounded-full px-3 py-1 text-xs font-medium ${
+                    <span className={`rounded-full px-3 py-1 text-xs font-medium border ${
                       item.status === "Selected"
-                        ? "bg-[#6a7a6a] text-white"
-                        : "border border-stone-300 text-stone-600"
+                        ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+                        : "bg-stone-100 text-stone-600 border-stone-200"
                     }`}>
                       {item.status}
                     </span>
                     {item.recommended && (
-                      <span className="rounded-full bg-[#3a3a3a] px-3 py-1 text-xs font-medium text-white">
+                      <span className="rounded-full bg-amber-400 text-amber-950 px-3 py-1 text-xs font-bold shadow-sm">
                         Best Fit
                       </span>
                     )}
                   </div>
                 </div>
 
-                <p className="text-sm leading-6 text-stone-600 flex-1">
+                <p className="text-sm leading-relaxed text-stone-600 flex-1">
                   {item.description}
                 </p>
 
                 {item.recommended && (
-                  <div className="mt-6 pt-4 border-t border-stone-300">
-                    <p className="text-sm text-stone-500">
+                  <div className="mt-4 pt-4 border-t border-amber-200/50">
+                    <p className="text-xs text-amber-700/80 font-medium flex items-center gap-1">
+                      <Sparkles className="w-3 h-3" />
                       Recommended for your current stage
                     </p>
                   </div>
@@ -799,48 +973,22 @@ export default function PortalAdvisoryPage() {
         </div>
       </section>
 
-      {/* TIER 2: Smart Next Step */}
-      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-sm font-medium text-stone-500">
-              Smart Next Step
-            </p>
-            <p className="mt-1 text-lg font-semibold text-stone-900">
-              {smartNextStep.step}
-            </p>
-            <p className="mt-1 text-sm text-stone-600">
-              {smartNextStep.context}
-            </p>
-          </div>
-          <span
-            className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
-              smartNextStep.priority === "high"
-                ? priorityStyles.high
-                : smartNextStep.priority === "medium"
-                ? priorityStyles.medium
-                : priorityStyles.low
-            }`}
-          >
-            {smartNextStep.priority} priority
-          </span>
-        </div>
-      </section>
-
       {/* TIER 2: Advisory Settings */}
-      <section className="rounded-2xl border border-stone-300 bg-stone-100 p-8 shadow-sm">
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-stone-900">
-            Advisory Settings
-          </h2>
-          <p className="mt-1 text-sm text-stone-600">
+      <section className="rounded-2xl border border-stone-200 bg-white p-8 shadow-sm">
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-2">
+            <FileText className="w-4 h-4 text-stone-400" />
+            <h2 className="text-sm font-bold tracking-[0.15em] text-stone-400 uppercase">
+              Advisory Settings
+            </h2>
+          </div>
+          <p className="text-sm text-stone-500">
             Manage your advisory stage, preferred pathway, notes, and next action.
           </p>
         </div>
 
-        {/* Group 1: Advisory Position */}
-        <div className="mb-8">
-          <h3 className="text-sm font-medium uppercase tracking-wider text-stone-500 mb-4">
+        <div className="mb-6">
+          <h3 className="text-xs font-bold tracking-wide text-stone-400 uppercase mb-4">
             Advisory Position
           </h3>
           <div className="grid gap-4 lg:grid-cols-2">
@@ -848,45 +996,50 @@ export default function PortalAdvisoryPage() {
               <label className="mb-2 block text-sm font-medium text-stone-700">
                 Advisory Status
               </label>
-              <select
-                className="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 focus:border-stone-500 focus:outline-none"
-                value={plan.advisory_status ?? "Not Started"}
-                onChange={(e) =>
-                  updatePlanField("advisory_status", e.target.value)
-                }
-              >
-                {ADVISORY_STATUS_OPTIONS.map((status) => (
-                  <option key={status} value={status}>
-                    {status}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <select
+                  className="w-full appearance-none rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-900 focus:outline-none focus:border-stone-400 focus:bg-white transition-all cursor-pointer"
+                  value={plan.advisory_status ?? "Not Started"}
+                  onChange={(e) =>
+                    updatePlanField("advisory_status", e.target.value)
+                  }
+                >
+                  {ADVISORY_STATUS_OPTIONS.map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </select>
+                <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 rotate-90 pointer-events-none" />
+              </div>
             </div>
 
             <div>
               <label className="mb-2 block text-sm font-medium text-stone-700">
                 Preferred Advisory Pathway
               </label>
-              <select
-                className="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 focus:border-stone-500 focus:outline-none"
-                value={plan.advisory_pathway ?? "Undecided"}
-                onChange={(e) =>
-                  updatePlanField("advisory_pathway", e.target.value)
-                }
-              >
-                {ADVISORY_PATHWAY_OPTIONS.map((pathway) => (
-                  <option key={pathway} value={pathway}>
-                    {pathway}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <select
+                  className="w-full appearance-none rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-900 focus:outline-none focus:border-stone-400 focus:bg-white transition-all cursor-pointer"
+                  value={plan.advisory_pathway ?? "Undecided"}
+                  onChange={(e) =>
+                    updatePlanField("advisory_pathway", e.target.value)
+                  }
+                >
+                  {ADVISORY_PATHWAY_OPTIONS.map((pathway) => (
+                    <option key={pathway} value={pathway}>
+                      {pathway}
+                    </option>
+                  ))}
+                </select>
+                <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 rotate-90 pointer-events-none" />
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Group 2: Notes & Next Action */}
-        <div className="mb-8">
-          <h3 className="text-sm font-medium uppercase tracking-wider text-stone-500 mb-4">
+        <div className="mb-6">
+          <h3 className="text-xs font-bold tracking-wide text-stone-400 uppercase mb-4">
             Notes & Next Action
           </h3>
           <div className="space-y-4">
@@ -895,7 +1048,7 @@ export default function PortalAdvisoryPage() {
                 Advisory Notes
               </label>
               <textarea
-                className="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 focus:border-stone-500 focus:outline-none"
+                className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-stone-400 focus:bg-white transition-all resize-none"
                 rows={4}
                 value={plan.advisory_notes ?? ""}
                 onChange={(e) =>
@@ -910,7 +1063,8 @@ export default function PortalAdvisoryPage() {
                 Next Advisory Step
               </label>
               <input
-                className="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 focus:border-stone-500 focus:outline-none"
+                type="text"
+                className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-stone-400 focus:bg-white transition-all"
                 value={plan.advisory_next_step ?? ""}
                 onChange={(e) =>
                   updatePlanField("advisory_next_step", e.target.value)
@@ -921,30 +1075,38 @@ export default function PortalAdvisoryPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 pt-4 border-t border-stone-200">
+        <div className="flex items-center justify-between pt-6 border-t border-stone-100">
           <button
             type="button"
             onClick={handleSave}
             disabled={saving || !hasUnsavedChanges}
-            className="rounded-xl bg-[#3a3a3a] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#2a2a2a] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-xl bg-stone-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-60 shadow-lg shadow-stone-900/10"
           >
-            {saving
-              ? "Saving..."
-              : hasUnsavedChanges
-              ? "Save Advisory Settings"
-              : "Saved"}
+            {saving ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                Saving...
+              </>
+            ) : hasUnsavedChanges ? (
+              "Save Changes"
+            ) : (
+              <>
+                <CheckCircle2 className="w-4 h-4" />
+                Saved
+              </>
+            )}
           </button>
 
           {message ? (
             <p
-              className={`text-sm ${
-                isError ? "text-[#5c3a3a]" : "text-[#4a5a4a]"
+              className={`text-sm font-medium ${
+                isError ? "text-rose-600" : "text-emerald-600"
               }`}
             >
               {message}
             </p>
           ) : (
-            <p className="text-sm text-stone-500">
+            <p className="text-sm text-stone-400">
               {hasUnsavedChanges ? "Unsaved changes" : "All changes saved"}
             </p>
           )}
@@ -952,107 +1114,74 @@ export default function PortalAdvisoryPage() {
       </section>
 
       {/* TIER 3: Cross-Module Context */}
-      <section className="grid gap-6 lg:grid-cols-4">
-        <div className="rounded-2xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">
-            Shortlisted Countries
-          </p>
-          <p className="mt-2 text-base font-semibold text-stone-900">
-            {shortlistedCountries.length > 0
-              ? shortlistedCountries.join(", ")
-              : "No shortlist yet"}
-          </p>
-          <p className="mt-2 text-sm leading-6 text-stone-600">
-            {shortlistedCountries.length === 0 ? (
-              <Link href="/portal/countries" className="text-stone-900 underline">
-                Build shortlist →
+      <section className="grid gap-4 lg:grid-cols-4">
+        {[
+          { 
+            label: "Shortlisted Countries", 
+            value: shortlistedCountries.length > 0 ? shortlistedCountries.join(", ") : "No shortlist yet",
+            icon: MapPin,
+            action: shortlistedCountries.length === 0 ? { text: "Build shortlist", href: "/portal/countries" } : null
+          },
+          { 
+            label: "Timeline Completed", 
+            value: timelineCounts.completed.toString(),
+            icon: CheckCircle2,
+            subtext: "Completed milestones",
+            action: timelineCounts.completed === 0 && timelineCounts.total === 0 ? { text: "Generate timeline", href: "/portal/timeline" } : null
+          },
+          { 
+            label: "Timeline In Progress", 
+            value: timelineCounts.inProgress.toString(),
+            icon: TrendingUp,
+            subtext: "Active planning items"
+          },
+          { 
+            label: "Timeline Upcoming", 
+            value: timelineCounts.upcoming.toString(),
+            icon: Calendar,
+            subtext: "Remaining milestones"
+          },
+        ].map((item, idx) => (
+          <div key={idx} className="rounded-2xl border border-stone-200 bg-white p-5 hover:shadow-sm transition-all">
+            <div className="flex items-center gap-2 mb-3">
+              <item.icon className="w-4 h-4 text-stone-400" />
+              <span className="text-[10px] font-bold tracking-wide text-stone-400 uppercase">{item.label}</span>
+            </div>
+            <p className="text-lg font-semibold text-stone-900 mb-1">
+              {item.value}
+            </p>
+            {item.action ? (
+              <Link href={item.action.href} className="inline-flex items-center gap-1 text-xs text-stone-500 hover:text-stone-900 transition">
+                {item.action.text} <ArrowRight className="w-3 h-3" />
               </Link>
             ) : (
-              "Pulled from your saved country planning."
+              <p className="text-xs text-stone-400">{item.subtext}</p>
             )}
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">
-            Timeline Completed
-          </p>
-          <p className="mt-2 text-3xl font-semibold text-stone-900">
-            {timelineCounts.completed}
-          </p>
-          <p className="mt-2 text-sm leading-6 text-stone-600">
-            {timelineCounts.completed === 0 && timelineCounts.total === 0 ? (
-              <Link href="/portal/timeline" className="text-stone-900 underline">
-                Generate timeline →
-              </Link>
-            ) : (
-              "Completed milestones."
-            )}
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">
-            Timeline In Progress
-          </p>
-          <p className="mt-2 text-3xl font-semibold text-stone-900">
-            {timelineCounts.inProgress}
-          </p>
-          <p className="mt-2 text-sm leading-6 text-stone-600">
-            Active planning items.
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">Timeline Upcoming</p>
-          <p className="mt-2 text-3xl font-semibold text-stone-900">
-            {timelineCounts.upcoming}
-          </p>
-          <p className="mt-2 text-sm leading-6 text-stone-600">
-            Remaining milestones.
-          </p>
-        </div>
+          </div>
+        ))}
       </section>
 
       {/* TIER 3: Planning Context Snapshot */}
-      <section className="rounded-2xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-stone-900">
-          Planning Context Snapshot
-        </h2>
-        <p className="mt-1 text-sm text-stone-600">
-          This advisory workspace is informed by your portal planning data.
-        </p>
+      <section className="rounded-2xl border border-stone-200 bg-stone-50 p-6">
+        <div className="flex items-center gap-2 mb-6">
+          <FileText className="w-4 h-4 text-stone-400" />
+          <h2 className="text-sm font-bold tracking-[0.15em] text-stone-400 uppercase">
+            Planning Context Snapshot
+          </h2>
+        </div>
 
-        <div className="mt-6 grid gap-4 lg:grid-cols-4">
-          <div className="rounded-xl border border-stone-200 bg-white p-4">
-            <p className="text-sm font-medium text-stone-500">Pathway</p>
-            <p className="mt-2 text-base font-semibold text-stone-900">
-              {getDisplayValue(plan.pathway_type, "Not yet specified")}
-            </p>
-          </div>
-
-          <div className="rounded-xl border border-stone-200 bg-white p-4">
-            <p className="text-sm font-medium text-stone-500">
-              Target Timeline
-            </p>
-            <p className="mt-2 text-base font-semibold text-stone-900">
-              {getDisplayValue(plan.target_timeline, "Not yet defined")}
-            </p>
-          </div>
-
-          <div className="rounded-xl border border-stone-200 bg-white p-4">
-            <p className="text-sm font-medium text-stone-500">Budget Range</p>
-            <p className="mt-2 text-base font-semibold text-stone-900">
-              {getDisplayValue(plan.budget_range, "Not yet defined")}
-            </p>
-          </div>
-
-          <div className="rounded-xl border border-stone-200 bg-white p-4">
-            <p className="text-sm font-medium text-stone-500">Planning Notes</p>
-            <p className="mt-2 text-base font-semibold text-stone-900">
-              {getDisplayValue(plan.notes, "No planning notes saved yet")}
-            </p>
-          </div>
+        <div className="grid gap-4 lg:grid-cols-4">
+          {[
+            { label: "Pathway", value: getDisplayValue(plan.pathway_type, "Not yet specified") },
+            { label: "Target Timeline", value: getDisplayValue(plan.target_timeline, "Not yet defined") },
+            { label: "Budget Range", value: getDisplayValue(plan.budget_range, "Not yet defined") },
+            { label: "Planning Notes", value: getDisplayValue(plan.notes, "No notes saved yet") },
+          ].map((item, idx) => (
+            <div key={idx} className="rounded-xl border border-stone-200 bg-white p-4">
+              <p className="text-[10px] font-bold tracking-wide text-stone-400 uppercase mb-2">{item.label}</p>
+              <p className="text-sm font-medium text-stone-900 leading-relaxed">{item.value}</p>
+            </div>
+          ))}
         </div>
       </section>
     </div>
