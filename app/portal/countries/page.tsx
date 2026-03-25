@@ -666,6 +666,7 @@ export default function PortalCountriesPage() {
             advisory_notes: existing.advisory_notes ?? null,
             advisory_next_step: existing.advisory_next_step ?? null,
             advisory_stage: existing.advisory_stage ?? null,
+            primary_country: existing.primary_country ?? null,
           });
 
           setLastSavedAt(
