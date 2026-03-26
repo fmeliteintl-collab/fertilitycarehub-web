@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   getCurrentUserPlan,
   upsertCurrentUserPlan,
@@ -721,7 +721,6 @@ export default function PortalCountriesPage() {
   const [isError, setIsError] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
-  const isAutoSavingPrimary = useRef(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -786,34 +785,6 @@ export default function PortalCountriesPage() {
   // === Decision Engine ===
   const decisionEngine = useMemo(() => computeDecisionProfiles(plan), [plan]);
 
-  // === CHANGE 1: Auto-commit and auto-save lead jurisdiction ===
-  useEffect(() => {
-    if (isAutoSavingPrimary.current) return;
-    
-    const leadProfile = decisionEngine.allProfiles.find(p => p.role === "lead");
-    const newPrimary = leadProfile?.name || null;
-    
-    if (newPrimary && newPrimary !== plan.primary_country) {
-      isAutoSavingPrimary.current = true;
-      
-      const updatedPlan = {
-        ...plan,
-        primary_country: newPrimary
-      };
-      setPlan(updatedPlan);
-      
-      upsertCurrentUserPlan(updatedPlan).then(() => {
-        setLastSavedAt(new Date().toISOString());
-        setHasUnsavedChanges(false);
-        isAutoSavingPrimary.current = false;
-      }).catch((err: unknown) => {
-        console.error("Failed to auto-save primary country:", err);
-        setHasUnsavedChanges(true);
-        isAutoSavingPrimary.current = false;
-      });
-    }
-  }, [decisionEngine.allProfiles, plan]);
-
   const recommendedCountries = useMemo(() => getRecommendedCountries(plan), [plan]);
   const recommendedCountryNames = useMemo(
     () => new Set(recommendedCountries.map((country) => country.name)),
@@ -872,14 +843,20 @@ export default function PortalCountriesPage() {
     setHasUnsavedChanges(true);
   }
 
-  // === CHANGE 2: Save includes primary_country (already in plan object) ===
+  // === STEP 5: Save includes primary_country with proper null handling ===
   async function handleSaveShortlist() {
     try {
       setSaving(true);
       setMessage(null);
       setIsError(false);
 
-      await upsertCurrentUserPlan(plan);
+      // Ensure primary_country is explicitly included and normalized
+      const planToSave = {
+        ...plan,
+        primary_country: plan.primary_country || null,
+      };
+
+      await upsertCurrentUserPlan(planToSave);
 
       setMessage("Shortlist saved successfully.");
       setHasUnsavedChanges(false);
@@ -975,7 +952,7 @@ export default function PortalCountriesPage() {
           </div>
         </div>
 
-        {/* Lead Country - Premium Treatment */}
+        {/* === STEP 4: Lead Country - Premium Treatment with Primary Commit Button === */}
         {leadProfile && (
           <article className="rounded-2xl border-2 border-[#3a3a3a] bg-[#3a3a3a] p-6 text-white shadow-lg">
             <div className="flex items-start justify-between mb-4">
@@ -1029,9 +1006,47 @@ export default function PortalCountriesPage() {
             </div>
 
             <div className="mt-4 pt-4 border-t border-stone-700">
-              <p className="text-sm text-stone-300">
+              <p className="text-sm text-stone-300 mb-3">
                 <span className="font-bold">Recommended action:</span> {leadProfile.action}
               </p>
+              
+              {/* PRIMARY COMMIT BUTTON - STEP 4 FIX */}
+              {plan.primary_country === leadProfile.name ? (
+                <div className="flex items-center gap-2 text-[#6a7a6a]">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  <span className="font-semibold">Committed as Primary Jurisdiction</span>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const updatedPlan = {
+                      ...plan,
+                      primary_country: leadProfile.name,
+                    };
+                    setPlan(updatedPlan);
+                    setHasUnsavedChanges(true);
+                    
+                    // Auto-save immediately
+                    try {
+                      await upsertCurrentUserPlan(updatedPlan);
+                      setLastSavedAt(new Date().toISOString());
+                      setHasUnsavedChanges(false);
+                      setMessage("Primary jurisdiction committed successfully.");
+                      setIsError(false);
+                    } catch (err) {
+                      console.error(err);
+                      setMessage("Failed to commit primary jurisdiction.");
+                      setIsError(true);
+                    }
+                  }}
+                  className="inline-flex items-center gap-2 rounded-lg bg-[#6a7a6a] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#5a6a5a]"
+                >
+                  Commit as Primary Jurisdiction →
+                </button>
+              )}
             </div>
           </article>
         )}
