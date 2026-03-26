@@ -22,13 +22,13 @@ function normalizeTimelineItems(value: unknown): TimelineItem[] {
         status = item.status;
       }
 
-      // Handle new phase-based fields with defaults for backward compatibility
       const phase = (item.phase as TimelineItem["phase"]) || "planning";
       const priority = (item.priority as TimelineItem["priority"]) || "medium";
       const dependencies = Array.isArray(item.dependencies)
         ? item.dependencies.filter((d): d is string => typeof d === "string")
         : [];
-      const isLocked = typeof item.isLocked === "boolean" ? item.isLocked : false;
+      const isLocked =
+        typeof item.isLocked === "boolean" ? item.isLocked : false;
       const lockReason =
         typeof item.lockReason === "string" ? item.lockReason : undefined;
       const estimatedDuration =
@@ -42,9 +42,11 @@ function normalizeTimelineItems(value: unknown): TimelineItem[] {
             ? item.id
             : `timeline-${index + 1}`,
         title: typeof item.title === "string" ? item.title : "",
-        category: typeof item.category === "string" ? item.category : "Planning",
+        category:
+          typeof item.category === "string" ? item.category : "Planning",
         status,
-        description: typeof item.description === "string" ? item.description : "",
+        description:
+          typeof item.description === "string" ? item.description : "",
         phase,
         priority,
         dependencies,
@@ -64,6 +66,8 @@ function normalizeUserPlan(row: UserPlan): UserPlan {
     shortlisted_countries: Array.isArray(row.shortlisted_countries)
       ? row.shortlisted_countries
       : [],
+    primary_country:
+      typeof row.primary_country === "string" ? row.primary_country : null,
     timeline_items: normalizeTimelineItems(row.timeline_items),
     advisory_status:
       typeof row.advisory_status === "string" ? row.advisory_status : null,
@@ -72,7 +76,16 @@ function normalizeUserPlan(row: UserPlan): UserPlan {
     advisory_notes:
       typeof row.advisory_notes === "string" ? row.advisory_notes : null,
     advisory_next_step:
-      typeof row.advisory_next_step === "string" ? row.advisory_next_step : null,
+      typeof row.advisory_next_step === "string"
+        ? row.advisory_next_step
+        : null,
+    advisory_stage:
+      row.advisory_stage === "intake" ||
+      row.advisory_stage === "strategy" ||
+      row.advisory_stage === "decision" ||
+      row.advisory_stage === "execution"
+        ? row.advisory_stage
+        : null,
   };
 }
 
@@ -132,13 +145,12 @@ export async function getCurrentUserPlan(): Promise<UserPlan | null> {
 }
 
 export async function upsertCurrentUserPlan(
-  input: UserPlanInput
+  input: UserPlanInput,
 ): Promise<UserPlan> {
   const { supabase, user } = await getAuthenticatedUser();
 
   if (!user) {
     throw new Error("User is not authenticated.");
-    console.log("SAVE USER", { id: user.id, email: user.email });
   }
 
   const payload = {
@@ -151,11 +163,13 @@ export async function upsertCurrentUserPlan(
     priorities: input.priorities,
     constraints: input.constraints,
     shortlisted_countries: input.shortlisted_countries,
+    primary_country: input.primary_country,
     timeline_items: input.timeline_items,
     advisory_status: input.advisory_status,
     advisory_pathway: input.advisory_pathway,
     advisory_notes: input.advisory_notes,
     advisory_next_step: input.advisory_next_step,
+    advisory_stage: input.advisory_stage,
     target_timeline: input.target_timeline,
     budget_range: input.budget_range,
     notes: input.notes,
