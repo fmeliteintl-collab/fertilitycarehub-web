@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import {
   getCurrentUserPlan,
   upsertCurrentUserPlan,
@@ -721,6 +721,7 @@ export default function PortalCountriesPage() {
   const [isError, setIsError] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
+  const isAutoSavingPrimary = useRef(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -785,6 +786,34 @@ export default function PortalCountriesPage() {
   // === Decision Engine ===
   const decisionEngine = useMemo(() => computeDecisionProfiles(plan), [plan]);
 
+  // === CHANGE 1: Auto-commit and auto-save lead jurisdiction ===
+  useEffect(() => {
+    if (isAutoSavingPrimary.current) return;
+    
+    const leadProfile = decisionEngine.allProfiles.find(p => p.role === "lead");
+    const newPrimary = leadProfile?.name || null;
+    
+    if (newPrimary && newPrimary !== plan.primary_country) {
+      isAutoSavingPrimary.current = true;
+      
+      const updatedPlan = {
+        ...plan,
+        primary_country: newPrimary
+      };
+      setPlan(updatedPlan);
+      
+      upsertCurrentUserPlan(updatedPlan).then(() => {
+        setLastSavedAt(new Date().toISOString());
+        setHasUnsavedChanges(false);
+        isAutoSavingPrimary.current = false;
+      }).catch((err: unknown) => {
+        console.error("Failed to auto-save primary country:", err);
+        setHasUnsavedChanges(true);
+        isAutoSavingPrimary.current = false;
+      });
+    }
+  }, [decisionEngine.allProfiles, plan]);
+
   const recommendedCountries = useMemo(() => getRecommendedCountries(plan), [plan]);
   const recommendedCountryNames = useMemo(
     () => new Set(recommendedCountries.map((country) => country.name)),
@@ -843,6 +872,7 @@ export default function PortalCountriesPage() {
     setHasUnsavedChanges(true);
   }
 
+  // === CHANGE 2: Save includes primary_country (already in plan object) ===
   async function handleSaveShortlist() {
     try {
       setSaving(true);
