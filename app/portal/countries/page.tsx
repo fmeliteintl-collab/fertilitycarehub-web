@@ -9,6 +9,7 @@ import {
 import { EMPTY_USER_PLAN_INPUT, type UserPlanInput } from "@/types/plan";
 
 import type { NextAction } from "@/lib/intelligence/plan-intelligence";
+
 export const runtime = "edge";
 
 const AVAILABLE_COUNTRIES = [
@@ -27,7 +28,7 @@ const AVAILABLE_COUNTRIES = [
 
 type CountryName = (typeof AVAILABLE_COUNTRIES)[number];
 
-// === NEW: Decision Engine Types ===
+// === Decision Engine Types ===
 type FitLevel = "high" | "moderate" | "low";
 type CountryRole = "lead" | "comparator" | "watchlist";
 
@@ -54,6 +55,10 @@ const COUNTRY_CONTENT: Record<CountryName, {
   summary: string;
   notes: string;
   baseScore: number;
+  complexity: "low" | "moderate" | "high";
+  timing: "fast" | "moderate" | "extended";
+  legalClarity: "high" | "moderate" | "variable";
+  costLevel: "budget" | "moderate" | "premium";
 }> = {
   Spain: {
     status: "Strong fit",
@@ -62,6 +67,10 @@ const COUNTRY_CONTENT: Record<CountryName, {
     notes:
       "Evaluate legal fit, donor framework, and timeline practicality against your personal pathway.",
     baseScore: 85,
+    complexity: "low",
+    timing: "fast",
+    legalClarity: "high",
+    costLevel: "moderate",
   },
   Greece: {
     status: "Needs review",
@@ -70,6 +79,10 @@ const COUNTRY_CONTENT: Record<CountryName, {
     notes:
       "Compare regulatory comfort, logistics, and legal pathway alignment before prioritizing.",
     baseScore: 70,
+    complexity: "moderate",
+    timing: "fast",
+    legalClarity: "moderate",
+    costLevel: "budget",
   },
   Portugal: {
     status: "Watchlist",
@@ -78,6 +91,10 @@ const COUNTRY_CONTENT: Record<CountryName, {
     notes:
       "Assess planning complexity, travel factors, and broader advisory fit before moving higher.",
     baseScore: 65,
+    complexity: "low",
+    timing: "moderate",
+    legalClarity: "high",
+    costLevel: "moderate",
   },
   India: {
     status: "Under review",
@@ -86,6 +103,10 @@ const COUNTRY_CONTENT: Record<CountryName, {
     notes:
       "Review regulatory fit, timeline predictability, and cross-border practicality.",
     baseScore: 60,
+    complexity: "high",
+    timing: "extended",
+    legalClarity: "variable",
+    costLevel: "budget",
   },
   Mexico: {
     status: "Under review",
@@ -94,6 +115,10 @@ const COUNTRY_CONTENT: Record<CountryName, {
     notes:
       "Assess legal clarity, donor or surrogate pathway implications, and travel simplicity.",
     baseScore: 55,
+    complexity: "moderate",
+    timing: "fast",
+    legalClarity: "moderate",
+    costLevel: "budget",
   },
   Turkey: {
     status: "Under review",
@@ -102,6 +127,10 @@ const COUNTRY_CONTENT: Record<CountryName, {
     notes:
       "Consider legal structure, medical fit, and operational logistics before elevating priority.",
     baseScore: 50,
+    complexity: "moderate",
+    timing: "moderate",
+    legalClarity: "moderate",
+    costLevel: "budget",
   },
   "Czech Republic": {
     status: "Under review",
@@ -110,6 +139,10 @@ const COUNTRY_CONTENT: Record<CountryName, {
     notes:
       "Review treatment structure, donor framework, and planning practicality.",
     baseScore: 60,
+    complexity: "low",
+    timing: "moderate",
+    legalClarity: "high",
+    costLevel: "budget",
   },
   "Costa Rica": {
     status: "Under review",
@@ -118,6 +151,10 @@ const COUNTRY_CONTENT: Record<CountryName, {
     notes:
       "Assess pathway compatibility, legal framework, and overall coordination complexity.",
     baseScore: 45,
+    complexity: "moderate",
+    timing: "moderate",
+    legalClarity: "variable",
+    costLevel: "budget",
   },
   China: {
     status: "Under review",
@@ -126,6 +163,10 @@ const COUNTRY_CONTENT: Record<CountryName, {
     notes:
       "Review legal fit, accessibility, and advisory practicality before prioritizing.",
     baseScore: 40,
+    complexity: "high",
+    timing: "extended",
+    legalClarity: "variable",
+    costLevel: "moderate",
   },
   UK: {
     status: "Under review",
@@ -134,6 +175,10 @@ const COUNTRY_CONTENT: Record<CountryName, {
     notes:
       "Evaluate timing, eligibility, legal constraints, and cross-border feasibility.",
     baseScore: 75,
+    complexity: "low",
+    timing: "moderate",
+    legalClarity: "high",
+    costLevel: "premium",
   },
   US: {
     status: "Under review",
@@ -142,6 +187,10 @@ const COUNTRY_CONTENT: Record<CountryName, {
     notes:
       "Assess cost intensity, treatment structure, legal environment, and execution practicality.",
     baseScore: 70,
+    complexity: "moderate",
+    timing: "moderate",
+    legalClarity: "high",
+    costLevel: "premium",
   },
 };
 
@@ -210,7 +259,7 @@ function getPlanningBadges(plan: UserPlanInput): { label: string }[] {
   return badges;
 }
 
-// === NEW: Decision Engine Core ===
+// === Decision Engine Core ===
 function computeDecisionProfiles(plan: UserPlanInput): DecisionEngineOutput {
   const planText = getPlanText(plan);
   const shortlisted = plan.shortlisted_countries as CountryName[];
@@ -327,7 +376,7 @@ function computeDecisionProfiles(plan: UserPlanInput): DecisionEngineOutput {
 
   if (profiles.length > 1) {
     profiles[1].role = "comparator";
-    profiles[1].action = "Retain for comparison — do not prioritize yet";
+    profiles[1].action = "Retain as Comparator — do not prioritize yet";
   }
 
   profiles.slice(2).forEach(p => {
@@ -462,7 +511,7 @@ function getCountriesNextAction(plan: UserPlanInput, decisionEngine: DecisionEng
     return {
       title: "Build your jurisdiction shortlist",
       body: "Select 2–3 countries for structured comparison. This is the foundation of your execution planning.",
-      href: "#manage-shortlist",
+      href: "#active-shortlist",
       cta: "Select Countries",
       priority: "high",
     };
@@ -472,7 +521,7 @@ function getCountriesNextAction(plan: UserPlanInput, decisionEngine: DecisionEng
     return {
       title: "Add a comparator jurisdiction",
       body: "Your shortlist is very narrow. Add one comparison country to improve decision quality before committing.",
-      href: "#manage-shortlist",
+      href: "#active-shortlist",
       cta: "Add Comparator",
       priority: "high",
     };
@@ -483,8 +532,8 @@ function getCountriesNextAction(plan: UserPlanInput, decisionEngine: DecisionEng
       return {
         title: "Narrow Your Jurisdiction Selection",
         body: "You have a strong shortlist. At this stage, your goal is to reduce uncertainty and move toward a primary jurisdiction.",
-        href: "#decision-engine",
-        cta: "Review Decision Engine",
+        href: "#decision-intelligence",
+        cta: "Review Decision Intelligence",
         priority: "high",
       };
     }
@@ -500,7 +549,7 @@ function getCountriesNextAction(plan: UserPlanInput, decisionEngine: DecisionEng
   return {
     title: "Reduce shortlist complexity",
     body: "Your shortlist is broad. Reduce it to 2–3 stronger candidates so planning becomes easier and more actionable.",
-    href: "#manage-shortlist",
+    href: "#active-shortlist",
     cta: "Refine Shortlist",
     priority: "medium",
   };
@@ -567,9 +616,20 @@ function getShortlistReadiness(plan: UserPlanInput, decisionEngine: DecisionEngi
   };
 }
 
-// === Signals (Upgraded) ===
-function getCountrySignals(plan: UserPlanInput, decisionEngine: DecisionEngineOutput): string[] {
-  const signals: string[] = [];
+// === Grouped Signals ===
+interface GroupedSignals {
+  risks: string[];
+  questions: string[];
+  indicators: string[];
+}
+
+function getGroupedSignals(plan: UserPlanInput, decisionEngine: DecisionEngineOutput): GroupedSignals {
+  const signals: GroupedSignals = {
+    risks: [],
+    questions: [],
+    indicators: [],
+  };
+
   const shortlistCount = plan.shortlisted_countries.length;
   const hasPlanningBasics = Boolean(
     plan.pathway_type?.trim() ||
@@ -577,39 +637,50 @@ function getCountrySignals(plan: UserPlanInput, decisionEngine: DecisionEngineOu
       plan.notes?.trim()
   );
 
+  // Risks
   if (!hasPlanningBasics) {
-    signals.push("Your jurisdiction guidance is limited because planning details are still thin.");
-  }
-
-  if (shortlistCount === 0) {
-    signals.push("No jurisdictions are currently shortlisted. This page is in exploration mode.");
+    signals.risks.push("Limited planning context reduces jurisdiction guidance quality");
   }
 
   if (shortlistCount === 1) {
-    signals.push("Only one jurisdiction shortlisted. Add comparison options to improve decision quality.");
+    signals.risks.push("Single jurisdiction shortlist limits comparison quality");
   }
 
   if (shortlistCount >= 4) {
-    signals.push("Your shortlist is broad. Reducing it to 2–3 jurisdictions will make deeper comparison easier.");
+    signals.risks.push("Broad shortlist may delay decision-making");
   }
 
   if (decisionEngine.allProfiles.length >= 2) {
     const differentiated = decisionEngine.allProfiles.filter(p => p.fit !== decisionEngine.allProfiles[0].fit).length > 0;
     if (!differentiated) {
-      signals.push("⚠ Countries in shortlist are not yet clearly differentiated → Increase comparison depth before narrowing");
+      signals.risks.push("Countries in shortlist are not yet clearly differentiated");
     }
   }
 
+  // Questions
   if (plan.donor_needed) {
-    signals.push("Donor pathway is part of this case. Jurisdiction comparison should account for donor-related structure and constraints.");
+    signals.questions.push("Donor pathway structure needs jurisdiction-specific review");
   }
 
   if (plan.surrogate_needed) {
-    signals.push("Surrogacy review is part of this case. Jurisdiction selection should be pressure-tested for legal and execution complexity.");
+    signals.questions.push("Surrogacy legal framework requires validation in shortlisted jurisdictions");
   }
 
   if (shortlistCount >= 2 && shortlistCount <= 3) {
-    signals.push("Your shortlist is in a strong range for deeper legal, timing, and logistics comparison.");
+    signals.questions.push("Which jurisdiction offers better legal clarity for your specific case?");
+  }
+
+  // Indicators
+  if (shortlistCount >= 2 && shortlistCount <= 3) {
+    signals.indicators.push("Shortlist is in optimal range for deep comparison");
+  }
+
+  if (decisionEngine.primary?.fit === "high") {
+    signals.indicators.push("Lead jurisdiction shows strong planning alignment");
+  }
+
+  if (decisionEngine.comparator) {
+    signals.indicators.push("Comparator country available for validation");
   }
 
   return signals;
@@ -627,6 +698,19 @@ function getShortlistQuality(shortlistCount: number): { status: string; message:
     return { status: "optimal", message: "Ideal for comparison" };
   }
   return { status: "broad", message: "Too broad — reduce complexity" };
+}
+
+// === Comparison Data Helper ===
+function getCountryComparisonData(profile: CountryDecisionProfile) {
+  const content = COUNTRY_CONTENT[profile.name];
+  return {
+    fit: profile.fit,
+    complexity: content.complexity,
+    timing: content.timing,
+    legalClarity: content.legalClarity,
+    costLevel: content.costLevel,
+    score: profile.score,
+  };
 }
 
 export default function PortalCountriesPage() {
@@ -698,7 +782,7 @@ export default function PortalCountriesPage() {
     return () => { isMounted = false; };
   }, []);
 
-  // === NEW: Decision Engine ===
+  // === Decision Engine ===
   const decisionEngine = useMemo(() => computeDecisionProfiles(plan), [plan]);
 
   const recommendedCountries = useMemo(() => getRecommendedCountries(plan), [plan]);
@@ -729,12 +813,17 @@ export default function PortalCountriesPage() {
 
   const countriesNextAction = useMemo(() => getCountriesNextAction(plan, decisionEngine), [plan, decisionEngine]);
   const shortlistReadiness = useMemo(() => getShortlistReadiness(plan, decisionEngine), [plan, decisionEngine]);
-  const countrySignals = useMemo(() => getCountrySignals(plan, decisionEngine), [plan, decisionEngine]);
+  const groupedSignals = useMemo(() => getGroupedSignals(plan, decisionEngine), [plan, decisionEngine]);
   const planningBadges = useMemo(() => getPlanningBadges(plan), [plan]);
   const shortlistQuality = useMemo(() => getShortlistQuality(plan.shortlisted_countries.length), [plan.shortlisted_countries.length]);
 
   const shortlistReadyForTimeline = plan.shortlisted_countries.length >= 2 && plan.shortlisted_countries.length <= 3;
   const formattedLastSaved = lastSavedAt !== null ? new Date(lastSavedAt).toLocaleString() : null;
+
+  // Separate profiles by role
+  const leadProfile = decisionEngine.allProfiles.find(p => p.role === "lead");
+  const comparatorProfile = decisionEngine.allProfiles.find(p => p.role === "comparator");
+  const watchlistProfiles = decisionEngine.allProfiles.filter(p => p.role === "watchlist");
 
   function toggleCountry(countryName: CountryName) {
     setMessage(null);
@@ -779,63 +868,114 @@ export default function PortalCountriesPage() {
   }
 
   return (
-    <div className="space-y-8">
-      {/* === HEADER === */}
-      <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-        <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
-          Countries
-        </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-stone-900">
-          Country Shortlist
-        </h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-stone-600">
-          Save, compare, and organize the jurisdictions that best align with
-          your fertility planning pathway. This area is now your working
-          shortlist for advisory preparation and decision support.
-        </p>
+    <div className="space-y-8 max-w-6xl">
+      {/* === PREMIUM: EXECUTIVE DECISION ROOM HEADER === */}
+      <section className="rounded-2xl border-2 border-[#3a3a3a] bg-[#3a3a3a] p-8 text-white shadow-xl">
+        <div className="flex flex-col gap-6">
+          <div>
+            <p className="text-sm font-medium uppercase tracking-[0.2em] text-stone-400">
+              Jurisdiction Decision Room
+            </p>
+            <h1 className="mt-2 text-3xl font-bold tracking-tight">
+              {decisionEngine.primary 
+                ? `${decisionEngine.primary.name} leads your shortlist`
+                : "Build your jurisdiction shortlist"}
+            </h1>
+            <p className="mt-3 text-base text-stone-300 max-w-3xl leading-relaxed">
+              {decisionEngine.primary 
+                ? `Your comparison set shows ${shortlistQuality.status === "optimal" ? "strong" : "developing"} decision quality. ${decisionEngine.guidance}`
+                : "Select 2–3 jurisdictions for structured comparison. This is the foundation of your execution planning."}
+            </p>
+          </div>
 
-        <div className="mt-5 flex flex-wrap gap-3">
-          <Link
-            href="/compare"
-            className="rounded-xl bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-800"
-          >
-            Compare Countries
-          </Link>
-          <Link
-            href="/countries"
-            className="rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
-          >
-            Explore Country Research
-          </Link>
-        </div>
-      </div>
-
-      {/* === NEW: JURISDICTION DECISION ENGINE === */}
-      {decisionEngine.primary && (
-        <section id="decision-engine" className="rounded-2xl border-2 border-[#3a3a3a] bg-[#3a3a3a] p-8 text-white shadow-xl">
-          <div className="flex flex-col gap-6">
-            <div>
-              <p className="text-sm font-medium uppercase tracking-[0.2em] text-stone-400">
-                Jurisdiction Decision Engine
-              </p>
-              <h2 className="mt-2 text-2xl font-bold">
-                Primary Recommendation: {decisionEngine.primary.name}
-              </h2>
-              <div className="mt-2 flex items-center gap-2">
-                <span className="rounded-full bg-[#6a7a6a] px-3 py-1 text-xs font-bold uppercase">
-                  Confidence: {decisionEngine.primary.fit === "high" ? "High" : "Moderate"}
-                </span>
+          {decisionEngine.primary && (
+            <div className="grid gap-4 lg:grid-cols-3">
+              <div className="rounded-xl bg-stone-800/50 p-4 border border-stone-700">
+                <p className="text-xs font-bold uppercase tracking-wider text-stone-400">Lead Jurisdiction</p>
+                <p className="mt-1 text-xl font-semibold">{decisionEngine.primary.name}</p>
+                <p className="mt-1 text-sm text-stone-400">{decisionEngine.primary.fit === "high" ? "Strong alignment" : "Moderate alignment"}</p>
+              </div>
+              <div className="rounded-xl bg-stone-800/50 p-4 border border-stone-700">
+                <p className="text-xs font-bold uppercase tracking-wider text-stone-400">Shortlist Status</p>
+                <p className="mt-1 text-xl font-semibold">{plan.shortlisted_countries.length} countries</p>
+                <p className="mt-1 text-sm text-stone-400">{shortlistQuality.message}</p>
+              </div>
+              <div className="rounded-xl bg-stone-800/50 p-4 border border-stone-700">
+                <p className="text-xs font-bold uppercase tracking-wider text-stone-400">Decision Readiness</p>
+                <p className="mt-1 text-xl font-semibold">{shortlistReadiness.label}</p>
+                <p className="mt-1 text-sm text-stone-400">{shortlistReadiness.score}% complete</p>
               </div>
             </div>
+          )}
+
+          {/* Primary Action */}
+          <div className="flex items-center gap-4">
+            <a
+              href={countriesNextAction.href}
+              className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-stone-900 transition hover:bg-stone-100"
+            >
+              {countriesNextAction.cta}
+            </a>
+            <span className="text-sm text-stone-400">
+              {countriesNextAction.body}
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* === ZONE 1: ACTIVE SHORTLIST === */}
+      <section id="active-shortlist" className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-stone-900">Active Shortlist</h2>
+            <p className="mt-1 text-sm text-stone-600">
+              Your jurisdiction comparison set with system-assigned roles.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <span className="rounded-full bg-[#f0f4f0] px-3 py-1 text-xs font-medium text-[#4a5a4a]">
+              Lead
+            </span>
+            <span className="rounded-full bg-[#faf8f3] px-3 py-1 text-xs font-medium text-[#8a7a5a]">
+              Comparator
+            </span>
+            <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600">
+              Watchlist
+            </span>
+          </div>
+        </div>
+
+        {/* Lead Country - Premium Treatment */}
+        {leadProfile && (
+          <article className="rounded-2xl border-2 border-[#3a3a3a] bg-[#3a3a3a] p-6 text-white shadow-lg">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <span className="rounded-full bg-[#6a7a6a] px-3 py-1 text-xs font-bold uppercase tracking-wider">
+                  Lead Jurisdiction
+                </span>
+                <span className="rounded-full bg-stone-700 px-3 py-1 text-xs font-medium">
+                  {leadProfile.fit === "high" ? "Strong Fit" : "Moderate Fit"}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => toggleCountry(leadProfile.name)}
+                className="text-sm text-stone-400 hover:text-white transition"
+              >
+                Remove from Active Review
+              </button>
+            </div>
+
+            <h3 className="text-2xl font-bold mb-4">{leadProfile.name}</h3>
 
             <div className="grid gap-6 lg:grid-cols-2">
               <div>
-                <h3 className="text-sm font-bold uppercase tracking-wider text-stone-300 mb-3">
+                <p className="text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">
                   Why this leads
-                </h3>
-                <ul className="space-y-2">
-                  {decisionEngine.primary.whyFit.map((reason, idx) => (
-                    <li key={idx} className="flex items-start gap-2 text-sm text-stone-200">
+                </p>
+                <ul className="space-y-1">
+                  {leadProfile.whyFit.slice(0, 3).map((reason, idx) => (
+                    <li key={idx} className="text-sm text-stone-300 flex items-start gap-2">
                       <span className="text-[#6a7a6a]">•</span>
                       {reason}
                     </li>
@@ -843,13 +983,13 @@ export default function PortalCountriesPage() {
                 </ul>
               </div>
 
-              <div>
-                <h3 className="text-sm font-bold uppercase tracking-wider text-[#c4a7a7] mb-3">
+              <div className="rounded-xl bg-stone-800/50 p-4 border border-stone-700">
+                <p className="text-xs font-bold uppercase tracking-wider text-[#c4a7a7] mb-2">
                   Pressure-test before finalizing
-                </h3>
-                <ul className="space-y-2">
-                  {decisionEngine.primary.watchouts.map((watchout, idx) => (
-                    <li key={idx} className="flex items-start gap-2 text-sm text-stone-300">
+                </p>
+                <ul className="space-y-1">
+                  {leadProfile.watchouts.slice(0, 3).map((watchout, idx) => (
+                    <li key={idx} className="text-sm text-stone-400 flex items-start gap-2">
                       <span className="text-[#c4a7a7]">•</span>
                       {watchout}
                     </li>
@@ -858,298 +998,420 @@ export default function PortalCountriesPage() {
               </div>
             </div>
 
-            {decisionEngine.comparator && (
-              <div className="rounded-xl bg-stone-800/50 p-4 border border-stone-700">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-stone-300 mb-2">
-                  Best comparator: {decisionEngine.comparator.name}
+            <div className="mt-4 pt-4 border-t border-stone-700">
+              <p className="text-sm text-stone-300">
+                <span className="font-bold">Recommended action:</span> {leadProfile.action}
+              </p>
+            </div>
+          </article>
+        )}
+
+        {/* Comparator Country - Secondary Treatment */}
+        {comparatorProfile && (
+          <article className="rounded-2xl border border-stone-300 bg-white p-6 shadow-sm">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <span className="rounded-full bg-[#faf8f3] px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#8a7a5a]">
+                  Comparator
+                </span>
+                <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600">
+                  {comparatorProfile.fit === "high" ? "Strong Fit" : "Moderate Fit"}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => toggleCountry(comparatorProfile.name)}
+                className="text-sm text-stone-500 hover:text-stone-900 transition"
+              >
+                Remove from Active Review
+              </button>
+            </div>
+
+            <h3 className="text-xl font-semibold text-stone-900 mb-4">{comparatorProfile.name}</h3>
+
+            <div className="grid gap-4 lg:grid-cols-2">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-stone-500 mb-2">
+                  Comparison value
+                </p>
+                <ul className="space-y-1">
+                  {comparatorProfile.whyFit.slice(0, 2).map((reason, idx) => (
+                    <li key={idx} className="text-sm text-stone-700 flex items-start gap-2">
+                      <span className="text-[#8a7a5a]">•</span>
+                      {reason}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="rounded-lg bg-[#faf8f3] border border-[#e8e0d0] p-3">
+                <p className="text-xs font-bold uppercase tracking-wider text-[#8a7a5a] mb-2">
+                  Key differences to validate
+                </p>
+                <ul className="space-y-1">
+                  {comparatorProfile.watchouts.slice(0, 2).map((watchout, idx) => (
+                    <li key={idx} className="text-sm text-[#6a5a4a] flex items-start gap-2">
+                      <span className="text-[#b4a080]">•</span>
+                      {watchout}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-stone-200">
+              <p className="text-sm text-stone-700">
+                <span className="font-bold">Action:</span> {comparatorProfile.action}
+              </p>
+            </div>
+          </article>
+        )}
+
+        {/* Watchlist Countries - Subdued Treatment */}
+        {watchlistProfiles.length > 0 && (
+          <div className="grid gap-4 lg:grid-cols-2">
+            {watchlistProfiles.map((profile) => (
+              <article 
+                key={profile.name} 
+                className="rounded-xl border border-stone-200 bg-stone-50 p-4 opacity-90"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-full bg-stone-200 px-2 py-0.5 text-xs font-medium text-stone-600">
+                      Watchlist
+                    </span>
+                    <span className="text-sm text-stone-500">{profile.name}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => toggleCountry(profile.name)}
+                    className="text-xs text-stone-400 hover:text-stone-600 transition"
+                  >
+                    Remove
+                  </button>
+                </div>
+
+                <p className="text-xs text-stone-500 mb-2">
+                  {profile.whyFit[0]}
+                </p>
+
+                <p className="text-xs text-stone-400">
+                  <span className="font-medium">Action:</span> {profile.action}
+                </p>
+              </article>
+            ))}
+          </div>
+        )}
+
+        {/* Empty State */}
+        {decisionEngine.allProfiles.length === 0 && (
+          <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-8 text-center">
+            <p className="text-stone-600 mb-4">No jurisdictions selected yet.</p>
+            <p className="text-sm text-stone-500 mb-6">
+              Select 2–3 countries below to build your comparison set.
+            </p>
+          </div>
+        )}
+      </section>
+
+      {/* === ZONE 2: DECISION INTELLIGENCE === */}
+      <section id="decision-intelligence" className="space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold text-stone-900">Decision Intelligence</h2>
+          <p className="mt-1 text-sm text-stone-600">
+            System observations to guide your jurisdiction comparison.
+          </p>
+        </div>
+
+        {/* Top-Two Comparison Layer */}
+        {leadProfile && comparatorProfile && (
+          <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+            <h3 className="text-lg font-semibold text-stone-900 mb-4">
+              Lead vs Comparator: Key Differentiators
+            </h3>
+
+            {(() => {
+              const leadData = getCountryComparisonData(leadProfile);
+              const compData = getCountryComparisonData(comparatorProfile);
+
+              return (
+                <div className="grid gap-4 lg:grid-cols-2">
+                  {/* Lead Column */}
+                  <div className="rounded-xl bg-[#f0f4f0] border border-[#d8e0d8] p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="font-semibold text-[#4a5a4a]">{leadProfile.name}</span>
+                      <span className="rounded-full bg-[#6a7a6a] px-2 py-0.5 text-xs font-bold text-white">
+                        Lead
+                      </span>
+                    </div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-stone-600">Planning fit</span>
+                        <span className="font-medium text-[#4a5a4a]">{leadData.fit}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-stone-600">Complexity</span>
+                        <span className="font-medium">{leadData.complexity}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-stone-600">Timeline</span>
+                        <span className="font-medium">{leadData.timing}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-stone-600">Legal clarity</span>
+                        <span className="font-medium">{leadData.legalClarity}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-stone-600">Cost level</span>
+                        <span className="font-medium">{leadData.costLevel}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Comparator Column */}
+                  <div className="rounded-xl bg-[#faf8f3] border border-[#e8e0d0] p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="font-semibold text-[#6a5a4a]">{comparatorProfile.name}</span>
+                      <span className="rounded-full bg-[#b4a080] px-2 py-0.5 text-xs font-bold text-white">
+                        Comparator
+                      </span>
+                    </div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-stone-600">Planning fit</span>
+                        <span className="font-medium text-[#6a5a4a]">{compData.fit}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-stone-600">Complexity</span>
+                        <span className="font-medium">{compData.complexity}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-stone-600">Timeline</span>
+                        <span className="font-medium">{compData.timing}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-stone-600">Legal clarity</span>
+                        <span className="font-medium">{compData.legalClarity}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-stone-600">Cost level</span>
+                        <span className="font-medium">{compData.costLevel}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            <div className="mt-4 rounded-lg bg-stone-50 border border-stone-200 p-3">
+              <p className="text-sm text-stone-700">
+                <span className="font-bold">Next validation question:</span> Which jurisdiction offers better alignment with your specific timeline and legal comfort requirements?
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Grouped Signals */}
+        <div className="grid gap-4 lg:grid-cols-3">
+          {/* Key Risks */}
+          <div className="rounded-xl border border-[#c4a7a7] bg-[#faf6f6] p-4">
+            <h4 className="text-sm font-bold uppercase tracking-wider text-[#8a6a6a] mb-3">
+              Key Risks
+            </h4>
+            {groupedSignals.risks.length > 0 ? (
+              <ul className="space-y-2">
+                {groupedSignals.risks.map((signal, idx) => (
+                  <li key={idx} className="text-sm text-[#6a4a4a] flex items-start gap-2">
+                    <span className="text-[#c4a7a7]">•</span>
+                    {signal}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-[#8a6a6a]">No major risks detected.</p>
+            )}
+          </div>
+
+          {/* Unresolved Questions */}
+          <div className="rounded-xl border border-[#d4c4a4] bg-[#faf8f3] p-4">
+            <h4 className="text-sm font-bold uppercase tracking-wider text-[#8a7a5a] mb-3">
+              Unresolved Questions
+            </h4>
+            {groupedSignals.questions.length > 0 ? (
+              <ul className="space-y-2">
+                {groupedSignals.questions.map((signal, idx) => (
+                  <li key={idx} className="text-sm text-[#6a5a4a] flex items-start gap-2">
+                    <span className="text-[#b4a080]">•</span>
+                    {signal}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-[#8a7a5a]">No pending questions.</p>
+            )}
+          </div>
+
+          {/* Supportive Indicators */}
+          <div className="rounded-xl border border-[#a7c4a7] bg-[#f0f4f0] p-4">
+            <h4 className="text-sm font-bold uppercase tracking-wider text-[#4a5a4a] mb-3">
+              Supportive Indicators
+            </h4>
+            {groupedSignals.indicators.length > 0 ? (
+              <ul className="space-y-2">
+                {groupedSignals.indicators.map((signal, idx) => (
+                  <li key={idx} className="text-sm text-[#4a5a4a] flex items-start gap-2">
+                    <span className="text-[#6a7a6a]">•</span>
+                    {signal}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-[#5a6a5a]">No indicators yet.</p>
+            )}
+          </div>
+        </div>
+
+        {/* Readiness Section */}
+        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-stone-900">
+                Decision Readiness
+              </h3>
+              <p className="mt-1 text-sm text-stone-600">
+                Readiness for jurisdiction commitment and execution planning.
+              </p>
+            </div>
+
+            <div className={`rounded-xl px-4 py-2 text-sm font-bold ${
+              shortlistReadiness.label === "High" 
+                ? "bg-[#f0f4f0] text-[#4a5a4a]" 
+                : shortlistReadiness.label === "Moderate"
+                  ? "bg-[#faf8f3] text-[#8a7a5a]"
+                  : "bg-[#faf6f6] text-[#8a6a6a]"
+            }`}>
+              {shortlistReadiness.label} Readiness
+            </div>
+          </div>
+
+          <div className="mt-5">
+            <p className="text-3xl font-semibold text-stone-900">
+              {shortlistReadiness.score}%
+            </p>
+            <p className="mt-2 text-sm leading-6 text-stone-600">
+              {shortlistReadiness.summary}
+            </p>
+          </div>
+
+          <div className="mt-5 h-3 w-full overflow-hidden rounded-full bg-stone-200">
+            <div
+              className="h-full rounded-full bg-stone-900 transition-all"
+              style={{ width: `${shortlistReadiness.score}%` }}
+            />
+          </div>
+
+          <div className="mt-5 grid gap-4 lg:grid-cols-2">
+            <div className="rounded-xl bg-[#f0f4f0] border border-[#d8e0d8] p-4">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#4a5a4a]">
+                Supporting Signals
+              </p>
+              <p className="mt-2 text-sm leading-6 text-[#4a5a4a]">
+                {shortlistReadiness.strengths.length > 0
+                  ? shortlistReadiness.strengths.join("; ")
+                  : "No strong signals detected yet."}
+              </p>
+            </div>
+
+            <div className="rounded-xl bg-[#faf6f6] border border-[#e8d8d8] p-4">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#8a6a6a]">
+                Gaps to Address
+              </p>
+              <p className="mt-2 text-sm leading-6 text-[#6a4a4a]">
+                {shortlistReadiness.gaps.length > 0
+                  ? shortlistReadiness.gaps.join("; ")
+                  : "No major gaps detected."}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Timeline CTA */}
+        {shortlistReadyForTimeline && (
+          <div className="rounded-2xl border border-stone-900 bg-stone-900 p-6 text-white shadow-sm">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <p className="text-sm uppercase tracking-[0.18em] text-white/70">
+                  Execution Ready
+                </p>
+                <h3 className="mt-2 text-xl font-semibold">
+                  Your shortlist is ready for execution planning
                 </h3>
-                <p className="text-sm text-stone-400">
-                  Similar pathway structure. Compare for potential differences in legal clarity and execution flow.
+                <p className="mt-2 text-sm text-white/80">
+                  You now have a focused comparison set. Move to the timeline to start
+                  structuring execution, logistics, and next actions.
                 </p>
               </div>
+
+              <a
+                href="/portal/timeline"
+                className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-stone-900 transition hover:bg-stone-100"
+              >
+                Open Timeline
+              </a>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* === ZONE 3: SUGGESTED JURISDICTIONS === */}
+      <section className="space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold text-stone-900">Suggested Jurisdictions</h2>
+          <p className="mt-1 text-sm text-stone-600">
+            Additional countries worth considering based on your planning profile.
+          </p>
+        </div>
+
+        {/* Planning Context */}
+        <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-stone-500 mb-3">
+            Your Planning Context
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {planningBadges.length > 0 ? (
+              planningBadges.map((badge) => (
+                <span
+                  key={badge.label}
+                  className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-700"
+                >
+                  {badge.label}
+                </span>
+              ))
+            ) : (
+              <p className="text-sm text-stone-600">
+                Add planning details in My Plan to improve jurisdiction guidance.
+              </p>
             )}
-
-            <div className="rounded-xl bg-stone-800/30 p-4 border border-stone-700">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-stone-300 mb-2">
-                Decision guidance
-              </h3>
-              <p className="text-sm text-stone-300">
-                {decisionEngine.guidance}
-              </p>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* === STATS GRID === */}
-      <section className="grid gap-6 lg:grid-cols-3">
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">Saved Jurisdictions</p>
-          <p className="mt-2 text-3xl font-semibold text-stone-900">
-            {plan.shortlisted_countries.length}
-          </p>
-          <p className="mt-2 text-sm leading-6 text-stone-600">
-            Your active shortlist reflects jurisdictions under review.
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">Lead Jurisdiction</p>
-          <p className="mt-2 text-3xl font-semibold text-stone-900">
-            {decisionEngine.primary?.name || "None yet"}
-          </p>
-          <p className="mt-2 text-sm leading-6 text-stone-600">
-            Lead jurisdiction is determined based on planning alignment and system scoring.
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">Next Action</p>
-          <p className="mt-2 text-lg font-semibold text-stone-900">
-            {countriesNextAction.title}
-          </p>
-          <p className="mt-2 text-sm leading-6 text-stone-600">
-            {countriesNextAction.body}
-          </p>
-          {countriesNextAction.cta && (
-            <a
-              href={countriesNextAction.href}
-              className="mt-4 inline-block rounded-xl bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-800"
-            >
-              {countriesNextAction.cta}
-            </a>
-          )}
-        </div>
-      </section>
-
-      {/* === PLANNING CONTEXT === */}
-      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-        <div>
-          <h2 className="text-xl font-semibold text-stone-900">
-            Planning Context
-          </h2>
-          <p className="mt-1 text-sm text-stone-600">
-            Your saved plan shapes jurisdiction recommendations and decision scoring.
-          </p>
-        </div>
-
-        <div className="mt-5 flex flex-wrap gap-2">
-          {planningBadges.length > 0 ? (
-            planningBadges.map((badge) => (
-              <span
-                key={badge.label}
-                className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-700"
-              >
-                {badge.label}
-              </span>
-            ))
-          ) : (
-            <p className="text-sm text-stone-600">
-              Add planning details in My Plan to improve jurisdiction guidance.
-            </p>
-          )}
-        </div>
-
-        <div className="mt-5 grid gap-4 lg:grid-cols-2">
-          <div className="rounded-xl bg-stone-50 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-              Current Goal
-            </p>
-            <p className="mt-2 text-sm leading-6 text-stone-700">
-              {plan.treatment_goal?.trim() || "No treatment goal saved yet."}
-            </p>
-          </div>
-
-          <div className="rounded-xl bg-stone-50 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-              Current Constraints
-            </p>
-            <p className="mt-2 text-sm leading-6 text-stone-700">
-              {plan.constraints.length > 0
-                ? plan.constraints.join(", ")
-                : "No constraints saved yet."}
-            </p>
           </div>
         </div>
 
-        {formattedLastSaved ? (
-          <p className="mt-4 text-xs text-stone-500">
-            Last saved: {formattedLastSaved}
-          </p>
-        ) : null}
-      </section>
-
-      {/* === SHORTLIST QUALITY BAR === */}
-      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <h2 className="text-xl font-semibold text-stone-900">
-              Shortlist Quality
-            </h2>
-            <p className="mt-1 text-sm text-stone-600">
-              Optimal Range: 2–3 jurisdictions
-            </p>
-          </div>
-          <div className={`rounded-xl px-4 py-2 text-sm font-bold ${
-            shortlistQuality.status === "optimal" 
-              ? "bg-[#f0f4f0] text-[#4a5a4a]" 
-              : shortlistQuality.status === "narrow"
-                ? "bg-[#faf6f6] text-[#8a6a6a]"
-                : "bg-[#faf8f3] text-[#8a7a5a]"
-          }`}>
-            Current: {plan.shortlisted_countries.length} — {shortlistQuality.message}
-          </div>
-        </div>
-      </section>
-
-      {/* === READINESS === */}
-      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <h2 className="text-xl font-semibold text-stone-900">
-              Decision Readiness
-            </h2>
-            <p className="mt-1 text-sm text-stone-600">
-              Readiness for jurisdiction decision and execution planning.
-            </p>
-          </div>
-
-          <div className={`rounded-xl px-4 py-3 text-sm font-bold ${
-            shortlistReadiness.label === "High" 
-              ? "bg-[#f0f4f0] text-[#4a5a4a]" 
-              : shortlistReadiness.label === "Moderate"
-                ? "bg-[#faf8f3] text-[#8a7a5a]"
-                : "bg-[#faf6f6] text-[#8a6a6a]"
-          }`}>
-            {shortlistReadiness.label} Readiness
-          </div>
-        </div>
-
-        <div className="mt-5">
-          <p className="text-3xl font-semibold text-stone-900">
-            {shortlistReadiness.score}%
-          </p>
-          <p className="mt-2 text-sm leading-6 text-stone-600">
-            {shortlistReadiness.summary}
-          </p>
-        </div>
-
-        <div className="mt-5 h-3 w-full overflow-hidden rounded-full bg-stone-200">
-          <div
-            className="h-full rounded-full bg-stone-900 transition-all"
-            style={{ width: `${shortlistReadiness.score}%` }}
-          />
-        </div>
-
-        <div className="mt-5 grid gap-4 lg:grid-cols-2">
-          <div className="rounded-xl bg-stone-50 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-              Supporting Signals
-            </p>
-            <p className="mt-2 text-sm leading-6 text-stone-700">
-              {shortlistReadiness.strengths.length > 0
-                ? shortlistReadiness.strengths.join("; ")
-                : "No strong signals detected yet."}
-            </p>
-          </div>
-
-          <div className="rounded-xl bg-stone-50 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-              Gaps to Improve
-            </p>
-            <p className="mt-2 text-sm leading-6 text-stone-700">
-              {shortlistReadiness.gaps.length > 0
-                ? shortlistReadiness.gaps.join("; ")
-                : "No major gaps detected."}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* === TIMELINE CTA === */}
-      {shortlistReadyForTimeline && (
-        <section className="rounded-2xl border border-stone-900 bg-stone-900 p-6 text-white shadow-sm">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <p className="text-sm uppercase tracking-[0.18em] text-white/70">
-                Next Step
-              </p>
-              <h2 className="mt-2 text-xl font-semibold">
-                Your shortlist is ready for execution planning
-              </h2>
-              <p className="mt-2 text-sm text-white/80">
-                You now have a focused shortlist. Move to the timeline to start
-                structuring execution, logistics, and next actions.
-              </p>
-            </div>
-
-            <a
-              href="/portal/timeline"
-              className="inline-flex items-center justify-center rounded-xl bg-white px-4 py-2 text-sm font-medium text-stone-900 transition hover:bg-stone-100"
-            >
-              Open Timeline
-            </a>
-          </div>
-        </section>
-      )}
-
-      {/* === SIGNALS === */}
-      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-        <div>
-          <h2 className="text-xl font-semibold text-stone-900">
-            Country Signals
-          </h2>
-          <p className="mt-1 text-sm text-stone-600">
-            Observations highlighting shortlist patterns and comparison risks.
-          </p>
-        </div>
-
-        <div className="mt-5 space-y-3">
-          {countrySignals.length > 0 ? (
-            countrySignals.map((signal, idx) => (
-              <div
-                key={idx}
-                className={`rounded-xl border px-4 py-3 text-sm ${
-                  signal.includes("⚠") 
-                    ? "border-[#c4a7a7] bg-[#faf6f6] text-[#6a4a4a]" 
-                    : "border-stone-200 bg-stone-50 text-stone-700"
-                }`}
-              >
-                {signal}
-              </div>
-            ))
-          ) : (
-            <p className="text-sm text-stone-500">
-              No major signals detected.
-            </p>
-          )}
-        </div>
-      </section>
-
-      {/* === SUGGESTED COUNTRIES (DECISION CARDS) === */}
-      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-        <div>
-          <h2 className="text-xl font-semibold text-stone-900">
-            Suggested Jurisdictions
-          </h2>
-          <p className="mt-1 text-sm text-stone-600">
-            Decision support recommendations based on your planning profile.
-          </p>
-        </div>
-
+        {/* Suggested Countries Grid */}
         {recommendedCountries.length === 0 ? (
-          <div className="mt-5 rounded-xl border border-dashed border-stone-300 bg-stone-50 p-4 text-sm text-stone-600">
+          <div className="rounded-xl border border-dashed border-stone-300 bg-stone-50 p-4 text-sm text-stone-600">
             Save more detail in My Plan to unlock jurisdiction guidance.
           </div>
         ) : (
-          <div className="mt-5 grid gap-4 lg:grid-cols-2">
-            {recommendedCountries.slice(0, 4).map((country) => (
+          <div className="grid gap-4 lg:grid-cols-2">
+            {recommendedCountries
+              .filter(c => !plan.shortlisted_countries.includes(c.name))
+              .slice(0, 4)
+              .map((country) => (
               <div
                 key={country.name}
-                className="rounded-xl border border-stone-200 bg-stone-50 p-4"
+                className="rounded-xl border border-stone-200 bg-stone-50 p-4 opacity-90"
               >
                 <div className="flex items-center justify-between gap-3 mb-3">
-                  <h3 className="text-lg font-semibold text-stone-900">
+                  <h3 className="text-base font-semibold text-stone-900">
                     {country.name}
                   </h3>
                   <div className="flex gap-2">
@@ -1162,43 +1424,28 @@ export default function PortalCountriesPage() {
                     }`}>
                       {country.fit === "high" ? "Strong Fit" : country.fit === "moderate" ? "Moderate Fit" : "Low Fit"}
                     </span>
-                    <span className="rounded-full bg-white px-2 py-0.5 text-xs font-medium text-stone-600">
-                      {country.role === "comparator" ? "Comparator" : "Watchlist"}
-                    </span>
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-stone-500 mb-1">
-                      Why this fits
-                    </p>
-                    <ul className="space-y-1">
-                      {country.whyFit.slice(0, 2).map((reason, idx) => (
-                        <li key={idx} className="text-sm text-stone-700">• {reason}</li>
-                      ))}
-                    </ul>
-                  </div>
+                <div className="space-y-2">
+                  <p className="text-xs text-stone-600">
+                    {country.whyFit[0]}
+                  </p>
 
                   {country.watchouts.length > 0 && (
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-wider text-[#8a6a6a] mb-1">
-                        Watchouts
-                      </p>
-                      <ul className="space-y-1">
-                        {country.watchouts.slice(0, 2).map((watchout, idx) => (
-                          <li key={idx} className="text-sm text-stone-600">• {watchout}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  <div className="pt-2 border-t border-stone-200">
-                    <p className="text-xs font-medium text-stone-600">
-                      <span className="font-bold">Action:</span> {country.action}
+                    <p className="text-xs text-stone-500">
+                      Note: {country.watchouts[0]}
                     </p>
-                  </div>
+                  )}
                 </div>
+
+                <button
+                  type="button"
+                  onClick={() => toggleCountry(country.name)}
+                  className="mt-3 text-xs font-medium text-stone-600 hover:text-stone-900 transition"
+                >
+                  + Add to Shortlist
+                </button>
               </div>
             ))}
           </div>
@@ -1206,7 +1453,7 @@ export default function PortalCountriesPage() {
       </section>
 
       {/* === MANAGE SHORTLIST === */}
-      <section id="manage-shortlist" className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
         <div>
           <h2 className="text-xl font-semibold text-stone-900">
             Manage Shortlist
@@ -1233,7 +1480,7 @@ export default function PortalCountriesPage() {
                 }`}
               >
                 {country}
-                {isRecommended ? " • Suggested" : ""}
+                {isRecommended && !isSelected ? " • Suggested" : ""}
               </button>
             );
           })}
@@ -1271,111 +1518,28 @@ export default function PortalCountriesPage() {
             </p>
           ) : null}
         </div>
+
+        {formattedLastSaved ? (
+          <p className="mt-4 text-xs text-stone-500">
+            Last saved: {formattedLastSaved}
+          </p>
+        ) : null}
       </section>
 
-      {/* === CURRENT SHORTLIST (UPGRADED CARDS) === */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="text-xl font-semibold text-stone-900">
-            Current Shortlist
-          </h2>
-          <p className="mt-1 text-sm text-stone-600">
-            Jurisdictions currently saved to your planning workspace.
-          </p>
-        </div>
-
-        {decisionEngine.allProfiles.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-6 text-sm text-stone-600">
-            No jurisdictions saved yet. Select one or more countries above and save your shortlist.
-          </div>
-        ) : (
-          <div className="grid gap-6">
-            {decisionEngine.allProfiles.map((profile) => (
-              <article
-                key={profile.name}
-                className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm"
-              >
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      <h3 className="text-xl font-semibold text-stone-900">
-                        {profile.name}
-                      </h3>
-                      <div className="flex gap-2">
-                        <span className={`rounded-full px-3 py-1 text-xs font-bold ${
-                          profile.fit === "high" 
-                            ? "bg-[#f0f4f0] text-[#4a5a4a]" 
-                            : profile.fit === "moderate"
-                              ? "bg-[#faf8f3] text-[#8a7a5a]"
-                              : "bg-[#faf6f6] text-[#8a6a6a]"
-                        }`}>
-                          {profile.fit === "high" ? "Strong Fit" : profile.fit === "moderate" ? "Moderate Fit" : "Needs Review"}
-                        </span>
-                        <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-700">
-                          {profile.role === "lead" ? "Lead Jurisdiction" : profile.role === "comparator" ? "Comparator" : "Watchlist"}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div>
-                        <p className="text-xs font-bold uppercase tracking-wider text-stone-500 mb-2">
-                          Why this fits your case
-                        </p>
-                        <ul className="space-y-1">
-                          {profile.whyFit.map((reason, idx) => (
-                            <li key={idx} className="text-sm text-stone-700 flex items-start gap-2">
-                              <span className="text-[#6a7a6a]">•</span>
-                              {reason}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <div className="rounded-lg bg-[#faf6f6] border border-[#e8d8d8] p-3">
-                        <p className="text-xs font-bold uppercase tracking-wider text-[#8a6a6a] mb-2">
-                          Pressure-test
-                        </p>
-                        <ul className="space-y-1">
-                          {profile.watchouts.map((watchout, idx) => (
-                            <li key={idx} className="text-sm text-[#6a4a4a] flex items-start gap-2">
-                              <span className="text-[#c4a7a7]">•</span>
-                              {watchout}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <div className="flex flex-wrap gap-4 text-sm">
-                        <div>
-                          <span className="font-medium text-stone-500">System position:</span>
-                          <span className="ml-2 text-stone-700">
-                            {profile.role === "lead" ? "Currently leading your shortlist" : 
-                             profile.role === "comparator" ? "Comparator country" : "Under review"}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="pt-3 border-t border-stone-200">
-                        <p className="text-sm text-stone-700">
-                          <span className="font-bold">Recommended action:</span> {profile.action}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => toggleCountry(profile.name)}
-                    className="rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
-                  >
-                    Remove
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
-        )}
+      {/* === EXTERNAL LINKS === */}
+      <section className="flex flex-wrap gap-3">
+        <Link
+          href="/compare"
+          className="rounded-xl bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-800"
+        >
+          Compare Countries
+        </Link>
+        <Link
+          href="/countries"
+          className="rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
+        >
+          Explore Country Research
+        </Link>
       </section>
     </div>
   );

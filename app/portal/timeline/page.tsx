@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";  // Removed unused 'Link'
+import { useEffect, useMemo, useState } from "react";
 import {
   getCurrentUserPlan,
   upsertCurrentUserPlan,
@@ -16,14 +16,58 @@ import {
 } from "@/types/plan";
 import {
   calculateTimelineReadiness,
-  getTimelineCounts,
   determineExecutionStage,
   getDisplayValue,
 } from "@/lib/intelligence/plan-intelligence";
 
 export const runtime = "edge";
 
-// Phase badge component
+// === PREMIUM: Status Pill Component (replaces dropdown) ===
+function StatusPill({
+  value,
+  onChange,
+  isLocked,
+}: {
+  value: TimelineItemStatus;
+  onChange: (status: TimelineItemStatus) => void;
+  isLocked: boolean;
+}) {
+  if (isLocked) {
+    return (
+      <span className="inline-flex items-center rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-500">
+        Locked
+      </span>
+    );
+  }
+
+  const statuses: { value: TimelineItemStatus; label: string; color: string }[] = [
+    { value: "Upcoming", label: "Upcoming", color: "bg-stone-100 text-stone-600" },
+    { value: "In Progress", label: "In Progress", color: "bg-[#faf8f3] text-[#8a7a5a] border-[#d4c4a8]" },
+    { value: "Completed", label: "Completed", color: "bg-[#f0f4f0] text-[#4a5a4a]" },
+    { value: "Blocked", label: "Blocked", color: "bg-[#faf6f6] text-[#8a6a6a] border-[#c4a7a7]" },
+  ];
+
+  return (
+    <div className="flex items-center gap-1">
+      {statuses.map((status) => (
+        <button
+          key={status.value}
+          type="button"
+          onClick={() => onChange(status.value)}
+          className={`rounded-full px-2.5 py-1 text-xs font-medium transition ${
+            value === status.value 
+              ? `${status.color} border` 
+              : "bg-transparent text-stone-400 hover:text-stone-600"
+          }`}
+        >
+          {status.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// === PREMIUM: Phase Badge with Visual Hierarchy ===
 function PhaseBadge({
   phase,
   isLocked,
@@ -68,12 +112,12 @@ function PhaseBadge({
   );
 }
 
-// Priority indicator
+// === PREMIUM: Priority Indicator (subtle) ===
 function PriorityIndicator({ priority }: { priority: string }) {
   const styles = {
-    high: "bg-[#c4a7a7] text-[#5c3a3a]",
-    medium: "bg-[#d4c4a8] text-[#5c4a3a]",
-    low: "bg-stone-200 text-stone-600",
+    high: "bg-[#c4a7a7]/20 text-[#6a4a4a]",
+    medium: "bg-[#d4c4a8]/20 text-[#6a5a4a]",
+    low: "bg-stone-100 text-stone-500",
   };
 
   return (
@@ -85,54 +129,14 @@ function PriorityIndicator({ priority }: { priority: string }) {
   );
 }
 
-// Status selector
-function StatusSelector({
-  value,
-  onChange,
-  isLocked,
-}: {
-  value: TimelineItemStatus;
-  onChange: (status: TimelineItemStatus) => void;
-  isLocked: boolean;
-}) {
-  const options: TimelineItemStatus[] = [
-    "Completed",
-    "In Progress",
-    "Upcoming",
-    "Blocked",
-  ];
-
-  if (isLocked) {
-    return (
-      <span className="inline-flex items-center rounded-lg bg-stone-100 px-3 py-1.5 text-sm text-stone-500">
-        Locked
-      </span>
-    );
-  }
-
-  return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value as TimelineItemStatus)}
-      className="rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-sm text-stone-900 focus:border-[#3a3a3a] focus:outline-none"
-    >
-      {options.map((opt) => (
-        <option key={opt} value={opt}>
-          {opt}
-        </option>
-      ))}
-    </select>
-  );
-}
-
-// Calculate phase completion percentage
+// === PREMIUM: Phase Completion Calculation ===
 function calculatePhaseCompletion(items: TimelineItem[]): number {
   if (items.length === 0) return 0;
   const completed = items.filter((i) => i.status === "Completed").length;
   return Math.round((completed / items.length) * 100);
 }
 
-// Check if phase is locked
+// === PREMIUM: Phase Lock Check ===
 function checkPhaseLock(
   phase: TimelinePhase,
   phaseMap: Map<TimelinePhase, TimelineItem[]>,
@@ -151,14 +155,13 @@ function checkPhaseLock(
     if (!hasCountries) {
       return {
         isLocked: true,
-        reason:
-          "Country shortlist required. Complete Phase 1 and select countries first.",
+        reason: "Country shortlist required",
       };
     }
     if (previousCompletion < 50) {
       return {
         isLocked: true,
-        reason: `Complete at least 50% of ${PHASE_METADATA[previousPhase].name} first (${previousCompletion}%)`,
+        reason: `Complete ${PHASE_METADATA[previousPhase].name} first`,
       };
     }
     return { isLocked: false };
@@ -167,14 +170,14 @@ function checkPhaseLock(
   if (previousCompletion < 60) {
     return {
       isLocked: true,
-      reason: `Complete ${PHASE_METADATA[previousPhase].name} first (${previousCompletion}% done, need 60%)`,
+      reason: `Complete ${PHASE_METADATA[previousPhase].name} first`,
     };
   }
 
   return { isLocked: false };
 }
 
-// Generate dynamic phase-based timeline
+// === PREMIUM: Generate Timeline Items ===
 function generatePhaseBasedTimeline(plan: UserPlanInput): TimelineItem[] {
   const items: TimelineItem[] = [];
   const countries = plan.shortlisted_countries || [];
@@ -204,8 +207,8 @@ function generatePhaseBasedTimeline(plan: UserPlanInput): TimelineItem[] {
     category: "Research",
     status: hasCountries ? "Completed" : "Upcoming",
     description: hasCountries
-      ? `Selected: ${countries.join(", ")}. Validate legal fit for your pathway.`
-      : "Identify 2-3 jurisdictions that support your required treatment structure.",
+      ? `Selected: ${countries.join(", ")}. Validate legal fit.`
+      : "Identify 2-3 jurisdictions supporting your treatment structure.",
     phase: "planning",
     priority: "high",
     dependencies: ["p1-1"],
@@ -218,8 +221,7 @@ function generatePhaseBasedTimeline(plan: UserPlanInput): TimelineItem[] {
     title: "Compare legal pathways",
     category: "Legal",
     status: hasCountries ? "In Progress" : "Upcoming",
-    description:
-      "Analyze legal structures, parental rights, and cross-border execution risks.",
+    description: "Analyze legal structures, parental rights, and cross-border risks.",
     phase: "planning",
     priority: "high",
     dependencies: ["p1-2"],
@@ -240,35 +242,20 @@ function generatePhaseBasedTimeline(plan: UserPlanInput): TimelineItem[] {
     priority: "high",
     dependencies: ["p1-3"],
     isLocked: countries.length === 0,
-    lockReason:
-      countries.length === 0 ? "Complete country comparison first" : undefined,
+    lockReason: countries.length === 0 ? "Complete country comparison first" : undefined,
   });
 
-  // Phase 2: Preparation (conditional items based on pathway)
+  // Phase 2: Preparation
   if (surrogate) {
     items.push({
       id: "p2-s1",
       title: "Assess surrogacy legal pathway",
       category: "Legal",
       status: "Upcoming",
-      description:
-        "Understand legal structure, parental rights, and cross-border execution risks.",
+      description: "Understand legal structure, parental rights, and cross-border risks.",
       phase: "preparation",
       priority: "high",
       dependencies: ["p1-4"],
-      isLocked: true,
-    });
-
-    items.push({
-      id: "p2-s2",
-      title: "Identify surrogacy agencies",
-      category: "Research",
-      status: "Upcoming",
-      description:
-        "Research and shortlist reputable surrogacy agencies in your target country.",
-      phase: "preparation",
-      priority: "high",
-      dependencies: ["p2-s1"],
       isLocked: true,
     });
   }
@@ -279,27 +266,12 @@ function generatePhaseBasedTimeline(plan: UserPlanInput): TimelineItem[] {
       title: "Confirm donor pathway constraints",
       category: "Medical",
       status: "Upcoming",
-      description:
-        "Review donor eligibility, anonymity rules, and clinic matching processes.",
+      description: "Review donor eligibility, anonymity rules, and clinic matching.",
       phase: "preparation",
       priority: "high",
       dependencies: ["p1-4"],
       isLocked: true,
     });
-
-    if (countries.includes("Greece") || countries.includes("Spain")) {
-      items.push({
-        id: "p2-d2",
-        title: "Review EU donor anonymity regulations",
-        category: "Legal",
-        status: "Upcoming",
-        description: "Understand GDPR implications and donor privacy frameworks.",
-        phase: "preparation",
-        priority: "medium",
-        dependencies: ["p2-d1"],
-        isLocked: true,
-      });
-    }
   }
 
   items.push({
@@ -319,8 +291,7 @@ function generatePhaseBasedTimeline(plan: UserPlanInput): TimelineItem[] {
     title: "Initial legal consultation",
     category: "Legal",
     status: "Upcoming",
-    description:
-      "Engage fertility lawyer in target jurisdiction for pathway validation.",
+    description: "Engage fertility lawyer in target jurisdiction for pathway validation.",
     phase: "preparation",
     priority: "high",
     dependencies: ["p1-4"],
@@ -329,24 +300,10 @@ function generatePhaseBasedTimeline(plan: UserPlanInput): TimelineItem[] {
 
   items.push({
     id: "p2-3",
-    title: "Medical record compilation",
-    category: "Medical",
-    status: "Upcoming",
-    description:
-      "Gather fertility history, test results, and referral documentation.",
-    phase: "preparation",
-    priority: "medium",
-    dependencies: ["p2-1"],
-    isLocked: true,
-  });
-
-  items.push({
-    id: "p2-4",
     title: "Financial planning and budget lock",
     category: "Finance",
     status: "Upcoming",
-    description:
-      "Validate budget against full pathway cost including travel, legal, and contingency.",
+    description: "Validate budget against full pathway cost including travel and legal.",
     phase: "preparation",
     priority: "high",
     dependencies: ["p2-1", "p2-2"],
@@ -359,11 +316,10 @@ function generatePhaseBasedTimeline(plan: UserPlanInput): TimelineItem[] {
     title: "Travel documentation review",
     category: "Logistics",
     status: "Upcoming",
-    description:
-      "Check passport validity, visa requirements, and travel restrictions.",
+    description: "Check passport validity, visa requirements, and travel restrictions.",
     phase: "pre-treatment",
     priority: "high",
-    dependencies: ["p2-4"],
+    dependencies: ["p2-3"],
     isLocked: true,
   });
 
@@ -384,31 +340,12 @@ function generatePhaseBasedTimeline(plan: UserPlanInput): TimelineItem[] {
     title: "Cycle scheduling and coordination",
     category: "Medical",
     status: "Upcoming",
-    description:
-      "Align travel dates with treatment cycle and donor/surrogate availability.",
+    description: "Align travel dates with treatment cycle and availability.",
     phase: "pre-treatment",
     priority: "high",
     dependencies: ["p3-1", "p3-2"],
     isLocked: true,
   });
-
-  if (
-    plan.target_timeline?.includes("6 months") ||
-    plan.target_timeline?.includes("urgent")
-  ) {
-    items.push({
-      id: "p3-exp",
-      title: "Expedited clinic booking (priority timeline)",
-      category: "Medical",
-      status: "Upcoming",
-      description:
-        "Request priority scheduling due to accelerated timeline requirements.",
-      phase: "pre-treatment",
-      priority: "high",
-      dependencies: ["p3-3"],
-      isLocked: true,
-    });
-  }
 
   // Phase 4: Treatment
   items.push({
@@ -489,8 +426,7 @@ function generatePhaseBasedTimeline(plan: UserPlanInput): TimelineItem[] {
     title: "Return travel planning",
     category: "Logistics",
     status: "Upcoming",
-    description:
-      "Coordinate safe return with medical clearance and documentation.",
+    description: "Coordinate safe return with medical clearance.",
     phase: "post-treatment",
     priority: "medium",
     dependencies: ["p5-1"],
@@ -500,7 +436,7 @@ function generatePhaseBasedTimeline(plan: UserPlanInput): TimelineItem[] {
   return items;
 }
 
-// Build phase metadata with lock status
+// === PREMIUM: Build Phase Metadata ===
 type PhaseMeta = {
   id: TimelinePhase;
   name: string;
@@ -511,13 +447,13 @@ type PhaseMeta = {
   unlocksDescription: string;
   completionPercentage: number;
   items: TimelineItem[];
+  skippedImpact: string;
 };
 
 function buildPhaseMeta(
   items: TimelineItem[],
   plan: UserPlanInput
 ): PhaseMeta[] {
-  // Group items by phase
   const phaseMap = new Map<TimelinePhase, TimelineItem[]>();
   PHASE_ORDER.forEach((phase) => phaseMap.set(phase, []));
 
@@ -527,19 +463,26 @@ function buildPhaseMeta(
     phaseMap.set(item.phase, phaseItems);
   });
 
-  // Build metadata
+  const unlocksDesc: Record<TimelinePhase, string> = {
+    planning: "Clinic identification, legal consultation, and preparation phase",
+    preparation: "Travel planning, documentation, and pre-treatment coordination",
+    "pre-treatment": "Begin treatment cycle, monitoring, and medical procedures",
+    treatment: "Recovery, follow-up, and post-treatment legal processes",
+    "post-treatment": "Completion and return to home country with full documentation",
+  };
+
+  const skippedImpact: Record<TimelinePhase, string> = {
+    planning: "Without clear direction, clinic selection and legal pathways remain undefined, causing costly mid-process changes.",
+    preparation: "Skipping preparation risks clinic misalignment, legal gaps, and budget surprises during execution.",
+    "pre-treatment": "Without proper documentation and scheduling, treatment cycles face delays and logistical failures.",
+    treatment: "Treatment cannot proceed without pre-treatment completion. Medical and legal sequencing is mandatory.",
+    "post-treatment": "Skipping post-treatment risks citizenship issues, legal non-compliance, and unsafe travel.",
+  };
+
   return PHASE_ORDER.map((phase, index) => {
     const phaseItems = phaseMap.get(phase) || [];
     const lockStatus = checkPhaseLock(phase, phaseMap, plan);
     const completionPercentage = calculatePhaseCompletion(phaseItems);
-
-    const unlocksDesc: Record<TimelinePhase, string> = {
-      planning: "Clinic identification, legal consultation, and preparation phase",
-      preparation: "Travel planning, documentation, and pre-treatment coordination",
-      "pre-treatment": "Begin treatment cycle, monitoring, and medical procedures",
-      treatment: "Recovery, follow-up, and post-treatment legal processes",
-      "post-treatment": "Completion and return to home country with full documentation",
-    };
 
     return {
       id: phase,
@@ -551,22 +494,22 @@ function buildPhaseMeta(
       unlocksDescription: unlocksDesc[phase],
       completionPercentage,
       items: phaseItems,
+      skippedImpact: skippedImpact[phase],
     };
   });
 }
 
-// Get next actionable item
+// === PREMIUM: Get Next Action ===
 function getNextPhaseAction(
   phases: PhaseMeta[],
-  plan: UserPlanInput  // Kept as it's required by function signature
+  plan: UserPlanInput
 ): {
   item: TimelineItem | null;
   phase: PhaseMeta | null;
   context: string;
 } {
-  // plan parameter used in future expansion for conditional logic
-  void plan;  // Explicitly mark as intentionally unused for now
-  
+  void plan;
+
   for (const phase of phases) {
     if (phase.isLocked) continue;
 
@@ -580,7 +523,7 @@ function getNextPhaseAction(
         return {
           item: inProgress,
           phase,
-          context: `Active ${inProgress.category.toLowerCase()} task in ${phase.name}`,
+          context: `Active in ${phase.name}`,
         };
       }
 
@@ -595,7 +538,7 @@ function getNextPhaseAction(
         return {
           item: nextUpcoming,
           phase,
-          context: `Next ${nextUpcoming.category.toLowerCase()} task in ${phase.name}`,
+          context: `Next in ${phase.name}`,
         };
       }
     }
@@ -606,53 +549,48 @@ function getNextPhaseAction(
     item: null,
     phase: firstLocked || null,
     context: firstLocked
-      ? `${firstLocked.name} is locked: ${firstLocked.lockReason}`
+      ? `${firstLocked.name} locked`
       : "All phases complete",
   };
 }
 
-// Timeline signals detection
-function detectTimelineSignals(
+// === PREMIUM: Grouped Signals ===
+interface GroupedSignals {
+  blockers: string[];
+  warnings: string[];
+  ready: string[];
+}
+
+function getGroupedSignals(
   plan: UserPlanInput,
   phases: PhaseMeta[]
-): { type: "blocking" | "attention" | "ready"; message: string }[] {
-  const signals: { type: "blocking" | "attention" | "ready"; message: string }[] =
-    [];
+): GroupedSignals {
+  const signals: GroupedSignals = {
+    blockers: [],
+    warnings: [],
+    ready: [],
+  };
 
   const hasPathway = !!plan.pathway_type?.trim();
   const hasCountries = (plan.shortlisted_countries || []).length > 0;
   const allItems = phases.flatMap((p) => p.items);
   const hasInProgress = allItems.some((i) => i.status === "In Progress");
 
-  if (!hasPathway && allItems.length > 0) {
-    signals.push({
-      type: "blocking",
-      message:
-        "Planning context missing — timeline exists without a defined pathway. Return to My Plan to define your case.",
-    });
+  if (!hasPathway) {
+    signals.blockers.push("Planning context missing — timeline exists without defined pathway");
   }
 
   if (hasPathway && !hasCountries) {
-    signals.push({
-      type: "blocking",
-      message:
-        "Country shortlist missing — timeline generated but no countries selected. Visit Countries to shortlist before execution planning.",
-    });
+    signals.blockers.push("Country shortlist missing — timeline generated but no countries selected");
   }
 
   const lockedPhases = phases.filter((p) => p.isLocked);
   if (lockedPhases.length > 0 && hasPathway) {
-    signals.push({
-      type: "attention",
-      message: `${lockedPhases.length} phase(s) locked. Complete current phase to unlock next steps.`,
-    });
+    signals.warnings.push(`${lockedPhases.length} phase(s) locked — complete current phase to proceed`);
   }
 
   if (hasInProgress) {
-    signals.push({
-      type: "ready",
-      message: "Timeline is active — execution planning in progress.",
-    });
+    signals.ready.push("Timeline is active — execution planning in progress");
   }
 
   return signals;
@@ -664,9 +602,7 @@ export default function PortalTimelinePage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [isError, setIsError] = useState(false);
-  const [expandedPhases, setExpandedPhases] = useState<Set<TimelinePhase>>(
-    new Set()
-  );
+  const [expandedPhases, setExpandedPhases] = useState<Set<TimelinePhase>>(new Set());
 
   useEffect(() => {
     let isMounted = true;
@@ -678,14 +614,12 @@ export default function PortalTimelinePage() {
         if (!isMounted) return;
 
         if (existing) {
-          // Normalize items to new structure
           const normalizedItems =
             existing.timeline_items.length > 0
               ? existing.timeline_items.map((item) => ({
                   ...item,
                   phase: (item.phase as TimelinePhase) || "planning",
-                  priority:
-                    (item.priority as "high" | "medium" | "low") || "medium",
+                  priority: (item.priority as "high" | "medium" | "low") || "medium",
                   dependencies: item.dependencies || [],
                   isLocked: item.isLocked ?? false,
                 }))
@@ -696,15 +630,20 @@ export default function PortalTimelinePage() {
             timeline_items: normalizedItems,
           });
 
-          // Auto-expand first unlocked phase
+          // PREMIUM: Auto-expand only current active phase
           if (normalizedItems.length > 0) {
             const phases = buildPhaseMeta(normalizedItems, existing);
-            const firstUnlocked = phases.find((p) => !p.isLocked);
-            if (firstUnlocked) {
-              setExpandedPhases(new Set([firstUnlocked.id]));
+            const activePhase = phases.find(
+              (p) => !p.isLocked && p.completionPercentage < 100 && p.completionPercentage > 0
+            ) || phases.find((p) => !p.isLocked);
+            if (activePhase) {
+              setExpandedPhases(new Set([activePhase.id]));
             }
           }
         }
+
+        setMessage(null);
+        setIsError(false);
       } catch (error: unknown) {
         console.error(error);
         if (isMounted) {
@@ -722,29 +661,13 @@ export default function PortalTimelinePage() {
     };
   }, []);
 
-  // Compute phases
-  const phases = useMemo(
-    () => buildPhaseMeta(plan.timeline_items, plan),
-    [plan]
-  );
-
+  const phases = useMemo(() => buildPhaseMeta(plan.timeline_items, plan), [plan]);
   const allItems = useMemo(() => phases.flatMap((p) => p.items), [phases]);
-
-  const readiness = useMemo(
-    () => calculateTimelineReadiness(plan),
-    [plan]
-  );
-
+  const readiness = useMemo(() => calculateTimelineReadiness(plan), [plan]);
   const nextAction = useMemo(() => getNextPhaseAction(phases, plan), [phases, plan]);
-
-  const timelineCounts = useMemo(() => getTimelineCounts(allItems), [allItems]);
-
-  const signals = useMemo(() => detectTimelineSignals(plan, phases), [plan, phases]);
-
-  const executionStageResult = useMemo(
-    () => determineExecutionStage(plan),
-    [plan]
-  );
+  // Timeline counts available via getTimelineCounts(allItems) if needed
+  const groupedSignals = useMemo(() => getGroupedSignals(plan, phases), [plan, phases]);
+  const executionStageResult = useMemo(() => determineExecutionStage(plan), [plan]);
 
   const activePhase = phases.find(
     (p) => !p.isLocked && p.completionPercentage < 100
@@ -785,16 +708,15 @@ export default function PortalTimelinePage() {
       timeline_items: generatedTasks,
     }));
 
-    // Auto-expand first unlocked
     const newPhases = buildPhaseMeta(generatedTasks, plan);
-    const firstUnlocked = newPhases.find((p) => !p.isLocked);
-    if (firstUnlocked) {
-      setExpandedPhases(new Set([firstUnlocked.id]));
+    const activePhase = newPhases.find(
+      (p) => !p.isLocked && p.completionPercentage < 100 && p.completionPercentage > 0
+    ) || newPhases.find((p) => !p.isLocked);
+    if (activePhase) {
+      setExpandedPhases(new Set([activePhase.id]));
     }
 
-    setMessage(
-      "Timeline regenerated from your planning context. Review phases and activate your first task."
-    );
+    setMessage("Timeline generated. Review phases and activate your first task.");
   }
 
   async function handleSave() {
@@ -804,7 +726,7 @@ export default function PortalTimelinePage() {
       setIsError(false);
 
       await upsertCurrentUserPlan(plan);
-      setMessage("Timeline saved successfully.");
+      setMessage("Timeline saved.");
     } catch (error: unknown) {
       console.error(error);
       setIsError(true);
@@ -816,25 +738,20 @@ export default function PortalTimelinePage() {
 
   const planningContext = useMemo(
     () => ({
-      pathwayType: getDisplayValue(plan.pathway_type, "Not yet specified"),
+      pathwayType: getDisplayValue(plan.pathway_type, "Not specified"),
       shortlistedCountries:
         (plan.shortlisted_countries || []).length > 0
           ? plan.shortlisted_countries.join(", ")
-          : "No countries shortlisted yet",
-      targetTimeline: getDisplayValue(plan.target_timeline, "Not yet defined"),
-      budgetRange: getDisplayValue(plan.budget_range, "Not yet defined"),
+          : "None selected",
+      targetTimeline: getDisplayValue(plan.target_timeline, "Not defined"),
+      budgetRange: getDisplayValue(plan.budget_range, "Not defined"),
     }),
-    [
-      plan.pathway_type,
-      plan.shortlisted_countries,
-      plan.target_timeline,
-      plan.budget_range,
-    ]
+    [plan.pathway_type, plan.shortlisted_countries, plan.target_timeline, plan.budget_range]
   );
 
   if (loading) {
     return (
-      <div className="space-y-8">
+      <div className="space-y-8 max-w-6xl">
         <div className="h-32 animate-pulse rounded-2xl bg-stone-100" />
         <div className="grid gap-6 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
@@ -846,225 +763,192 @@ export default function PortalTimelinePage() {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-        <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
-          Timeline
-        </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-stone-900">
-          Execution Roadmap
-        </h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-stone-600">
-          Your fertility journey organized into five strategic phases. Complete
-          each phase to unlock the next. Tasks are dynamically generated based
-          on your pathway, country selection, and treatment requirements.
-        </p>
-      </div>
-
-      {/* Executive Summary Cards */}
-      <section className="grid gap-6 lg:grid-cols-3">
-        {/* Readiness Card */}
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-stone-500">
-              Overall Readiness
+    <div className="space-y-8 max-w-6xl">
+      {/* === PREMIUM: EXECUTIVE OVERVIEW HEADER === */}
+      <section className="rounded-2xl border-2 border-[#3a3a3a] bg-[#3a3a3a] p-8 text-white shadow-xl">
+        <div className="flex flex-col gap-6">
+          <div>
+            <p className="text-sm font-medium uppercase tracking-[0.2em] text-stone-400">
+              Execution Roadmap
             </p>
-            <span className="text-2xl font-semibold text-stone-900">
-              {readiness.percentage}%
-            </span>
+            <h1 className="mt-2 text-3xl font-bold tracking-tight">
+              {activePhase 
+                ? `Currently in ${activePhase.name}`
+                : "Generate your execution timeline"}
+            </h1>
+            <p className="mt-3 text-base text-stone-300 max-w-3xl leading-relaxed">
+              {activePhase
+                ? `${activePhase.description}. Complete this phase to unlock ${activePhase.unlocksDescription}.`
+                : "Your fertility journey organized into five strategic phases. Each phase unlocks the next."}
+            </p>
           </div>
-          <p className="mt-2 text-base font-semibold capitalize text-stone-900">
-            {readiness.stage.replace("-", " ")}
-          </p>
-          <div className="mt-4 h-2 w-full rounded-full bg-stone-100">
-            <div
-              className="h-2 rounded-full bg-stone-600 transition-all"
-              style={{ width: `${readiness.percentage}%` }}
-            />
-          </div>
-          <p className="mt-3 text-sm text-stone-600">
-            {activePhase
-              ? `Currently in: ${activePhase.name}`
-              : "Generate timeline to begin"}
-          </p>
-        </div>
 
-        {/* Next Action Card */}
-        <div className="rounded-2xl border-2 border-[#3a3a3a] bg-stone-50 p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">Current Focus</p>
-          <p className="mt-2 text-base font-semibold text-stone-900">
-            {nextAction.item?.title || nextAction.context}
-          </p>
-          <p className="mt-2 text-sm text-stone-600">
-            {nextAction.phase
-              ? `${nextAction.phase.name} • ${nextAction.item?.category || "Phase locked"}`
-              : nextAction.context}
-          </p>
-          {nextAction.item && (
-            <div className="mt-3 flex items-center gap-2">
-              <PriorityIndicator priority={nextAction.item.priority} />
-              <span className="text-xs text-stone-500">
-                {nextAction.item.estimatedDuration || "Duration TBD"}
+          {/* Execution Stage Summary */}
+          <div className="grid gap-4 lg:grid-cols-3">
+            <div className="rounded-xl bg-stone-800/50 p-4 border border-stone-700">
+              <p className="text-xs font-bold uppercase tracking-wider text-stone-400">Execution Stage</p>
+              <p className="mt-1 text-lg font-semibold capitalize">
+                {executionStageResult.stage.replace(/-/g, " ")}
+              </p>
+              <p className="mt-1 text-xs text-stone-400">
+                {executionStageResult.description.slice(0, 60)}...
+              </p>
+            </div>
+            <div className="rounded-xl bg-stone-800/50 p-4 border border-stone-700">
+              <p className="text-xs font-bold uppercase tracking-wider text-stone-400">Readiness</p>
+              <p className="mt-1 text-lg font-semibold">{readiness.percentage}%</p>
+              <p className="mt-1 text-xs text-stone-400 capitalize">{readiness.stage}</p>
+            </div>
+            <div className="rounded-xl bg-stone-800/50 p-4 border border-stone-700">
+              <p className="text-xs font-bold uppercase tracking-wider text-stone-400">Current Focus</p>
+              <p className="mt-1 text-lg font-semibold truncate">
+                {nextAction.item?.title || nextAction.context}
+              </p>
+              <p className="mt-1 text-xs text-stone-400">
+                {nextAction.phase?.name || "All phases"}
+              </p>
+            </div>
+          </div>
+
+          {/* Primary Action */}
+          {allItems.length === 0 ? (
+            <button
+              type="button"
+              onClick={handleGenerateTimeline}
+              className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-stone-900 transition hover:bg-stone-100 w-fit"
+            >
+              Generate Timeline
+            </button>
+          ) : (
+            <div className="flex items-center gap-4">
+              <a
+                href={nextAction.item ? `#phase-${nextAction.phase?.id}` : "#phases"}
+                className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-stone-900 transition hover:bg-stone-100"
+              >
+                {nextAction.item ? "Continue Current Phase" : "Review All Phases"}
+              </a>
+              <span className="text-sm text-stone-400">
+                {nextAction.item?.title || nextAction.context}
               </span>
             </div>
           )}
         </div>
-
-        {/* Phase Progress Card */}
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">Phase Progress</p>
-          <div className="mt-3 flex items-baseline gap-2">
-            <p className="text-3xl font-semibold text-stone-900">
-              {phases.filter((p) => p.completionPercentage === 100).length}
-            </p>
-            <span className="text-lg text-stone-400">/</span>
-            <p className="text-lg font-medium text-stone-500">5</p>
-          </div>
-          <p className="mt-2 text-sm text-stone-600">
-            {activePhase
-              ? `Currently in: ${activePhase.name}`
-              : "All phases complete"}
-          </p>
-          <div className="mt-3 flex gap-1">
-            {phases.map((p) => (
-              <div
-                key={p.id}
-                className={`h-1.5 flex-1 rounded-full ${
-                  p.completionPercentage === 100
-                    ? "bg-[#6a7a6a]"
-                    : p.isLocked
-                      ? "bg-stone-200"
-                      : "bg-[#d4c4a8]"
-                }`}
-              />
-            ))}
-          </div>
-        </div>
       </section>
 
-      {/* Execution Stage */}
-      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-        <div className="flex items-start gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-stone-100">
-            <span className="text-xs font-semibold uppercase tracking-wider text-stone-600">
-              STAGE
-            </span>
-          </div>
-          <div className="flex-1">
-            <h2 className="text-lg font-semibold capitalize text-stone-900">
-              {executionStageResult.stage.replace(/-/g, " ")}
-            </h2>
-            <p className="mt-1 text-sm text-stone-600">
-              {executionStageResult.description}
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {executionStageResult.nextActions.slice(0, 3).map((indicator) => (
-                <span
-                  key={indicator}
-                  className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600"
-                >
-                  {indicator}
-                </span>
-              ))}
+      {/* === PREMIUM: GROUPED SIGNALS === */}
+      {(groupedSignals.blockers.length > 0 || groupedSignals.warnings.length > 0 || groupedSignals.ready.length > 0) && (
+        <section className="grid gap-4 lg:grid-cols-3">
+          {groupedSignals.blockers.length > 0 && (
+            <div className="rounded-xl border border-[#c4a7a7] bg-[#faf6f6] p-4">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#8a6a6a] mb-2">
+                Blockers
+              </h3>
+              <ul className="space-y-1">
+                {groupedSignals.blockers.map((signal, idx) => (
+                  <li key={idx} className="text-sm text-[#6a4a4a] flex items-start gap-2">
+                    <span className="text-[#c4a7a7]">•</span>
+                    {signal}
+                  </li>
+                ))}
+              </ul>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Signals */}
-      {signals.length > 0 && (
-        <section className="space-y-3">
-          <h2 className="text-lg font-semibold text-stone-900">
-            Timeline Signals
-          </h2>
-          {signals.map((signal, idx) => (
-            <div
-              key={idx}
-              className={`rounded-xl border p-4 ${
-                signal.type === "blocking"
-                  ? "border-[#c4a7a7] bg-[#faf6f6]"
-                  : signal.type === "attention"
-                    ? "border-[#d4c4a8] bg-[#faf8f3]"
-                    : "border-stone-200 bg-white"
-              }`}
-            >
-              <p
-                className={`text-sm ${
-                  signal.type === "blocking"
-                    ? "text-[#5c3a3a]"
-                    : signal.type === "attention"
-                      ? "text-[#5c4a3a]"
-                      : "text-stone-800"
-                }`}
-              >
-                {signal.type === "blocking" && "🚫 "}
-                {signal.type === "attention" && "⚠️ "}
-                {signal.type === "ready" && "✓ "}
-                {signal.message}
-              </p>
+          )}
+          {groupedSignals.warnings.length > 0 && (
+            <div className="rounded-xl border border-[#d4c4a8] bg-[#faf8f3] p-4">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#8a7a5a] mb-2">
+                Attention
+              </h3>
+              <ul className="space-y-1">
+                {groupedSignals.warnings.map((signal, idx) => (
+                  <li key={idx} className="text-sm text-[#6a5a4a] flex items-start gap-2">
+                    <span className="text-[#b4a080]">•</span>
+                    {signal}
+                  </li>
+                ))}
+              </ul>
             </div>
-          ))}
+          )}
+          {groupedSignals.ready.length > 0 && (
+            <div className="rounded-xl border border-[#a7c4a7] bg-[#f0f4f0] p-4">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#4a5a4a] mb-2">
+                Ready
+              </h3>
+              <ul className="space-y-1">
+                {groupedSignals.ready.map((signal, idx) => (
+                  <li key={idx} className="text-sm text-[#4a5a4a] flex items-start gap-2">
+                    <span className="text-[#6a7a6a]">•</span>
+                    {signal}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </section>
       )}
 
-      {/* Phase Navigation */}
+      {/* === PREMIUM: VISUAL ROADMAP SPINE === */}
       <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-stone-900">Phase Overview</h2>
-        <div className="mt-4 grid gap-4 lg:grid-cols-5">
-          {phases.map((phase) => (
-            <button
-              key={phase.id}
-              onClick={() => togglePhase(phase.id)}
-              className={`flex flex-col items-center gap-3 rounded-xl border p-4 text-left transition hover:bg-stone-50 ${
-                expandedPhases.has(phase.id)
-                  ? "border-[#3a3a3a] bg-stone-50"
-                  : "border-stone-200"
-              }`}
-            >
-              <PhaseBadge
-                phase={phase.id}
-                isLocked={phase.isLocked}
-                isActive={
-                  !phase.isLocked &&
-                  phase.completionPercentage < 100 &&
-                  phase.completionPercentage > 0
-                }
-                completion={phase.completionPercentage}
-              />
-              <div className="text-center">
-                <p
-                  className={`text-sm font-semibold ${
-                    phase.isLocked ? "text-stone-400" : "text-stone-900"
-                  }`}
+        <h2 className="text-lg font-semibold text-stone-900 mb-4">Journey Overview</h2>
+        <div className="relative">
+          {/* Connecting line */}
+          <div className="absolute top-4 left-0 right-0 h-0.5 bg-stone-200" />
+          <div className="relative grid grid-cols-5 gap-2">
+            {phases.map((phase, idx) => {
+              const isCompleted = phase.completionPercentage === 100;
+              const isActive = !phase.isLocked && phase.completionPercentage < 100 && phase.completionPercentage > 0;
+              // Phase status: completed, active, or upcoming
+
+              return (
+                <button
+                  key={phase.id}
+                  onClick={() => togglePhase(phase.id)}
+                  className="flex flex-col items-center gap-2 text-center group"
                 >
-                  {phase.name}
-                </p>
-                <p className="mt-1 text-xs text-stone-500">
-                  {phase.isLocked ? "Locked" : `${phase.completionPercentage}% complete`}
-                </p>
-              </div>
-            </button>
-          ))}
+                  <div className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold transition ${
+                    isCompleted 
+                      ? "bg-[#6a7a6a] text-white" 
+                      : isActive 
+                        ? "bg-[#3a3a3a] text-white ring-2 ring-[#3a3a3a] ring-offset-2" 
+                        : "bg-stone-200 text-stone-500 group-hover:bg-stone-300"
+                  }`}>
+                    {isCompleted ? "✓" : idx + 1}
+                  </div>
+                  <div className="space-y-1">
+                    <p className={`text-xs font-medium ${
+                      isActive ? "text-stone-900" : "text-stone-500"
+                    }`}>
+                      {phase.name}
+                    </p>
+                    <p className="text-[10px] text-stone-400">
+                      {isCompleted ? "Complete" : isActive ? `${phase.completionPercentage}%` : phase.isLocked ? "Locked" : "Pending"}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </section>
 
-      {/* Phase Details */}
-      <section className="space-y-6">
+      {/* === PREMIUM: PHASE DETAILS (COLLAPSIBLE) === */}
+      <section id="phases" className="space-y-4">
         {phases.map((phase) => {
           const isExpanded = expandedPhases.has(phase.id);
-          const isActive =
-            !phase.isLocked && phase.completionPercentage < 100;
+          const isActive = !phase.isLocked && phase.completionPercentage < 100;
+          const isCompleted = phase.completionPercentage === 100;
 
           return (
             <div
               key={phase.id}
+              id={`phase-${phase.id}`}
               className={`rounded-2xl border shadow-sm transition-all ${
                 isActive
                   ? "border-[#3a3a3a] bg-white"
-                  : phase.isLocked
-                    ? "border-stone-200 bg-stone-50"
-                    : "border-stone-200 bg-white"
+                  : isCompleted
+                    ? "border-stone-200 bg-stone-50/50"
+                    : phase.isLocked
+                      ? "border-stone-200 bg-stone-50"
+                      : "border-stone-200 bg-white"
               }`}
             >
               {/* Phase Header */}
@@ -1080,17 +964,27 @@ export default function PortalTimelinePage() {
                     completion={phase.completionPercentage}
                   />
                   <div>
-                    <h3
-                      className={`text-lg font-semibold ${
-                        phase.isLocked ? "text-stone-400" : "text-stone-900"
-                      }`}
-                    >
-                      {phase.name}
-                    </h3>
+                    <div className="flex items-center gap-2">
+                      <h3
+                        className={`text-lg font-semibold ${
+                          phase.isLocked ? "text-stone-400" : "text-stone-900"
+                        }`}
+                      >
+                        {phase.name}
+                      </h3>
+                      {isActive && (
+                        <span className="rounded-full bg-[#3a3a3a] px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider">
+                          Current
+                        </span>
+                      )}
+                      {isCompleted && (
+                        <span className="rounded-full bg-[#6a7a6a] px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider">
+                          Complete
+                        </span>
+                      )}
+                    </div>
                     <p className="mt-1 text-sm text-stone-600">
-                      {phase.isLocked
-                        ? `🔒 ${phase.lockReason}`
-                        : phase.description}
+                      {phase.isLocked ? phase.lockReason : phase.description}
                     </p>
                   </div>
                 </div>
@@ -1100,7 +994,7 @@ export default function PortalTimelinePage() {
                       {phase.items.filter((i) => i.status === "Completed").length} /{" "}
                       {phase.items.length}
                     </p>
-                    <p className="text-xs text-stone-500">tasks complete</p>
+                    <p className="text-xs text-stone-500">tasks</p>
                   </div>
                   <svg
                     className={`h-5 w-5 text-stone-400 transition-transform ${
@@ -1120,38 +1014,63 @@ export default function PortalTimelinePage() {
                 </div>
               </button>
 
-              {/* Phase Content */}
+              {/* Phase Content (Collapsible) */}
               {isExpanded && (
                 <div className="border-t border-stone-200 px-6 pb-6">
+                  {/* PREMIUM: Phase Purpose Summary */}
+                  <div className="mt-6 grid gap-4 lg:grid-cols-2">
+                    <div className="rounded-xl bg-[#f0f4f0] border border-[#d8e0d8] p-4">
+                      <p className="text-xs font-bold uppercase tracking-wider text-[#4a5a4a] mb-2">
+                        What this unlocks
+                      </p>
+                      <p className="text-sm text-[#4a5a4a]">
+                        {phase.unlocksDescription}
+                      </p>
+                    </div>
+                    <div className="rounded-xl bg-[#faf6f6] border border-[#e8d8d8] p-4">
+                      <p className="text-xs font-bold uppercase tracking-wider text-[#8a6a6a] mb-2">
+                        If skipped
+                      </p>
+                      <p className="text-sm text-[#6a4a4a]">
+                        {phase.skippedImpact}
+                      </p>
+                    </div>
+                  </div>
+
                   {phase.isLocked ? (
-                    <div className="py-8 text-center">
+                    <div className="mt-6 py-8 text-center">
                       <p className="text-stone-500">
                         Complete previous phases to unlock {phase.name.toLowerCase()}
                       </p>
-                      <p className="mt-2 text-sm text-stone-400">
-                        Unlocks: {phase.unlocksDescription}
-                      </p>
                     </div>
                   ) : (
-                    <div className="mt-6 space-y-4">
+                    <div className="mt-6 space-y-3">
                       {phase.items.map((item, idx) => (
                         <div
                           key={item.id}
                           className={`rounded-xl border p-4 transition ${
                             item.status === "Completed"
-                              ? "border-stone-200 bg-stone-50"
+                              ? "border-stone-200 bg-stone-50/70"
                               : item.status === "In Progress"
                                 ? "border-[#d4c4a8] bg-[#faf8f3]"
-                                : "border-stone-200 bg-white"
+                                : item.status === "Blocked"
+                                  ? "border-[#c4a7a7] bg-[#faf6f6]"
+                                  : "border-stone-200 bg-white"
                           }`}
                         >
                           <div className="flex items-start gap-4">
-                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-stone-900 text-xs font-semibold text-white">
+                            <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
+                              item.status === "Completed"
+                                ? "bg-[#6a7a6a] text-white"
+                                : item.status === "In Progress"
+                                  ? "bg-[#3a3a3a] text-white"
+                                  : "bg-stone-200 text-stone-600"
+                            }`}>
                               {idx + 1}
                             </div>
-                            <div className="flex-1 space-y-3">
+                            <div className="flex-1 min-w-0">
                               <div className="flex items-start justify-between gap-4">
-                                <div>
+                                <div className="min-w-0">
                                   <h4
                                     className={`font-semibold ${
                                       item.status === "Completed"
@@ -1165,7 +1084,7 @@ export default function PortalTimelinePage() {
                                     {item.description}
                                   </p>
                                 </div>
-                                <StatusSelector
+                                <StatusPill
                                   value={item.status}
                                   onChange={(status) =>
                                     updateItemStatus(item.id, status)
@@ -1174,7 +1093,7 @@ export default function PortalTimelinePage() {
                                 />
                               </div>
 
-                              <div className="flex items-center gap-3">
+                              <div className="mt-3 flex items-center gap-3">
                                 <PriorityIndicator priority={item.priority} />
                                 <span className="text-xs text-stone-500">
                                   {item.category}
@@ -1185,12 +1104,6 @@ export default function PortalTimelinePage() {
                                   </span>
                                 )}
                               </div>
-
-                              {item.dependencies.length > 0 && (
-                                <p className="text-xs text-stone-400">
-                                  Depends on: {item.dependencies.join(", ")}
-                                </p>
-                              )}
                             </div>
                           </div>
                         </div>
@@ -1204,57 +1117,27 @@ export default function PortalTimelinePage() {
         })}
       </section>
 
-      {/* Planning Context */}
-      <section className="grid gap-6 lg:grid-cols-4">
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">Pathway</p>
-          <p className="mt-2 text-lg font-semibold text-stone-900">
-            {planningContext.pathwayType}
-          </p>
-        </div>
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">Countries</p>
-          <p className="mt-2 text-lg font-semibold text-stone-900">
-            {planningContext.shortlistedCountries}
-          </p>
-        </div>
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">Target Timeline</p>
-          <p className="mt-2 text-lg font-semibold text-stone-900">
-            {planningContext.targetTimeline}
-          </p>
-        </div>
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">Budget Range</p>
-          <p className="mt-2 text-lg font-semibold text-stone-900">
-            {planningContext.budgetRange}
-          </p>
+      {/* === PREMIUM: PLANNING CONTEXT (COMPACT) === */}
+      <section className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-stone-500">Pathway:</span>
+            <span className="text-sm font-semibold text-stone-900">{planningContext.pathwayType}</span>
+          </div>
+          <div className="h-4 w-px bg-stone-200 hidden sm:block" />
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-stone-500">Countries:</span>
+            <span className="text-sm font-semibold text-stone-900 truncate max-w-[200px]">{planningContext.shortlistedCountries}</span>
+          </div>
+          <div className="h-4 w-px bg-stone-200 hidden sm:block" />
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-stone-500">Timeline:</span>
+            <span className="text-sm font-semibold text-stone-900">{planningContext.targetTimeline}</span>
+          </div>
         </div>
       </section>
 
-      {/* Task Counts */}
-      <section className="grid gap-6 lg:grid-cols-3">
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">Completed</p>
-          <p className="mt-2 text-3xl font-semibold text-stone-900">
-            {timelineCounts.completed}
-          </p>
-        </div>
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">In Progress</p>
-          <p className="mt-2 text-3xl font-semibold text-stone-900">
-            {timelineCounts.inProgress}
-          </p>
-        </div>
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">Upcoming</p>
-          <p className="mt-2 text-3xl font-semibold text-stone-900">
-            {timelineCounts.upcoming}
-          </p>
-        </div>
-      </section>
-
-      {/* Actions */}
+      {/* === PREMIUM: ACTIONS === */}
       <section className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
         <div>
           <h3 className="font-semibold text-stone-900">Manage Timeline</h3>
