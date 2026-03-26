@@ -558,7 +558,17 @@ export default function PortalDashboardPage() {
     }
 
     void loadPlan();
-    return () => { isMounted = false; };
+
+    // STEP 7: Refresh when window regains focus (user may have updated data in another tab/page)
+    const handleFocus = () => {
+      if (isMounted) void loadPlan();
+    };
+    window.addEventListener('focus', handleFocus);
+
+    return () => { 
+      isMounted = false;
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   // SINGLE SOURCE OF TRUTH - Portal Intelligence

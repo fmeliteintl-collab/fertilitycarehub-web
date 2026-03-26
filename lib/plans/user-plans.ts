@@ -67,7 +67,9 @@ function normalizeUserPlan(row: UserPlan): UserPlan {
       ? row.shortlisted_countries
       : [],
     primary_country:
-      typeof row.primary_country === "string" ? row.primary_country : null,
+  typeof row.primary_country === "string" && row.primary_country.trim() !== ""
+    ? row.primary_country.trim()
+    : null,
     timeline_items: normalizeTimelineItems(row.timeline_items),
     advisory_status:
       typeof row.advisory_status === "string" ? row.advisory_status : null,
@@ -163,7 +165,7 @@ export async function upsertCurrentUserPlan(
     priorities: input.priorities,
     constraints: input.constraints,
     shortlisted_countries: input.shortlisted_countries,
-    primary_country: input.primary_country,
+    primary_country: input.primary_country?.trim() || null,
     timeline_items: input.timeline_items,
     advisory_status: input.advisory_status,
     advisory_pathway: input.advisory_pathway,

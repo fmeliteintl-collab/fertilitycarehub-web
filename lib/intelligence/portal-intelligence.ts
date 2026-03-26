@@ -121,10 +121,17 @@ export function getPortalIntelligence(
   const countryCount = plan?.shortlisted_countries?.length ?? 0;
   const hasCountries = countryCount > 0;
 
-  const typedPlan =
-    plan && typeof plan === "object" ? (plan as PlanWithPrimary) : null;
-  const hasPrimaryCountry = Boolean(typedPlan?.primary_country?.trim());
-  const primaryCountryName = typedPlan?.primary_country ?? null;
+  // With:
+const typedPlan =
+  plan && typeof plan === "object" ? (plan as PlanWithPrimary) : null;
+
+// Defensive extraction: handle null, undefined, empty string, or whitespace
+const rawPrimary = typedPlan?.primary_country;
+const primaryCountryName = 
+  typeof rawPrimary === "string" && rawPrimary.trim().length > 0
+    ? rawPrimary.trim()
+    : null;
+const hasPrimaryCountry = primaryCountryName !== null;
 
   const timelineCounts = getTimelineCounts(plan?.timeline_items);
   const hasTimeline = timelineCounts.total > 0;
