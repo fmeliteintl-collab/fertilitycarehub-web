@@ -496,7 +496,7 @@ export default function PortalDocumentsPage() {
             surrogate_needed: userPlan.surrogate_needed,
             priorities: userPlan.priorities ?? [],
             constraints: userPlan.constraints ?? [],
-            primary_country: userPlan.primary_country ?? null,
+           
             shortlisted_countries: userPlan.shortlisted_countries ?? [],
             timeline_items: userPlan.timeline_items ?? [],
             advisory_status: userPlan.advisory_status ?? null,
