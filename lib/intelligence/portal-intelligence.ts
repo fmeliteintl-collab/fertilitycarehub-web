@@ -13,17 +13,12 @@ import {
 
 type PlanData = UserPlan | UserPlanInput | null | undefined;
 
-type PlanWithPrimary = (UserPlan | UserPlanInput) & {
-  primary_country?: string | null;
-};
-
 export type SystemStage = "planning" | "decision" | "execution" | "completion";
 
 export type PrimaryBlocker =
   | "missing_pathway"
   | "missing_family_structure"
   | "missing_country_selection"
-  | "missing_primary_country"
   | "timeline_not_started"
   | "timeline_incomplete"
   | "documents_required"
@@ -98,7 +93,6 @@ export interface PortalIntelligence {
     hasPathway: boolean;
     hasFamilyStructure: boolean;
     hasCountries: boolean;
-    hasPrimaryCountry: boolean;
     hasTimeline: boolean;
     hasActiveTimeline: boolean;
     hasDocuments: boolean;
@@ -120,18 +114,6 @@ export function getPortalIntelligence(
   const hasFamilyStructure = Boolean(plan?.family_structure);
   const countryCount = plan?.shortlisted_countries?.length ?? 0;
   const hasCountries = countryCount > 0;
-
-  // With:
-const typedPlan =
-  plan && typeof plan === "object" ? (plan as PlanWithPrimary) : null;
-
-// Defensive extraction: handle null, undefined, empty string, or whitespace
-const rawPrimary = typedPlan?.primary_country;
-const primaryCountryName = 
-  typeof rawPrimary === "string" && rawPrimary.trim().length > 0
-    ? rawPrimary.trim()
-    : null;
-const hasPrimaryCountry = primaryCountryName !== null;
 
   const timelineCounts = getTimelineCounts(plan?.timeline_items);
   const hasTimeline = timelineCounts.total > 0;
@@ -173,7 +155,6 @@ const hasPrimaryCountry = primaryCountryName !== null;
     hasPathway,
     hasFamilyStructure,
     hasCountries,
-    hasPrimaryCountry,
     hasTimeline,
     timelineComplete,
     readiness,
@@ -189,7 +170,6 @@ const hasPrimaryCountry = primaryCountryName !== null;
   const stage = determineSystemStage({
     hasPathway,
     hasCountries,
-    hasPrimaryCountry,
     hasTimeline,
     executionStatus,
   });
@@ -199,8 +179,6 @@ const hasPrimaryCountry = primaryCountryName !== null;
     hasFamilyStructure,
     hasCountries,
     countryCount,
-    hasPrimaryCountry,
-    primaryCountryName,
     hasTimeline,
     timelineComplete,
     timelineProgress,
@@ -216,7 +194,6 @@ const hasPrimaryCountry = primaryCountryName !== null;
   const signals = buildEnhancedSignals({
     hasCountries,
     countryCount,
-    hasPrimaryCountry,
     hasTimeline,
     timelineProgress,
     timelineComplete,
@@ -240,7 +217,6 @@ const hasPrimaryCountry = primaryCountryName !== null;
       hasPathway,
       hasFamilyStructure,
       hasCountries,
-      hasPrimaryCountry,
       hasTimeline,
       hasActiveTimeline,
       hasDocuments,
@@ -292,7 +268,6 @@ function determinePrimaryBlocker(params: {
   hasPathway: boolean;
   hasFamilyStructure: boolean;
   hasCountries: boolean;
-  hasPrimaryCountry: boolean;
   hasTimeline: boolean;
   timelineComplete: boolean;
   readiness: SplitReadiness;
@@ -300,9 +275,6 @@ function determinePrimaryBlocker(params: {
   if (!params.hasPathway) return "missing_pathway";
   if (!params.hasFamilyStructure) return "missing_family_structure";
   if (!params.hasCountries) return "missing_country_selection";
-  if (!params.hasPrimaryCountry && params.hasCountries) {
-    return "missing_primary_country";
-  }
   if (!params.hasTimeline) return "timeline_not_started";
   if (
     !params.timelineComplete &&
@@ -324,8 +296,7 @@ function determineExecutionStatus(params: {
   if (
     params.primaryBlocker === "missing_pathway" ||
     params.primaryBlocker === "missing_family_structure" ||
-    params.primaryBlocker === "missing_country_selection" ||
-    params.primaryBlocker === "missing_primary_country"
+    params.primaryBlocker === "missing_country_selection"
   ) {
     return "blocked";
   }
@@ -339,12 +310,11 @@ function determineExecutionStatus(params: {
 function determineSystemStage(params: {
   hasPathway: boolean;
   hasCountries: boolean;
-  hasPrimaryCountry: boolean;
   hasTimeline: boolean;
   executionStatus: ExecutionStatus;
 }): SystemStage {
   if (!params.hasPathway || !params.hasCountries) return "planning";
-  if (!params.hasPrimaryCountry || !params.hasTimeline) return "decision";
+  if (!params.hasTimeline) return "decision";
   if (params.executionStatus === "complete") return "completion";
 
   return "execution";
@@ -355,8 +325,6 @@ interface FlowStepParams {
   hasFamilyStructure: boolean;
   hasCountries: boolean;
   countryCount: number;
-  hasPrimaryCountry: boolean;
-  primaryCountryName: string | null;
   hasTimeline: boolean;
   timelineComplete: boolean;
   timelineProgress: number;
@@ -403,57 +371,42 @@ function buildUnifiedFlowSteps(params: FlowStepParams): UnifiedFlowStep[] {
     {
       id: "countries",
       number: 2,
-      title: params.hasPrimaryCountry ? "Country Committed" : "Select Countries",
+      title: "Select Countries",
       module: "countries",
       status: params.hasCountries
-        ? params.hasPrimaryCountry
-          ? "complete"
-          : "active"
+        ? "complete"
         : params.hasPathway
           ? "active"
           : "locked",
-      statusLabel: params.hasPrimaryCountry
-        ? "COMMITTED"
-        : params.hasCountries
-          ? "DECISION NEEDED"
-          : "REQUIRED NOW",
-      directive: params.hasPrimaryCountry
-        ? `Primary: ${params.primaryCountryName} (${Math.max(params.countryCount - 1, 0)} backup options)`
-        : params.hasCountries
-          ? `${params.countryCount} shortlisted — commit to primary jurisdiction`
-          : "Select jurisdictions for your treatment plan",
-      whyMatters: params.hasPrimaryCountry
-        ? "Primary jurisdiction commitment enables execution planning."
-        : "Jurisdiction determines your legal rights, timeline speed, donor availability, and total cost.",
-      systemInsight: params.hasPrimaryCountry
-        ? "Primary country locked. Execution can now proceed with legal and clinic coordination."
+      statusLabel: params.hasCountries
+        ? "COMPLETE"
+        : "REQUIRED NOW",
+      directive: params.hasCountries
+        ? `${params.countryCount} shortlisted — ready for timeline generation`
+        : "Select jurisdictions for your treatment plan",
+      whyMatters:
+        "Jurisdiction determines your legal rights, timeline speed, donor availability, and total cost.",
+      systemInsight: params.hasCountries
+        ? "Country selection complete. Timeline generation is now available."
         : "Country selection activates the timeline generation engine. Each jurisdiction has unique legal requirements.",
-      riskIfDelayed: params.hasPrimaryCountry
+      riskIfDelayed: params.hasCountries
         ? undefined
         : "Limited clinic availability; legal pathway complexity increases with delayed decisions.",
       cta:
         params.hasCountries || !params.hasPathway
-          ? params.hasCountries && !params.hasPrimaryCountry
-            ? {
-                label: "Commit to Primary",
-                href: "/portal/countries",
-                variant: "primary",
-              }
-            : undefined
+          ? undefined
           : {
               label: "Select Countries",
               href: "/portal/countries",
               variant: "primary",
             },
-      unlocks: params.hasPrimaryCountry
-        ? ["Execution authorization", "Clinic coordination", "Legal documentation"]
-        : params.hasCountries
-          ? ["Timeline generation", "Document requirements"]
-          : [
-              "Phase-based timeline",
-              "Document requirements",
-              "Legal pathway mapping",
-            ],
+      unlocks: params.hasCountries
+        ? ["Timeline generation", "Document requirements"]
+        : [
+            "Phase-based timeline",
+            "Document requirements",
+            "Legal pathway mapping",
+          ],
       isLocked: !params.hasPathway,
       lockReason: !params.hasPathway
         ? "Complete pathway definition first"
@@ -468,7 +421,7 @@ function buildUnifiedFlowSteps(params: FlowStepParams): UnifiedFlowStep[] {
         ? "complete"
         : params.hasTimeline
           ? "active"
-          : params.hasPrimaryCountry
+          : params.hasCountries
             ? "active"
             : "locked",
       statusLabel: params.timelineComplete
@@ -480,14 +433,14 @@ function buildUnifiedFlowSteps(params: FlowStepParams): UnifiedFlowStep[] {
         ? "Timeline complete — execution ready"
         : params.hasTimeline
           ? `Timeline in progress (${params.timelineProgress}%)`
-          : params.hasPrimaryCountry
+          : params.hasCountries
             ? "Initiate execution timeline — blocking all downstream phases"
-            : "Commit to primary country to unlock timeline",
+            : "Select countries to unlock timeline",
       whyMatters:
         "Without a structured timeline, treatment scheduling, legal preparation, and clinic coordination remain unstructured.",
-      systemInsight: params.hasPrimaryCountry
+      systemInsight: params.hasCountries
         ? "Execution cannot begin without structured timeline. All downstream phases depend on this step."
-        : "Timeline locked until primary jurisdiction is committed.",
+        : "Timeline locked until countries are selected.",
       riskIfDelayed:
         "Treatment scheduling delays of 3–8 weeks; missed scheduling windows increase risk.",
       estimatedEffort: "15–20 minutes to initialize",
@@ -499,7 +452,7 @@ function buildUnifiedFlowSteps(params: FlowStepParams): UnifiedFlowStep[] {
               href: "/portal/timeline",
               variant: "primary",
             }
-        : params.hasPrimaryCountry
+        : params.hasCountries
           ? {
               label: "Start Timeline Execution",
               href: "/portal/timeline",
@@ -513,9 +466,9 @@ function buildUnifiedFlowSteps(params: FlowStepParams): UnifiedFlowStep[] {
             "Execution tracking",
           ]
         : ["Document preparation system", "Advisory eligibility"],
-      isLocked: !params.hasPrimaryCountry,
-      lockReason: !params.hasPrimaryCountry
-        ? "Commit to primary country first"
+      isLocked: !params.hasCountries,
+      lockReason: !params.hasCountries
+        ? "Select countries first"
         : undefined,
     },
     {
@@ -607,40 +560,13 @@ function buildUnifiedNextAction(params: {
   stage: SystemStage;
 }): UnifiedNextAction {
   if (
-    params.primaryBlocker === "missing_primary_country" &&
-    params.stage === "decision"
-  ) {
-    return {
-      ...params.baseAction,
-      title: "Commit to Primary Jurisdiction",
-      body: "You have shortlisted countries but haven't committed to a primary jurisdiction. Execution is blocked until you select your primary destination.",
-      explanation:
-        "Multiple countries provide optionality, but execution requires commitment. Primary jurisdiction selection unlocks timeline generation, legal documentation requirements, and clinic coordination.",
-      stakes:
-        "Without primary country commitment, you cannot generate execution timelines, receive jurisdiction-specific legal guidance, or begin clinic outreach. This creates indefinite planning loops.",
-      unlocks: [
-        "Timeline generation with jurisdiction-specific sequencing",
-        "Legal documentation requirements",
-        "Clinic eligibility verification",
-        "Advisory with execution focus",
-      ],
-      priority: "critical",
-      type: "critical",
-      module: "countries",
-      href: "/portal/countries",
-      cta: "Commit to Primary Country →",
-      label: "EXECUTION BLOCKED — DECISION REQUIRED",
-    };
-  }
-
-  if (
     params.primaryBlocker === "timeline_not_started" &&
     params.stage === "decision"
   ) {
     return {
       ...params.baseAction,
       title: "Generate Execution Timeline",
-      body: "Primary jurisdiction selected. Now transform your planning into executable steps with structured timeline generation.",
+      body: "Countries selected. Now transform your planning into executable steps with structured timeline generation.",
       explanation:
         "Timeline structure determines the sequence of legal, medical, and logistical steps. Without it, execution timing cannot be coordinated.",
       stakes:
@@ -677,7 +603,6 @@ function buildUnifiedNextAction(params: {
 function buildEnhancedSignals(params: {
   hasCountries: boolean;
   countryCount: number;
-  hasPrimaryCountry: boolean;
   hasTimeline: boolean;
   timelineProgress: number;
   timelineComplete: boolean;
@@ -712,15 +637,6 @@ function buildEnhancedSignals(params: {
       id: "missing_country_selection",
       message: "No countries shortlisted",
       resolution: "Research and shortlist 2-4 jurisdictions",
-      href: "/portal/countries",
-      severity: "blocking",
-    });
-  } else if (params.primaryBlocker === "missing_primary_country") {
-    blockers.push({
-      id: "missing_primary_country",
-      message: "Primary jurisdiction not committed",
-      resolution:
-        "Select primary country from your shortlist to unlock execution",
       href: "/portal/countries",
       severity: "blocking",
     });
@@ -759,14 +675,6 @@ function buildEnhancedSignals(params: {
       id: "stalled_timeline",
       message: "Timeline initiated but progress stalled",
       mitigation: "Activate at least one step to maintain momentum",
-    });
-  }
-
-  if (params.hasPrimaryCountry) {
-    insights.push({
-      id: "primary_committed",
-      message: "Primary jurisdiction committed — execution authorized",
-      type: "positive",
     });
   }
 

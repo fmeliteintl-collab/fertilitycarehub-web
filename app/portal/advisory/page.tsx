@@ -543,7 +543,7 @@ export default function PortalAdvisoryPage() {
             surrogate_needed: existing.surrogate_needed,
             priorities: existing.priorities ?? [],
             constraints: existing.constraints ?? [],
-            primary_country: existing.primary_country ?? null,
+           
             shortlisted_countries: existing.shortlisted_countries ?? [],
             timeline_items: existing.timeline_items ?? [],
             advisory_status: existing.advisory_status ?? null,
