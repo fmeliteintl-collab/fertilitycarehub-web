@@ -72,13 +72,11 @@ function ExecutiveSummary({
   primaryBlocker,
   readinessTotal,
   flags,
-  plan,
 }: {
   stage: PortalIntelligence["stage"];
   primaryBlocker: PortalIntelligence["primaryBlocker"];
   readinessTotal: number;
   flags: PortalIntelligence["flags"];
-  plan: UserPlanInput;
 }) {
   // PREMIUM: Audit-aligned strategic interpretation
   const getStrategicInterpretation = () => {
@@ -88,11 +86,11 @@ function ExecutiveSummary({
     if (stage === "planning" && flags.hasPathway && !flags.hasCountries) {
       return "Pathway defined. Your planning foundation is strong, but country selection is required to proceed with execution planning.";
     }
-    if (stage === "decision" && !flags.hasPrimaryCountry && flags.hasCountries) {
+    if (stage === "decision" && flags.hasCountries) {
       return "You are in shortlist validation. Your planning foundation is strong, but country commitment is needed to unlock execution.";
     }
-    if (stage === "decision" && flags.hasPrimaryCountry && !flags.hasTimeline) {
-      return "Primary jurisdiction committed. Generate your execution timeline to transition from planning to active execution.";
+    if (stage === "decision" && !flags.hasTimeline) {
+      return "Generate your execution timeline to transition from planning to active execution.";
     }
     if (stage === "execution" && flags.hasTimeline && !flags.timelineComplete) {
       return "Active execution phase. Maintain milestone momentum and validate key decisions with advisory as needed.";
@@ -119,9 +117,6 @@ function ExecutiveSummary({
     }
     if (!flags.hasCountries) {
       return { label: "Select Countries", href: "/portal/countries", enabled: true };
-    }
-    if (!flags.hasPrimaryCountry) {
-      return { label: "Commit to Primary", href: "/portal/countries", enabled: true };
     }
     if (!flags.hasTimeline) {
       return { label: "Generate Timeline", href: "/portal/timeline", enabled: true };
@@ -173,21 +168,19 @@ function ExecutiveSummary({
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <StatusDot status={flags.hasPrimaryCountry ? "complete" : flags.hasCountries ? "active" : "blocked"} />
+              <StatusDot status={flags.hasCountries ? "active" : "blocked"} />
               <span className={
-                flags.hasPrimaryCountry ? "text-stone-300" : flags.hasCountries ? "text-[#d4c4a8]" : "text-stone-500"
+                flags.hasCountries ? "text-[#d4c4a8]" : "text-stone-500"
               }>
-                {flags.hasPrimaryCountry 
-                  ? `Primary: ${plan.primary_country}` 
-                  : flags.hasCountries 
-                    ? `${flags.countryCount} shortlisted` 
-                    : "Countries required"}
+                {flags.hasCountries 
+                  ? `${flags.countryCount} shortlisted` 
+                  : "Countries required"}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <StatusDot status={flags.hasTimeline ? "complete" : flags.hasPrimaryCountry ? "active" : "pending"} />
+              <StatusDot status={flags.hasTimeline ? "complete" : flags.hasCountries ? "active" : "pending"} />
               <span className={flags.hasTimeline ? "text-stone-300" : "text-stone-500"}>
-                Timeline {flags.hasTimeline ? `${flags.timelineProgress}%` : flags.hasPrimaryCountry ? "ready" : "locked"}
+                Timeline {flags.hasTimeline ? `${flags.timelineProgress}%` : flags.hasCountries ? "ready" : "locked"}
               </span>
             </div>
           </div>
@@ -537,7 +530,6 @@ export default function PortalDashboardPage() {
             priorities: existing.priorities ?? [],
             constraints: existing.constraints ?? [],
             shortlisted_countries: existing.shortlisted_countries ?? [],
-            primary_country: existing.primary_country ?? null,
             timeline_items: existing.timeline_items ?? [],
             advisory_status: existing.advisory_status ?? null,
             advisory_pathway: existing.advisory_pathway ?? null,
@@ -608,7 +600,6 @@ export default function PortalDashboardPage() {
         primaryBlocker={primaryBlocker}
         readinessTotal={readinessTotal}
         flags={flags}
-        plan={plan}
       />
 
       {/* === 2. PREMIUM: PRIMARY ACTION === */}
@@ -764,15 +755,11 @@ export default function PortalDashboardPage() {
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-bold text-stone-500 uppercase tracking-wider">Country Status</p>
           <p className="mt-3 text-lg font-bold text-stone-900">
-            {flags.hasPrimaryCountry 
-              ? plan.primary_country 
-              : flags.hasCountries 
-                ? `${flags.countryCount} shortlisted` 
-                : "None"}
+            {flags.hasCountries 
+              ? `${flags.countryCount} shortlisted` 
+              : "None"}
           </p>
-          {flags.hasPrimaryCountry ? (
-            <p className="mt-2 text-xs text-[#6a7a6a]">Primary committed — execution authorized</p>
-          ) : flags.hasCountries ? (
+          {flags.hasCountries ? (
             <p className="mt-2 text-xs text-[#d4c4a8]">Selection needed to unlock timeline</p>
           ) : (
             <p className="mt-2 text-xs text-stone-400">Start with country research</p>
