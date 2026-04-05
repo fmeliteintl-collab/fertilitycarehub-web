@@ -2,9 +2,11 @@
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export default function SignupPage() {
+  const router = useRouter();
   const supabase = getSupabaseBrowserClient();
 
   const [fullName, setFullName] = useState("");
@@ -12,7 +14,6 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -20,14 +21,16 @@ export default function SignupPage() {
     try {
       setSubmitting(true);
       setMessage(null);
-      setSuccess(false);
+
+      const trimmedFullName = fullName.trim();
+      const trimmedEmail = email.trim();
 
       const { error } = await supabase.auth.signUp({
-        email: email.trim(),
+        email: trimmedEmail,
         password,
         options: {
           data: {
-            full_name: fullName.trim(),
+            full_name: trimmedFullName,
           },
         },
       });
@@ -36,13 +39,21 @@ export default function SignupPage() {
         throw error;
       }
 
-      setSuccess(true);
-      setMessage(
-        "Account created. Check your email for confirmation if email verification is enabled."
-      );
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: trimmedEmail,
+        password,
+      });
+
+      if (signInError) {
+        throw signInError;
+      }
+
       setFullName("");
       setEmail("");
       setPassword("");
+
+      router.push("/portal");
+      router.refresh();
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unable to sign up.";
@@ -136,13 +147,7 @@ export default function SignupPage() {
         </form>
 
         {message ? (
-          <p
-            className={`mt-4 text-sm ${
-              success ? "text-green-700" : "text-red-600"
-            }`}
-          >
-            {message}
-          </p>
+          <p className="mt-4 text-sm text-red-600">{message}</p>
         ) : null}
 
         <p className="mt-6 text-sm text-stone-600">

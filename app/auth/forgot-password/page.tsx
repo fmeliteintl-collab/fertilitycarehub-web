@@ -2,17 +2,15 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
-export default function LoginPage() {
-  const router = useRouter();
+export default function ForgotPasswordPage() {
   const supabase = getSupabaseBrowserClient();
 
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -20,22 +18,34 @@ export default function LoginPage() {
     try {
       setSubmitting(true);
       setMessage(null);
+      setSuccess(false);
 
-      const { error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
+      const redirectTo =
+        typeof window !== "undefined"
+          ? `${window.location.origin}/auth/reset-password`
+          : undefined;
+
+      const { error } = await supabase.auth.resetPasswordForEmail(
+        email.trim(),
+        redirectTo ? { redirectTo } : undefined
+      );
 
       if (error) {
         throw error;
       }
 
-      router.push("/portal");
-      router.refresh();
+      setSuccess(true);
+      setMessage(
+        "If an account exists for that email, a password reset link has been sent."
+      );
+      setEmail("");
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "Unable to sign in.";
+        error instanceof Error
+          ? error.message
+          : "Unable to send password reset email.";
 
+      setSuccess(false);
       setMessage(errorMessage);
     } finally {
       setSubmitting(false);
@@ -49,10 +59,13 @@ export default function LoginPage() {
           FertilityCareHub
         </p>
 
-        <h1 className="mt-3 text-2xl font-semibold text-stone-900">Login</h1>
+        <h1 className="mt-3 text-2xl font-semibold text-stone-900">
+          Forgot Password
+        </h1>
 
         <p className="mt-2 text-sm leading-6 text-stone-600">
-          Sign in to access your private fertility planning workspace.
+          Enter your email address and we&apos;ll send you a link to reset your
+          password.
         </p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-5">
@@ -75,55 +88,32 @@ export default function LoginPage() {
             />
           </div>
 
-          <div>
-            <div className="flex items-center justify-between gap-4">
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-stone-800"
-              >
-                Password
-              </label>
-
-              <Link
-                href="/auth/forgot-password"
-                className="text-sm font-medium text-stone-700 underline underline-offset-4 transition hover:text-stone-900"
-              >
-                Forgot password?
-              </Link>
-            </div>
-
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className="mt-2 w-full rounded-xl border border-stone-300 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-stone-500"
-              placeholder="Enter your password"
-              required
-            />
-          </div>
-
           <button
             type="submit"
             disabled={submitting}
             className="w-full rounded-xl bg-stone-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {submitting ? "Signing in..." : "Sign In"}
+            {submitting ? "Sending reset link..." : "Send Reset Link"}
           </button>
         </form>
 
         {message ? (
-          <p className="mt-4 text-sm text-red-600">{message}</p>
+          <p
+            className={`mt-4 text-sm ${
+              success ? "text-green-700" : "text-red-600"
+            }`}
+          >
+            {message}
+          </p>
         ) : null}
 
         <p className="mt-6 text-sm text-stone-600">
-          Don&apos;t have an account?{" "}
+          Back to{" "}
           <Link
-            href="/auth/signup"
+            href="/auth/login"
             className="font-medium text-stone-900 underline"
           >
-            Create one
+            login
           </Link>
         </p>
       </div>
