@@ -14,6 +14,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -21,6 +22,7 @@ export default function SignupPage() {
     try {
       setSubmitting(true);
       setMessage(null);
+      setSuccess(false);
 
       const trimmedFullName = fullName.trim();
       const trimmedEmail = email.trim();
@@ -48,16 +50,24 @@ export default function SignupPage() {
         throw signInError;
       }
 
+      setSuccess(true);
+      setMessage(
+        "Your FertilityCareHub account has been created successfully. You are now signed in and can access your private planning workspace. Please make sure you used the correct email address, as it will be required for password recovery and future account-related communication."
+      );
+
       setFullName("");
       setEmail("");
       setPassword("");
 
-      router.push("/portal");
-      router.refresh();
+      window.setTimeout(() => {
+        router.push("/portal");
+        router.refresh();
+      }, 1500);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unable to sign up.";
 
+      setSuccess(false);
       setMessage(errorMessage);
     } finally {
       setSubmitting(false);
@@ -147,7 +157,13 @@ export default function SignupPage() {
         </form>
 
         {message ? (
-          <p className="mt-4 text-sm text-red-600">{message}</p>
+          <p
+            className={`mt-4 text-sm ${
+              success ? "text-green-700" : "text-red-600"
+            }`}
+          >
+            {message}
+          </p>
         ) : null}
 
         <p className="mt-6 text-sm text-stone-600">
