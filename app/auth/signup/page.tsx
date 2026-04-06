@@ -62,7 +62,7 @@ export default function SignupPage() {
       window.setTimeout(() => {
         router.push("/portal");
         router.refresh();
-      }, 1500);
+      }, 5000);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unable to sign up.";
