@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
 
@@ -97,7 +98,7 @@ export default function Home() {
 
         <p style={{ fontSize: 14, color: "#6a6256", marginTop: 14 }}>
           Powered by the{" "}
-          <strong>FCH Global Fertility Intelligence Framework™️</strong> — a
+          <strong>FCH Global Fertility Intelligence Framework(TM)</strong> - a
           structured model that evaluates jurisdictions across regulatory
           alignment, donor pathway constraints, clinical infrastructure, and
           execution risk.
@@ -244,8 +245,191 @@ export default function Home() {
             color: "#7a7a7a",
           }}
         >
-          Structured Analysis Across 30+ Jurisdictions • Legal &amp; Clinical
+          Structured Analysis Across 30+ Jurisdictions • Legal and Clinical
           Intelligence • Cross-Border Strategic Advisory
+        </div>
+      </section>
+
+      {/* START YOUR JOURNEY */}
+      <section
+        style={{
+          padding: "90px 20px",
+          backgroundColor: "#f3efe7",
+          textAlign: "center",
+          borderTop: "1px solid #ece3d1",
+          borderBottom: "1px solid #ece3d1",
+        }}
+      >
+        <div style={{ maxWidth: "980px", margin: "0 auto" }}>
+          <h2 style={{ fontSize: "28px", marginBottom: 18 }}>
+            Start Your Fertility Planning Journey
+          </h2>
+
+          <p
+            style={{
+              color: "#555",
+              marginBottom: 44,
+              maxWidth: 760,
+              marginLeft: "auto",
+              marginRight: "auto",
+            }}
+          >
+            FertilityCareHub follows a structured three-step advisory process:
+            first understand the framework, then choose the advisory path that
+            fits your situation, and then receive private client workspace access
+            as part of eligible engagement and onboarding.
+          </p>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+              gap: "28px",
+              textAlign: "left",
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: "#ffffff",
+                padding: 28,
+                borderRadius: 6,
+                border: "1px solid #e5ddc8",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 12,
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+                  color: "#8a7a55",
+                  marginBottom: 10,
+                }}
+              >
+                Step 1
+              </div>
+
+              <h3 style={{ marginTop: 0, marginBottom: 12 }}>
+                Understand the Framework
+              </h3>
+
+              <p style={{ color: "#555", marginBottom: 18 }}>
+                Begin with the FertilityCareHub planning framework to understand
+                how cross-border fertility decisions should be evaluated across
+                regulatory, clinical, financial, and execution dimensions.
+              </p>
+
+              <p style={{ color: "#555", marginBottom: 18, fontSize: 14 }}>
+                This is the strategic foundation behind the system, not generic
+                fertility content or promotional ranking logic.
+              </p>
+
+              <Link
+                href="/brief"
+                style={{
+                  color: "#8a7a55",
+                  textDecoration: "underline",
+                  textUnderlineOffset: 4,
+                }}
+              >
+                Review the Planning Framework
+              </Link>
+            </div>
+
+            <div
+              style={{
+                backgroundColor: "#ffffff",
+                padding: 28,
+                borderRadius: 6,
+                border: "1px solid #e5ddc8",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 12,
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+                  color: "#8a7a55",
+                  marginBottom: 10,
+                }}
+              >
+                Step 2
+              </div>
+
+              <h3 style={{ marginTop: 0, marginBottom: 12 }}>
+                Choose Your Advisory Path
+              </h3>
+
+              <p style={{ color: "#555", marginBottom: 18 }}>
+                Review the appropriate advisory pathway for your fertility goals,
+                jurisdictional complexity, donor or surrogacy exposure, and level
+                of strategic support required.
+              </p>
+
+              <p style={{ color: "#555", marginBottom: 18, fontSize: 14 }}>
+                This is where public research transitions into structured client
+                engagement and guided strategic decision-making.
+              </p>
+
+              <Link
+                href="/advisory"
+                style={{
+                  color: "#8a7a55",
+                  textDecoration: "underline",
+                  textUnderlineOffset: 4,
+                }}
+              >
+                View Advisory Tiers
+              </Link>
+            </div>
+
+            <div
+              style={{
+                backgroundColor: "#ffffff",
+                padding: 28,
+                borderRadius: 6,
+                border: "1px solid #e5ddc8",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 12,
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+                  color: "#8a7a55",
+                  marginBottom: 10,
+                }}
+              >
+                Step 3
+              </div>
+
+              <h3 style={{ marginTop: 0, marginBottom: 12 }}>
+                Receive Private Client Workspace Access
+              </h3>
+
+              <p style={{ color: "#555", marginBottom: 18 }}>
+                Eligible advisory clients receive access to a private planning
+                workspace used to organize pathway decisions, shortlisted
+                jurisdictions, timeline milestones, and key documents throughout
+                the engagement.
+              </p>
+
+              <p style={{ color: "#555", marginBottom: 18, fontSize: 14 }}>
+                Workspace access is issued selectively as part of structured
+                advisory onboarding. It is not a public sign-up portal.
+              </p>
+
+              <Link
+                href="/consultation"
+                style={{
+                  color: "#8a7a55",
+                  textDecoration: "underline",
+                  textUnderlineOffset: 4,
+                }}
+              >
+                Request Client Intake
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -264,7 +448,7 @@ export default function Home() {
 
           <p style={{ color: "#555", marginBottom: 16 }}>
             FertilityCareHub operates under the{" "}
-            <strong>FCH Global Fertility Intelligence Framework™️</strong> — a
+            <strong>FCH Global Fertility Intelligence Framework(TM)</strong> - a
             documented, version-controlled jurisdiction evaluation model.
           </p>
 
@@ -334,7 +518,7 @@ export default function Home() {
           <p style={{ color: "#555", marginBottom: 0 }}>
             Each engagement follows structured internal scoring discipline with
             qualitative client-facing risk translation. This is institutional
-            advisory — not clinic referral, not rankings, and not promotional
+            advisory - not clinic referral, not rankings, and not promotional
             comparison.
           </p>
         </div>
@@ -365,7 +549,7 @@ export default function Home() {
             framework designed to evaluate regulatory alignment, governance
             structure, clinical infrastructure depth, and execution complexity.
             Advisory outputs are derived from structured internal scoring
-            discipline and qualitative risk translation — not promotional ranking
+            discipline and qualitative risk translation, not promotional ranking
             models.
           </p>
         </div>
@@ -375,7 +559,7 @@ export default function Home() {
       <section style={{ padding: "100px 20px", textAlign: "center" }}>
         <div style={{ maxWidth: "1050px", margin: "0 auto" }}>
           <h2 style={{ fontSize: "28px", marginBottom: "18px" }}>
-            The FCH Global Fertility Intelligence Framework™️
+            The FCH Global Fertility Intelligence Framework(TM)
           </h2>
 
           <p
@@ -420,7 +604,7 @@ export default function Home() {
 
             <div style={{ background: "#ffffff", padding: 26, borderRadius: 6 }}>
               <h3 style={{ marginTop: 0 }}>
-                Governance &amp; Donor Policy Structure
+                Governance and Donor Policy Structure
               </h3>
               <p style={{ color: "#555", marginBottom: 0 }}>
                 Anonymity frameworks, disclosure requirements, donor eligibility
@@ -471,7 +655,7 @@ export default function Home() {
             intermediaries, FertilityCareHub operates as an independent
             analytical advisory platform. Jurisdictional comparisons are
             produced under structured elimination protocols and weighted
-            framework modeling — not referral incentives.
+            framework modeling, not referral incentives.
           </p>
 
           <p style={{ color: "#555", marginBottom: 0 }}>
@@ -606,7 +790,7 @@ export default function Home() {
       {/* FOOTER */}
       <footer style={{ padding: "34px 20px", textAlign: "center", color: "#777" }}>
         <div style={{ fontSize: 12 }}>
-          ©️ {new Date().getFullYear()} FertilityCareHub •{" "}
+          Copyright {new Date().getFullYear()} FertilityCareHub •{" "}
           <Link href="/privacy" style={{ textDecoration: "underline" }}>
             Privacy
           </Link>{" "}

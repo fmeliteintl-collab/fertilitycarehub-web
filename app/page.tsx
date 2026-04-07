@@ -2,16 +2,18 @@ import type { Metadata } from "next";
 import HomeClient from "./HomeClient";
 
 export const metadata: Metadata = {
-  title: "Private Global Fertility Strategy Advisory | FertilityCareHub",
+  title:
+    "FertilityCareHub | Cross-Border Fertility Planning, Portal, and Advisory",
   description:
-    "Discreet, cross-border fertility jurisdiction advisory for individuals and families navigating international reproductive care. Strategic assessment, regulatory clarity, and curated clinical alignment.",
+    "FertilityCareHub is a private cross-border fertility planning and advisory platform with a gated portal to help individuals and families navigate international reproductive care with greater clarity, structure, and control.",
   alternates: {
     canonical: "https://fertilitycarehub.com",
   },
   openGraph: {
-    title: "Private Global Fertility Strategy Advisory",
+    title:
+      "FertilityCareHub | Cross-Border Fertility Planning, Portal, and Advisory",
     description:
-      "A private advisory for cross-border fertility care, jurisdiction strategy, and clinical alignment.",
+      "A private fertility planning platform with framework-based guidance, a gated planning portal, and personalized cross-border fertility strategy advisory.",
     url: "https://fertilitycarehub.com",
     siteName: "FertilityCareHub",
     type: "website",
@@ -23,6 +25,8 @@ const WEBSITE_JSON_LD = {
   "@type": "WebSite",
   name: "FertilityCareHub",
   url: "https://fertilitycarehub.com",
+  description:
+    "A private cross-border fertility planning and advisory platform with a gated portal for structured fertility journey management.",
   publisher: {
     "@type": "Organization",
     name: "FertilityCareHub",
@@ -34,7 +38,7 @@ const WEBSITE_JSON_LD = {
 const WEBPAGE_JSON_LD = {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  name: "Private Global Fertility Strategy Advisory",
+  name: "FertilityCareHub",
   url: "https://fertilitycarehub.com",
   isPartOf: {
     "@type": "WebSite",
@@ -42,20 +46,20 @@ const WEBPAGE_JSON_LD = {
   },
   about: {
     "@type": "Thing",
-    name: "Cross-border fertility strategy advisory",
+    name: "Cross-border fertility planning and advisory",
   },
+  description:
+    "Framework-based fertility planning, gated portal access, and personalized advisory for international fertility journeys.",
 } as const;
 
 export default function Page() {
   return (
     <>
-      {/* JSON-LD: WebSite */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(WEBSITE_JSON_LD) }}
       />
 
-      {/* JSON-LD: WebPage */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(WEBPAGE_JSON_LD) }}
