@@ -1,79 +1,8 @@
 "use client";
 
-import { FormEvent, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export default function SignupPage() {
-  const router = useRouter();
-  const supabase = getSupabaseBrowserClient();
-
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    try {
-      setSubmitting(true);
-      setMessage(null);
-      setSuccess(false);
-
-      const trimmedFullName = fullName.trim();
-      const trimmedEmail = email.trim();
-
-      const { error } = await supabase.auth.signUp({
-        email: trimmedEmail,
-        password,
-        options: {
-          data: {
-            full_name: trimmedFullName,
-          },
-        },
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: trimmedEmail,
-        password,
-      });
-
-      if (signInError) {
-        throw signInError;
-      }
-
-      setSuccess(true);
-      setMessage(
-        "Your FertilityCareHub account has been created successfully. You are now signed in and can access your private planning workspace. Please make sure you used the correct email address, as it will be required for password recovery and future account-related communication."
-      );
-
-      setFullName("");
-      setEmail("");
-      setPassword("");
-
-      window.setTimeout(() => {
-        router.push("/portal");
-        router.refresh();
-      }, 5000);
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unable to sign up.";
-
-      setSuccess(false);
-      setMessage(errorMessage);
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
   return (
     <div className="min-h-screen bg-stone-50 px-6 py-16">
       <div className="mx-auto max-w-md rounded-2xl border border-stone-200 bg-white p-8 shadow-sm">
@@ -81,99 +10,88 @@ export default function SignupPage() {
           FertilityCareHub
         </p>
 
-        <h1 className="mt-3 text-2xl font-semibold text-stone-900">Sign Up</h1>
+        <h1 className="mt-3 text-2xl font-semibold text-stone-900">
+          Private Client Access
+        </h1>
 
         <p className="mt-2 text-sm leading-6 text-stone-600">
-          Create your account to access your private fertility planning
-          workspace.
+          FertilityCareHub client workspace access is reserved for approved
+          premium advisory clients. Public self-registration is not available.
         </p>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-          <div>
-            <label
-              htmlFor="fullName"
-              className="block text-sm font-medium text-stone-800"
-            >
-              Full Name
-            </label>
-            <input
-              id="fullName"
-              type="text"
-              autoComplete="name"
-              value={fullName}
-              onChange={(event) => setFullName(event.target.value)}
-              className="mt-2 w-full rounded-xl border border-stone-300 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-stone-500"
-              placeholder="Your full name"
-              required
-            />
+        <div className="mt-8 space-y-5">
+          <div className="rounded-xl border border-stone-200 bg-stone-50 px-4 py-4">
+            <h2 className="text-sm font-semibold text-stone-900">
+              How access works
+            </h2>
+
+            <div className="mt-3 space-y-3 text-sm leading-6 text-stone-700">
+              <p>
+                <span className="font-medium text-stone-900">
+                  1. Advisory selection.
+                </span>{" "}
+                Clients begin by selecting the advisory pathway appropriate to
+                their fertility goals, jurisdictional complexity, and level of
+                support required.
+              </p>
+
+              <p>
+                <span className="font-medium text-stone-900">
+                  2. Intake and onboarding.
+                </span>{" "}
+                Eligible clients proceed through structured intake and approval.
+              </p>
+
+              <p>
+                <span className="font-medium text-stone-900">
+                  3. Workspace access issued.
+                </span>{" "}
+                Private portal access is then provided directly as part of the
+                approved engagement. It is not an open public signup system.
+              </p>
+            </div>
           </div>
 
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-stone-800"
-            >
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              className="mt-2 w-full rounded-xl border border-stone-300 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-stone-500"
-              placeholder="you@example.com"
-              required
-            />
+          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-4">
+            <p className="text-sm leading-6 text-amber-900">
+              If you are an approved client and believe you should already have
+              access, please use your issued login credentials or contact
+              FertilityCareHub for assistance.
+            </p>
           </div>
+        </div>
 
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-stone-800"
-            >
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              autoComplete="new-password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className="mt-2 w-full rounded-xl border border-stone-300 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-stone-500"
-              placeholder="Create a password"
-              required
-              minLength={8}
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full rounded-xl bg-stone-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {submitting ? "Creating account..." : "Create Account"}
-          </button>
-        </form>
-
-        {message ? (
-          <p
-            className={`mt-4 text-sm ${
-              success ? "text-green-700" : "text-red-600"
-            }`}
-          >
-            {message}
-          </p>
-        ) : null}
-
-        <p className="mt-6 text-sm text-stone-600">
-          Already have an account?{" "}
+        <div className="mt-8 space-y-3">
           <Link
-            href="/auth/login"
-            className="font-medium text-stone-900 underline"
+            href="/advisory"
+            className="block w-full rounded-xl bg-stone-900 px-4 py-3 text-center text-sm font-medium text-white transition hover:bg-stone-800"
           >
-            Sign in
+            View Advisory Tiers
           </Link>
+
+          <Link
+            href="/consultation"
+            className="block w-full rounded-xl border border-stone-300 px-4 py-3 text-center text-sm font-medium text-stone-900 transition hover:bg-stone-100"
+          >
+            Request Client Intake
+          </Link>
+        </div>
+
+        <div className="mt-6 rounded-xl border border-stone-200 bg-white px-4 py-4">
+          <p className="text-sm leading-6 text-stone-600">
+            Already have an account?{" "}
+            <Link
+              href="/auth/login"
+              className="font-medium text-stone-900 underline"
+            >
+              Sign in
+            </Link>
+          </p>
+        </div>
+
+        <p className="mt-6 text-xs leading-5 text-stone-500">
+          Client workspace access is issued selectively as part of structured
+          advisory onboarding and approval.
         </p>
       </div>
     </div>
