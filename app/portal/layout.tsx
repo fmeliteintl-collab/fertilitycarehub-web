@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createServerClient } from "@supabase/ssr";
+import type { User } from "@supabase/supabase-js";
 import { getCurrentUser } from "@/lib/auth/get-current-user";
 import PortalShell from "@/components/portal/PortalShell";
 
@@ -15,8 +16,8 @@ type ProfileAccessRow = {
   portal_access: boolean | null;
 };
 
-function getUserLabel(user: Awaited<ReturnType<typeof getCurrentUser>>) {
-  const metadata = user?.user_metadata;
+function getUserLabel(user: User) {
+  const metadata = user.user_metadata;
 
   const fullName =
     metadata &&
@@ -26,7 +27,7 @@ function getUserLabel(user: Awaited<ReturnType<typeof getCurrentUser>>) {
       ? metadata.full_name
       : null;
 
-  return fullName || user?.email || "Account";
+  return fullName || user.email || "Account";
 }
 
 async function getServerSupabaseClient() {
@@ -65,14 +66,15 @@ export default async function PortalLayout({
     .from("profiles")
     .select("portal_access")
     .eq("id", user.id)
-    .maybeSingle<ProfileAccessRow>();
+    .maybeSingle();
 
   if (error) {
     console.error("Failed to verify portal access:", error);
     redirect("/consultation");
   }
 
-  const hasPortalAccess = data?.portal_access === true;
+  const profile = data as ProfileAccessRow | null;
+  const hasPortalAccess = profile?.portal_access === true;
 
   if (!hasPortalAccess) {
     redirect("/auth/signup");
