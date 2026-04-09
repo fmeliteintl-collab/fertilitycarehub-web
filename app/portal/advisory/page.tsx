@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ElementType, type FormEvent } from "react";
 import Link from "next/link";
 import {
   getCurrentUserPlan,
@@ -50,7 +50,15 @@ import {
   HelpCircle,
   AlertCircle,
   Clock,
-  Shield
+  Shield,
+  Building2,
+  ClipboardList,
+  Scale,
+  Users,
+  BookOpen,
+  FileCheck2,
+  Layers3,
+  CalendarRange
 } from "lucide-react";
 
 export const runtime = "edge";
@@ -109,7 +117,7 @@ function ColoredGlobe({ className = "w-6 h-6" }: { className?: string }) {
 // Stage configuration with premium styling
 const STAGE_CONFIG: Record<string, { 
   num: string; 
-  icon: React.ElementType; 
+  icon: ElementType; 
   color: string;
   bgColor: string;
   borderColor: string;
@@ -382,7 +390,7 @@ function WorkstreamSection({
   variant = "default"
 }: { 
   title: string; 
-  icon: React.ElementType; 
+  icon: ElementType; 
   items: AdvisoryTask[];
   emptyText: string;
   variant?: "default" | "critical" | "question";
@@ -504,6 +512,149 @@ function PathwayCard({
         <span className="text-xs text-stone-500">
           {suitability === "ideal" ? "Ideal for your current stage" : 
            suitability === "suitable" ? "Suitable with preparation" : "Complete planning foundation first"}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+type MethodologyPillar = {
+  title: string;
+  description: string;
+  icon: ElementType;
+};
+
+function MethodologyPillarCard({ pillar }: { pillar: MethodologyPillar }) {
+  const Icon = pillar.icon;
+
+  return (
+    <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+      <div className="flex items-start gap-4">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-stone-100">
+          <Icon className="h-5 w-5 text-stone-700" />
+        </div>
+        <div>
+          <h3 className="text-sm font-semibold text-stone-900">{pillar.title}</h3>
+          <p className="mt-2 text-sm leading-6 text-stone-500">{pillar.description}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+type DeliverableItem = {
+  title: string;
+  description: string;
+  icon: ElementType;
+};
+
+function DeliverableCard({ item }: { item: DeliverableItem }) {
+  const Icon = item.icon;
+
+  return (
+    <div className="rounded-2xl border border-stone-200 bg-stone-50/70 p-5">
+      <div className="flex items-start gap-3">
+        <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white border border-stone-200 shadow-sm">
+          <Icon className="h-4.5 w-4.5 text-stone-700" />
+        </div>
+        <div>
+          <h3 className="text-sm font-semibold text-stone-900">{item.title}</h3>
+          <p className="mt-1.5 text-sm leading-6 text-stone-500">{item.description}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+type FitSignalTone = "strong" | "developing" | "early";
+
+function AdvisoryFitSummary({
+  tone,
+  title,
+  description,
+  bullets,
+}: {
+  tone: FitSignalTone;
+  title: string;
+  description: string;
+  bullets: string[];
+}) {
+  const toneStyles = {
+    strong: {
+      wrapper: "border-emerald-200 bg-emerald-50/70",
+      iconWrap: "bg-emerald-100",
+      icon: "text-emerald-700",
+      title: "text-emerald-950",
+      body: "text-emerald-800/80",
+      bullet: "bg-emerald-500",
+    },
+    developing: {
+      wrapper: "border-amber-200 bg-amber-50/70",
+      iconWrap: "bg-amber-100",
+      icon: "text-amber-700",
+      title: "text-amber-950",
+      body: "text-amber-800/80",
+      bullet: "bg-amber-500",
+    },
+    early: {
+      wrapper: "border-stone-200 bg-stone-50/70",
+      iconWrap: "bg-stone-100",
+      icon: "text-stone-700",
+      title: "text-stone-950",
+      body: "text-stone-700",
+      bullet: "bg-stone-400",
+    },
+  };
+
+  const styles = toneStyles[tone];
+
+  return (
+    <div className={`rounded-2xl border p-6 ${styles.wrapper}`}>
+      <div className="flex items-start gap-4">
+        <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${styles.iconWrap}`}>
+          <Sparkles className={`h-5 w-5 ${styles.icon}`} />
+        </div>
+        <div className="flex-1">
+          <h3 className={`text-lg font-semibold ${styles.title}`}>{title}</h3>
+          <p className={`mt-2 text-sm leading-6 ${styles.body}`}>{description}</p>
+          <div className="mt-4 space-y-2">
+            {bullets.map((bullet) => (
+              <div key={bullet} className="flex items-start gap-2.5">
+                <span className={`mt-2 h-1.5 w-1.5 shrink-0 rounded-full ${styles.bullet}`} />
+                <p className={`text-sm leading-6 ${styles.body}`}>{bullet}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+type ScenarioCardItem = {
+  title: string;
+  description: string;
+  badge: string;
+  icon: ElementType;
+};
+
+function ScenarioCard({ item }: { item: ScenarioCardItem }) {
+  const Icon = item.icon;
+
+  return (
+    <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-100">
+            <Icon className="h-5 w-5 text-stone-700" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-stone-900">{item.title}</h3>
+            <p className="mt-1.5 text-sm leading-6 text-stone-500">{item.description}</p>
+          </div>
+        </div>
+        <span className="shrink-0 rounded-full border border-stone-200 bg-stone-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.15em] text-stone-500">
+          {item.badge}
         </span>
       </div>
     </div>
@@ -664,7 +815,7 @@ export default function PortalAdvisoryPage() {
     }
   }
 
-  async function handleCreateTask(e: React.FormEvent) {
+  async function handleCreateTask(e: FormEvent) {
     e.preventDefault();
     if (!advisoryStage || !newTaskTitle.trim()) return;
 
@@ -775,6 +926,149 @@ export default function PortalAdvisoryPage() {
     if (advisoryReadiness.percentage >= 50) return "suitable";
     return "not-yet";
   };
+
+  const methodologyPillars: MethodologyPillar[] = useMemo(
+    () => [
+      {
+        title: "Jurisdiction Fit",
+        description:
+          "We assess whether a country aligns with your pathway structure, treatment goal, donor or surrogate needs, and practical eligibility realities before deeper execution begins.",
+        icon: Globe,
+      },
+      {
+        title: "Legal & Process Friction",
+        description:
+          "We identify areas where documentation, regulation, sequencing, or cross-border process exposure may create avoidable delays, ambiguity, or downstream risk.",
+        icon: Scale,
+      },
+      {
+        title: "Operational Sequencing",
+        description:
+          "We map the order in which decisions should happen so planning logic, timeline timing, and advisory effort stay coherent from first decision to execution stage.",
+        icon: CalendarRange,
+      },
+      {
+        title: "Case Clarity",
+        description:
+          "We convert scattered considerations into a structured pathway: what matters now, what can wait, and which variables should be actively monitored.",
+        icon: Layers3,
+      },
+    ],
+    []
+  );
+
+  const pathwayDeliverables: DeliverableItem[] = useMemo(
+    () => [
+      {
+        title: "Structured planning interpretation",
+        description:
+          "A synthesized view of your current planning position based on pathway type, shortlisted countries, timing, and advisory maturity.",
+        icon: BookOpen,
+      },
+      {
+        title: "Priority decision framing",
+        description:
+          "Clear guidance on which decisions should be handled first so effort is applied where it changes the outcome most.",
+        icon: Target,
+      },
+      {
+        title: "Risk and readiness signals",
+        description:
+          "Identification of missing inputs, unresolved assumptions, or sequencing gaps that could weaken downstream execution.",
+        icon: Shield,
+      },
+      {
+        title: "Actionable next-step direction",
+        description:
+          "A practical path forward that connects your advisory work to countries, timeline, and case preparation without unnecessary noise.",
+        icon: FileCheck2,
+      },
+    ],
+    []
+  );
+
+  const advisoryScenarios: ScenarioCardItem[] = useMemo(
+    () => [
+      {
+        title: "You have a shortlist but not a confident decision path.",
+        description:
+          "Best for clients comparing plausible jurisdictions but needing structure around tradeoffs, fit, and timing before moving further.",
+        badge: "Type A",
+        icon: MapPin,
+      },
+      {
+        title: "Your case has cross-border complexity or multiple moving parts.",
+        description:
+          "Best for situations where donor, surrogate, family structure, logistics, or timeline sensitivity create higher sequencing risk.",
+        badge: "Type B",
+        icon: Building2,
+      },
+      {
+        title: "You need a disciplined execution framework, not scattered research.",
+        description:
+          "Best for clients who want a private planning layer that converts information into an ordered decision process with accountable next actions.",
+        badge: "Type C",
+        icon: ClipboardList,
+      },
+    ],
+    []
+  );
+
+  const advisoryFitSummary = useMemo(() => {
+    if (isInAdvisory) {
+      return {
+        tone: "strong" as const,
+        title: "Your advisory layer is active.",
+        description:
+          "The focus now is not whether advisory is valuable, but how to extract maximum value from the current engagement stage.",
+        bullets: [
+          "Use the active workstream to keep decisions sequenced and visible.",
+          "Document unresolved questions so strategic sessions are used efficiently.",
+          "Keep your timeline and country logic aligned with each new advisory output.",
+        ],
+      };
+    }
+
+    if (advisoryReadiness.percentage >= 75) {
+      return {
+        tone: "strong" as const,
+        title: "You are well-positioned for advisory support.",
+        description:
+          "Your planning foundation appears developed enough that advisory work can focus on leverage, interpretation, and decision precision rather than basic setup.",
+        bullets: [
+          "Your planning profile is established enough to support higher-value strategic review.",
+          "Country logic and timeline structure can now be challenged and refined.",
+          "A strategy session is likely to add practical clarity rather than generic direction.",
+        ],
+      };
+    }
+
+    if (advisoryReadiness.percentage >= 50) {
+      return {
+        tone: "developing" as const,
+        title: "Advisory may be suitable once a few planning gaps are tightened.",
+        description:
+          "You are no longer at zero, but you will extract more value after strengthening the shortlist, timeline, or pathway definition first.",
+        bullets: [
+          "Clarify the countries that are truly under consideration.",
+          "Reduce uncertainty in your timing assumptions and next milestones.",
+          "Use advisory to validate a structured plan, not replace one.",
+        ],
+      };
+    }
+
+    return {
+      tone: "early" as const,
+      title: "Complete the planning foundation before deeper advisory work.",
+      description:
+        "At this stage, the best use of time is establishing the basics so any future advisory session starts from clarity rather than open-ended uncertainty.",
+      bullets: [
+        "Define your pathway and core family context first.",
+        "Build an initial country direction before comparing deeper variables.",
+        "Generate a timeline so advisory can work against a sequence, not a blank slate.",
+      ],
+    };
+  }, [advisoryReadiness.percentage, isInAdvisory]);
 
   if (loading) {
     return <DashboardSkeleton />;
@@ -984,6 +1278,65 @@ export default function PortalAdvisoryPage() {
             </p>
           </section>
 
+          {/* Advisory Methodology */}
+          <section className="space-y-6">
+            <div className="flex items-center gap-2 px-1">
+              <Building2 className="w-4 h-4 text-stone-400" />
+              <h2 className="text-sm font-bold tracking-[0.15em] text-stone-400 uppercase">
+                Institutional Advisory Method
+              </h2>
+              <span className="ml-2 h-px flex-1 bg-stone-200"></span>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-2">
+              {methodologyPillars.map((pillar) => (
+                <MethodologyPillarCard key={pillar.title} pillar={pillar} />
+              ))}
+            </div>
+          </section>
+
+          {/* Advisory Fit Summary */}
+          <AdvisoryFitSummary
+            tone={advisoryFitSummary.tone}
+            title={advisoryFitSummary.title}
+            description={advisoryFitSummary.description}
+            bullets={advisoryFitSummary.bullets}
+          />
+
+          {/* Deliverables */}
+          <section className="space-y-6">
+            <div className="flex items-center gap-2 px-1">
+              <FileText className="w-4 h-4 text-stone-400" />
+              <h2 className="text-sm font-bold tracking-[0.15em] text-stone-400 uppercase">
+                What Advisory Adds
+              </h2>
+              <span className="ml-2 h-px flex-1 bg-stone-200"></span>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-2">
+              {pathwayDeliverables.map((item) => (
+                <DeliverableCard key={item.title} item={item} />
+              ))}
+            </div>
+          </section>
+
+          {/* Scenario Fit */}
+          <section className="space-y-6">
+            <div className="flex items-center gap-2 px-1">
+              <Users className="w-4 h-4 text-stone-400" />
+              <h2 className="text-sm font-bold tracking-[0.15em] text-stone-400 uppercase">
+                When Advisory Is Most Useful
+              </h2>
+              <span className="ml-2 h-px flex-1 bg-stone-200"></span>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-3">
+              {advisoryScenarios.map((item) => (
+                <ScenarioCard key={item.title} item={item} />
+              ))}
+            </div>
+          </section>
+
           {/* Advisory Settings */}
           <section className="rounded-2xl border border-stone-200 bg-white p-8 shadow-sm">
             <div className="mb-6">
@@ -1170,6 +1523,50 @@ export default function PortalAdvisoryPage() {
                 emptyText="Track documents, decisions, or information needed."
               />
             </div>
+          )}
+
+          {/* Active Engagement Operating Model */}
+          {advisoryStage && (
+            <section className="rounded-2xl border border-stone-200 bg-white p-8 shadow-sm">
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+                <div className="max-w-2xl">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Layers3 className="w-4 h-4 text-stone-400" />
+                    <h2 className="text-sm font-bold tracking-[0.15em] text-stone-400 uppercase">
+                      Engagement Structure
+                    </h2>
+                  </div>
+                  <p className="text-lg font-semibold text-stone-900">
+                    Advisory is being handled as a disciplined workstream, not a loose note-taking area.
+                  </p>
+                  <p className="mt-3 text-sm leading-6 text-stone-500">
+                    Use this space to keep stage clarity, active tasks, decision context, and next actions synchronized. Each stage should leave you with better sequencing, fewer unknowns, and a cleaner execution path.
+                  </p>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-3 lg:w-[420px]">
+                  {[
+                    {
+                      label: "Current stage",
+                      value: ADVISORY_STAGES.find((stage) => stage.key === advisoryStage)?.label ?? "Not set",
+                    },
+                    {
+                      label: "Open tasks",
+                      value: `${taskProgress.total - taskProgress.done}`,
+                    },
+                    {
+                      label: "Stage progress",
+                      value: `${taskProgress.percentage}%`,
+                    },
+                  ].map((item) => (
+                    <div key={item.label} className="rounded-2xl border border-stone-200 bg-stone-50/60 p-4">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-stone-400">{item.label}</p>
+                      <p className="mt-2 text-sm font-semibold text-stone-900">{item.value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
           )}
 
           {/* Task Management */}
