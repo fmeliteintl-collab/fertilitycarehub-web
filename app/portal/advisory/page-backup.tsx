@@ -26,10 +26,7 @@ import {
   getTimelineCounts,
   getDisplayValue,
   getDefaultTasksForStage,
-  determinePathwayClassification,
-  getPathwayClassificationBadgeTone,
   type AdvisorySignal,
-  type PathwayClassificationResult,
 } from "@/lib/intelligence/plan-intelligence";
 import { DashboardSkeleton } from "@/app/components/skeletons";
 
@@ -641,125 +638,6 @@ type ScenarioCardItem = {
   icon: ElementType;
 };
 
-
-
-
-function PathwayClassificationBadge({ classification }: { classification: PathwayClassificationResult }) {
-  const tone = getPathwayClassificationBadgeTone(classification);
-
-  const toneStyles = {
-    emerald: "border-emerald-200 bg-emerald-50 text-emerald-800",
-    amber: "border-amber-200 bg-amber-50 text-amber-800",
-    rose: "border-rose-200 bg-rose-50 text-rose-800",
-  };
-
-  return (
-    <span className={`inline-flex items-center rounded-full border px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] ${toneStyles[tone]}`}>
-      {classification.label}
-    </span>
-  );
-}
-
-function PathwayClassificationCard({
-  classification,
-  readinessPercentage,
-}: {
-  classification: PathwayClassificationResult;
-  readinessPercentage: number;
-}) {
-  const tone = getPathwayClassificationBadgeTone(classification);
-
-  const toneStyles = {
-    emerald: {
-      wrapper: "border-emerald-200 bg-gradient-to-br from-emerald-50 to-white",
-      iconWrap: "bg-emerald-100",
-      icon: "text-emerald-700",
-      accent: "text-emerald-900",
-      body: "text-emerald-800/80",
-      bullet: "bg-emerald-500",
-      Icon: Compass,
-    },
-    amber: {
-      wrapper: "border-amber-200 bg-gradient-to-br from-amber-50 to-white",
-      iconWrap: "bg-amber-100",
-      icon: "text-amber-700",
-      accent: "text-amber-900",
-      body: "text-amber-800/80",
-      bullet: "bg-amber-500",
-      Icon: Scale,
-    },
-    rose: {
-      wrapper: "border-rose-200 bg-gradient-to-br from-rose-50 to-white",
-      iconWrap: "bg-rose-100",
-      icon: "text-rose-700",
-      accent: "text-rose-900",
-      body: "text-rose-800/80",
-      bullet: "bg-rose-500",
-      Icon: Layers3,
-    },
-  } as const;
-
-  const styles = toneStyles[tone];
-  const Icon = styles.Icon;
-
-  return (
-    <section className={`rounded-2xl border p-8 shadow-sm ${styles.wrapper}`}>
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-        <div className="max-w-3xl">
-          <div className="flex items-center gap-2 mb-3">
-            <Target className="w-4 h-4 text-stone-400" />
-            <h2 className="text-sm font-bold tracking-[0.15em] text-stone-500 uppercase">
-              Pathway Classification
-            </h2>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <PathwayClassificationBadge classification={classification} />
-            <p className={`text-lg font-semibold ${styles.accent}`}>{classification.title}</p>
-          </div>
-
-          <p className={`mt-2 text-sm font-medium ${styles.accent}`}>{classification.shortTitle} case profile</p>
-          <p className={`mt-4 text-sm leading-6 ${styles.body}`}>{classification.summary}</p>
-          <p className={`mt-4 text-sm leading-6 ${styles.body}`}>{classification.advisoryFit}</p>
-        </div>
-
-        <div className="rounded-2xl border border-white/70 bg-white/80 p-5 lg:w-[260px]">
-          <div className="flex items-center gap-3">
-            <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${styles.iconWrap}`}>
-              <Icon className={`h-5 w-5 ${styles.icon}`} />
-            </div>
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-stone-400">Readiness</p>
-              <p className="text-lg font-semibold text-stone-900">{readinessPercentage}%</p>
-            </div>
-          </div>
-          <div className="mt-4 space-y-2">
-            <div className="flex items-start gap-2.5">
-              <span className={`mt-2 h-1.5 w-1.5 shrink-0 rounded-full ${styles.bullet}`} />
-              <p className="text-sm leading-6 text-stone-600">{classification.nextFocus}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-6 grid gap-3 lg:grid-cols-3">
-        {classification.indicators.map((indicator) => (
-          <div key={indicator} className="rounded-2xl border border-white/70 bg-white/80 p-4">
-            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-stone-400">Why this classification</p>
-            <p className="mt-2 text-sm leading-6 text-stone-700">{indicator}</p>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-4 rounded-2xl border border-white/70 bg-white/80 p-4">
-        <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-stone-400">Classification rationale</p>
-        <p className="mt-2 text-sm leading-6 text-stone-700">{classification.rationale}</p>
-      </div>
-    </section>
-  );
-}
-
-
 function ScenarioCard({ item }: { item: ScenarioCardItem }) {
   const Icon = item.icon;
 
@@ -1136,11 +1014,6 @@ export default function PortalAdvisoryPage() {
     []
   );
 
-  const pathwayClassification = useMemo(
-    () => determinePathwayClassification(plan),
-    [plan]
-  );
-
   const advisoryFitSummary = useMemo(() => {
     if (isInAdvisory) {
       return {
@@ -1405,11 +1278,6 @@ export default function PortalAdvisoryPage() {
             </p>
           </section>
 
-          <PathwayClassificationCard
-            classification={pathwayClassification}
-            readinessPercentage={advisoryReadiness.percentage}
-          />
-
           {/* Advisory Methodology */}
           <section className="space-y-6">
             <div className="flex items-center gap-2 px-1">
@@ -1656,11 +1524,6 @@ export default function PortalAdvisoryPage() {
               />
             </div>
           )}
-
-          <PathwayClassificationCard
-            classification={pathwayClassification}
-            readinessPercentage={advisoryReadiness.percentage}
-          />
 
           {/* Active Engagement Operating Model */}
           {advisoryStage && (

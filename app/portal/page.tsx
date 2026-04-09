@@ -11,6 +11,11 @@ import {
   getPortalIntelligence,
   type PortalIntelligence,
 } from "@/lib/intelligence/portal-intelligence";
+import {
+  determinePathwayClassification,
+  getPathwayClassificationBadgeTone,
+  type PathwayClassificationResult,
+} from "@/lib/intelligence/plan-intelligence";
 import { DashboardSkeleton } from "@/app/components/skeletons";
 
 export const runtime = "edge";
@@ -63,6 +68,133 @@ function StatusDot({ status }: { status: "complete" | "active" | "pending" | "bl
   };
 
   return <div className={`h-2 w-2 rounded-full ${styles[status]}`} />;
+}
+
+function PathwayClassificationBadge({
+  type,
+  tone,
+}: {
+  type: PathwayClassificationResult["label"];
+  tone: ReturnType<typeof getPathwayClassificationBadgeTone>;
+}) {
+  const styles: Record<ReturnType<typeof getPathwayClassificationBadgeTone>, string> = {
+    emerald: "border-emerald-200 bg-emerald-50 text-emerald-800",
+    amber: "border-amber-200 bg-amber-50 text-amber-800",
+    rose: "border-rose-200 bg-rose-50 text-rose-800",
+  };
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-full border px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] ${styles[tone]}`}
+    >
+      {type}
+    </span>
+  );
+}
+
+function PathwayClassificationCard({
+  classification,
+  readinessTotal,
+}: {
+  classification: PathwayClassificationResult;
+  readinessTotal: number;
+}) {
+  const tone = getPathwayClassificationBadgeTone(classification);
+
+  const styles: Record<ReturnType<typeof getPathwayClassificationBadgeTone>, {
+    wrapper: string;
+    title: string;
+    body: string;
+    bullet: string;
+    panel: string;
+    accent: string;
+  }> = {
+    emerald: {
+      wrapper: "border-emerald-200 bg-gradient-to-br from-emerald-50 to-white",
+      title: "text-emerald-900",
+      body: "text-emerald-800/80",
+      bullet: "bg-emerald-500",
+      panel: "border-emerald-100 bg-white/80",
+      accent: "text-emerald-700",
+    },
+    amber: {
+      wrapper: "border-amber-200 bg-gradient-to-br from-amber-50 to-white",
+      title: "text-amber-900",
+      body: "text-amber-800/80",
+      bullet: "bg-amber-500",
+      panel: "border-amber-100 bg-white/80",
+      accent: "text-amber-700",
+    },
+    rose: {
+      wrapper: "border-rose-200 bg-gradient-to-br from-rose-50 to-white",
+      title: "text-rose-900",
+      body: "text-rose-800/80",
+      bullet: "bg-rose-500",
+      panel: "border-rose-100 bg-white/80",
+      accent: "text-rose-700",
+    },
+  };
+
+  const currentStyles = styles[tone];
+
+  return (
+    <section className={`rounded-2xl border p-6 shadow-sm ${currentStyles.wrapper}`}>
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+        <div className="max-w-3xl">
+          <p className="text-xs font-semibold uppercase tracking-wider text-stone-500">
+            Shared Pathway Classification
+          </p>
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <PathwayClassificationBadge type={classification.label} tone={tone} />
+            <h2 className={`text-xl font-semibold ${currentStyles.title}`}>
+              {classification.title}
+            </h2>
+          </div>
+          <p className={`mt-2 text-sm font-medium ${currentStyles.accent}`}>
+            {classification.label}
+          </p>
+          <p className={`mt-4 text-sm leading-6 ${currentStyles.body}`}>
+            {classification.summary}
+          </p>
+          <p className={`mt-3 text-sm leading-6 ${currentStyles.body}`}>
+            {classification.advisoryFit}
+          </p>
+        </div>
+
+        <div className={`rounded-2xl border p-5 lg:w-[280px] ${currentStyles.panel}`}>
+          <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-stone-400">
+            Current interpretation
+          </p>
+          <p className="mt-2 text-3xl font-light text-stone-900">
+            {readinessTotal}%
+          </p>
+          <p className="mt-1 text-xs text-stone-500">
+            Readiness aligned to your current case type
+          </p>
+
+          <div className="mt-4 space-y-2">
+            {classification.nextFocus.split(/\.\s+/).filter(Boolean).map((item: string) => (
+              <div key={item} className="flex items-start gap-2.5">
+                <span className={`mt-2 h-1.5 w-1.5 shrink-0 rounded-full ${currentStyles.bullet}`} />
+                <p className="text-sm leading-6 text-stone-700">{item}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-3 lg:grid-cols-3">
+        {classification.indicators.map((reason: string) => (
+          <div key={reason} className={`rounded-2xl border p-4 ${currentStyles.panel}`}>
+            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-stone-400">
+              Why this classification
+            </p>
+            <p className="mt-2 text-sm leading-6 text-stone-700">{reason}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 // === PREMIUM: EXECUTIVE SUMMARY COMPONENT ===
@@ -581,6 +713,11 @@ export default function PortalDashboardPage() {
   } = intelligence;
 
   const readinessTotal = readiness.overall;
+  const pathwayClassification = useMemo(
+    () => determinePathwayClassification(plan),
+    [plan]
+  );
+
 
   if (loading) return <DashboardSkeleton />;
   if (isError) {
@@ -641,14 +778,20 @@ export default function PortalDashboardPage() {
         </div>
       </section>
 
-      {/* === 4. SYSTEM INTELLIGENCE === */}
+      {/* === 4. PATHWAY CLASSIFICATION === */}
+      <PathwayClassificationCard
+        classification={pathwayClassification}
+        readinessTotal={readinessTotal}
+      />
+
+      {/* === 5. SYSTEM INTELLIGENCE === */}
       <SystemInsights
         signals={signals}
         executionStatus={executionStatus}
         stage={stage}
       />
 
-      {/* === 5. READINESS BREAKDOWN === */}
+      {/* === 6. READINESS BREAKDOWN === */}
       <section className="rounded-2xl border border-stone-200 bg-stone-50 p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -721,7 +864,7 @@ export default function PortalDashboardPage() {
         )}
       </section>
 
-      {/* === 6. METRICS === */}
+      {/* === 7. METRICS === */}
       <section className="grid gap-6 lg:grid-cols-3">
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-bold text-stone-500 uppercase tracking-wider">Execution Progress</p>
@@ -767,7 +910,7 @@ export default function PortalDashboardPage() {
         </div>
       </section>
 
-      {/* === 7. STAGE STATUS === */}
+      {/* === 8. STAGE STATUS === */}
       <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
         <div className="flex items-start gap-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-stone-100">
@@ -796,7 +939,7 @@ export default function PortalDashboardPage() {
         </div>
       </section>
 
-      {/* === ADVISORY CTA === */}
+      {/* === 9. ADVISORY CTA === */}
       <section className="rounded-2xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
