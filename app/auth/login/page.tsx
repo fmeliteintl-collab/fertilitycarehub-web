@@ -49,11 +49,21 @@ export default function LoginPage() {
           FertilityCareHub
         </p>
 
-        <h1 className="mt-3 text-2xl font-semibold text-stone-900">Login</h1>
+        <h1 className="mt-3 text-2xl font-semibold text-stone-900">
+          Client Sign In
+        </h1>
 
         <p className="mt-2 text-sm leading-6 text-stone-600">
-          Sign in to access your private fertility planning workspace.
+          Sign in to access your private FertilityCareHub client workspace.
         </p>
+
+        <div className="mt-4 rounded-xl border border-stone-200 bg-stone-50 px-4 py-4">
+          <p className="text-sm leading-6 text-stone-700">
+            Client workspace access is reserved for approved advisory clients and
+            is issued directly during onboarding. This is not a public account
+            registration system.
+          </p>
+        </div>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-5">
           <div>
@@ -117,15 +127,25 @@ export default function LoginPage() {
           <p className="mt-4 text-sm text-red-600">{message}</p>
         ) : null}
 
-        <p className="mt-6 text-sm text-stone-600">
-          Don&apos;t have an account?{" "}
-          <Link
-            href="/auth/signup"
-            className="font-medium text-stone-900 underline"
-          >
-            Create one
-          </Link>
-        </p>
+        <div className="mt-6 border-t border-stone-200 pt-6">
+          <p className="text-sm leading-6 text-stone-600">
+            Need client access?{" "}
+            <Link
+              href="/consultation"
+              className="font-medium text-stone-900 underline"
+            >
+              Request intake
+            </Link>{" "}
+            or{" "}
+            <Link
+              href="/advisory"
+              className="font-medium text-stone-900 underline"
+            >
+              view advisory tiers
+            </Link>
+            .
+          </p>
+        </div>
       </div>
     </div>
   );
