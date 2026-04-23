@@ -108,8 +108,12 @@ export default function AdminConsultationsPage() {
   }, [router]);
 
   useEffect(() => {
-    fetchRows();
-  }, [fetchRows]);
+  const timer = window.setTimeout(() => {
+    void fetchRows();
+  }, 0);
+
+  return () => window.clearTimeout(timer);
+}, [fetchRows]);
 
   const filtered = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();

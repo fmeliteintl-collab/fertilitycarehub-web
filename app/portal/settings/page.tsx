@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { 
@@ -296,14 +296,13 @@ export default function PortalSettingsPage() {
     );
   }
 
-  const accountCreatedLabel = useMemo(() => {
-    if (!profile?.created_at) return "Not available";
-    return new Date(profile.created_at).toLocaleDateString("en-US", {
+const accountCreatedLabel = !profile?.created_at
+  ? "Not available"
+  : new Date(profile.created_at).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
-      day: "numeric"
+      day: "numeric",
     });
-  }, [profile?.created_at]);
 
   if (loading) {
     return (
