@@ -2,20 +2,20 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { headers } from "next/headers";
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-if (!stripeSecretKey) {
-  throw new Error("Missing STRIPE_SECRET_KEY");
-}
-
-if (!stripeWebhookSecret) {
-  throw new Error("Missing STRIPE_WEBHOOK_SECRET");
-}
-
-const stripe = new Stripe(stripeSecretKey);
-
 export async function POST(req: Request) {
+  const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+  const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!stripeSecretKey) {
+    return new NextResponse("Missing STRIPE_SECRET_KEY", { status: 500 });
+  }
+
+  if (!stripeWebhookSecret) {
+    return new NextResponse("Missing STRIPE_WEBHOOK_SECRET", { status: 500 });
+  }
+
+  const stripe = new Stripe(stripeSecretKey);
+
   const body = await req.text();
   const headerList = await headers();
   const sig = headerList.get("stripe-signature");
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(body, sig, stripeWebhookSecret as string);
+    event = stripe.webhooks.constructEvent(body, sig, stripeWebhookSecret);
   } catch (err: unknown) {
     if (err instanceof Error) {
       return new NextResponse(`Webhook Error: ${err.message}`, {
