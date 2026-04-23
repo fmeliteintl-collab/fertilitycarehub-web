@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { headers } from "next/headers";
-
+export const runtime = "edge";
 export async function POST(req: Request) {
   const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
   const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
