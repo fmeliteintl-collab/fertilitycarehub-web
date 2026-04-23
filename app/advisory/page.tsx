@@ -81,6 +81,24 @@ export default function AdvisoryPage() {
       },
       {
         "@type": "Question",
+        name: "Does private client portal access come with an advisory engagement?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text:
+            "Yes. Approved advisory engagements include access to a private planning workspace as part of structured onboarding. FertilityCareHub is not an open public sign-up platform.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Do I create a public account immediately after payment?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text:
+            "No. FertilityCareHub follows a selective onboarding model. After payment or engagement confirmation, your case enters onboarding review and private portal access is issued directly as part of approved engagement setup.",
+        },
+      },
+      {
+        "@type": "Question",
         name: "Does FertilityCareHub guarantee fertility outcomes?",
         acceptedAnswer: {
           "@type": "Answer",
@@ -167,6 +185,77 @@ export default function AdvisoryPage() {
           <Link href="/consultation#request" className={CTA_SECONDARY}>
             Request Advisory Consultation
           </Link>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 pb-12">
+        <div className="rounded-2xl border border-[#DCCFB3] bg-[#FFF8EC] p-8">
+          <div className="max-w-4xl">
+            <div className="text-xs tracking-[0.24em] text-[#8A7652]">
+              CLIENT ACCESS MODEL
+            </div>
+
+            <h2 className="mt-3 text-2xl font-medium">
+              Private portal access is included as part of approved advisory
+              onboarding
+            </h2>
+
+            <p className="mt-4 text-sm leading-relaxed text-[#5F584C]">
+              FertilityCareHub is not an open public sign-up platform. Advisory
+              clients engage through structured purchase and onboarding, and
+              private planning workspace access is then issued directly as part
+              of approved client setup.
+            </p>
+
+            <p className="mt-4 text-sm leading-relaxed text-[#5F584C]">
+              This means the value of your engagement includes not only
+              structured strategic analysis, but also a private client-facing
+              planning environment where approved clients can later sign in,
+              review planning materials, and work through their advisory process
+              in a more organized way.
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
+            <div className="rounded-xl border border-[#E5DDC8] bg-white/80 p-6">
+              <div className="text-xs tracking-[0.22em] text-[#6A6256]">
+                INCLUDED
+              </div>
+              <div className="mt-2 font-medium">
+                Private planning workspace access
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Approved advisory clients receive private portal access as part
+                of structured onboarding and client activation.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-[#E5DDC8] bg-white/80 p-6">
+              <div className="text-xs tracking-[0.22em] text-[#6A6256]">
+                IMPORTANT
+              </div>
+              <div className="mt-2 font-medium">
+                This is not a public self-registration system
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Payment does not open a public account creation flow. Workspace
+                access is issued selectively as part of advisory onboarding.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-[#E5DDC8] bg-white/80 p-6">
+              <div className="text-xs tracking-[0.22em] text-[#6A6256]">
+                CLIENT LOGIN
+              </div>
+              <div className="mt-2 font-medium">
+                Approved clients later sign in through the portal login page
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Once access is activated, clients use the FertilityCareHub login
+                page to enter their private planning workspace.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -384,6 +473,8 @@ export default function AdvisoryPage() {
               <li>Pillar-level qualitative risk bands</li>
               <li>Primary regulatory friction flags</li>
               <li>Strategic direction with rationale</li>
+              <li>Structured onboarding into the advisory process</li>
+              <li>Private client workspace access included upon approved setup</li>
             </ul>
 
             <p className="mt-6 text-xs leading-relaxed text-[#6A6256]">
@@ -436,6 +527,8 @@ export default function AdvisoryPage() {
               <li>Regulatory risk briefing</li>
               <li>Conditional scenario modeling</li>
               <li>Execution roadmap &amp; readiness checklist</li>
+              <li>Structured onboarding into the advisory process</li>
+              <li>Private client workspace access included upon approved setup</li>
             </ul>
 
             <p className="mt-6 text-xs leading-relaxed text-[#6A6256]">
@@ -443,6 +536,89 @@ export default function AdvisoryPage() {
               requirements, regulatory sensitivity, or cases requiring a
               documented execution roadmap.
             </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 pb-16">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-8">
+          <h2 className="text-2xl font-medium">
+            What happens immediately after purchase
+          </h2>
+
+          <p className="mt-4 max-w-4xl text-sm leading-relaxed text-[#6A6256]">
+            Once your advisory engagement is submitted, your case moves into a
+            structured onboarding and review process. This is a private,
+            selective advisory model — not an open public software signup flow.
+          </p>
+
+          <div className="mt-6 grid gap-6 md:grid-cols-4">
+            <div className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-5">
+              <div className="text-xs tracking-[0.22em] text-[#6A6256]">
+                STEP 1
+              </div>
+              <div className="mt-2 font-medium">Your engagement is received</div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Your advisory purchase and engagement details are captured and
+                prepared for onboarding review.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-5">
+              <div className="text-xs tracking-[0.22em] text-[#6A6256]">
+                STEP 2
+              </div>
+              <div className="mt-2 font-medium">Onboarding review begins</div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                FertilityCareHub reviews your engagement context, advisory fit,
+                and client setup requirements before portal activation.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-5">
+              <div className="text-xs tracking-[0.22em] text-[#6A6256]">
+                STEP 3
+              </div>
+              <div className="mt-2 font-medium">
+                Private workspace access is issued
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Approved clients are issued access to a private planning
+                workspace as part of the advisory engagement.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-5">
+              <div className="text-xs tracking-[0.22em] text-[#6A6256]">
+                STEP 4
+              </div>
+              <div className="mt-2 font-medium">
+                You sign in through the client login page
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Once your access is active, you use the FertilityCareHub login
+                page to enter your private portal workspace.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-8 rounded-xl border border-[#DCCFB3] bg-[#FFF8EC] p-6">
+            <p className="text-sm leading-relaxed text-[#5F584C]">
+              <span className="font-medium text-[#1A1A1A]">Important:</span>{" "}
+              You do not need to create a public account immediately after
+              payment. FertilityCareHub client workspace access is issued
+              directly as part of approved advisory onboarding.
+            </p>
+          </div>
+
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link href="/auth/login" className={CTA_SECONDARY}>
+              Client Login
+            </Link>
+
+            <Link href="/consultation#request" className={CTA_PRIMARY}>
+              Request Advisory Consultation
+            </Link>
           </div>
         </div>
       </section>
@@ -489,6 +665,57 @@ export default function AdvisoryPage() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-6xl px-6 pb-16">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-8">
+          <h2 className="text-2xl font-medium">
+            What approved clients can expect from portal access
+          </h2>
+
+          <p className="mt-4 max-w-4xl text-sm leading-relaxed text-[#6A6256]">
+            Private portal access is designed to support a more structured
+            client experience after advisory onboarding. It is part of the
+            engagement environment — not a public product subscription.
+          </p>
+
+          <div className="mt-6 grid gap-6 md:grid-cols-2">
+            <div className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-6">
+              <div className="text-sm font-medium">Planning structure</div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Approved clients can work within a dedicated planning space that
+                supports cross-border fertility strategy, jurisdiction review,
+                execution planning, and advisory continuity.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-6">
+              <div className="text-sm font-medium">Client-specific access</div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Access is issued only to approved clients whose advisory
+                engagement has been reviewed and activated through FertilityCareHub.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-6">
+              <div className="text-sm font-medium">Protected environment</div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Portal access is controlled separately from the public website so
+                clients receive a more private and structured workspace
+                experience.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-6">
+              <div className="text-sm font-medium">Login after activation</div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Once access is issued, approved clients use the client login page
+                to enter the workspace. Access is not available through open
+                public self-registration.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-6xl px-6 pb-20 text-center">
         <div className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-8">
           <h2 className="text-2xl font-medium">Advisory Capacity</h2>
@@ -504,6 +731,11 @@ export default function AdvisoryPage() {
             FertilityCareHub does not provide medical treatment, legal advice,
             or outcome guarantees. The platform provides structured strategic
             planning support for cross-border fertility decision-making.
+          </p>
+
+          <p className="mx-auto mt-4 max-w-3xl text-xs leading-relaxed text-[#6A6256]">
+            Private workspace access is issued selectively as part of approved
+            advisory onboarding and client activation.
           </p>
         </div>
       </section>
