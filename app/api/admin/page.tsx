@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import Link from "next/link";
 
 type ConsultationRow = {
@@ -30,19 +30,18 @@ function formatDate(s?: string) {
 }
 
 export default function AdminConsultationsPage() {
-  const [token, setToken] = useState("");
-  const [savedToken, setSavedToken] = useState<string>("");
+  const [token, setToken] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return window.localStorage.getItem("FCH_ADMIN_TOKEN") || "";
+  });
+  const [savedToken, setSavedToken] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    return window.localStorage.getItem("FCH_ADMIN_TOKEN") || "";
+  });
   const [rows, setRows] = useState<ConsultationRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string>("");
   const [query, setQuery] = useState("");
-
-  // Load token from localStorage on first render
-  useEffect(() => {
-    const t = window.localStorage.getItem("FCH_ADMIN_TOKEN") || "";
-    setSavedToken(t);
-    setToken(t);
-  }, []);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -88,8 +87,9 @@ export default function AdminConsultationsPage() {
       }
 
       setRows(Array.isArray(json?.data) ? json.data : []);
-       } catch (e: unknown) {
-      const errorMessage = e instanceof Error ? e.message : "Failed to fetch consultations.";
+    } catch (e: unknown) {
+      const errorMessage =
+        e instanceof Error ? e.message : "Failed to fetch consultations.";
       setErr(errorMessage);
       setRows([]);
     } finally {
@@ -111,7 +111,6 @@ export default function AdminConsultationsPage() {
     }
 
     setErr("");
-    // optimistic UI update
     setRows((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
 
     try {
@@ -128,12 +127,12 @@ export default function AdminConsultationsPage() {
 
       if (!res.ok) {
         setErr(json?.error || `PATCH failed (${res.status})`);
-        // revert by re-fetching
         await fetchRows(t);
         return;
       }
-        } catch (e: unknown) {
-      const errorMessage = e instanceof Error ? e.message : "Failed to update status.";
+    } catch (e: unknown) {
+      const errorMessage =
+        e instanceof Error ? e.message : "Failed to update status.";
       setErr(errorMessage);
       await fetchRows(t);
     }
@@ -186,7 +185,7 @@ export default function AdminConsultationsPage() {
 
             <div className="mt-3 flex gap-2">
               <button
-                onClick={() => fetchRows(savedToken || token)}
+                onClick={() => void fetchRows(savedToken || token)}
                 className="w-full rounded-xl border border-[#1A1A1A] px-4 py-2 text-sm font-medium hover:bg-black/5"
               >
                 Load / Refresh
@@ -260,7 +259,9 @@ export default function AdminConsultationsPage() {
                   <td className="p-3">
                     <div className="font-medium">{r.name || "—"}</div>
                     {r.phone && (
-                      <div className="text-[#6A6256] text-xs mt-1">{r.phone}</div>
+                      <div className="text-[#6A6256] text-xs mt-1">
+                        {r.phone}
+                      </div>
                     )}
                   </td>
 
@@ -323,7 +324,7 @@ export default function AdminConsultationsPage() {
                   <td className="p-3 whitespace-nowrap">
                     <select
                       value={r.status || "new"}
-                      onChange={(e) => updateStatus(r.id, e.target.value)}
+                      onChange={(e) => void updateStatus(r.id, e.target.value)}
                       className="rounded-xl border border-[#E6DDCD] bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#D7C8AF]"
                     >
                       {STATUS_OPTIONS.map((s) => (
