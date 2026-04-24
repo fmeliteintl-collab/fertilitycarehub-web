@@ -13,7 +13,6 @@ type StripeWebhookEnv = {
 function getStripeEnv(): StripeWebhookEnv {
   try {
     const context = getRequestContext();
-
     return context.env as StripeWebhookEnv;
   } catch {
     return {
@@ -40,6 +39,8 @@ export async function POST(req: Request) {
   const stripe = new Stripe(stripeSecretKey);
 
   const body = await req.text();
+  
+  // Fix: Handle headers() as Promise for TypeScript compatibility
   const headerList = await headers();
   const sig = headerList.get("stripe-signature");
 
@@ -63,7 +64,6 @@ export async function POST(req: Request) {
         status: 400,
       });
     }
-
     return new NextResponse("Webhook Error", { status: 400 });
   }
 
