@@ -28,6 +28,16 @@ export async function POST(req: Request) {
   const stripeSecretKey = stripeEnv.STRIPE_SECRET_KEY;
   const stripeWebhookSecret = stripeEnv.STRIPE_WEBHOOK_SECRET;
 
+  // DIAGNOSTIC LOGGING
+  console.log("=== WEBHOOK DIAGNOSTICS ===");
+  console.log("Secret exists:", !!stripeWebhookSecret);
+  console.log("Secret length:", stripeWebhookSecret?.length);
+  console.log("Secret starts with whsec_:", stripeWebhookSecret?.startsWith("whsec_"));
+  console.log("Secret has whitespace:", /\s/.test(stripeWebhookSecret || ""));
+  console.log("Secret first 10 chars:", stripeWebhookSecret?.substring(0, 10));
+  console.log("Secret last 10 chars:", stripeWebhookSecret?.substring(stripeWebhookSecret.length - 10));
+  console.log("==========================");
+
   if (!stripeSecretKey) {
     return new NextResponse("Missing STRIPE_SECRET_KEY", { status: 500 });
   }
@@ -39,15 +49,11 @@ export async function POST(req: Request) {
   const stripe = new Stripe(stripeSecretKey);
 
   const body = await req.text();
-  
-  // Fix: Handle headers() as Promise for TypeScript compatibility
   const headerList = await headers();
   const sig = headerList.get("stripe-signature");
 
   if (!sig) {
-    return new NextResponse("Missing stripe-signature header", {
-      status: 400,
-    });
+    return new NextResponse("Missing stripe-signature header", { status: 400 });
   }
 
   let event: Stripe.Event;
@@ -60,9 +66,8 @@ export async function POST(req: Request) {
     );
   } catch (err: unknown) {
     if (err instanceof Error) {
-      return new NextResponse(`Webhook Error: ${err.message}`, {
-        status: 400,
-      });
+      console.log("Webhook verification failed:", err.message);
+      return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
     }
     return new NextResponse("Webhook Error", { status: 400 });
   }
@@ -70,7 +75,6 @@ export async function POST(req: Request) {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
     const customerEmail = session.customer_details?.email ?? null;
-
     console.log("Payment received from:", customerEmail);
   }
 
