@@ -13,6 +13,7 @@ type StripeWebhookEnv = {
 function getStripeEnv(): StripeWebhookEnv {
   try {
     const context = getRequestContext();
+
     return context.env as StripeWebhookEnv;
   } catch {
     return {
@@ -51,7 +52,11 @@ export async function POST(req: Request) {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(body, sig, stripeWebhookSecret);
+    event = await stripe.webhooks.constructEventAsync(
+      body,
+      sig,
+      stripeWebhookSecret
+    );
   } catch (err: unknown) {
     if (err instanceof Error) {
       return new NextResponse(`Webhook Error: ${err.message}`, {
