@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { headers } from "next/headers";
-export const runtime = "edge";
+
+export const runtime = "nodejs";
+
 export async function POST(req: Request) {
   const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
   const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -36,7 +38,6 @@ export async function POST(req: Request) {
         status: 400,
       });
     }
-
     return new NextResponse("Webhook Error", { status: 400 });
   }
 
@@ -44,7 +45,7 @@ export async function POST(req: Request) {
     const session = event.data.object as Stripe.Checkout.Session;
     const customerEmail = session.customer_details?.email ?? null;
 
-    console.log("Payment received from:", customerEmail);
+    console.log("✅ Payment received from:", customerEmail);
   }
 
   return NextResponse.json({ received: true });
