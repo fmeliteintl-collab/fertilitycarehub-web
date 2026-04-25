@@ -22,20 +22,32 @@ function getStripeEnv(): StripeWebhookEnv {
   }
 }
 
+// TEMPORARY: Diagnostic endpoint
+export async function GET() {
+  const stripeEnv = getStripeEnv();
+  const secret = stripeEnv.STRIPE_WEBHOOK_SECRET;
+
+  return NextResponse.json({
+    secretExists: !!secret,
+    secretLength: secret?.length,
+    startsWithWhsec: secret?.startsWith("whsec_"),
+    hasWhitespace: /\s/.test(secret || ""),
+    firstChars: secret?.substring(0, 15),
+    lastChars: secret?.substring((secret?.length || 0) - 10),
+  });
+}
+
 export async function POST(req: Request) {
   const stripeEnv = getStripeEnv();
 
   const stripeSecretKey = stripeEnv.STRIPE_SECRET_KEY;
   const stripeWebhookSecret = stripeEnv.STRIPE_WEBHOOK_SECRET;
 
-  // DIAGNOSTIC LOGGING
   console.log("=== WEBHOOK DIAGNOSTICS ===");
   console.log("Secret exists:", !!stripeWebhookSecret);
   console.log("Secret length:", stripeWebhookSecret?.length);
   console.log("Secret starts with whsec_:", stripeWebhookSecret?.startsWith("whsec_"));
   console.log("Secret has whitespace:", /\s/.test(stripeWebhookSecret || ""));
-  console.log("Secret first 10 chars:", stripeWebhookSecret?.substring(0, 10));
-  console.log("Secret last 10 chars:", stripeWebhookSecret?.substring(stripeWebhookSecret.length - 10));
   console.log("==========================");
 
   if (!stripeSecretKey) {
