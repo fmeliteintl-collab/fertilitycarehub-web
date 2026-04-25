@@ -22,33 +22,11 @@ function getStripeEnv(): StripeWebhookEnv {
   }
 }
 
-// TEMPORARY: Diagnostic endpoint
-export async function GET() {
-  const stripeEnv = getStripeEnv();
-  const secret = stripeEnv.STRIPE_WEBHOOK_SECRET;
-
-  return NextResponse.json({
-    secretExists: !!secret,
-    secretLength: secret?.length,
-    startsWithWhsec: secret?.startsWith("whsec_"),
-    hasWhitespace: /\s/.test(secret || ""),
-    firstChars: secret?.substring(0, 15),
-    lastChars: secret?.substring((secret?.length || 0) - 10),
-  });
-}
-
 export async function POST(req: Request) {
   const stripeEnv = getStripeEnv();
 
   const stripeSecretKey = stripeEnv.STRIPE_SECRET_KEY;
   const stripeWebhookSecret = stripeEnv.STRIPE_WEBHOOK_SECRET;
-
-  console.log("=== WEBHOOK DIAGNOSTICS ===");
-  console.log("Secret exists:", !!stripeWebhookSecret);
-  console.log("Secret length:", stripeWebhookSecret?.length);
-  console.log("Secret starts with whsec_:", stripeWebhookSecret?.startsWith("whsec_"));
-  console.log("Secret has whitespace:", /\s/.test(stripeWebhookSecret || ""));
-  console.log("==========================");
 
   if (!stripeSecretKey) {
     return new NextResponse("Missing STRIPE_SECRET_KEY", { status: 500 });
@@ -78,7 +56,7 @@ export async function POST(req: Request) {
     );
   } catch (err: unknown) {
     if (err instanceof Error) {
-      console.log("Webhook verification failed:", err.message);
+      console.error("Webhook verification failed:", err.message);
       return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
     }
     return new NextResponse("Webhook Error", { status: 400 });
@@ -88,6 +66,8 @@ export async function POST(req: Request) {
     const session = event.data.object as Stripe.Checkout.Session;
     const customerEmail = session.customer_details?.email ?? null;
     console.log("Payment received from:", customerEmail);
+
+    // TODO: Phase 2 — Supabase + Resend automation
   }
 
   return NextResponse.json({ received: true });
