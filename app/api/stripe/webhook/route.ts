@@ -140,12 +140,50 @@ async function grantPortalAccessByEmail(params: {
   };
 }
 
+function getPortalAuthDetails(params: {
+  email: string;
+  portalAccessStatus: PortalAccessStatus;
+}): {
+  authUrl: string;
+  buttonText: string;
+  instructionText: string;
+  secondaryInstructionText: string;
+} {
+  const encodedEmail = encodeURIComponent(params.email);
+
+  if (params.portalAccessStatus === "portal_access_granted_new_profile") {
+    return {
+      authUrl: `https://fertilitycarehub.com/auth/signup?email=${encodedEmail}`,
+      buttonText: "Create Your Portal Login",
+      instructionText:
+        "Your private workspace is unlocked. Please create your secure login using the same email address you used at checkout.",
+      secondaryInstructionText:
+        "After creating your login, you will be able to access your private planning portal immediately.",
+    };
+  }
+
+  return {
+    authUrl: `https://fertilitycarehub.com/auth/login?email=${encodedEmail}`,
+    buttonText: "Log In to Your Portal",
+    instructionText:
+      "Your private workspace is unlocked. Please log in using the same email address you used at checkout.",
+    secondaryInstructionText:
+      "Once signed in, you will be taken to your private planning portal.",
+  };
+}
+
 async function sendOnboardingEmail(params: {
   email: string;
   fullName: string | null;
   resendApiKey: string;
+  portalAccessStatus: PortalAccessStatus;
 }): Promise<{ status: "email_sent" | "email_failed"; email: string }> {
   const firstName = params.fullName?.split(" ")[0] ?? "there";
+
+  const authDetails = getPortalAuthDetails({
+    email: params.email,
+    portalAccessStatus: params.portalAccessStatus,
+  });
 
   const emailHtml = `
 <!DOCTYPE html>
@@ -169,7 +207,10 @@ async function sendOnboardingEmail(params: {
           <tr>
             <td style="padding:40px;">
               <h2 style="margin:0 0 16px;color:#0f172a;font-size:20px;font-weight:600;">Welcome, ${firstName}</h2>
-              <p style="margin:0 0 20px;color:#475569;font-size:15px;line-height:1.6;">Your payment has been confirmed and your private portal is now unlocked. You now have full access to your personalized fertility planning dashboard.</p>
+
+              <p style="margin:0 0 20px;color:#475569;font-size:15px;line-height:1.6;">Your payment has been confirmed and your private portal access has been unlocked.</p>
+
+              <p style="margin:0 0 20px;color:#475569;font-size:15px;line-height:1.6;">${authDetails.instructionText}</p>
               
               <div style="background-color:#f1f5f9;border-radius:8px;padding:20px;margin:0 0 24px;">
                 <p style="margin:0 0 12px;color:#0f172a;font-size:14px;font-weight:600;">What you can do now:</p>
@@ -185,10 +226,12 @@ async function sendOnboardingEmail(params: {
               <table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;">
                 <tr>
                   <td style="border-radius:8px;background-color:#0f172a;">
-                    <a href="https://fertilitycarehub.com/portal" style="display:inline-block;padding:14px 32px;color:#ffffff;text-decoration:none;font-size:15px;font-weight:500;border-radius:8px;">Access Your Portal</a>
+                    <a href="${authDetails.authUrl}" style="display:inline-block;padding:14px 32px;color:#ffffff;text-decoration:none;font-size:15px;font-weight:500;border-radius:8px;">${authDetails.buttonText}</a>
                   </td>
                 </tr>
               </table>
+
+              <p style="margin:0 0 16px;color:#475569;font-size:14px;line-height:1.6;">${authDetails.secondaryInstructionText}</p>
 
               <p style="margin:0 0 16px;color:#475569;font-size:14px;line-height:1.6;">If you have any questions or need guidance at any stage, simply reply to this email. Our team is here to support your journey.</p>
               
@@ -249,15 +292,19 @@ export async function POST(req: Request) {
   if (!stripeSecretKey) {
     return new NextResponse("Missing STRIPE_SECRET_KEY", { status: 500 });
   }
+
   if (!stripeWebhookSecret) {
     return new NextResponse("Missing STRIPE_WEBHOOK_SECRET", { status: 500 });
   }
+
   if (!supabaseUrl) {
     return new NextResponse("Missing SUPABASE_URL", { status: 500 });
   }
+
   if (!supabaseServiceRoleKey) {
     return new NextResponse("Missing SUPABASE_SERVICE_ROLE_KEY", { status: 500 });
   }
+
   if (!resendApiKey) {
     return new NextResponse("Missing RESEND_API_KEY", { status: 500 });
   }
@@ -281,6 +328,7 @@ export async function POST(req: Request) {
       console.error("Webhook verification failed:", err.message);
       return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
     }
+
     return new NextResponse("Webhook Error", { status: 400 });
   }
 
@@ -292,6 +340,7 @@ export async function POST(req: Request) {
 
     if (!customerEmail) {
       console.log("Checkout session completed without customer email");
+
       return NextResponse.json({
         received: true,
         portalAccess: "missing_customer_email",
@@ -310,6 +359,7 @@ export async function POST(req: Request) {
         email: portalResult.email,
         fullName: portalResult.fullName,
         resendApiKey,
+        portalAccessStatus: portalResult.status,
       });
 
       return NextResponse.json({
@@ -323,6 +373,7 @@ export async function POST(req: Request) {
         console.error("Portal access automation failed:", err.message);
         return new NextResponse(`Portal Access Error: ${err.message}`, { status: 500 });
       }
+
       console.error("Portal access automation failed");
       return new NextResponse("Portal Access Error", { status: 500 });
     }
