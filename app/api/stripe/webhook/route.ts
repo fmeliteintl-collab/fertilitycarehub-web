@@ -5,17 +5,17 @@ import Stripe from "stripe";
 
 export const runtime = "edge";
 
-type StripeWebhookEnv = {
+type WebhookEnv = {
   STRIPE_SECRET_KEY?: string;
   STRIPE_WEBHOOK_SECRET?: string;
   SUPABASE_URL?: string;
   SUPABASE_SERVICE_ROLE_KEY?: string;
 };
 
-function getStripeEnv(): StripeWebhookEnv {
+function getEnv(): WebhookEnv {
   try {
     const context = getRequestContext();
-    return context.env as StripeWebhookEnv;
+    return context.env as WebhookEnv;
   } catch {
     return {
       STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
@@ -26,11 +26,22 @@ function getStripeEnv(): StripeWebhookEnv {
   }
 }
 
+type Profile = {
+  id: string;
+  email: string;
+  full_name: string | null;
+  portal_access: boolean | null;
+};
+
 async function grantPortalAccessByEmail(params: {
   email: string;
   supabaseUrl: string;
   supabaseServiceRoleKey: string;
-}) {
+}): Promise<{
+  status: "portal_access_granted" | "profile_not_found";
+  email: string;
+  fullName: string | null;
+}> {
   const normalizedEmail = params.email.trim().toLowerCase();
 
   if (!normalizedEmail) {
@@ -39,7 +50,7 @@ async function grantPortalAccessByEmail(params: {
 
   const lookupUrl = `${params.supabaseUrl}/rest/v1/profiles?email=eq.${encodeURIComponent(
     normalizedEmail
-  )}&select=id,email,portal_access`;
+  )}&select=id,email,full_name,portal_access`;
 
   const lookupResponse = await fetch(lookupUrl, {
     method: "GET",
@@ -55,19 +66,14 @@ async function grantPortalAccessByEmail(params: {
     throw new Error(`Supabase profile lookup failed: ${errorText}`);
   }
 
-  const profiles = (await lookupResponse.json()) as Array<{
-    id: string;
-    email: string;
-    portal_access: boolean | null;
-  }>;
+  const profiles = (await lookupResponse.json()) as Profile[];
 
   if (profiles.length === 0) {
     console.log("No existing profile found for paid email:", normalizedEmail);
-    return {
-      status: "profile_not_found" as const,
-      email: normalizedEmail,
-    };
+    return { status: "profile_not_found", email: normalizedEmail, fullName: null };
   }
+
+  const profile = profiles[0];
 
   const updateUrl = `${params.supabaseUrl}/rest/v1/profiles?email=eq.${encodeURIComponent(
     normalizedEmail
@@ -95,35 +101,31 @@ async function grantPortalAccessByEmail(params: {
   console.log("Portal access granted for:", normalizedEmail);
 
   return {
-    status: "portal_access_granted" as const,
+    status: "portal_access_granted",
     email: normalizedEmail,
+    fullName: profile.full_name,
   };
 }
 
 export async function POST(req: Request) {
-  const stripeEnv = getStripeEnv();
+  const env = getEnv();
 
-  const stripeSecretKey = stripeEnv.STRIPE_SECRET_KEY;
-  const stripeWebhookSecret = stripeEnv.STRIPE_WEBHOOK_SECRET;
-  const supabaseUrl = stripeEnv.SUPABASE_URL;
-  const supabaseServiceRoleKey = stripeEnv.SUPABASE_SERVICE_ROLE_KEY;
+  const stripeSecretKey = env.STRIPE_SECRET_KEY;
+  const stripeWebhookSecret = env.STRIPE_WEBHOOK_SECRET;
+  const supabaseUrl = env.SUPABASE_URL;
+  const supabaseServiceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!stripeSecretKey) {
     return new NextResponse("Missing STRIPE_SECRET_KEY", { status: 500 });
   }
-
   if (!stripeWebhookSecret) {
     return new NextResponse("Missing STRIPE_WEBHOOK_SECRET", { status: 500 });
   }
-
   if (!supabaseUrl) {
     return new NextResponse("Missing SUPABASE_URL", { status: 500 });
   }
-
   if (!supabaseServiceRoleKey) {
-    return new NextResponse("Missing SUPABASE_SERVICE_ROLE_KEY", {
-      status: 500,
-    });
+    return new NextResponse("Missing SUPABASE_SERVICE_ROLE_KEY", { status: 500 });
   }
 
   const stripe = new Stripe(stripeSecretKey);
@@ -139,17 +141,12 @@ export async function POST(req: Request) {
   let event: Stripe.Event;
 
   try {
-    event = await stripe.webhooks.constructEventAsync(
-      body,
-      sig,
-      stripeWebhookSecret
-    );
+    event = await stripe.webhooks.constructEventAsync(body, sig, stripeWebhookSecret);
   } catch (err: unknown) {
     if (err instanceof Error) {
       console.error("Webhook verification failed:", err.message);
       return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
     }
-
     return new NextResponse("Webhook Error", { status: 400 });
   }
 
@@ -164,11 +161,12 @@ export async function POST(req: Request) {
       return NextResponse.json({
         received: true,
         portalAccess: "missing_customer_email",
+        emailSent: "skipped",
       });
     }
 
     try {
-      const portalAccessResult = await grantPortalAccessByEmail({
+      const portalResult = await grantPortalAccessByEmail({
         email: customerEmail,
         supabaseUrl,
         supabaseServiceRoleKey,
@@ -176,17 +174,17 @@ export async function POST(req: Request) {
 
       return NextResponse.json({
         received: true,
-        portalAccess: portalAccessResult.status,
-        email: portalAccessResult.email,
+        portalAccess: portalResult.status,
+        email: portalResult.email,
+        fullName: portalResult.fullName,
+        // Phase 2A: Email not sent yet
+        emailSent: "phase_2a_email_skipped",
       });
     } catch (err: unknown) {
       if (err instanceof Error) {
         console.error("Portal access automation failed:", err.message);
-        return new NextResponse(`Portal Access Error: ${err.message}`, {
-          status: 500,
-        });
+        return new NextResponse(`Portal Access Error: ${err.message}`, { status: 500 });
       }
-
       console.error("Portal access automation failed");
       return new NextResponse("Portal Access Error", { status: 500 });
     }
