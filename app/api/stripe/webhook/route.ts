@@ -13,6 +13,34 @@ type WebhookEnv = {
   RESEND_API_KEY?: string;
 };
 
+type Profile = {
+  id: string;
+  email: string;
+  full_name: string | null;
+  portal_access: boolean | null;
+};
+
+type SupabaseAuthUser = {
+  id: string;
+  email?: string;
+};
+
+type SupabaseCreateUserResponse = {
+  id?: string;
+  email?: string;
+  user?: SupabaseAuthUser;
+};
+
+type PortalAccessStatus =
+  | "portal_access_granted_existing_profile"
+  | "portal_access_granted_new_profile";
+
+type PortalAccessResult = {
+  status: PortalAccessStatus;
+  email: string;
+  fullName: string | null;
+};
+
 function getEnv(): WebhookEnv {
   try {
     const context = getRequestContext();
@@ -28,22 +56,67 @@ function getEnv(): WebhookEnv {
   }
 }
 
-type Profile = {
-  id: string;
-  email: string;
-  full_name: string | null;
-  portal_access: boolean | null;
-};
+function getSupabaseHeaders(serviceRoleKey: string): HeadersInit {
+  return {
+    apikey: serviceRoleKey,
+    Authorization: `Bearer ${serviceRoleKey}`,
+    "Content-Type": "application/json",
+  };
+}
 
-type PortalAccessStatus =
-  | "portal_access_granted_existing_profile"
-  | "portal_access_granted_new_profile";
+function getAuthUserId(payload: SupabaseCreateUserResponse): string | null {
+  if (typeof payload.id === "string" && payload.id.length > 0) {
+    return payload.id;
+  }
+
+  if (typeof payload.user?.id === "string" && payload.user.id.length > 0) {
+    return payload.user.id;
+  }
+
+  return null;
+}
+
+async function createSupabaseAuthUser(params: {
+  email: string;
+  fullName: string;
+  supabaseUrl: string;
+  supabaseServiceRoleKey: string;
+}): Promise<string> {
+  const response = await fetch(`${params.supabaseUrl}/auth/v1/admin/users`, {
+    method: "POST",
+    headers: getSupabaseHeaders(params.supabaseServiceRoleKey),
+    body: JSON.stringify({
+      email: params.email,
+      email_confirm: true,
+      user_metadata: {
+        full_name: params.fullName,
+        portal_access: true,
+        source: "stripe_checkout",
+      },
+    }),
+  });
+
+  const responseText = await response.text();
+
+  if (!response.ok) {
+    throw new Error(`Supabase auth user creation failed: ${responseText}`);
+  }
+
+  const payload = JSON.parse(responseText) as SupabaseCreateUserResponse;
+  const userId = getAuthUserId(payload);
+
+  if (!userId) {
+    throw new Error("Supabase auth user creation succeeded but no user id was returned");
+  }
+
+  return userId;
+}
 
 async function grantPortalAccessByEmail(params: {
   email: string;
   supabaseUrl: string;
   supabaseServiceRoleKey: string;
-}): Promise<{ status: PortalAccessStatus; email: string; fullName: string | null }> {
+}): Promise<PortalAccessResult> {
   const normalizedEmail = params.email.trim().toLowerCase();
 
   if (!normalizedEmail) {
@@ -56,11 +129,7 @@ async function grantPortalAccessByEmail(params: {
 
   const lookupResponse = await fetch(lookupUrl, {
     method: "GET",
-    headers: {
-      apikey: params.supabaseServiceRoleKey,
-      Authorization: `Bearer ${params.supabaseServiceRoleKey}`,
-      "Content-Type": "application/json",
-    },
+    headers: getSupabaseHeaders(params.supabaseServiceRoleKey),
   });
 
   if (!lookupResponse.ok) {
@@ -80,9 +149,7 @@ async function grantPortalAccessByEmail(params: {
     const updateResponse = await fetch(updateUrl, {
       method: "PATCH",
       headers: {
-        apikey: params.supabaseServiceRoleKey,
-        Authorization: `Bearer ${params.supabaseServiceRoleKey}`,
-        "Content-Type": "application/json",
+        ...getSupabaseHeaders(params.supabaseServiceRoleKey),
         Prefer: "return=representation",
       },
       body: JSON.stringify({
@@ -96,8 +163,6 @@ async function grantPortalAccessByEmail(params: {
       throw new Error(`Supabase portal access update failed: ${errorText}`);
     }
 
-    console.log("Portal access granted for existing profile:", normalizedEmail);
-
     return {
       status: "portal_access_granted_existing_profile",
       email: normalizedEmail,
@@ -106,18 +171,21 @@ async function grantPortalAccessByEmail(params: {
   }
 
   const fallbackFullName = normalizedEmail.split("@")[0];
+  const authUserId = await createSupabaseAuthUser({
+    email: normalizedEmail,
+    fullName: fallbackFullName,
+    supabaseUrl: params.supabaseUrl,
+    supabaseServiceRoleKey: params.supabaseServiceRoleKey,
+  });
 
-  const insertUrl = `${params.supabaseUrl}/rest/v1/profiles`;
-
-  const insertResponse = await fetch(insertUrl, {
+  const insertResponse = await fetch(`${params.supabaseUrl}/rest/v1/profiles`, {
     method: "POST",
     headers: {
-      apikey: params.supabaseServiceRoleKey,
-      Authorization: `Bearer ${params.supabaseServiceRoleKey}`,
-      "Content-Type": "application/json",
+      ...getSupabaseHeaders(params.supabaseServiceRoleKey),
       Prefer: "return=representation",
     },
     body: JSON.stringify({
+      id: authUserId,
       email: normalizedEmail,
       full_name: fallbackFullName,
       portal_access: true,
@@ -131,8 +199,6 @@ async function grantPortalAccessByEmail(params: {
     throw new Error(`Supabase profile creation failed: ${errorText}`);
   }
 
-  console.log("New paid profile created and portal access granted for:", normalizedEmail);
-
   return {
     status: "portal_access_granted_new_profile",
     email: normalizedEmail,
@@ -143,22 +209,17 @@ async function grantPortalAccessByEmail(params: {
 function getPortalAuthDetails(params: {
   email: string;
   portalAccessStatus: PortalAccessStatus;
-}): {
-  authUrl: string;
-  buttonText: string;
-  instructionText: string;
-  secondaryInstructionText: string;
-} {
+}) {
   const encodedEmail = encodeURIComponent(params.email);
 
   if (params.portalAccessStatus === "portal_access_granted_new_profile") {
     return {
-      authUrl: `https://fertilitycarehub.com/auth/signup?email=${encodedEmail}`,
-      buttonText: "Create Your Portal Login",
+      authUrl: `https://fertilitycarehub.com/auth/login?email=${encodedEmail}`,
+      buttonText: "Set Up Your Portal Login",
       instructionText:
-        "Your private workspace is unlocked. Please create your secure login using the same email address you used at checkout.",
+        "Your private workspace is unlocked. Please use this same email address to complete your secure portal login setup.",
       secondaryInstructionText:
-        "After creating your login, you will be able to access your private planning portal immediately.",
+        "If this is your first time signing in, use the password setup or recovery option on the login page for this email address.",
     };
   }
 
@@ -272,7 +333,6 @@ async function sendOnboardingEmail(params: {
       return { status: "email_failed", email: params.email };
     }
 
-    console.log("Onboarding email sent to:", params.email);
     return { status: "email_sent", email: params.email };
   } catch (err) {
     console.error("Resend email exception:", err);
@@ -336,11 +396,7 @@ export async function POST(req: Request) {
     const session = event.data.object as Stripe.Checkout.Session;
     const customerEmail = session.customer_details?.email ?? null;
 
-    console.log("Payment received from:", customerEmail);
-
     if (!customerEmail) {
-      console.log("Checkout session completed without customer email");
-
       return NextResponse.json({
         received: true,
         portalAccess: "missing_customer_email",
