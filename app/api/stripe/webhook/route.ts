@@ -35,11 +35,15 @@ type Profile = {
   portal_access: boolean | null;
 };
 
+type PortalAccessStatus =
+  | "portal_access_granted_existing_profile"
+  | "portal_access_granted_new_profile";
+
 async function grantPortalAccessByEmail(params: {
   email: string;
   supabaseUrl: string;
   supabaseServiceRoleKey: string;
-}): Promise<{ status: "portal_access_granted" | "profile_not_found"; email: string; fullName: string | null }> {
+}): Promise<{ status: PortalAccessStatus; email: string; fullName: string | null }> {
   const normalizedEmail = params.email.trim().toLowerCase();
 
   if (!normalizedEmail) {
@@ -66,19 +70,47 @@ async function grantPortalAccessByEmail(params: {
 
   const profiles = (await lookupResponse.json()) as Profile[];
 
-  if (profiles.length === 0) {
-    console.log("No existing profile found for paid email:", normalizedEmail);
-    return { status: "profile_not_found", email: normalizedEmail, fullName: null };
+  if (profiles.length > 0) {
+    const profile = profiles[0];
+
+    const updateUrl = `${params.supabaseUrl}/rest/v1/profiles?email=eq.${encodeURIComponent(
+      normalizedEmail
+    )}`;
+
+    const updateResponse = await fetch(updateUrl, {
+      method: "PATCH",
+      headers: {
+        apikey: params.supabaseServiceRoleKey,
+        Authorization: `Bearer ${params.supabaseServiceRoleKey}`,
+        "Content-Type": "application/json",
+        Prefer: "return=representation",
+      },
+      body: JSON.stringify({
+        portal_access: true,
+        updated_at: new Date().toISOString(),
+      }),
+    });
+
+    if (!updateResponse.ok) {
+      const errorText = await updateResponse.text();
+      throw new Error(`Supabase portal access update failed: ${errorText}`);
+    }
+
+    console.log("Portal access granted for existing profile:", normalizedEmail);
+
+    return {
+      status: "portal_access_granted_existing_profile",
+      email: normalizedEmail,
+      fullName: profile.full_name,
+    };
   }
 
-  const profile = profiles[0];
+  const fallbackFullName = normalizedEmail.split("@")[0];
 
-  const updateUrl = `${params.supabaseUrl}/rest/v1/profiles?email=eq.${encodeURIComponent(
-    normalizedEmail
-  )}`;
+  const insertUrl = `${params.supabaseUrl}/rest/v1/profiles`;
 
-  const updateResponse = await fetch(updateUrl, {
-    method: "PATCH",
+  const insertResponse = await fetch(insertUrl, {
+    method: "POST",
     headers: {
       apikey: params.supabaseServiceRoleKey,
       Authorization: `Bearer ${params.supabaseServiceRoleKey}`,
@@ -86,22 +118,25 @@ async function grantPortalAccessByEmail(params: {
       Prefer: "return=representation",
     },
     body: JSON.stringify({
+      email: normalizedEmail,
+      full_name: fallbackFullName,
       portal_access: true,
+      created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     }),
   });
 
-  if (!updateResponse.ok) {
-    const errorText = await updateResponse.text();
-    throw new Error(`Supabase portal access update failed: ${errorText}`);
+  if (!insertResponse.ok) {
+    const errorText = await insertResponse.text();
+    throw new Error(`Supabase profile creation failed: ${errorText}`);
   }
 
-  console.log("Portal access granted for:", normalizedEmail);
+  console.log("New paid profile created and portal access granted for:", normalizedEmail);
 
   return {
-    status: "portal_access_granted",
+    status: "portal_access_granted_new_profile",
     email: normalizedEmail,
-    fullName: profile.full_name,
+    fullName: fallbackFullName,
   };
 }
 
@@ -271,18 +306,11 @@ export async function POST(req: Request) {
         supabaseServiceRoleKey,
       });
 
-      let emailResult: { status: "email_sent" | "email_failed"; email: string } = {
-        status: "email_failed",
-        email: customerEmail,
-      };
-
-      if (portalResult.status === "portal_access_granted") {
-        emailResult = await sendOnboardingEmail({
-          email: customerEmail,
-          fullName: portalResult.fullName,
-          resendApiKey,
-        });
-      }
+      const emailResult = await sendOnboardingEmail({
+        email: portalResult.email,
+        fullName: portalResult.fullName,
+        resendApiKey,
+      });
 
       return NextResponse.json({
         received: true,
