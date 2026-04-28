@@ -41,6 +41,38 @@ type PortalAccessResult = {
   fullName: string | null;
 };
 
+type PortalAuthDetails = {
+  authUrl: string;
+  buttonText: string;
+  instructionText: string;
+  secondaryInstructionText: string;
+  supportText: string;
+};
+
+type WebhookEventStatus = "processing" | "completed" | "failed" | "skipped";
+
+type WebhookEventLog = {
+  id: string;
+  event_type: string;
+  email: string | null;
+  status: WebhookEventStatus;
+  portal_access_result: string | null;
+  email_result: string | null;
+  error_message: string | null;
+  processed_at: string | null;
+  created_at: string;
+  updated_at: string | null;
+};
+
+type WebhookEventUpdate = {
+  status: WebhookEventStatus;
+  email?: string | null;
+  portalAccessResult?: string | null;
+  emailResult?: string | null;
+  errorMessage?: string | null;
+  processedAt?: string | null;
+};
+
 function getEnv(): WebhookEnv {
   try {
     const context = getRequestContext();
@@ -74,6 +106,233 @@ function getAuthUserId(payload: SupabaseCreateUserResponse): string | null {
   }
 
   return null;
+}
+
+function getErrorMessage(err: unknown): string {
+  if (err instanceof Error) {
+    return err.message;
+  }
+
+  return "Unknown error";
+}
+
+function getWebhookEventLogUrl(params: {
+  supabaseUrl: string;
+  eventId: string;
+}): string {
+  return `${params.supabaseUrl}/rest/v1/stripe_webhook_events?id=eq.${encodeURIComponent(
+    params.eventId
+  )}&select=id,event_type,email,status,portal_access_result,email_result,error_message,processed_at,created_at,updated_at`;
+}
+
+async function getWebhookEventLog(params: {
+  eventId: string;
+  supabaseUrl: string;
+  supabaseServiceRoleKey: string;
+}): Promise<WebhookEventLog | null> {
+  const response = await fetch(
+    getWebhookEventLogUrl({
+      supabaseUrl: params.supabaseUrl,
+      eventId: params.eventId,
+    }),
+    {
+      method: "GET",
+      headers: getSupabaseHeaders(params.supabaseServiceRoleKey),
+    }
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Stripe webhook event lookup failed: ${errorText}`);
+  }
+
+  const rows = (await response.json()) as WebhookEventLog[];
+
+  if (rows.length === 0) {
+    return null;
+  }
+
+  return rows[0];
+}
+
+async function createWebhookEventLog(params: {
+  eventId: string;
+  eventType: string;
+  email: string | null;
+  supabaseUrl: string;
+  supabaseServiceRoleKey: string;
+}): Promise<boolean> {
+  const response = await fetch(`${params.supabaseUrl}/rest/v1/stripe_webhook_events`, {
+    method: "POST",
+    headers: {
+      ...getSupabaseHeaders(params.supabaseServiceRoleKey),
+      Prefer: "return=representation",
+    },
+    body: JSON.stringify({
+      id: params.eventId,
+      event_type: params.eventType,
+      email: params.email,
+      status: "processing",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }),
+  });
+
+  if (response.status === 409) {
+    return false;
+  }
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Stripe webhook event log creation failed: ${errorText}`);
+  }
+
+  return true;
+}
+
+async function updateWebhookEventLog(params: {
+  eventId: string;
+  supabaseUrl: string;
+  supabaseServiceRoleKey: string;
+  update: WebhookEventUpdate;
+}): Promise<void> {
+  const now = new Date().toISOString();
+
+  const body: Record<string, string | null> = {
+    status: params.update.status,
+    updated_at: now,
+  };
+
+  if ("email" in params.update) {
+    body.email = params.update.email ?? null;
+  }
+
+  if ("portalAccessResult" in params.update) {
+    body.portal_access_result = params.update.portalAccessResult ?? null;
+  }
+
+  if ("emailResult" in params.update) {
+    body.email_result = params.update.emailResult ?? null;
+  }
+
+  if ("errorMessage" in params.update) {
+    body.error_message = params.update.errorMessage ?? null;
+  }
+
+  if ("processedAt" in params.update) {
+    body.processed_at = params.update.processedAt ?? null;
+  }
+
+  const response = await fetch(
+    `${params.supabaseUrl}/rest/v1/stripe_webhook_events?id=eq.${encodeURIComponent(
+      params.eventId
+    )}`,
+    {
+      method: "PATCH",
+      headers: {
+        ...getSupabaseHeaders(params.supabaseServiceRoleKey),
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify(body),
+    }
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Stripe webhook event log update failed: ${errorText}`);
+  }
+}
+
+async function prepareWebhookEventProcessing(params: {
+  eventId: string;
+  eventType: string;
+  email: string | null;
+  supabaseUrl: string;
+  supabaseServiceRoleKey: string;
+}): Promise<{
+  shouldProcess: boolean;
+  reason:
+    | "new_event"
+    | "retry_failed_event"
+    | "already_completed"
+    | "already_processing"
+    | "already_skipped"
+    | "duplicate_insert";
+  existingStatus: WebhookEventStatus | null;
+}> {
+  const existingEvent = await getWebhookEventLog({
+    eventId: params.eventId,
+    supabaseUrl: params.supabaseUrl,
+    supabaseServiceRoleKey: params.supabaseServiceRoleKey,
+  });
+
+  if (existingEvent?.status === "completed") {
+    return {
+      shouldProcess: false,
+      reason: "already_completed",
+      existingStatus: existingEvent.status,
+    };
+  }
+
+  if (existingEvent?.status === "processing") {
+    return {
+      shouldProcess: false,
+      reason: "already_processing",
+      existingStatus: existingEvent.status,
+    };
+  }
+
+  if (existingEvent?.status === "skipped") {
+    return {
+      shouldProcess: false,
+      reason: "already_skipped",
+      existingStatus: existingEvent.status,
+    };
+  }
+
+  if (existingEvent?.status === "failed") {
+    await updateWebhookEventLog({
+      eventId: params.eventId,
+      supabaseUrl: params.supabaseUrl,
+      supabaseServiceRoleKey: params.supabaseServiceRoleKey,
+      update: {
+        status: "processing",
+        email: params.email,
+        errorMessage: null,
+        portalAccessResult: null,
+        emailResult: null,
+        processedAt: null,
+      },
+    });
+
+    return {
+      shouldProcess: true,
+      reason: "retry_failed_event",
+      existingStatus: existingEvent.status,
+    };
+  }
+
+  const created = await createWebhookEventLog({
+    eventId: params.eventId,
+    eventType: params.eventType,
+    email: params.email,
+    supabaseUrl: params.supabaseUrl,
+    supabaseServiceRoleKey: params.supabaseServiceRoleKey,
+  });
+
+  if (!created) {
+    return {
+      shouldProcess: false,
+      reason: "duplicate_insert",
+      existingStatus: null,
+    };
+  }
+
+  return {
+    shouldProcess: true,
+    reason: "new_event",
+    existingStatus: null,
+  };
 }
 
 async function createSupabaseAuthUser(params: {
@@ -171,6 +430,7 @@ async function grantPortalAccessByEmail(params: {
   }
 
   const fallbackFullName = normalizedEmail.split("@")[0];
+
   const authUserId = await createSupabaseAuthUser({
     email: normalizedEmail,
     fullName: fallbackFullName,
@@ -209,17 +469,19 @@ async function grantPortalAccessByEmail(params: {
 function getPortalAuthDetails(params: {
   email: string;
   portalAccessStatus: PortalAccessStatus;
-}) {
+}): PortalAuthDetails {
   const encodedEmail = encodeURIComponent(params.email);
 
   if (params.portalAccessStatus === "portal_access_granted_new_profile") {
     return {
-      authUrl: `https://fertilitycarehub.com/auth/login?email=${encodedEmail}`,
-      buttonText: "Set Up Your Portal Login",
+      authUrl: `https://fertilitycarehub.com/auth/signup?email=${encodedEmail}`,
+      buttonText: "Create Your Portal Login",
       instructionText:
-        "Your private workspace is unlocked. Please use this same email address to complete your secure portal login setup.",
+        "Your private workspace is unlocked. Please use the same email address from checkout to create your secure portal login.",
       secondaryInstructionText:
-        "If this is your first time signing in, use the password setup or recovery option on the login page for this email address.",
+        "Because your access has already been approved through payment, this setup step is only for creating your login credentials.",
+      supportText:
+        "If you already created a password for this email, use the client login page instead.",
     };
   }
 
@@ -230,6 +492,8 @@ function getPortalAuthDetails(params: {
       "Your private workspace is unlocked. Please log in using the same email address you used at checkout.",
     secondaryInstructionText:
       "Once signed in, you will be taken to your private planning portal.",
+    supportText:
+      "If you cannot remember your password, use the password recovery option on the login page.",
   };
 }
 
@@ -293,6 +557,8 @@ async function sendOnboardingEmail(params: {
               </table>
 
               <p style="margin:0 0 16px;color:#475569;font-size:14px;line-height:1.6;">${authDetails.secondaryInstructionText}</p>
+
+              <p style="margin:0 0 16px;color:#475569;font-size:14px;line-height:1.6;">${authDetails.supportText}</p>
 
               <p style="margin:0 0 16px;color:#475569;font-size:14px;line-height:1.6;">If you have any questions or need guidance at any stage, simply reply to this email. Our team is here to support your journey.</p>
               
@@ -384,56 +650,135 @@ export async function POST(req: Request) {
   try {
     event = await stripe.webhooks.constructEventAsync(body, sig, stripeWebhookSecret);
   } catch (err: unknown) {
-    if (err instanceof Error) {
-      console.error("Webhook verification failed:", err.message);
-      return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
-    }
-
-    return new NextResponse("Webhook Error", { status: 400 });
+    const errorMessage = getErrorMessage(err);
+    console.error("Webhook verification failed:", errorMessage);
+    return new NextResponse(`Webhook Error: ${errorMessage}`, { status: 400 });
   }
 
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object as Stripe.Checkout.Session;
-    const customerEmail = session.customer_details?.email ?? null;
+  if (event.type !== "checkout.session.completed") {
+    return NextResponse.json({
+      received: true,
+      ignored: true,
+      eventId: event.id,
+      eventType: event.type,
+    });
+  }
 
-    if (!customerEmail) {
-      return NextResponse.json({
-        received: true,
-        portalAccess: "missing_customer_email",
-        emailSent: "skipped",
-      });
-    }
+  const session = event.data.object as Stripe.Checkout.Session;
+  const customerEmail = session.customer_details?.email?.trim().toLowerCase() ?? null;
+
+  let processingDecision: Awaited<ReturnType<typeof prepareWebhookEventProcessing>>;
+
+  try {
+    processingDecision = await prepareWebhookEventProcessing({
+      eventId: event.id,
+      eventType: event.type,
+      email: customerEmail,
+      supabaseUrl,
+      supabaseServiceRoleKey,
+    });
+  } catch (err: unknown) {
+    const errorMessage = getErrorMessage(err);
+    console.error("Webhook idempotency check failed:", errorMessage);
+
+    return new NextResponse(`Webhook Idempotency Error: ${errorMessage}`, {
+      status: 500,
+    });
+  }
+
+  if (!processingDecision.shouldProcess) {
+    return NextResponse.json({
+      received: true,
+      duplicate: true,
+      eventId: event.id,
+      eventType: event.type,
+      reason: processingDecision.reason,
+      existingStatus: processingDecision.existingStatus,
+    });
+  }
+
+  if (!customerEmail) {
+    await updateWebhookEventLog({
+      eventId: event.id,
+      supabaseUrl,
+      supabaseServiceRoleKey,
+      update: {
+        status: "skipped",
+        email: null,
+        portalAccessResult: "missing_customer_email",
+        emailResult: "skipped",
+        errorMessage: null,
+        processedAt: new Date().toISOString(),
+      },
+    });
+
+    return NextResponse.json({
+      received: true,
+      eventId: event.id,
+      portalAccess: "missing_customer_email",
+      emailSent: "skipped",
+    });
+  }
+
+  try {
+    const portalResult = await grantPortalAccessByEmail({
+      email: customerEmail,
+      supabaseUrl,
+      supabaseServiceRoleKey,
+    });
+
+    const emailResult = await sendOnboardingEmail({
+      email: portalResult.email,
+      fullName: portalResult.fullName,
+      resendApiKey,
+      portalAccessStatus: portalResult.status,
+    });
+
+    await updateWebhookEventLog({
+      eventId: event.id,
+      supabaseUrl,
+      supabaseServiceRoleKey,
+      update: {
+        status: "completed",
+        email: portalResult.email,
+        portalAccessResult: portalResult.status,
+        emailResult: emailResult.status,
+        errorMessage: null,
+        processedAt: new Date().toISOString(),
+      },
+    });
+
+    return NextResponse.json({
+      received: true,
+      eventId: event.id,
+      portalAccess: portalResult.status,
+      email: portalResult.email,
+      emailSent: emailResult.status,
+    });
+  } catch (err: unknown) {
+    const errorMessage = getErrorMessage(err);
+    console.error("Portal access automation failed:", errorMessage);
 
     try {
-      const portalResult = await grantPortalAccessByEmail({
-        email: customerEmail,
+      await updateWebhookEventLog({
+        eventId: event.id,
         supabaseUrl,
         supabaseServiceRoleKey,
+        update: {
+          status: "failed",
+          email: customerEmail,
+          portalAccessResult: "failed",
+          emailResult: "not_sent",
+          errorMessage,
+          processedAt: new Date().toISOString(),
+        },
       });
-
-      const emailResult = await sendOnboardingEmail({
-        email: portalResult.email,
-        fullName: portalResult.fullName,
-        resendApiKey,
-        portalAccessStatus: portalResult.status,
-      });
-
-      return NextResponse.json({
-        received: true,
-        portalAccess: portalResult.status,
-        email: portalResult.email,
-        emailSent: emailResult.status,
-      });
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        console.error("Portal access automation failed:", err.message);
-        return new NextResponse(`Portal Access Error: ${err.message}`, { status: 500 });
-      }
-
-      console.error("Portal access automation failed");
-      return new NextResponse("Portal Access Error", { status: 500 });
+    } catch (logErr: unknown) {
+      console.error("Failed to update failed webhook log:", getErrorMessage(logErr));
     }
-  }
 
-  return NextResponse.json({ received: true });
+    return new NextResponse(`Portal Access Error: ${errorMessage}`, {
+      status: 500,
+    });
+  }
 }
