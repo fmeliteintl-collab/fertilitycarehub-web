@@ -37,7 +37,7 @@ function SetupPortalLoginForm() {
       const { error } = await supabase.auth.resetPasswordForEmail(
         normalizedEmail,
         {
-          redirectTo: `${window.location.origin}/auth/update-password`,
+          redirectTo: `${window.location.origin}/auth/reset-password`,
         }
       );
 
