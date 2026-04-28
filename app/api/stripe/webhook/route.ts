@@ -474,7 +474,7 @@ function getPortalAuthDetails(params: {
 
   if (params.portalAccessStatus === "portal_access_granted_new_profile") {
     return {
-      authUrl: `https://fertilitycarehub.com/auth/signup?email=${encodedEmail}`,
+      authUrl: `https://fertilitycarehub.com/auth/setup?email=${encodedEmail}`,
       buttonText: "Create Your Portal Login",
       instructionText:
         "Your private workspace is unlocked. Please use the same email address from checkout to create your secure portal login.",
