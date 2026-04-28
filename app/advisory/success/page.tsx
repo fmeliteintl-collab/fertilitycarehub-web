@@ -219,9 +219,9 @@ export default function AdvisorySuccessPage({
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Link href="/auth/login" className={PRIMARY_BUTTON}>
-            Go to Client Login
-          </Link>
+          <a href="#email-next-step" className={PRIMARY_BUTTON}>
+  Check Your Email First
+</a>
 
           <Link href="/consultation" className={SECONDARY_BUTTON}>
             Contact Advisory Team
@@ -229,7 +229,7 @@ export default function AdvisorySuccessPage({
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 pb-12">
+      <section id="email-next-step" className="mx-auto max-w-6xl px-6 pb-12">
         <div className="rounded-2xl border border-[#DCCFB3] bg-[#FFF8EC] p-8">
           <div className="max-w-4xl">
             <div className="text-xs tracking-[0.24em] text-[#8A7652]">
