@@ -116,6 +116,42 @@ function getErrorMessage(err: unknown): string {
   return "Unknown error";
 }
 
+function createSecurePortalSetupToken(): string {
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+
+  return Array.from(bytes)
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+async function createPortalSetupToken(params: {
+  email: string;
+  supabaseUrl: string;
+  supabaseServiceRoleKey: string;
+}): Promise<string> {
+  const token = createSecurePortalSetupToken();
+
+  const response = await fetch(`${params.supabaseUrl}/rest/v1/portal_setup_tokens`, {
+    method: "POST",
+    headers: {
+      ...getSupabaseHeaders(params.supabaseServiceRoleKey),
+      Prefer: "return=minimal",
+    },
+    body: JSON.stringify({
+      email: params.email,
+      token,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Portal setup token creation failed: ${errorText}`);
+  }
+
+  return token;
+}
+
 function getWebhookEventLogUrl(params: {
   supabaseUrl: string;
   eventId: string;
@@ -469,17 +505,20 @@ async function grantPortalAccessByEmail(params: {
 function getPortalAuthDetails(params: {
   email: string;
   portalAccessStatus: PortalAccessStatus;
+  setupToken: string | null;
 }): PortalAuthDetails {
   const encodedEmail = encodeURIComponent(params.email);
 
   if (params.portalAccessStatus === "portal_access_granted_new_profile") {
+    const encodedSetupToken = encodeURIComponent(params.setupToken ?? "");
+
     return {
-      authUrl: `https://fertilitycarehub.com/auth/setup?email=${encodedEmail}`,
+      authUrl: `https://fertilitycarehub.com/auth/setup?token=${encodedSetupToken}`,
       buttonText: "Create Your Portal Login",
       instructionText:
-        "Your private workspace is unlocked. Please use the same email address from checkout to create your secure portal login.",
+        "Your private workspace is unlocked. Please use the secure setup button below to create your portal password.",
       secondaryInstructionText:
-        "Because your access has already been approved through payment, this setup step is only for creating your login credentials.",
+        "This setup link is private, time-sensitive, and intended only for the paid advisory client associated with this checkout email.",
       supportText:
         "If you already created a password for this email, use the client login page instead.",
     };
@@ -502,12 +541,23 @@ async function sendOnboardingEmail(params: {
   fullName: string | null;
   resendApiKey: string;
   portalAccessStatus: PortalAccessStatus;
+  supabaseUrl: string;
+  supabaseServiceRoleKey: string;
 }): Promise<{ status: "email_sent" | "email_failed"; email: string }> {
   const firstName = params.fullName?.split(" ")[0] ?? "there";
+  const setupToken =
+    params.portalAccessStatus === "portal_access_granted_new_profile"
+      ? await createPortalSetupToken({
+          email: params.email,
+          supabaseUrl: params.supabaseUrl,
+          supabaseServiceRoleKey: params.supabaseServiceRoleKey,
+        })
+      : null;
 
   const authDetails = getPortalAuthDetails({
     email: params.email,
     portalAccessStatus: params.portalAccessStatus,
+    setupToken,
   });
 
   const emailHtml = `
@@ -732,6 +782,8 @@ export async function POST(req: Request) {
       fullName: portalResult.fullName,
       resendApiKey,
       portalAccessStatus: portalResult.status,
+      supabaseUrl,
+      supabaseServiceRoleKey,
     });
 
     await updateWebhookEventLog({

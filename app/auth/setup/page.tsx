@@ -1,24 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { FormEvent, Suspense, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 function SetupPortalLoginForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = getSupabaseBrowserClient();
 
-  const emailFromUrl = searchParams.get("email") ?? "";
+  const token = useMemo(() => searchParams.get("token") ?? "", [searchParams]);
 
-  const [email, setEmail] = useState(emailFromUrl);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-
-  useEffect(() => {
-    setEmail(emailFromUrl);
-  }, [emailFromUrl]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -28,32 +26,60 @@ function SetupPortalLoginForm() {
       setMessage(null);
       setSuccess(false);
 
-      const normalizedEmail = email.trim().toLowerCase();
-
-      if (!normalizedEmail) {
-        throw new Error("Please enter the email address used at checkout.");
+      if (!token) {
+        throw new Error(
+          "This setup link is missing or invalid. Please use the secure link from your FertilityCareHub email."
+        );
       }
 
-      const { error } = await supabase.auth.resetPasswordForEmail(
-        normalizedEmail,
-        {
-          redirectTo: `${window.location.origin}/auth/reset-password`,
-        }
-      );
+      if (password.length < 8) {
+        throw new Error("Password must be at least 8 characters.");
+      }
 
-      if (error) {
-        throw error;
+      if (password !== confirmPassword) {
+        throw new Error("Passwords do not match.");
+      }
+
+      const response = await fetch("/api/auth/setup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token,
+          password,
+        }),
+      });
+
+      const result = (await response.json()) as {
+        success?: boolean;
+        email?: string;
+        error?: string;
+      };
+
+      if (!response.ok || !result.success || !result.email) {
+        throw new Error(result.error ?? "Unable to complete portal setup.");
+      }
+
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: result.email,
+        password,
+      });
+
+      if (signInError) {
+        throw signInError;
       }
 
       setSuccess(true);
-      setMessage(
-        "A secure portal login setup link has been sent to your email. Please check your inbox and junk folder."
-      );
+      setMessage("Your portal login has been created. Redirecting you now...");
+
+      router.push("/portal");
+      router.refresh();
     } catch (error) {
       const errorMessage =
         error instanceof Error
           ? error.message
-          : "Unable to send the setup link.";
+          : "Unable to complete portal setup.";
 
       setMessage(errorMessage);
     } finally {
@@ -74,50 +100,80 @@ function SetupPortalLoginForm() {
 
         <p className="mt-2 text-sm leading-6 text-stone-600">
           Your advisory payment has been confirmed and your private portal access
-          has been unlocked. Use the same email address entered at Stripe
-          checkout to create your secure login.
+          has been activated. Create your password below to enter your secure
+          planning workspace.
         </p>
 
         <div className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-4">
           <p className="text-sm leading-6 text-emerald-900">
-            This setup page is only for paid FertilityCareHub advisory clients
-            whose portal access has already been activated.
+            This secure setup page is available only through the private link
+            sent to paid FertilityCareHub advisory clients.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-stone-800"
-            >
-              Checkout email
-            </label>
-
-            <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              className="mt-2 w-full rounded-xl border border-stone-300 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-stone-500"
-              placeholder="you@example.com"
-              required
-            />
-
-            <p className="mt-2 text-xs leading-5 text-stone-500">
-              This must match the email address used during payment.
-            </p>
+        {!token ? (
+          <div className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-4 text-sm leading-6 text-red-700">
+            This setup link is missing or invalid. Please return to your
+            FertilityCareHub onboarding email and use the secure portal setup
+            button.
           </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-stone-800"
+              >
+                Create password
+              </label>
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full rounded-xl bg-stone-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {submitting ? "Sending setup link..." : "Send Secure Setup Link"}
-          </button>
-        </form>
+              <input
+                id="password"
+                type="password"
+                autoComplete="new-password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                className="mt-2 w-full rounded-xl border border-stone-300 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-stone-500"
+                placeholder="Minimum 8 characters"
+                required
+              />
+
+              <p className="mt-2 text-xs leading-5 text-stone-500">
+                Use a secure password that you do not use on other websites.
+              </p>
+            </div>
+
+            <div>
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-stone-800"
+              >
+                Confirm password
+              </label>
+
+              <input
+                id="confirmPassword"
+                type="password"
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChange={(event) => setConfirmPassword(event.target.value)}
+                className="mt-2 w-full rounded-xl border border-stone-300 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-stone-500"
+                placeholder="Re-enter password"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={submitting}
+              className="w-full rounded-xl bg-stone-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {submitting
+                ? "Creating portal login..."
+                : "Create Secure Portal Login"}
+            </button>
+          </form>
+        )}
 
         {message ? (
           <div
@@ -138,18 +194,18 @@ function SetupPortalLoginForm() {
 
           <div className="mt-3 space-y-3 text-sm leading-6 text-stone-700">
             <p>
-              <span className="font-medium text-stone-900">1.</span> We send a
-              secure password setup link to your checkout email.
+              <span className="font-medium text-stone-900">1.</span> Create your
+              secure portal password on this page.
             </p>
 
             <p>
-              <span className="font-medium text-stone-900">2.</span> You create
-              your password through the secure link.
+              <span className="font-medium text-stone-900">2.</span> You will be
+              signed in automatically.
             </p>
 
             <p>
-              <span className="font-medium text-stone-900">3.</span> You sign in
-              and access your private planning workspace.
+              <span className="font-medium text-stone-900">3.</span> Your
+              private planning workspace will open.
             </p>
           </div>
         </div>
