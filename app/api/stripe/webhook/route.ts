@@ -279,6 +279,36 @@ async function updateWebhookEventLog(params: {
   }
 }
 
+async function logOnboardingEvent(params: {
+  email: string | null;
+  eventType: string;
+  eventSource: string;
+  status?: string;
+  metadata?: Record<string, unknown>;
+  supabaseUrl: string;
+  supabaseServiceRoleKey: string;
+}): Promise<void> {
+  const response = await fetch(`${params.supabaseUrl}/rest/v1/onboarding_events`, {
+    method: "POST",
+    headers: {
+      ...getSupabaseHeaders(params.supabaseServiceRoleKey),
+      Prefer: "return=minimal",
+    },
+    body: JSON.stringify({
+      email: params.email,
+      event_type: params.eventType,
+      event_source: params.eventSource,
+      status: params.status ?? "completed",
+      metadata: params.metadata ?? {},
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error(`Onboarding event logging failed: ${errorText}`);
+  }
+}
+
 async function prepareWebhookEventProcessing(params: {
   eventId: string;
   eventType: string;
@@ -762,6 +792,20 @@ export async function POST(req: Request) {
       },
     });
 
+    await logOnboardingEvent({
+      email: null,
+      eventType: "webhook_skipped",
+      eventSource: "stripe_webhook",
+      status: "skipped",
+      metadata: {
+        stripe_event_id: event.id,
+        stripe_session_id: session.id,
+        reason: "missing_customer_email",
+      },
+      supabaseUrl,
+      supabaseServiceRoleKey,
+    });
+
     return NextResponse.json({
       received: true,
       eventId: event.id,
@@ -800,6 +844,35 @@ export async function POST(req: Request) {
       },
     });
 
+    await logOnboardingEvent({
+      email: portalResult.email,
+      eventType: "payment_completed",
+      eventSource: "stripe_webhook",
+      status: "completed",
+      metadata: {
+        stripe_event_id: event.id,
+        stripe_session_id: session.id,
+        portal_access_result: portalResult.status,
+      },
+      supabaseUrl,
+      supabaseServiceRoleKey,
+    });
+
+    await logOnboardingEvent({
+      email: portalResult.email,
+      eventType: "setup_link_sent",
+      eventSource: "stripe_webhook",
+      status: emailResult.status === "email_sent" ? "completed" : "failed",
+      metadata: {
+        stripe_event_id: event.id,
+        stripe_session_id: session.id,
+        email_result: emailResult.status,
+        delivery_provider: "resend",
+      },
+      supabaseUrl,
+      supabaseServiceRoleKey,
+    });
+
     return NextResponse.json({
       received: true,
       eventId: event.id,
@@ -828,6 +901,20 @@ export async function POST(req: Request) {
     } catch (logErr: unknown) {
       console.error("Failed to update failed webhook log:", getErrorMessage(logErr));
     }
+
+    await logOnboardingEvent({
+      email: customerEmail,
+      eventType: "webhook_failed",
+      eventSource: "stripe_webhook",
+      status: "failed",
+      metadata: {
+        stripe_event_id: event.id,
+        stripe_session_id: session.id,
+        error: errorMessage,
+      },
+      supabaseUrl,
+      supabaseServiceRoleKey,
+    });
 
     return new NextResponse(`Portal Access Error: ${errorMessage}`, {
       status: 500,
