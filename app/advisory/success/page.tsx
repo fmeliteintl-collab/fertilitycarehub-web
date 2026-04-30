@@ -1,5 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import ResendSetupLinkForm from "./ResendSetupLinkForm";
+
 
 export const metadata: Metadata = {
   title: "Advisory Access Activated | FertilityCareHub",
@@ -43,8 +45,6 @@ const PRIMARY_BUTTON =
 const SECONDARY_BUTTON =
   "inline-flex items-center justify-center rounded-full border border-[#E5DDC8] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] transition hover:bg-[#EFE9DB]";
 
-const DISABLED_BUTTON =
-  "inline-flex cursor-not-allowed items-center justify-center rounded-full border border-[#DCCFB3] bg-[#EFE9DB] px-6 py-3 text-sm tracking-wide text-[#7A7164]";
 
 const TIER_CONTENT: Record<TierKey, TierContent> = {
   tier1: {
@@ -471,15 +471,13 @@ export default function AdvisorySuccessPage({
             message from FertilityCareHub at onboarding@fertilitycarehub.com.
           </p>
 
-          <div className="mt-6 flex flex-wrap gap-3">
-            <button type="button" className={DISABLED_BUTTON} disabled>
-              Resend Setup Link — Coming Next
-            </button>
+          <ResendSetupLinkForm />
 
-            <Link href="/consultation" className={SECONDARY_BUTTON}>
-              Contact Advisory Team
-            </Link>
-          </div>
+<div className="mt-6">
+  <Link href="/consultation" className={SECONDARY_BUTTON}>
+    Contact Advisory Team
+  </Link>
+</div>
 
           <p className="mt-5 text-xs leading-relaxed text-[#6A6256]">
             This button is intentionally inactive until the resend API route is
