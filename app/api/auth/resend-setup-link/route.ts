@@ -68,6 +68,36 @@ function normalizeEmail(email: unknown): string | null {
   return normalized;
 }
 
+async function logOnboardingEvent(params: {
+  email: string | null;
+  eventType: string;
+  eventSource: string;
+  status?: string;
+  metadata?: Record<string, unknown>;
+  supabaseUrl: string;
+  supabaseServiceRoleKey: string;
+}): Promise<void> {
+  const response = await fetch(`${params.supabaseUrl}/rest/v1/onboarding_events`, {
+    method: "POST",
+    headers: {
+      ...getSupabaseHeaders(params.supabaseServiceRoleKey),
+      Prefer: "return=minimal",
+    },
+    body: JSON.stringify({
+      email: params.email,
+      event_type: params.eventType,
+      event_source: params.eventSource,
+      status: params.status ?? "completed",
+      metadata: params.metadata ?? {},
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error(`Onboarding event logging failed: ${errorText}`);
+  }
+}
+
 async function getPaidProfile(params: {
   email: string;
   supabaseUrl: string;
@@ -136,17 +166,20 @@ async function createPortalSetupToken(params: {
 }): Promise<string> {
   const token = createSecurePortalSetupToken();
 
-  const response = await fetch(`${params.supabaseUrl}/rest/v1/portal_setup_tokens`, {
-    method: "POST",
-    headers: {
-      ...getSupabaseHeaders(params.supabaseServiceRoleKey),
-      Prefer: "return=minimal",
-    },
-    body: JSON.stringify({
-      email: params.email,
-      token,
-    }),
-  });
+  const response = await fetch(
+    `${params.supabaseUrl}/rest/v1/portal_setup_tokens`,
+    {
+      method: "POST",
+      headers: {
+        ...getSupabaseHeaders(params.supabaseServiceRoleKey),
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify({
+        email: params.email,
+        token,
+      }),
+    }
+  );
 
   if (!response.ok) {
     const errorText = await response.text();
@@ -271,11 +304,23 @@ export async function POST(req: Request) {
     return new NextResponse("Missing RESEND_API_KEY", { status: 500 });
   }
 
+  let email: string | null = null;
+
   try {
     const body = (await req.json()) as { email?: unknown };
-    const email = normalizeEmail(body.email);
+    email = normalizeEmail(body.email);
 
     if (!email) {
+      await logOnboardingEvent({
+        email: null,
+        eventType: "setup_link_resend_failed",
+        eventSource: "resend_setup_link",
+        status: "failed",
+        metadata: { reason: "invalid_email" },
+        supabaseUrl,
+        supabaseServiceRoleKey,
+      });
+
       return NextResponse.json(
         {
           ok: false,
@@ -292,6 +337,18 @@ export async function POST(req: Request) {
     });
 
     if (!profile) {
+      await logOnboardingEvent({
+        email,
+        eventType: "setup_link_resend_attempt",
+        eventSource: "resend_setup_link",
+        status: "not_sent",
+        metadata: {
+          reason: "profile_not_found_or_portal_access_inactive",
+        },
+        supabaseUrl,
+        supabaseServiceRoleKey,
+      });
+
       return NextResponse.json({
         ok: true,
         message:
@@ -318,6 +375,20 @@ export async function POST(req: Request) {
       resendApiKey,
     });
 
+    await logOnboardingEvent({
+      email,
+      eventType: "setup_link_resent",
+      eventSource: "resend_setup_link",
+      status: "completed",
+      metadata: {
+        profile_id: profile.id,
+        delivery_provider: "resend",
+        previous_unused_tokens_expired: true,
+      },
+      supabaseUrl,
+      supabaseServiceRoleKey,
+    });
+
     return NextResponse.json({
       ok: true,
       message:
@@ -325,6 +396,19 @@ export async function POST(req: Request) {
     });
   } catch (err: unknown) {
     console.error("Resend setup link failed:", getErrorMessage(err));
+
+    await logOnboardingEvent({
+      email,
+      eventType: "setup_link_resend_failed",
+      eventSource: "resend_setup_link",
+      status: "failed",
+      metadata: {
+        reason: "unexpected_error",
+        error: getErrorMessage(err),
+      },
+      supabaseUrl,
+      supabaseServiceRoleKey,
+    });
 
     return NextResponse.json(
       {
