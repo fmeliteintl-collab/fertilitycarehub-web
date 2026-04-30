@@ -1,17 +1,19 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import ResendSetupLinkForm from "./ResendSetupLinkForm";
+
 
 export const metadata: Metadata = {
-  title: "Payment Confirmed | FertilityCareHub",
+  title: "Advisory Access Activated | FertilityCareHub",
   description:
-    "Your FertilityCareHub advisory payment has been confirmed. Review next steps for portal access, onboarding email, and client login setup.",
+    "Your FertilityCareHub advisory payment has been confirmed. Complete your secure portal setup using the onboarding email sent after checkout.",
   alternates: {
     canonical: "https://fertilitycarehub.com/advisory/success",
   },
   openGraph: {
-    title: "Payment Confirmed | FertilityCareHub",
+    title: "Advisory Access Activated | FertilityCareHub",
     description:
-      "Your FertilityCareHub advisory payment has been confirmed. Review next steps for portal access, onboarding email, and client login setup.",
+      "Your FertilityCareHub advisory payment has been confirmed. Complete your secure portal setup using the onboarding email sent after checkout.",
     url: "https://fertilitycarehub.com/advisory/success",
     siteName: "FertilityCareHub",
     type: "website",
@@ -34,6 +36,7 @@ type TierContent = {
   onboardingFocus: string;
   paymentConfirmation: string;
   accessInstruction: string;
+  referenceDescription: string;
 };
 
 const PRIMARY_BUTTON =
@@ -42,12 +45,13 @@ const PRIMARY_BUTTON =
 const SECONDARY_BUTTON =
   "inline-flex items-center justify-center rounded-full border border-[#E5DDC8] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] transition hover:bg-[#EFE9DB]";
 
+
 const TIER_CONTENT: Record<TierKey, TierContent> = {
   tier1: {
     badge: "SNAPSHOT ENGAGEMENT",
     engagementTitle: "Strategic Alignment Snapshot™️",
     engagementDescription:
-      "Your advisory payment has been confirmed for the Strategic Alignment Snapshot™️. Your private workspace access is now being activated through the automated onboarding flow.",
+      "Your advisory payment has been confirmed for the Strategic Alignment Snapshot™️. Your private FertilityCareHub planning workspace has now been activated through the secure onboarding flow.",
     includedItems: [
       "Structured advisory onboarding",
       "Private planning workspace access linked to your checkout email",
@@ -60,13 +64,15 @@ const TIER_CONTENT: Record<TierKey, TierContent> = {
     paymentConfirmation:
       "Your Strategic Alignment Snapshot™️ purchase has been received and connected to the email address used at checkout.",
     accessInstruction:
-      "Please check that email address for your portal access message and follow the secure login or account setup link.",
+      "Please check that email address now for your secure FertilityCareHub portal setup link.",
+    referenceDescription:
+      "This page reflects your Strategic Alignment Snapshot™️ engagement. Your onboarding emphasis is on directional clarity, shortlist logic, and early structural review.",
   },
   tier2: {
     badge: "FULL BRIEF ENGAGEMENT",
     engagementTitle: "Global Fertility Intelligence Brief™️",
     engagementDescription:
-      "Your advisory payment has been confirmed for the Global Fertility Intelligence Brief™️. Your private workspace access is now being activated through the automated onboarding flow.",
+      "Your advisory payment has been confirmed for the Global Fertility Intelligence Brief™️. Your private FertilityCareHub planning workspace has now been activated through the secure onboarding flow.",
     includedItems: [
       "Structured advisory onboarding",
       "Private planning workspace access linked to your checkout email",
@@ -79,13 +85,15 @@ const TIER_CONTENT: Record<TierKey, TierContent> = {
     paymentConfirmation:
       "Your Global Fertility Intelligence Brief™️ purchase has been received and connected to the email address used at checkout.",
     accessInstruction:
-      "Please check that email address for your portal access message and follow the secure login or account setup link.",
+      "Please check that email address now for your secure FertilityCareHub portal setup link.",
+    referenceDescription:
+      "This page reflects your Global Fertility Intelligence Brief™️ engagement. Your onboarding emphasis is on deeper comparative structure, risk logic, and execution-readiness support.",
   },
   default: {
     badge: "ADVISORY ENGAGEMENT",
     engagementTitle: "FertilityCareHub Advisory Engagement",
     engagementDescription:
-      "Your advisory payment has been confirmed. Your private planning workspace access is now being activated through the automated onboarding flow.",
+      "Your advisory payment has been confirmed. Your private FertilityCareHub planning workspace has now been activated through the secure onboarding flow.",
     includedItems: [
       "Structured advisory onboarding",
       "Private planning workspace access linked to your checkout email",
@@ -98,7 +106,9 @@ const TIER_CONTENT: Record<TierKey, TierContent> = {
     paymentConfirmation:
       "Your advisory engagement has been received and connected to the email address used at checkout.",
     accessInstruction:
-      "Please check that email address for your portal access message and follow the secure login or account setup link.",
+      "Please check that email address now for your secure FertilityCareHub portal setup link.",
+    referenceDescription:
+      "This page is showing the standard advisory onboarding flow. If a tier-specific redirect parameter is provided, the page will adapt automatically to the purchased engagement.",
   },
 };
 
@@ -149,7 +159,7 @@ export default function AdvisorySuccessPage({
       {
         "@type": "ListItem",
         position: 3,
-        name: "Payment Confirmed",
+        name: "Advisory Access Activated",
         item: "https://fertilitycarehub.com/advisory/success",
       },
     ],
@@ -189,13 +199,13 @@ export default function AdvisorySuccessPage({
         </div>
 
         <h1 className="mt-5 text-4xl font-medium leading-tight md:text-6xl">
-          Your advisory access is being activated
+          Your advisory access has been activated
         </h1>
 
         <p className="mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-[#2A2A2A]">
-          Thank you for completing your FertilityCareHub advisory engagement.
-          Your payment has been confirmed, and your private planning workspace
-          is now being prepared automatically.
+          Your FertilityCareHub advisory payment has been confirmed. We have
+          created your private planning workspace and sent the secure setup link
+          to the email address used at checkout.
         </p>
 
         <div className="mx-auto mt-6 max-w-3xl rounded-2xl border border-[#DCCFB3] bg-[#FFF8EC] px-6 py-5 text-left">
@@ -212,21 +222,45 @@ export default function AdvisorySuccessPage({
           </p>
         </div>
 
-        <p className="mx-auto mt-6 max-w-2xl text-sm leading-relaxed text-[#6A6256]">
-          Your portal access is linked to the email address you entered during
-          Stripe checkout. Please use that same email address when creating or
-          logging into your FertilityCareHub client account.
-        </p>
+        <div className="mx-auto mt-6 max-w-3xl rounded-2xl border border-[#DCCFB3] bg-white/75 px-6 py-5 text-left">
+          <div className="text-xs tracking-[0.22em] text-[#8A7652]">
+            CHECK YOUR EMAIL NOW
+          </div>
+
+          <p className="mt-3 text-sm leading-relaxed text-[#5F584C]">
+            Look for an email from{" "}
+            <strong className="font-medium text-[#1A1A1A]">
+              FertilityCareHub
+            </strong>{" "}
+            at{" "}
+            <strong className="font-medium text-[#1A1A1A]">
+              onboarding@fertilitycarehub.com
+            </strong>
+            .
+          </p>
+
+          <p className="mt-3 text-sm leading-relaxed text-[#5F584C]">
+            The secure setup link is time-sensitive and should be completed as
+            soon as possible. If you do not see the email, check your junk or
+            spam folder before contacting the advisory team.
+          </p>
+        </div>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <a href="#email-next-step" className={PRIMARY_BUTTON}>
-  Check Your Email First
-</a>
+            Check Your Email First
+          </a>
 
-          <Link href="/consultation" className={SECONDARY_BUTTON}>
-            Contact Advisory Team
+          <Link href="/auth/login" className={SECONDARY_BUTTON}>
+            Already Set Up? Go to Login
           </Link>
         </div>
+
+        <p className="mx-auto mt-6 max-w-2xl text-sm leading-relaxed text-[#6A6256]">
+          Your portal access is linked to the email address you entered during
+          Stripe checkout. Please use that same email address when setting up or
+          accessing your FertilityCareHub client portal.
+        </p>
       </section>
 
       <section id="email-next-step" className="mx-auto max-w-6xl px-6 pb-12">
@@ -237,7 +271,7 @@ export default function AdvisorySuccessPage({
             </div>
 
             <h2 className="mt-3 text-2xl font-medium">
-              Check the email address you used at checkout
+              Complete your secure portal setup from your email
             </h2>
 
             <p className="mt-4 text-sm leading-relaxed text-[#5F584C]">
@@ -249,14 +283,42 @@ export default function AdvisorySuccessPage({
             </p>
 
             <p className="mt-4 text-sm leading-relaxed text-[#5F584C]">
-              If this is your first time accessing FertilityCareHub, your email
-              will guide you to create your secure portal login. If you already
-              have a login, you can sign in using the same checkout email.
+              The message will direct you to a secure FertilityCareHub setup
+              page where you can create your portal password. After setup, you
+              can access your private planning workspace.
             </p>
 
             <p className="mt-4 text-sm leading-relaxed text-[#5F584C]">
               {tierContent.onboardingFocus}
             </p>
+
+            <div className="mt-6 rounded-xl border border-[#DCCFB3] bg-white/75 p-5">
+              <h3 className="text-base font-medium text-[#1A1A1A]">
+                Email details to look for
+              </h3>
+
+              <dl className="mt-4 grid gap-3 text-sm text-[#5F584C] md:grid-cols-2">
+                <div>
+                  <dt className="font-medium text-[#1A1A1A]">Sender</dt>
+                  <dd className="mt-1">FertilityCareHub</dd>
+                </div>
+
+                <div>
+                  <dt className="font-medium text-[#1A1A1A]">Email address</dt>
+                  <dd className="mt-1">onboarding@fertilitycarehub.com</dd>
+                </div>
+
+                <div>
+                  <dt className="font-medium text-[#1A1A1A]">Purpose</dt>
+                  <dd className="mt-1">Secure portal password setup</dd>
+                </div>
+
+                <div>
+                  <dt className="font-medium text-[#1A1A1A]">Important</dt>
+                  <dd className="mt-1">The setup link is time-sensitive</dd>
+                </div>
+              </dl>
+            </div>
           </div>
         </div>
       </section>
@@ -284,11 +346,11 @@ export default function AdvisorySuccessPage({
                 STEP 2
               </div>
 
-              <div className="mt-2 font-medium">Portal access activated</div>
+              <div className="mt-2 font-medium">Workspace activated</div>
 
               <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
-                FertilityCareHub automatically links your checkout email to your
-                private portal access.
+                FertilityCareHub links your checkout email to private portal
+                access.
               </p>
             </div>
 
@@ -297,11 +359,11 @@ export default function AdvisorySuccessPage({
                 STEP 3
               </div>
 
-              <div className="mt-2 font-medium">Onboarding email sent</div>
+              <div className="mt-2 font-medium">Setup email sent</div>
 
               <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
-                You will receive an email with the correct login or account setup
-                link for your private workspace.
+                You receive a secure setup link from FertilityCareHub to create
+                your portal password.
               </p>
             </div>
 
@@ -310,13 +372,21 @@ export default function AdvisorySuccessPage({
                 STEP 4
               </div>
 
-              <div className="mt-2 font-medium">Enter your workspace</div>
+              <div className="mt-2 font-medium">Enter your portal</div>
 
               <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
-                Use the same email from checkout to create your login or sign in
-                and access your private portal.
+                Complete password setup and access your private planning
+                workspace.
               </p>
             </div>
+          </div>
+
+          <div className="mt-6 rounded-xl border border-[#DCCFB3] bg-[#FFF8EC] p-5">
+            <p className="text-sm leading-relaxed text-[#5F584C]">
+              For security, FertilityCareHub does not operate as a public signup
+              system. Portal setup is available only after a completed advisory
+              payment or approved client access.
+            </p>
           </div>
         </div>
       </section>
@@ -350,18 +420,17 @@ export default function AdvisorySuccessPage({
             </div>
 
             <h2 className="mt-3 text-2xl font-medium">
-              Ready to access your portal?
+              Already completed setup?
             </h2>
 
             <p className="mt-4 text-sm leading-relaxed text-[#6A6256]">
-              If you have already received your onboarding email, follow the link
-              inside that message. It will direct you to the correct login or
-              account setup page.
+              If you have already created your FertilityCareHub portal password,
+              you can go directly to the client login page below.
             </p>
 
             <p className="mt-4 text-sm leading-relaxed text-[#6A6256]">
-              If you already have your FertilityCareHub login, you can go
-              directly to the client login page below.
+              If you have not created your password yet, please use the secure
+              setup link sent to the same email address used at checkout.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -376,10 +445,45 @@ export default function AdvisorySuccessPage({
 
             <p className="mt-6 text-xs leading-relaxed text-[#6A6256]">
               If your payment was completed but you cannot find the onboarding
-              email, please check your junk or spam folder first, then contact
-              FertilityCareHub for assistance.
+              email, please check your junk or spam folder first.
             </p>
           </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 pb-12">
+        <div className="rounded-2xl border border-[#DCCFB3] bg-[#FFF8EC] p-8">
+          <div className="text-xs tracking-[0.24em] text-[#8A7652]">
+            EMAIL DELIVERY SUPPORT
+          </div>
+
+          <h2 className="mt-3 text-2xl font-medium">
+            Need another setup link?
+          </h2>
+
+          <p className="mt-4 max-w-4xl text-sm leading-relaxed text-[#5F584C]">
+            If the email does not arrive, the next system improvement will allow
+            clients to request a new secure setup link directly from this page.
+          </p>
+
+          <p className="mt-4 max-w-4xl text-sm leading-relaxed text-[#5F584C]">
+            For now, please check your inbox, junk folder, and spam folder for a
+            message from FertilityCareHub at onboarding@fertilitycarehub.com.
+          </p>
+
+          <ResendSetupLinkForm />
+
+<div className="mt-6">
+  <Link href="/consultation" className={SECONDARY_BUTTON}>
+    Contact Advisory Team
+  </Link>
+</div>
+
+          <p className="mt-5 text-xs leading-relaxed text-[#6A6256]">
+            This button is intentionally inactive until the resend API route is
+            added. Keeping it visible prepares the user experience without
+            introducing a broken action.
+          </p>
         </div>
       </section>
 
@@ -394,17 +498,13 @@ export default function AdvisorySuccessPage({
           </h2>
 
           <p className="mt-4 max-w-4xl text-sm leading-relaxed text-[#6A6256]">
-            {selectedTier === "tier1"
-              ? "This page reflects your Strategic Alignment Snapshot™️ engagement. Your onboarding emphasis is on directional clarity, shortlist logic, and early structural review."
-              : selectedTier === "tier2"
-                ? "This page reflects your Global Fertility Intelligence Brief™️ engagement. Your onboarding emphasis is on deeper comparative structure, risk logic, and execution-readiness support."
-                : "This page is showing the standard advisory onboarding flow. If a tier-specific redirect parameter is provided, the page will adapt automatically to the purchased engagement."}
+            {tierContent.referenceDescription}
           </p>
 
           <p className="mt-4 max-w-4xl text-sm leading-relaxed text-[#6A6256]">
             Your portal access is connected to the checkout email used during
             payment. For security and continuity, use that same email address
-            when creating your login or signing into the portal.
+            when creating your password or signing into the portal.
           </p>
         </div>
       </section>
@@ -416,19 +516,23 @@ export default function AdvisorySuccessPage({
           </div>
 
           <h2 className="mt-3 text-2xl font-medium">
-            Your access email may take a few moments
+            Your setup email may take a few moments
           </h2>
 
           <p className="mt-4 max-w-4xl text-sm leading-relaxed text-[#5F584C]">
             Your onboarding email is sent automatically after payment
-            confirmation. In some cases, it may take a short time to arrive. If
-            you do not see it in your inbox, please check your junk or spam
-            folder.
+            confirmation. In some cases, delivery may take a short time.
           </p>
 
           <p className="mt-4 max-w-4xl text-sm leading-relaxed text-[#5F584C]">
-            The email will come from FertilityCareHub and will include the next
-            step for accessing your private planning workspace.
+            The email will come from FertilityCareHub and will include your
+            secure setup link for the private planning workspace.
+          </p>
+
+          <p className="mt-4 max-w-4xl text-sm leading-relaxed text-[#5F584C]">
+            The setup link is designed for security and is time-sensitive. If it
+            expires, the advisory team can issue a new setup link once your
+            payment and checkout email are verified.
           </p>
         </div>
       </section>
