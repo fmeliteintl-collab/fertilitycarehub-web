@@ -615,15 +615,15 @@ function buildEnhancedSignals(params: {
   const insights: EnhancedSignals["insights"] = [];
 
   if (params.primaryBlocker === "missing_pathway") {
-    blockers.push({
-      id: "missing_pathway",
-      message: "Fertility pathway not defined",
-      resolution:
-        "Define your pathway in My Plan to enable country matching",
-      href: "/portal/my-plan",
-      severity: "blocking",
-    });
-  } else if (params.primaryBlocker === "missing_family_structure") {
+  blockers.push({
+    id: "missing_pathway",
+    message: "Your planning workspace is ready",
+    resolution:
+      "Start by defining your pathway in My Plan to activate country matching and timeline guidance",
+    href: "/portal/my-plan",
+    severity: "blocking",
+  });
+} else if (params.primaryBlocker === "missing_family_structure") {
     blockers.push({
       id: "missing_family_structure",
       message: "Family structure not defined",
