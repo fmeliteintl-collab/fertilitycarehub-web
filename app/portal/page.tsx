@@ -70,6 +70,33 @@ function StatusDot({ status }: { status: "complete" | "active" | "pending" | "bl
   return <div className={`h-2 w-2 rounded-full ${styles[status]}`} />;
 }
 
+
+function getPrimaryBlockerLabel(
+  primaryBlocker: PortalIntelligence["primaryBlocker"],
+): string {
+  if (primaryBlocker === "missing_pathway") {
+    return "Your planning workspace is ready";
+  }
+
+  if (primaryBlocker === "missing_family_structure") {
+    return "Family structure is the next planning step";
+  }
+
+  if (primaryBlocker === "missing_country_selection") {
+    return "Country shortlist is the next planning step";
+  }
+
+  if (primaryBlocker === "timeline_not_started") {
+    return "Timeline guidance is ready to be structured";
+  }
+
+  if (primaryBlocker === "timeline_incomplete") {
+    return "Timeline progress needs completion";
+  }
+
+  return primaryBlocker?.replace(/_/g, " ") ?? "";
+}
+
 function PathwayClassificationBadge({
   type,
   tone,
@@ -286,7 +313,7 @@ function ExecutiveSummary({
                 <span className="text-sm font-semibold uppercase tracking-wider">Current Blocker</span>
               </div>
               <p className="mt-1 text-stone-200">
-                {primaryBlocker.replace(/_/g, " ")}
+                {getPrimaryBlockerLabel(primaryBlocker)}
               </p>
             </div>
           )}
@@ -763,7 +790,7 @@ export default function PortalDashboardPage() {
           </h2>
           {primaryBlocker && (
             <p className="mt-2 text-sm text-[#c4a7a7]">
-              Current blocker: {primaryBlocker.replace(/_/g, " ")}
+              Current blocker: {getPrimaryBlockerLabel(primaryBlocker)}
             </p>
           )}
         </div>
@@ -857,7 +884,7 @@ export default function PortalDashboardPage() {
             </div>
             {primaryBlocker && (
               <p className="mt-3 text-xs text-[#8a6a6a]">
-                Next: {primaryBlocker.replace(/_/g, " ")}
+                Next: {getPrimaryBlockerLabel(primaryBlocker)}
               </p>
             )}
           </div>
@@ -933,7 +960,7 @@ export default function PortalDashboardPage() {
             </p>
             <p className="mt-2 text-sm text-stone-600">
               <span className="font-medium">Execution status:</span> <span className={executionStatus === "blocked" ? "text-[#c4a7a7] font-medium" : "text-[#6a7a6a] font-medium"}>{executionStatus}</span>
-              {primaryBlocker && <span className="text-stone-500"> — {primaryBlocker.replace(/_/g, " ")}</span>}
+              {primaryBlocker && <span className="text-stone-500"> — {getPrimaryBlockerLabel(primaryBlocker)}</span>}
             </p>
           </div>
         </div>
@@ -951,7 +978,7 @@ export default function PortalDashboardPage() {
               {flags.advisoryReady 
                 ? "Ensure jurisdiction, legal pathway, and clinic strategy are correct before execution."
                 : primaryBlocker
-                  ? `Blocked: ${primaryBlocker.replace(/_/g, " ")}`
+                  ? `Blocked: ${getPrimaryBlockerLabel(primaryBlocker)}`
                   : `Complete ${70 - readinessTotal}% more to unlock advisory eligibility`}
             </p>
           </div>
