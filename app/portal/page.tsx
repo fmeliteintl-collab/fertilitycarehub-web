@@ -75,23 +75,23 @@ function getPrimaryBlockerLabel(
   primaryBlocker: PortalIntelligence["primaryBlocker"],
 ): string {
   if (primaryBlocker === "missing_pathway") {
-    return "Your planning workspace is ready";
+    return "Define your fertility pathway to activate country matching and timeline guidance";
   }
 
   if (primaryBlocker === "missing_family_structure") {
-    return "Family structure is the next planning step";
+    return "Confirm family structure to refine eligibility and jurisdiction fit";
   }
 
   if (primaryBlocker === "missing_country_selection") {
-    return "Country shortlist is the next planning step";
+    return "Select your initial country shortlist to unlock comparison guidance";
   }
 
   if (primaryBlocker === "timeline_not_started") {
-    return "Timeline guidance is ready to be structured";
+    return "Generate your execution timeline to structure next steps";
   }
 
   if (primaryBlocker === "timeline_incomplete") {
-    return "Timeline progress needs completion";
+    return "Complete timeline milestones to improve advisory readiness";
   }
 
   return primaryBlocker?.replace(/_/g, " ") ?? "";
@@ -240,7 +240,7 @@ function ExecutiveSummary({
   // PREMIUM: Audit-aligned strategic interpretation
   const getStrategicInterpretation = () => {
     if (stage === "planning" && !flags.hasPathway) {
-      return "Planning foundation not yet established. Define your pathway to unlock country matching and timeline generation.";
+      return "Your planning workspace is active. Start by defining your pathway to unlock country matching and timeline guidance.";
     }
     if (stage === "planning" && flags.hasPathway && !flags.hasCountries) {
       return "Pathway defined. Your planning foundation is strong, but country selection is required to proceed with execution planning.";
@@ -310,7 +310,7 @@ function ExecutiveSummary({
             <div className="rounded-xl bg-[#3a2a2a] border border-[#5c3a3a] p-4">
               <div className="flex items-center gap-2 text-[#c4a7a7]">
                 <span className="text-lg">⚠</span>
-                <span className="text-sm font-semibold uppercase tracking-wider">Current Blocker</span>
+                <span className="text-sm font-semibold uppercase tracking-wider">Required Next Step</span>
               </div>
               <p className="mt-1 text-stone-200">
                 {getPrimaryBlockerLabel(primaryBlocker)}
@@ -790,7 +790,7 @@ export default function PortalDashboardPage() {
           </h2>
           {primaryBlocker && (
             <p className="mt-2 text-sm text-[#c4a7a7]">
-              Current blocker: {getPrimaryBlockerLabel(primaryBlocker)}
+              Required next step: {getPrimaryBlockerLabel(primaryBlocker)}
             </p>
           )}
         </div>
@@ -978,7 +978,7 @@ export default function PortalDashboardPage() {
               {flags.advisoryReady 
                 ? "Ensure jurisdiction, legal pathway, and clinic strategy are correct before execution."
                 : primaryBlocker
-                  ? `Blocked: ${getPrimaryBlockerLabel(primaryBlocker)}`
+                  ? `Next step: ${getPrimaryBlockerLabel(primaryBlocker)}`
                   : `Complete ${70 - readinessTotal}% more to unlock advisory eligibility`}
             </p>
           </div>

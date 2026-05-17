@@ -544,25 +544,25 @@ function getPortalAuthDetails(params: {
 
     return {
       authUrl: `https://fertilitycarehub.com/auth/setup?token=${encodedSetupToken}`,
-      buttonText: "Create Your Portal Login",
+      buttonText: "Set up your portal access",
       instructionText:
-        "Your private workspace is unlocked. Please use the secure setup button below to create your portal password.",
+        "Your FertilityCareHub planning workspace is now ready.",
       secondaryInstructionText:
-        "This setup link is private, time-sensitive, and intended only for the paid advisory client associated with this checkout email.",
+        "This is where your fertility strategy, country comparison, and timeline planning will be organized moving forward.",
       supportText:
-        "If you already created a password for this email, use the client login page instead.",
+        "If you already have a password for this email, use the login page instead.",
     };
   }
 
   return {
     authUrl: `https://fertilitycarehub.com/auth/login?email=${encodedEmail}`,
-    buttonText: "Log In to Your Portal",
+    buttonText: "Log in to your workspace",
     instructionText:
-      "Your private workspace is unlocked. Please log in using the same email address you used at checkout.",
+      "Your FertilityCareHub planning workspace is now ready.",
     secondaryInstructionText:
-      "Once signed in, you will be taken to your private planning portal.",
+      "Log in with the same email address you used at checkout to continue your planning.",
     supportText:
-      "If you cannot remember your password, use the password recovery option on the login page.",
+      "If you cannot remember your password, use the recovery option on the login page.",
   };
 }
 
@@ -574,7 +574,7 @@ async function sendOnboardingEmail(params: {
   supabaseUrl: string;
   supabaseServiceRoleKey: string;
 }): Promise<{ status: "email_sent" | "email_failed"; email: string }> {
-  const firstName = params.fullName?.split(" ")[0] ?? "there";
+  const firstName = params.fullName?.split(" ")[0] ?? "";
   const setupToken =
     params.portalAccessStatus === "portal_access_granted_new_profile"
       ? await createPortalSetupToken({
@@ -590,64 +590,68 @@ async function sendOnboardingEmail(params: {
     setupToken,
   });
 
+  const greeting = firstName ? `Hi ${firstName},` : "Hi,";
+
+  const plainTextBody = `${greeting}
+
+Your FertilityCareHub planning workspace is now ready.
+
+This is where your fertility strategy, country comparison, and timeline planning will be organized moving forward.
+
+To get started, please set up your access here:
+${authDetails.authUrl}
+
+If you did not request this, you can safely ignore this email.
+
+— FertilityCareHub`;
+
   const emailHtml = `
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to FertilityCareHub</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Your FertilityCareHub planning workspace</title>
 </head>
-<body style="margin:0;padding:0;background-color:#f8f9fa;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f8f9fa;">
+<body style="margin:0;padding:0;background-color:#ffffff;font-family:Georgia,'Times New Roman',serif;-webkit-font-smoothing:antialiased;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#ffffff;">
     <tr>
-      <td align="center" style="padding:40px 20px;">
-        <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+      <td align="center" style="padding:48px 24px 32px;">
+        <table role="presentation" width="520" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;width:100%;">
           <tr>
-            <td style="padding:48px 40px 32px;background-color:#0f172a;text-align:center;">
-              <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:600;letter-spacing:-0.02em;">FertilityCareHub</h1>
-              <p style="margin:8px 0 0;color:#94a3b8;font-size:14px;">Your private fertility planning portal</p>
+            <td style="padding-bottom:32px;border-bottom:1px solid #e5e5e5;">
+              <p style="margin:0;color:#1a1a1a;font-size:15px;font-weight:400;letter-spacing:0.02em;font-family:Georgia,serif;">FertilityCareHub</p>
             </td>
           </tr>
           <tr>
-            <td style="padding:40px;">
-              <h2 style="margin:0 0 16px;color:#0f172a;font-size:20px;font-weight:600;">Welcome, ${firstName}</h2>
+            <td style="padding:32px 0 24px;">
+              <p style="margin:0 0 20px;color:#1a1a1a;font-size:16px;line-height:1.6;font-family:Georgia,serif;">${greeting}</p>
 
-              <p style="margin:0 0 20px;color:#475569;font-size:15px;line-height:1.6;">Your payment has been confirmed and your private portal access has been unlocked.</p>
+              <p style="margin:0 0 20px;color:#333333;font-size:15px;line-height:1.7;font-family:Georgia,serif;">Your FertilityCareHub planning workspace is now ready.</p>
 
-              <p style="margin:0 0 20px;color:#475569;font-size:15px;line-height:1.6;">${authDetails.instructionText}</p>
-              
-              <div style="background-color:#f1f5f9;border-radius:8px;padding:20px;margin:0 0 24px;">
-                <p style="margin:0 0 12px;color:#0f172a;font-size:14px;font-weight:600;">What you can do now:</p>
-                <ul style="margin:0;padding-left:20px;color:#475569;font-size:14px;line-height:1.8;">
-                  <li>Review your personalized planning brief</li>
-                  <li>Explore country options and shortlist jurisdictions</li>
-                  <li>Track your treatment timeline and milestones</li>
-                  <li>Access strategic advisory insights</li>
-                  <li>Manage your document vault</li>
-                </ul>
-              </div>
+              <p style="margin:0 0 28px;color:#333333;font-size:15px;line-height:1.7;font-family:Georgia,serif;">This is where your fertility strategy, country comparison, and timeline planning will be organized moving forward.</p>
 
-              <table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;">
+              <p style="margin:0 0 12px;color:#333333;font-size:15px;line-height:1.7;font-family:Georgia,serif;">To get started:</p>
+
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 28px;">
                 <tr>
-                  <td style="border-radius:8px;background-color:#0f172a;">
-                    <a href="${authDetails.authUrl}" style="display:inline-block;padding:14px 32px;color:#ffffff;text-decoration:none;font-size:15px;font-weight:500;border-radius:8px;">${authDetails.buttonText}</a>
+                  <td style="border-bottom:1px solid #1a1a1a;padding-bottom:2px;">
+                    <a href="${authDetails.authUrl}" style="color:#1a1a1a;text-decoration:none;font-size:15px;font-family:Georgia,serif;">${authDetails.buttonText}</a>
                   </td>
                 </tr>
               </table>
 
-              <p style="margin:0 0 16px;color:#475569;font-size:14px;line-height:1.6;">${authDetails.secondaryInstructionText}</p>
+              <p style="margin:0 0 20px;color:#666666;font-size:13px;line-height:1.6;font-family:Georgia,serif;">If the link does not work, copy and paste this into your browser:<br>
+              <span style="color:#1a1a1a;word-break:break-all;">${authDetails.authUrl}</span></p>
 
-              <p style="margin:0 0 16px;color:#475569;font-size:14px;line-height:1.6;">${authDetails.supportText}</p>
-
-              <p style="margin:0 0 16px;color:#475569;font-size:14px;line-height:1.6;">If you have any questions or need guidance at any stage, simply reply to this email. Our team is here to support your journey.</p>
-              
-              <p style="margin:0;color:#94a3b8;font-size:13px;">This is an automated message from FertilityCareHub. Please do not share this email.</p>
+              <p style="margin:0 0 4px;color:#333333;font-size:15px;line-height:1.7;font-family:Georgia,serif;">${authDetails.secondaryInstructionText}</p>
             </td>
           </tr>
           <tr>
-            <td style="padding:24px 40px;border-top:1px solid #e2e8f0;text-align:center;">
-              <p style="margin:0;color:#94a3b8;font-size:12px;">FertilityCareHub — Private. Strategic. Yours.</p>
+            <td style="padding:24px 0 32px;border-top:1px solid #e5e5e5;">
+              <p style="margin:0 0 8px;color:#666666;font-size:13px;line-height:1.6;font-family:Georgia,serif;">If you did not request this, you can safely ignore this email.</p>
+              <p style="margin:0;color:#999999;font-size:12px;line-height:1.5;font-family:Georgia,serif;">— FertilityCareHub</p>
             </td>
           </tr>
         </table>
@@ -668,8 +672,12 @@ async function sendOnboardingEmail(params: {
       body: JSON.stringify({
         from: "FertilityCareHub <onboarding@fertilitycarehub.com>",
         to: params.email,
-        subject: "Your FertilityCareHub Portal is Ready",
+        subject: "Your FertilityCareHub planning workspace",
+        text: plainTextBody,
         html: emailHtml,
+        headers: {
+          "List-Unsubscribe": "<mailto:onboarding@fertilitycarehub.com?subject=unsubscribe>",
+        },
       }),
     });
 
