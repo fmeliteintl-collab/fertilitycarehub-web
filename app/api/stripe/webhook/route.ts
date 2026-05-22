@@ -401,6 +401,34 @@ async function prepareWebhookEventProcessing(params: {
   };
 }
 
+async function findSupabaseAuthUserByEmail(params: {
+  email: string;
+  supabaseUrl: string;
+  supabaseServiceRoleKey: string;
+}): Promise<string | null> {
+  const response = await fetch(
+    `${params.supabaseUrl}/auth/v1/admin/users?page=1&per_page=1000`,
+    {
+      method: "GET",
+      headers: getSupabaseHeaders(params.supabaseServiceRoleKey),
+    }
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Supabase auth user lookup failed: ${errorText}`);
+  }
+
+  const payload = (await response.json()) as { users?: SupabaseAuthUser[] };
+  const normalizedEmail = params.email.trim().toLowerCase();
+
+  const existingUser = payload.users?.find(
+    (user) => user.email?.trim().toLowerCase() === normalizedEmail
+  );
+
+  return existingUser?.id ?? null;
+}
+
 async function createSupabaseAuthUser(params: {
   email: string;
   fullName: string;
@@ -424,6 +452,21 @@ async function createSupabaseAuthUser(params: {
   const responseText = await response.text();
 
   if (!response.ok) {
+    if (
+      response.status === 422 &&
+      responseText.toLowerCase().includes("email_exists")
+    ) {
+      const existingUserId = await findSupabaseAuthUserByEmail({
+        email: params.email,
+        supabaseUrl: params.supabaseUrl,
+        supabaseServiceRoleKey: params.supabaseServiceRoleKey,
+      });
+
+      if (existingUserId) {
+        return existingUserId;
+      }
+    }
+
     throw new Error(`Supabase auth user creation failed: ${responseText}`);
   }
 
