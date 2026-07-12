@@ -3,13 +3,44 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
 
+const knowledgeGuides = [
+  {
+    title: "How to Compare Fertility Jurisdictions Strategically",
+    description:
+      "Use a structured framework to compare regulation, eligibility, donor pathways, clinic governance, costs, logistics, and execution risk.",
+    href: "/how-to-compare-fertility-jurisdictions",
+    status: "Published",
+  },
+  {
+    title: "How to Choose a Fertility Clinic Abroad",
+    description:
+      "Evaluate licensing, laboratory governance, treatment transparency, communication standards, total costs, and continuity of care.",
+    href: null,
+    status: "Coming soon",
+  },
+  {
+    title: "Understanding Fertility Clinic Success Rates",
+    description:
+      "Learn how to interpret pregnancy, ongoing-pregnancy, live-birth, cycle, transfer, and age-specific reporting measures.",
+    href: null,
+    status: "Coming soon",
+  },
+  {
+    title: "Hidden Costs of Fertility Treatment Abroad",
+    description:
+      "Identify medication, testing, donor, storage, freezing, travel, accommodation, cancellation, and repeat-treatment costs.",
+    href: null,
+    status: "Coming soon",
+  },
+];
+
 export default function Home() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">(
     "idle"
   );
 
-  // Deep-link context: /?from=country  (example: /?from=spain)
+  // Deep-link context: /?from=country
   const [from, setFrom] = useState("");
 
   useEffect(() => {
@@ -17,45 +48,58 @@ export default function Home() {
       const params = new URLSearchParams(window.location.search);
       const raw = (params.get("from") || "").trim().toLowerCase();
 
-      // Allow only slugs like "spain" or "united-states"
+      // Allow only slugs such as "spain" or "united-states".
       const safe = /^[a-z-]+$/.test(raw) ? raw : "";
       setFrom(safe);
     };
 
-    // Defer to next tick to avoid synchronous setState
     const timeoutId = setTimeout(handleRouteChange, 0);
 
     return () => clearTimeout(timeoutId);
   }, []);
 
   const countryLink = useMemo(() => {
-    if (!from) return null;
+    if (!from) {
+      return null;
+    }
+
     return `/countries/${encodeURIComponent(from)}`;
   }, [from]);
 
   const countryLabel = useMemo(() => {
-    if (!from) return "";
-    // simple label formatting: "united-states" -> "United States"
+    if (!from) {
+      return "";
+    }
+
     return from
       .split("-")
-      .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : ""))
+      .map((word) =>
+        word ? `${word[0].toUpperCase()}${word.slice(1)}` : ""
+      )
       .join(" ");
   }, [from]);
 
-  async function onJoinList(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function onJoinList(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     setStatus("loading");
 
-    const res = await fetch("/api/subscribe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
+    try {
+      const response = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
 
-    if (res.ok) {
-      setEmail("");
-      setStatus("ok");
-    } else {
+      if (response.ok) {
+        setEmail("");
+        setStatus("ok");
+        return;
+      }
+
+      setStatus("error");
+    } catch {
       setStatus("error");
     }
   }
@@ -98,7 +142,7 @@ export default function Home() {
 
         <p style={{ fontSize: 14, color: "#6a6256", marginTop: 14 }}>
           Powered by the{" "}
-          <strong>FCH Global Fertility Intelligence Framework(TM)</strong> - a
+          <strong>FCH Global Fertility Intelligence Framework(TM)</strong> — a
           structured model that evaluates jurisdictions across regulatory
           alignment, donor pathway constraints, clinical infrastructure, and
           execution risk.
@@ -112,7 +156,6 @@ export default function Home() {
             flexWrap: "wrap",
           }}
         >
-          {/* PRIMARY CTA -> /advisory (tier selection) */}
           <Link
             href="/advisory"
             style={{
@@ -127,7 +170,6 @@ export default function Home() {
             View Advisory Tiers (US$500 / US$2,500)
           </Link>
 
-          {/* SECONDARY CTA */}
           <Link
             href="/countries"
             style={{
@@ -152,7 +194,6 @@ export default function Home() {
             </Link>
           </div>
 
-          {/* Deep-link CTA (only appears when ?from=xxx is present and valid) */}
           {countryLink ? (
             <Link
               href={countryLink}
@@ -182,45 +223,25 @@ export default function Home() {
             color: "#6a6256",
           }}
         >
-          <span
-            style={{
-              padding: "6px 10px",
-              border: "1px solid #e5ddc8",
-              borderRadius: 999,
-            }}
-          >
-            Regulatory Alignment
-          </span>
-          <span
-            style={{
-              padding: "6px 10px",
-              border: "1px solid #e5ddc8",
-              borderRadius: 999,
-            }}
-          >
-            Donor Pathway Constraints
-          </span>
-          <span
-            style={{
-              padding: "6px 10px",
-              border: "1px solid #e5ddc8",
-              borderRadius: 999,
-            }}
-          >
-            Clinical Infrastructure
-          </span>
-          <span
-            style={{
-              padding: "6px 10px",
-              border: "1px solid #e5ddc8",
-              borderRadius: 999,
-            }}
-          >
-            Execution Risk
-          </span>
+          {[
+            "Regulatory Alignment",
+            "Donor Pathway Constraints",
+            "Clinical Infrastructure",
+            "Execution Risk",
+          ].map((label) => (
+            <span
+              key={label}
+              style={{
+                padding: "6px 10px",
+                border: "1px solid #e5ddc8",
+                borderRadius: 999,
+              }}
+            >
+              {label}
+            </span>
+          ))}
         </div>
 
-        {/* Optional helper link */}
         <div style={{ marginTop: 12 }}>
           <Link
             href="/consultation"
@@ -235,7 +256,6 @@ export default function Home() {
           </Link>
         </div>
 
-        {/* Credibility strip */}
         <div
           style={{
             marginTop: "36px",
@@ -433,6 +453,170 @@ export default function Home() {
         </div>
       </section>
 
+      {/* KNOWLEDGE HUB */}
+      <section
+        style={{
+          padding: "100px 20px",
+          backgroundColor: "#f8f6f2",
+          borderBottom: "1px solid #ece3d1",
+        }}
+      >
+        <div style={{ maxWidth: "1080px", margin: "0 auto" }}>
+          <div
+            style={{
+              maxWidth: 760,
+              margin: "0 auto 50px",
+              textAlign: "center",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 12,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "#8a7a55",
+                marginBottom: 12,
+              }}
+            >
+              FertilityCareHub Knowledge Hub
+            </div>
+
+            <h2 style={{ fontSize: "30px", marginBottom: 18 }}>
+              Structured Guidance for Cross-Border Fertility Decisions
+            </h2>
+
+            <p style={{ color: "#555", margin: 0 }}>
+              Explore independent planning guides designed to help individuals
+              and families evaluate jurisdictions, clinics, costs, reporting
+              standards, and execution risks before making high-stakes fertility
+              decisions.
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+              gap: 24,
+            }}
+          >
+            {knowledgeGuides.map((guide) => {
+              const cardContent = (
+                <>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: 12,
+                      marginBottom: 18,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: 11,
+                        letterSpacing: "0.12em",
+                        textTransform: "uppercase",
+                        color:
+                          guide.status === "Published" ? "#6d5a2d" : "#8a8377",
+                      }}
+                    >
+                      {guide.status}
+                    </span>
+
+                    <span
+                      aria-hidden="true"
+                      style={{
+                        fontSize: 18,
+                        color:
+                          guide.status === "Published" ? "#8a7a55" : "#aaa398",
+                      }}
+                    >
+                      {guide.status === "Published" ? "→" : "○"}
+                    </span>
+                  </div>
+
+                  <h3
+                    style={{
+                      marginTop: 0,
+                      marginBottom: 14,
+                      fontSize: 20,
+                      lineHeight: 1.35,
+                    }}
+                  >
+                    {guide.title}
+                  </h3>
+
+                  <p
+                    style={{
+                      color: "#5d5850",
+                      marginBottom: 0,
+                      fontSize: 14,
+                      lineHeight: 1.75,
+                    }}
+                  >
+                    {guide.description}
+                  </p>
+                </>
+              );
+
+              if (guide.href) {
+                return (
+                  <Link
+                    key={guide.title}
+                    href={guide.href}
+                    aria-label={`Read ${guide.title}`}
+                    style={{
+                      display: "block",
+                      backgroundColor: "#ffffff",
+                      padding: 26,
+                      borderRadius: 8,
+                      border: "1px solid #d9cba8",
+                      color: "#2b2b2b",
+                      textDecoration: "none",
+                      boxShadow: "0 8px 24px rgba(43, 43, 43, 0.04)",
+                    }}
+                  >
+                    {cardContent}
+                  </Link>
+                );
+              }
+
+              return (
+                <div
+                  key={guide.title}
+                  style={{
+                    backgroundColor: "#f3efe7",
+                    padding: 26,
+                    borderRadius: 8,
+                    border: "1px solid #e5ddc8",
+                    color: "#2b2b2b",
+                  }}
+                >
+                  {cardContent}
+                </div>
+              );
+            })}
+          </div>
+
+          <div style={{ textAlign: "center", marginTop: 34 }}>
+            <Link
+              href="/how-to-compare-fertility-jurisdictions"
+              style={{
+                display: "inline-block",
+                padding: "12px 22px",
+                border: "1px solid #b8a77a",
+                borderRadius: 4,
+                color: "#78683f",
+                textDecoration: "none",
+              }}
+            >
+              Read the Jurisdiction Comparison Guide
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* INSTITUTIONAL MODEL */}
       <section
         style={{
@@ -448,7 +632,7 @@ export default function Home() {
 
           <p style={{ color: "#555", marginBottom: 16 }}>
             FertilityCareHub operates under the{" "}
-            <strong>FCH Global Fertility Intelligence Framework(TM)</strong> - a
+            <strong>FCH Global Fertility Intelligence Framework(TM)</strong> — a
             documented, version-controlled jurisdiction evaluation model.
           </p>
 
@@ -477,48 +661,29 @@ export default function Home() {
               marginBottom: 18,
             }}
           >
-            <span
-              style={{
-                padding: "6px 10px",
-                border: "1px solid #e5ddc8",
-                borderRadius: 999,
-              }}
-            >
-              Weighted Regulatory Analysis
-            </span>
-            <span
-              style={{
-                padding: "6px 10px",
-                border: "1px solid #e5ddc8",
-                borderRadius: 999,
-              }}
-            >
-              Clinical Infrastructure Assessment
-            </span>
-            <span
-              style={{
-                padding: "6px 10px",
-                border: "1px solid #e5ddc8",
-                borderRadius: 999,
-              }}
-            >
-              Adaptive Donor Governance Weighting
-            </span>
-            <span
-              style={{
-                padding: "6px 10px",
-                border: "1px solid #e5ddc8",
-                borderRadius: 999,
-              }}
-            >
-              Execution Complexity Mapping
-            </span>
+            {[
+              "Weighted Regulatory Analysis",
+              "Clinical Infrastructure Assessment",
+              "Adaptive Donor Governance Weighting",
+              "Execution Complexity Mapping",
+            ].map((label) => (
+              <span
+                key={label}
+                style={{
+                  padding: "6px 10px",
+                  border: "1px solid #e5ddc8",
+                  borderRadius: 999,
+                }}
+              >
+                {label}
+              </span>
+            ))}
           </div>
 
           <p style={{ color: "#555", marginBottom: 0 }}>
             Each engagement follows structured internal scoring discipline with
             qualitative client-facing risk translation. This is institutional
-            advisory - not clinic referral, not rankings, and not promotional
+            advisory — not clinic referral, not rankings, and not promotional
             comparison.
           </p>
         </div>
@@ -688,7 +853,6 @@ export default function Home() {
             preserve analytical rigor.
           </p>
 
-          {/* CTA -> /advisory */}
           <Link
             href="/advisory"
             style={{
@@ -743,9 +907,10 @@ export default function Home() {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(event) => setEmail(event.target.value)}
               required
               placeholder="Enter your email"
+              aria-label="Email address"
               style={{
                 padding: "12px 14px",
                 minWidth: "260px",
@@ -757,32 +922,36 @@ export default function Home() {
 
             <button
               type="submit"
+              disabled={status === "loading"}
               style={{
                 padding: "12px 20px",
                 backgroundColor: "#b8a77a",
                 color: "#ffffff",
                 borderRadius: 4,
                 border: "none",
-                cursor: "pointer",
+                cursor: status === "loading" ? "not-allowed" : "pointer",
                 fontWeight: 500,
+                opacity: status === "loading" ? 0.75 : 1,
               }}
             >
               {status === "loading" ? "Joining..." : "Join the List"}
             </button>
           </form>
 
-          {status === "ok" && (
-            <p style={{ marginTop: 18, color: "#2d6a4f" }}>You are on the list.</p>
-          )}
+          {status === "ok" ? (
+            <p style={{ marginTop: 18, color: "#2d6a4f" }}>
+              You are on the list.
+            </p>
+          ) : null}
 
-          {status === "error" && (
+          {status === "error" ? (
             <p style={{ marginTop: 18, color: "#c1121f" }}>
               Something went wrong. Please try again.
             </p>
-          )}
+          ) : null}
 
           <p style={{ marginTop: 14, fontSize: 12, color: "#777" }}>
-            (We will reach out when consultation scheduling becomes available.)
+            We will reach out when consultation scheduling becomes available.
           </p>
         </div>
       </section>
@@ -791,6 +960,13 @@ export default function Home() {
       <footer style={{ padding: "34px 20px", textAlign: "center", color: "#777" }}>
         <div style={{ fontSize: 12 }}>
           Copyright {new Date().getFullYear()} FertilityCareHub •{" "}
+          <Link
+            href="/how-to-compare-fertility-jurisdictions"
+            style={{ textDecoration: "underline" }}
+          >
+            Knowledge Guide
+          </Link>{" "}
+          •{" "}
           <Link href="/privacy" style={{ textDecoration: "underline" }}>
             Privacy
           </Link>{" "}
