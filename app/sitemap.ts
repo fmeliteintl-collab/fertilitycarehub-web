@@ -11,6 +11,11 @@ const publicRoutes = [
     priority: 1,
   },
   {
+    path: "/guides",
+    changeFrequency: "weekly" as const,
+    priority: 0.9,
+  },
+  {
     path: "/countries",
     changeFrequency: "weekly" as const,
     priority: 0.9,

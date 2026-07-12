@@ -22,6 +22,25 @@ const ORG_JSON_LD = {
   sameAs: [],
 } as const;
 
+const navigationLinks = [
+  {
+    label: "Countries",
+    href: "/countries",
+  },
+  {
+    label: "Guides",
+    href: "/guides",
+  },
+  {
+    label: "Compare",
+    href: "/compare",
+  },
+  {
+    label: "Advisory",
+    href: "/advisory",
+  },
+];
+
 export const metadata: Metadata = {
   title: {
     default:
@@ -31,9 +50,6 @@ export const metadata: Metadata = {
   description:
     "Private global fertility strategy advisory for cross-border care across Europe and select international destinations — jurisdiction clarity, pathway alignment, and discreet planning.",
   metadataBase: new URL("https://fertilitycarehub.com"),
-  alternates: {
-    canonical: "/",
-  },
   openGraph: {
     title: "Global Fertility Strategy Advisory — Europe & Beyond",
     description:
@@ -53,7 +69,11 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: ReactNode;
+}>) {
   return (
     <html lang="en">
       <head>
@@ -64,19 +84,41 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }}
         />
       </head>
+
       <body
-  suppressHydrationWarning
-  className="bg-[#F5F1E8] font-serif text-[#1A1A1A]"
->
-        <header className="w-full border-b border-[#E5DDC8] py-6">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-6">
-            <Link href="/" className="flex items-center gap-4">
-              <span className="text-xl tracking-wide">FertilityCareHub</span>
-            </Link>
+        suppressHydrationWarning
+        className="bg-[#F5F1E8] font-serif text-[#1A1A1A]"
+      >
+        <header className="w-full border-b border-[#E5DDC8] bg-[#F5F1E8]">
+          <div className="mx-auto flex max-w-6xl flex-col gap-5 px-6 py-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between lg:justify-start">
+              <Link
+                href="/"
+                aria-label="FertilityCareHub homepage"
+                className="text-xl tracking-wide text-[#1A1A1A] no-underline"
+              >
+                FertilityCareHub
+              </Link>
+
+              <nav
+                aria-label="Primary navigation"
+                className="flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-[#5F584C] lg:ml-7"
+              >
+                {navigationLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="tracking-wide transition hover:text-[#8A7A55]"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
 
             <Link
               href="/consultation#request"
-              className="border border-[#B89B5E] px-5 py-2 text-sm tracking-wide transition hover:bg-[#B89B5E] hover:text-white"
+              className="inline-flex w-fit items-center justify-center border border-[#B89B5E] px-5 py-2 text-sm tracking-wide transition hover:bg-[#B89B5E] hover:text-white"
             >
               Request Advisory Consultation
             </Link>

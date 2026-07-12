@@ -601,7 +601,7 @@ export default function Home() {
 
           <div style={{ textAlign: "center", marginTop: 34 }}>
             <Link
-              href="/how-to-compare-fertility-jurisdictions"
+              href="/guides"
               style={{
                 display: "inline-block",
                 padding: "12px 22px",
@@ -611,7 +611,7 @@ export default function Home() {
                 textDecoration: "none",
               }}
             >
-              Read the Jurisdiction Comparison Guide
+              Browse All Guides
             </Link>
           </div>
         </div>
@@ -961,10 +961,10 @@ export default function Home() {
         <div style={{ fontSize: 12 }}>
           Copyright {new Date().getFullYear()} FertilityCareHub •{" "}
           <Link
-            href="/how-to-compare-fertility-jurisdictions"
+            href="/guides"
             style={{ textDecoration: "underline" }}
           >
-            Knowledge Guide
+            Guides
           </Link>{" "}
           •{" "}
           <Link href="/privacy" style={{ textDecoration: "underline" }}>
