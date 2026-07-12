@@ -2,39 +2,93 @@ import type { MetadataRoute } from "next";
 
 const baseUrl = "https://fertilitycarehub.com";
 
+const lastReviewed = new Date("2026-07-12");
+
+const publicRoutes = [
+  {
+    path: "",
+    changeFrequency: "monthly" as const,
+    priority: 1,
+  },
+  {
+    path: "/countries",
+    changeFrequency: "weekly" as const,
+    priority: 0.9,
+  },
+  {
+    path: "/compare",
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+  },
+  {
+    path: "/advisory",
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+  },
+  {
+    path: "/consultation",
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+  },
+  {
+    path: "/brief",
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  },
+  {
+    path: "/snapshot",
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
+  },
+  {
+    path: "/how-to-compare-fertility-jurisdictions",
+    changeFrequency: "monthly" as const,
+    priority: 0.9,
+  },
+  {
+    path: "/privacy",
+    changeFrequency: "yearly" as const,
+    priority: 0.3,
+  },
+  {
+    path: "/terms",
+    changeFrequency: "yearly" as const,
+    priority: 0.3,
+  },
+  {
+    path: "/disclaimer",
+    changeFrequency: "yearly" as const,
+    priority: 0.3,
+  },
+];
+
 const countries = [
-  "spain",
-  "greece",
-  "portugal",
+  "canada",
+  "china",
   "czech-republic",
+  "greece",
+  "india",
   "mexico",
-  "united-states",
+  "portugal",
+  "spain",
+  "turkey",
   "united-kingdom",
+  "united-states",
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticRoutes: MetadataRoute.Sitemap = [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 1,
-    },
-    {
-      // FIXED: Added backticks around the template literal
-      url: `${baseUrl}/consultation`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-  ];
+  const staticRoutes: MetadataRoute.Sitemap = publicRoutes.map((route) => ({
+    url: `${baseUrl}${route.path}`,
+    lastModified: lastReviewed,
+    changeFrequency: route.changeFrequency,
+    priority: route.priority,
+  }));
 
   const countryRoutes: MetadataRoute.Sitemap = countries.map((country) => ({
-    // FIXED: Added backticks around the template literal
     url: `${baseUrl}/countries/${country}`,
-    lastModified: new Date(),
-    changeFrequency: "weekly",
-    priority: 0.6,
+    lastModified: lastReviewed,
+    changeFrequency: "monthly",
+    priority: 0.7,
   }));
 
   return [...staticRoutes, ...countryRoutes];
