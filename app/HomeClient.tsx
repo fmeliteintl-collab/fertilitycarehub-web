@@ -131,13 +131,30 @@ export default function Home() {
           }}
         >
           Private Global Fertility Strategy Advisory
-          <br />
-          Discretion. Clarity. Cross-Border Direction.
         </h1>
 
-        <p style={{ fontSize: "18px", color: "#5a5a5a" }}>
-          Strategic jurisdiction assessment and clinical alignment for
-          individuals and families navigating cross-border reproductive care.
+        <p
+          style={{
+            fontSize: "18px",
+            color: "#5a5a5a",
+            maxWidth: 760,
+            margin: "0 auto",
+          }}
+        >
+          Independent strategic guidance for individuals and families planning
+          fertility treatment across international jurisdictions.
+        </p>
+
+        <p
+          style={{
+            fontSize: 16,
+            color: "#6a6256",
+            marginTop: 14,
+            marginBottom: 0,
+            letterSpacing: "0.04em",
+          }}
+        >
+          Discretion. Clarity. Cross-Border Direction.
         </p>
 
         <p style={{ fontSize: 14, color: "#6a6256", marginTop: 14 }}>
@@ -585,15 +602,30 @@ export default function Home() {
               return (
                 <div
                   key={guide.title}
+                  aria-label={`${guide.title} — coming soon`}
                   style={{
                     backgroundColor: "#f3efe7",
                     padding: 26,
                     borderRadius: 8,
                     border: "1px solid #e5ddc8",
                     color: "#2b2b2b",
+                    opacity: 0.92,
                   }}
                 >
                   {cardContent}
+
+                  <p
+                    style={{
+                      marginTop: 18,
+                      marginBottom: 0,
+                      fontSize: 12,
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                      color: "#8a8377",
+                    }}
+                  >
+                    Available soon
+                  </p>
                 </div>
               );
             })}

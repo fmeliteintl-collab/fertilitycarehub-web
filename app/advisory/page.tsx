@@ -5,17 +5,23 @@ export const metadata: Metadata = {
   title:
     "Private Advisory — Institutional Cross-Border Fertility Strategy | FertilityCareHub",
   description:
-    "Institutional cross-border fertility strategy advisory. Engage the Strategic Alignment Snapshot™️ (US$500) or the Global Fertility Intelligence Brief™️ (US$2,500).",
+    "Institutional cross-border fertility strategy advisory. Engage the Strategic Alignment Snapshot™ (US$500) or the Global Fertility Intelligence Brief™ (US$2,500).",
   alternates: {
     canonical: "https://fertilitycarehub.com/advisory",
   },
   openGraph: {
     title: "Private Advisory — Institutional Cross-Border Fertility Strategy",
     description:
-      "Institutional cross-border fertility strategy advisory using the FCH Global Fertility Intelligence Framework™️.",
+      "Institutional cross-border fertility strategy advisory using the FCH Global Fertility Intelligence Framework™.",
     url: "https://fertilitycarehub.com/advisory",
     siteName: "FertilityCareHub",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Private Advisory — Cross-Border Fertility Strategy",
+    description:
+      "Structured fertility-jurisdiction advisory for individuals and families navigating complex international treatment decisions.",
   },
 };
 
@@ -63,11 +69,11 @@ export default function AdvisoryPage() {
       },
       {
         "@type": "Question",
-        name: "What is included in the Strategic Alignment Snapshot™️?",
+        name: "What is included in the Strategic Alignment Snapshot™?",
         acceptedAnswer: {
           "@type": "Answer",
           text:
-            "The Strategic Alignment Snapshot™️ is a structured diagnostic engagement applying the FCH Global Fertility Intelligence Framework™️ to identify viable jurisdictions, primary regulatory risks, and directional strategy.",
+            "The Strategic Alignment Snapshot™ is a structured diagnostic engagement applying the FCH Global Fertility Intelligence Framework™ to identify viable jurisdictions, primary regulatory risks, and directional strategy.",
         },
       },
       {
@@ -109,6 +115,38 @@ export default function AdvisoryPage() {
     ],
   };
 
+  const serviceJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: "FertilityCareHub Cross-Border Fertility Strategy Advisory",
+    description:
+      "Private strategic advisory for evaluating fertility jurisdictions, donor pathways, regulatory constraints, clinical infrastructure, costs, documentation, and execution risk.",
+    provider: {
+      "@type": "Organization",
+      name: "FertilityCareHub",
+      url: "https://fertilitycarehub.com",
+    },
+    areaServed: "Worldwide",
+    serviceType: "Cross-border fertility strategy advisory",
+    offers: [
+      {
+        "@type": "Offer",
+        name: "Strategic Alignment Snapshot™",
+        price: "500",
+        priceCurrency: "USD",
+        url: STRIPE_TIER1_URL,
+      },
+      {
+        "@type": "Offer",
+        name: "Global Fertility Intelligence Brief™",
+        price: "2500",
+        priceCurrency: "USD",
+        url: STRIPE_TIER2_URL,
+      },
+    ],
+  };
+
+
   return (
     <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
       <script
@@ -118,6 +156,10 @@ export default function AdvisoryPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
       />
 
       <div className="mx-auto max-w-6xl px-6 pt-10">
@@ -150,7 +192,7 @@ export default function AdvisoryPage() {
           FertilityCareHub is an institutional, process-driven cross-border
           fertility strategy advisory — not a clinic and not a broker. Our work
           is delivered through the{" "}
-          <strong>FCH Global Fertility Intelligence Framework™️</strong>, a
+          <strong>FCH Global Fertility Intelligence Framework™</strong>, a
           structured model that evaluates jurisdictions across regulatory
           alignment, donor pathway constraints, clinical infrastructure, and
           execution risk so clients can make high-stakes decisions with greater
@@ -185,6 +227,71 @@ export default function AdvisoryPage() {
           <Link href="/consultation#request" className={CTA_SECONDARY}>
             Request Advisory Consultation
           </Link>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 pb-12">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6 sm:p-8">
+          <div className="max-w-3xl">
+            <div className="text-xs tracking-[0.24em] text-[#8A7652]">
+              BEFORE YOU ENGAGE
+            </div>
+
+            <h2 className="mt-3 text-2xl font-medium">
+              Use the public intelligence library to clarify your starting point
+            </h2>
+
+            <p className="mt-4 text-sm leading-relaxed text-[#5F584C]">
+              Review the guides, country dossiers, and jurisdiction comparisons
+              before selecting an advisory tier. This helps you identify your
+              shortlist, key questions, and the level of support your pathway may
+              require.
+            </p>
+          </div>
+
+          <div className="mt-6 grid gap-5 md:grid-cols-3">
+            <Link
+              href="/guides"
+              className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-5 transition hover:border-[#B89B5E]"
+            >
+              <div className="text-xs tracking-[0.18em] text-[#6A6256]">
+                GUIDES
+              </div>
+              <div className="mt-2 font-medium">Build your planning foundation</div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Review structured resources covering clinic selection, costs,
+                success rates, donor pathways, and travel planning.
+              </p>
+            </Link>
+
+            <Link
+              href="/countries"
+              className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-5 transition hover:border-[#B89B5E]"
+            >
+              <div className="text-xs tracking-[0.18em] text-[#6A6256]">
+                COUNTRIES
+              </div>
+              <div className="mt-2 font-medium">Explore jurisdiction dossiers</div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Review country-level considerations before narrowing your
+                shortlist.
+              </p>
+            </Link>
+
+            <Link
+              href="/compare"
+              className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-5 transition hover:border-[#B89B5E]"
+            >
+              <div className="text-xs tracking-[0.18em] text-[#6A6256]">
+                COMPARE
+              </div>
+              <div className="mt-2 font-medium">Evaluate structural differences</div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Compare regulation, donor governance, infrastructure, costs, and
+                execution risk across countries.
+              </p>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -262,7 +369,7 @@ export default function AdvisoryPage() {
       <section className="mx-auto max-w-6xl px-6 pb-16">
         <div className="rounded-2xl border border-[#E5DDC8] bg-white/70 p-8">
           <h2 className="text-2xl font-medium">
-            The FCH Global Fertility Intelligence Framework™️
+            The FCH Global Fertility Intelligence Framework™
           </h2>
 
           <div className="mt-6 grid gap-6 text-sm leading-relaxed text-[#2A2A2A] md:grid-cols-2">
@@ -359,7 +466,7 @@ export default function AdvisoryPage() {
           <h2 className="text-2xl font-medium">Select the correct engagement</h2>
           <p className="mt-4 max-w-4xl text-sm leading-relaxed text-[#6A6256]">
             This is a structured advisory funnel. If you are still determining
-            jurisdiction fit, begin with Snapshot™️. If your pathway is more
+            jurisdiction fit, begin with Snapshot™. If your pathway is more
             complex, time-sensitive, or requires a documented execution roadmap,
             engage Tier 2.
           </p>
@@ -397,7 +504,7 @@ export default function AdvisoryPage() {
               </div>
               <div className="mt-2 font-medium">Compressed decision timelines</div>
               <p className="mt-2 text-[#6A6256]">
-                Use Snapshot™️ as a screening layer when you need directional
+                Use Snapshot™ as a screening layer when you need directional
                 clarity quickly before deeper planning.
               </p>
             </div>
@@ -405,7 +512,7 @@ export default function AdvisoryPage() {
 
           <div className="mt-7 flex flex-wrap gap-3">
             <Link href="/snapshot" className={CTA_SECONDARY}>
-              View Strategic Alignment Snapshot™️
+              View Strategic Alignment Snapshot™
             </Link>
 
             <a
@@ -418,7 +525,7 @@ export default function AdvisoryPage() {
             </a>
 
             <Link href="/brief" className={CTA_SECONDARY}>
-              View Global Fertility Intelligence Brief™️
+              View Global Fertility Intelligence Brief™
             </Link>
 
             <a
@@ -441,7 +548,7 @@ export default function AdvisoryPage() {
             </div>
 
             <h2 className="mt-3 text-2xl font-medium">
-              Strategic Alignment Snapshot™️ — US$500
+              Strategic Alignment Snapshot™ — US$500
             </h2>
 
             <p className="mt-4 text-sm leading-relaxed text-[#2A2A2A]">
@@ -452,7 +559,7 @@ export default function AdvisoryPage() {
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/snapshot" className={CTA_SECONDARY}>
-                View Strategic Alignment Snapshot™️
+                View Strategic Alignment Snapshot™
               </Link>
 
               <a
@@ -495,19 +602,19 @@ export default function AdvisoryPage() {
             </div>
 
             <h2 className="mt-3 text-2xl font-medium">
-              Global Fertility Intelligence Brief™️ — US$2,500
+              Global Fertility Intelligence Brief™ — US$2,500
             </h2>
 
             <p className="mt-4 text-sm leading-relaxed text-[#2A2A2A]">
               A full institutional application of the FCH Global Fertility
-              Intelligence Framework™️, incorporating jurisdiction elimination
+              Intelligence Framework™, incorporating jurisdiction elimination
               logic, pillar-based comparative analysis, structural risk mapping,
               and a formal execution roadmap tailored to your pathway complexity.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/brief" className={CTA_SECONDARY}>
-                View Global Fertility Intelligence Brief™️
+                View Global Fertility Intelligence Brief™
               </Link>
 
               <a
@@ -723,7 +830,7 @@ export default function AdvisoryPage() {
             To preserve analytical rigor and framework integrity, advisory
             engagements are accepted in controlled intake cycles. Each case
             undergoes structured internal review before acceptance. Where
-            timelines are compressed, the Strategic Alignment Snapshot™️ may be
+            timelines are compressed, the Strategic Alignment Snapshot™ may be
             used as an initial screening layer.
           </p>
 

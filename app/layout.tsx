@@ -93,12 +93,18 @@ export default function RootLayout({
           <div className="mx-auto flex max-w-6xl flex-col gap-5 px-6 py-5 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between lg:justify-start">
               <Link
-                href="/"
-                aria-label="FertilityCareHub homepage"
-                className="text-xl tracking-wide text-[#1A1A1A] no-underline"
-              >
-                FertilityCareHub
-              </Link>
+  href="/"
+  aria-label="FertilityCareHub homepage"
+  className="flex flex-col no-underline"
+>
+  <span className="text-xl tracking-wide text-[#1A1A1A]">
+    FertilityCareHub
+  </span>
+
+  <span className="mt-1 text-[11px] uppercase tracking-[0.18em] text-[#8A7A55]">
+    Global Fertility Strategy Advisory
+  </span>
+</Link>
 
               <nav
                 aria-label="Primary navigation"

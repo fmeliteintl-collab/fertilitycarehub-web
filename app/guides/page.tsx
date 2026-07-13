@@ -392,6 +392,53 @@ export default function GuidesPage() {
             Request Private Intake
           </Link>
         </div>
+
+        <div
+          style={{
+            margin: "36px auto 0",
+            maxWidth: 820,
+            padding: "24px 26px",
+            backgroundColor: "#ffffff",
+            border: "1px solid #e5ddc8",
+            borderRadius: 8,
+            textAlign: "left",
+          }}
+        >
+          <div
+            style={{
+              fontSize: 11,
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              color: "#8a7a55",
+              marginBottom: 8,
+            }}
+          >
+            Need Personalized Guidance?
+          </div>
+
+          <p
+            style={{
+              margin: "0 0 14px",
+              color: "#555",
+              fontSize: 15,
+            }}
+          >
+            Explore structured advisory support for complex cross-border
+            fertility planning, jurisdiction selection, clinic evaluation,
+            costs, documentation, and execution risk.
+          </p>
+
+          <Link
+            href="/advisory"
+            style={{
+              color: "#78683f",
+              textDecoration: "underline",
+              textUnderlineOffset: 4,
+            }}
+          >
+            View Advisory Options →
+          </Link>
+        </div>
       </section>
 
       {featuredGuide ? (
@@ -432,9 +479,25 @@ export default function GuidesPage() {
                 Begin with the Strategic Comparison Framework
               </h2>
 
-              <p style={{ color: "#555", margin: 0 }}>
+              <p style={{ color: "#555", margin: "0 0 18px" }}>
                 Build a disciplined foundation before comparing individual
                 countries, clinics, treatment packages, or travel plans.
+              </p>
+
+              <p
+                style={{
+                  margin: 0,
+                  padding: "16px 18px",
+                  backgroundColor: "#f8f6f2",
+                  borderLeft: "3px solid #b8a77a",
+                  color: "#5d5850",
+                  fontSize: 14,
+                }}
+              >
+                Every FertilityCareHub guide is developed using the FCH Global
+                Fertility Intelligence Framework(TM) to support structured,
+                evidence-aware decision-making rather than promotional clinic
+                rankings.
               </p>
             </div>
 
