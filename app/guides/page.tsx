@@ -33,6 +33,7 @@ type Guide = {
   category: string;
   href: string | null;
   status: "Published" | "Coming soon";
+  reviewed?: string;
 };
 
 const guides: Guide[] = [
@@ -43,14 +44,16 @@ const guides: Guide[] = [
     category: "Jurisdiction Comparison",
     href: "/how-to-compare-fertility-jurisdictions",
     status: "Published",
+    reviewed: "July 12, 2026",
   },
   {
     title: "How to Choose a Fertility Clinic Abroad",
     description:
-      "Evaluate licensing, laboratory governance, treatment transparency, communication standards, total costs, and continuity of care.",
+      "Evaluate licensing, laboratory governance, treatment transparency, communication standards, total costs, donor practices, and continuity of care.",
     category: "Clinic Selection",
-    href: null,
-    status: "Coming soon",
+    href: "/how-to-choose-a-fertility-clinic-abroad",
+    status: "Published",
+    reviewed: "July 12, 2026",
   },
   {
     title: "Understanding Fertility Clinic Success Rates",
@@ -137,8 +140,8 @@ const topics = [
     title: "Clinic Selection",
     description:
       "Learn how to evaluate licensing, laboratory governance, treatment transparency, communication, pricing, and continuity of care.",
-    href: null,
-    linkLabel: null,
+    href: "/how-to-choose-a-fertility-clinic-abroad",
+    linkLabel: "Read the Clinic Selection Guide",
   },
   {
     title: "Costs and Financial Planning",
@@ -248,7 +251,9 @@ const faqSchema = {
 };
 
 export default function GuidesPage() {
-  const featuredGuide = guides.find((guide) => guide.status === "Published");
+  const publishedGuides = guides.filter(
+    (guide) => guide.status === "Published"
+  );
   const upcomingGuides = guides.filter(
     (guide) => guide.status === "Coming soon"
   );
@@ -268,14 +273,12 @@ export default function GuidesPage() {
           __html: JSON.stringify(collectionPageSchema),
         }}
       />
-
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(breadcrumbSchema),
         }}
       />
-
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -290,13 +293,7 @@ export default function GuidesPage() {
           margin: "0 auto",
         }}
       >
-        <nav
-          aria-label="Breadcrumb"
-          style={{
-            fontSize: 13,
-            color: "#6a6256",
-          }}
-        >
+        <nav aria-label="Breadcrumb" style={{ fontSize: 13, color: "#6a6256" }}>
           <Link
             href="/"
             style={{
@@ -416,13 +413,7 @@ export default function GuidesPage() {
             Need Personalized Guidance?
           </div>
 
-          <p
-            style={{
-              margin: "0 0 14px",
-              color: "#555",
-              fontSize: 15,
-            }}
-          >
+          <p style={{ margin: "0 0 14px", color: "#555", fontSize: 15 }}>
             Explore structured advisory support for complex cross-border
             fertility planning, jurisdiction selection, clinic evaluation,
             costs, documentation, and execution risk.
@@ -441,152 +432,141 @@ export default function GuidesPage() {
         </div>
       </section>
 
-      {featuredGuide ? (
-        <section
-          style={{
-            padding: "80px 20px",
-            backgroundColor: "#ffffff",
-            borderTop: "1px solid #ece3d1",
-            borderBottom: "1px solid #ece3d1",
-          }}
-        >
-          <div style={{ maxWidth: 1080, margin: "0 auto" }}>
-            <div
-              style={{
-                maxWidth: 720,
-                marginBottom: 34,
-              }}
-            >
-              <div
-                style={{
-                  fontSize: 12,
-                  letterSpacing: "0.16em",
-                  textTransform: "uppercase",
-                  color: "#8a7a55",
-                  marginBottom: 10,
-                }}
-              >
-                Featured Guide
-              </div>
-
-              <h2
-                style={{
-                  fontSize: 32,
-                  lineHeight: 1.25,
-                  margin: "0 0 14px",
-                }}
-              >
-                Begin with the Strategic Comparison Framework
-              </h2>
-
-              <p style={{ color: "#555", margin: "0 0 18px" }}>
-                Build a disciplined foundation before comparing individual
-                countries, clinics, treatment packages, or travel plans.
-              </p>
-
-              <p
-                style={{
-                  margin: 0,
-                  padding: "16px 18px",
-                  backgroundColor: "#f8f6f2",
-                  borderLeft: "3px solid #b8a77a",
-                  color: "#5d5850",
-                  fontSize: 14,
-                }}
-              >
-                Every FertilityCareHub guide is developed using the FCH Global
-                Fertility Intelligence Framework(TM) to support structured,
-                evidence-aware decision-making rather than promotional clinic
-                rankings.
-              </p>
-            </div>
-
-            <article
-              style={{
-                padding: "clamp(28px, 5vw, 52px)",
-                border: "1px solid #d9cba8",
-                borderRadius: 10,
-                backgroundColor: "#f8f6f2",
-                boxShadow: "0 12px 34px rgba(43, 43, 43, 0.05)",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                  gap: 20,
-                  flexWrap: "wrap",
-                  marginBottom: 20,
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: 11,
-                    letterSpacing: "0.14em",
-                    textTransform: "uppercase",
-                    color: "#6d5a2d",
-                  }}
-                >
-                  Published • {featuredGuide.category}
-                </div>
-
-                <div
-                  style={{
-                    fontSize: 12,
-                    color: "#6a6256",
-                  }}
-                >
-                  Reviewed July 12, 2026
-                </div>
-              </div>
-
-              <h2
-                style={{
-                  fontSize: "clamp(28px, 4vw, 40px)",
-                  lineHeight: 1.22,
-                  margin: "0 0 18px",
-                }}
-              >
-                {featuredGuide.title}
-              </h2>
-
-              <p
-                style={{
-                  color: "#555",
-                  fontSize: 17,
-                  maxWidth: 820,
-                  margin: "0 0 28px",
-                }}
-              >
-                {featuredGuide.description}
-              </p>
-
-              {featuredGuide.href ? (
-                <Link
-                  href={featuredGuide.href}
-                  style={{
-                    display: "inline-block",
-                    padding: "12px 22px",
-                    backgroundColor: "#2b2b2b",
-                    color: "#ffffff",
-                    borderRadius: 4,
-                    textDecoration: "none",
-                  }}
-                >
-                  Read the Full Guide
-                </Link>
-              ) : null}
-            </article>
-          </div>
-        </section>
-      ) : null}
-
       <section
         style={{
-          padding: "95px 20px",
+          padding: "80px 20px",
+          backgroundColor: "#ffffff",
+          borderTop: "1px solid #ece3d1",
+          borderBottom: "1px solid #ece3d1",
         }}
       >
+        <div style={{ maxWidth: 1080, margin: "0 auto" }}>
+          <div style={{ maxWidth: 760, marginBottom: 34 }}>
+            <div
+              style={{
+                fontSize: 12,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                color: "#8a7a55",
+                marginBottom: 10,
+              }}
+            >
+              Published Guides
+            </div>
+
+            <h2 style={{ fontSize: 32, lineHeight: 1.25, margin: "0 0 14px" }}>
+              Begin with the Core Strategic Frameworks
+            </h2>
+
+            <p style={{ color: "#555", margin: "0 0 18px" }}>
+              Start with jurisdiction fit, then evaluate individual clinics
+              within the destinations that remain aligned.
+            </p>
+
+            <p
+              style={{
+                margin: 0,
+                padding: "16px 18px",
+                backgroundColor: "#f8f6f2",
+                borderLeft: "3px solid #b8a77a",
+                color: "#5d5850",
+                fontSize: 14,
+              }}
+            >
+              Every FertilityCareHub guide is developed using the FCH Global
+              Fertility Intelligence Framework™ to support structured,
+              evidence-aware decision-making rather than promotional clinic
+              rankings.
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gap: 24,
+            }}
+          >
+            {publishedGuides.map((guide) => (
+              <article
+                key={guide.title}
+                style={{
+                  padding: "clamp(28px, 5vw, 42px)",
+                  border: "1px solid #d9cba8",
+                  borderRadius: 10,
+                  backgroundColor: "#f8f6f2",
+                  boxShadow: "0 12px 34px rgba(43, 43, 43, 0.05)",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    gap: 20,
+                    flexWrap: "wrap",
+                    marginBottom: 20,
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 11,
+                      letterSpacing: "0.14em",
+                      textTransform: "uppercase",
+                      color: "#6d5a2d",
+                    }}
+                  >
+                    Published • {guide.category}
+                  </div>
+
+                  <div style={{ fontSize: 12, color: "#6a6256" }}>
+                    Reviewed {guide.reviewed}
+                  </div>
+                </div>
+
+                <h2
+                  style={{
+                    fontSize: "clamp(26px, 4vw, 36px)",
+                    lineHeight: 1.22,
+                    margin: "0 0 18px",
+                  }}
+                >
+                  {guide.title}
+                </h2>
+
+                <p
+                  style={{
+                    color: "#555",
+                    fontSize: 16,
+                    maxWidth: 820,
+                    margin: "0 0 28px",
+                  }}
+                >
+                  {guide.description}
+                </p>
+
+                {guide.href ? (
+                  <Link
+                    href={guide.href}
+                    style={{
+                      display: "inline-block",
+                      padding: "12px 22px",
+                      backgroundColor: "#2b2b2b",
+                      color: "#ffffff",
+                      borderRadius: 4,
+                      textDecoration: "none",
+                    }}
+                  >
+                    Read the Full Guide
+                  </Link>
+                ) : null}
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section style={{ padding: "95px 20px" }}>
         <div style={{ maxWidth: 1120, margin: "0 auto" }}>
           <div
             style={{
@@ -633,6 +613,7 @@ export default function GuidesPage() {
                   backgroundColor: "#ffffff",
                   border: "1px solid #e5ddc8",
                   borderRadius: 8,
+                  opacity: 0.82,
                 }}
               >
                 <div
@@ -676,14 +657,19 @@ export default function GuidesPage() {
                   {guide.title}
                 </h3>
 
+                <p style={{ color: "#5d5850", fontSize: 14, margin: "0 0 12px" }}>
+                  {guide.description}
+                </p>
+
                 <p
                   style={{
-                    color: "#5d5850",
-                    fontSize: 14,
                     margin: 0,
+                    fontSize: 12,
+                    color: "#8a8377",
+                    fontStyle: "italic",
                   }}
                 >
-                  {guide.description}
+                  Available soon
                 </p>
               </article>
             ))}
@@ -700,12 +686,7 @@ export default function GuidesPage() {
         }}
       >
         <div style={{ maxWidth: 1120, margin: "0 auto" }}>
-          <div
-            style={{
-              maxWidth: 760,
-              marginBottom: 46,
-            }}
-          >
+          <div style={{ maxWidth: 760, marginBottom: 46 }}>
             <div
               style={{
                 fontSize: 12,
@@ -778,12 +759,7 @@ export default function GuidesPage() {
         </div>
       </section>
 
-      <section
-        style={{
-          padding: "95px 20px",
-          backgroundColor: "#ffffff",
-        }}
-      >
+      <section style={{ padding: "95px 20px", backgroundColor: "#ffffff" }}>
         <div style={{ maxWidth: 1020, margin: "0 auto" }}>
           <div
             style={{
@@ -928,12 +904,7 @@ export default function GuidesPage() {
         </div>
       </section>
 
-      <section
-        style={{
-          padding: "95px 20px",
-          backgroundColor: "#ffffff",
-        }}
-      >
+      <section style={{ padding: "95px 20px", backgroundColor: "#ffffff" }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
           <div
             style={{
@@ -970,12 +941,7 @@ export default function GuidesPage() {
                   borderRadius: 8,
                 }}
               >
-                <h3
-                  style={{
-                    fontSize: 19,
-                    margin: "0 0 10px",
-                  }}
-                >
+                <h3 style={{ fontSize: 19, margin: "0 0 10px" }}>
                   {faq.question}
                 </h3>
 
