@@ -358,6 +358,60 @@ export default function CompareFertilityJurisdictionsPage() {
             </div>
           </section>
 
+          <section className="py-10 sm:py-12">
+            <div className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr]">
+              <aside className="rounded-2xl border border-[#D8C89F] bg-[#EEE5D2] p-6 sm:p-7">
+                <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+                  Guide information
+                </p>
+
+                <dl className="mt-5 space-y-4 text-sm leading-6 text-[#5F584D]">
+                  <div>
+                    <dt className="font-semibold text-[#2A2824]">Last reviewed</dt>
+                    <dd className="mt-1">July 12, 2026</dd>
+                  </div>
+
+                  <div>
+                    <dt className="font-semibold text-[#2A2824]">
+                      Framework version
+                    </dt>
+                    <dd className="mt-1">FCH Global Fertility Intelligence Framework(TM) v1.0</dd>
+                  </div>
+
+                  <div>
+                    <dt className="font-semibold text-[#2A2824]">
+                      Estimated reading time
+                    </dt>
+                    <dd className="mt-1">Approximately 12 minutes</dd>
+                  </div>
+                </dl>
+              </aside>
+
+              <div className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6 sm:p-7">
+                <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+                  Who this guide is for
+                </p>
+
+                <ul className="mt-5 grid gap-3 text-sm leading-6 text-[#5F584D] sm:grid-cols-2">
+                  {[
+                    "Individuals beginning international fertility research",
+                    "Couples comparing fertility-treatment jurisdictions",
+                    "Intended parents evaluating donor pathways",
+                    "Patients planning treatment abroad",
+                  ].map((item) => (
+                    <li key={item} className="flex gap-3">
+                      <span
+                        aria-hidden="true"
+                        className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#B89B5E]"
+                      />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </section>
+
           <section className="py-12 sm:py-16">
             <div className="grid gap-6 lg:grid-cols-[1.35fr_0.65fr]">
               <div className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6 sm:p-8">
@@ -619,6 +673,85 @@ export default function CompareFertilityJurisdictionsPage() {
           <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
             <div className="max-w-3xl">
               <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+                Related resources
+              </p>
+
+              <h2 className="mt-4 text-3xl font-semibold sm:text-4xl">
+                Continue your research
+              </h2>
+
+              <p className="mt-5 leading-8 text-[#5F584D]">
+                Use these resources to move from general comparison toward
+                jurisdiction research, clinic-level evaluation, and private
+                strategic planning.
+              </p>
+            </div>
+
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {[
+                {
+                  title: "Countries",
+                  description:
+                    "Explore FertilityCareHub jurisdiction dossiers.",
+                  href: "/countries",
+                },
+                {
+                  title: "Spain",
+                  description:
+                    "Review the Spain fertility jurisdiction assessment.",
+                  href: "/countries/spain",
+                },
+                {
+                  title: "Greece",
+                  description:
+                    "Review the Greece fertility jurisdiction assessment.",
+                  href: "/countries/greece",
+                },
+                {
+                  title: "Compare",
+                  description:
+                    "View available country-to-country fertility comparisons.",
+                  href: "/compare",
+                },
+                {
+                  title: "Guides",
+                  description:
+                    "Browse the FertilityCareHub authority library.",
+                  href: "/guides",
+                },
+                {
+                  title: "Consultation",
+                  description:
+                    "Request structured support for a focused shortlist.",
+                  href: "/consultation",
+                },
+              ].map((resource) => (
+                <Link
+                  key={resource.href}
+                  href={resource.href}
+                  className="group rounded-xl border border-[#E5DDC8] bg-white/60 p-5 transition hover:border-[#B89B5E] hover:bg-white"
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <h3 className="font-semibold">{resource.title}</h3>
+                    <span
+                      aria-hidden="true"
+                      className="text-[#8C7541] transition group-hover:translate-x-1"
+                    >
+                      →
+                    </span>
+                  </div>
+
+                  <p className="mt-3 text-sm leading-6 text-[#625A4C]">
+                    {resource.description}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+            <div className="max-w-3xl">
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
                 Frequently asked questions
               </p>
 
@@ -673,6 +806,67 @@ export default function CompareFertilityJurisdictionsPage() {
               >
                 Request a strategy review
               </Link>
+            </div>
+          </section>
+
+          <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+            <div className="max-w-3xl">
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+                Continue your research
+              </p>
+
+              <h2 className="mt-4 text-3xl font-semibold sm:text-4xl">
+                Choose your next step
+              </h2>
+            </div>
+
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                {
+                  title: "Country Intelligence",
+                  href: "/countries",
+                  description:
+                    "Explore jurisdiction dossiers and country-level planning considerations.",
+                },
+                {
+                  title: "Jurisdiction Comparisons",
+                  href: "/compare",
+                  description:
+                    "Review available country-to-country fertility comparisons.",
+                },
+                {
+                  title: "Guides Library",
+                  href: "/guides",
+                  description:
+                    "Browse structured fertility-planning resources and future guides.",
+                },
+                {
+                  title: "Private Advisory",
+                  href: "/advisory",
+                  description:
+                    "Review advisory pathways for personalized cross-border planning.",
+                },
+              ].map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="group rounded-2xl border border-[#E5DDC8] bg-white/60 p-5 transition hover:border-[#B89B5E] hover:bg-white"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <h3 className="text-lg font-semibold">{item.title}</h3>
+                    <span
+                      aria-hidden="true"
+                      className="text-[#8C7541] transition group-hover:translate-x-1"
+                    >
+                      →
+                    </span>
+                  </div>
+
+                  <p className="mt-3 text-sm leading-6 text-[#625A4C]">
+                    {item.description}
+                  </p>
+                </Link>
+              ))}
             </div>
           </section>
 
