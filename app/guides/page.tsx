@@ -67,10 +67,11 @@ const guides: Guide[] = [
   {
     title: "Hidden Costs of Fertility Treatment Abroad",
     description:
-      "Identify medication, testing, donor, storage, freezing, travel, accommodation, cancellation, and repeat-treatment expenses.",
+      "Identify medication, testing, donor, laboratory, storage, freezing, transfer, travel, accommodation, cancellation, and repeat-treatment expenses.",
     category: "Costs and Planning",
-    href: null,
-    status: "Coming soon",
+    href: "/hidden-costs-of-fertility-treatment-abroad",
+    status: "Published",
+    reviewed: "July 15, 2026",
   },
   {
     title: "Spain vs Greece for Fertility Treatment",
@@ -147,9 +148,9 @@ const topics = [
   {
     title: "Costs and Financial Planning",
     description:
-      "Understand treatment-package limitations, medications, testing, donor costs, travel expenses, cancellation exposure, and repeat-cycle risk.",
-    href: null,
-    linkLabel: null,
+      "Understand treatment-package limitations, medications, testing, donor costs, travel expenses, cancellation exposure, storage, and repeat-cycle risk.",
+    href: "/hidden-costs-of-fertility-treatment-abroad",
+    linkLabel: "Read the Hidden Costs Guide",
   },
   {
     title: "Success Rates and Reporting",
