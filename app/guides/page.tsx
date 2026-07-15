@@ -58,10 +58,11 @@ const guides: Guide[] = [
   {
     title: "Understanding Fertility Clinic Success Rates",
     description:
-      "Learn how pregnancy, ongoing-pregnancy, live-birth, per-cycle, per-transfer, and age-specific reporting measures differ.",
+      "Learn how pregnancy, ongoing-pregnancy, live-birth, per-cycle, per-transfer, cumulative, age-specific, and donor-treatment reporting measures differ.",
     category: "Success Rates",
-    href: null,
-    status: "Coming soon",
+    href: "/understanding-fertility-clinic-success-rates",
+    status: "Published",
+    reviewed: "July 15, 2026",
   },
   {
     title: "Hidden Costs of Fertility Treatment Abroad",
@@ -153,9 +154,9 @@ const topics = [
   {
     title: "Success Rates and Reporting",
     description:
-      "Interpret clinic outcome statistics carefully by identifying the denominator, patient population, treatment type, age group, and reported endpoint.",
-    href: null,
-    linkLabel: null,
+      "Interpret clinic outcome statistics carefully by identifying the denominator, patient population, treatment type, age group, donor use, and reported endpoint.",
+    href: "/understanding-fertility-clinic-success-rates",
+    linkLabel: "Read the Success Rates Guide",
   },
   {
     title: "Legal and Regulatory Planning",
