@@ -84,10 +84,11 @@ const guides: Guide[] = [
   {
     title: "IVF Abroad vs Canada",
     description:
-      "Assess the tradeoffs between pursuing treatment within Canada and considering an international fertility pathway.",
+      "Compare access, funding, donor pathways, treatment availability, costs, travel, documentation, and continuity of care when considering IVF abroad or in Canada.",
     category: "Country Comparison",
-    href: null,
-    status: "Coming soon",
+    href: "/ivf-abroad-vs-canada",
+    status: "Published",
+    reviewed: "July 15, 2026",
   },
   {
     title: "Fertility Treatment Travel Checklist",
