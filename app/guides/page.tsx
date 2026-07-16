@@ -76,10 +76,11 @@ const guides: Guide[] = [
   {
     title: "Spain vs Greece for Fertility Treatment",
     description:
-      "Compare two established European fertility destinations across eligibility, donor pathways, clinical infrastructure, costs, and travel complexity.",
+      "Compare two established European fertility destinations across eligibility, donor pathways, clinical governance, costs, travel, documentation, and continuity of care.",
     category: "Country Comparison",
-    href: null,
-    status: "Coming soon",
+    href: "/spain-vs-greece-for-fertility-treatment",
+    status: "Published",
+    reviewed: "July 15, 2026",
   },
   {
     title: "IVF Abroad vs Canada",
