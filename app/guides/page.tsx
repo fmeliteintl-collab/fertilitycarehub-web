@@ -58,50 +58,56 @@ const guides: Guide[] = [
   {
     title: "Understanding Fertility Clinic Success Rates",
     description:
-      "Learn how pregnancy, ongoing-pregnancy, live-birth, per-cycle, per-transfer, and age-specific reporting measures differ.",
+      "Learn how pregnancy, ongoing-pregnancy, live-birth, per-cycle, per-transfer, cumulative, age-specific, and donor-treatment reporting measures differ.",
     category: "Success Rates",
-    href: null,
-    status: "Coming soon",
+    href: "/understanding-fertility-clinic-success-rates",
+    status: "Published",
+    reviewed: "July 15, 2026",
   },
   {
     title: "Hidden Costs of Fertility Treatment Abroad",
     description:
-      "Identify medication, testing, donor, storage, freezing, travel, accommodation, cancellation, and repeat-treatment expenses.",
+      "Identify medication, testing, donor, laboratory, storage, freezing, transfer, travel, accommodation, cancellation, and repeat-treatment expenses.",
     category: "Costs and Planning",
-    href: null,
-    status: "Coming soon",
+    href: "/hidden-costs-of-fertility-treatment-abroad",
+    status: "Published",
+    reviewed: "July 15, 2026",
   },
   {
     title: "Spain vs Greece for Fertility Treatment",
     description:
-      "Compare two established European fertility destinations across eligibility, donor pathways, clinical infrastructure, costs, and travel complexity.",
+      "Compare two established European fertility destinations across eligibility, donor pathways, clinical governance, costs, travel, documentation, and continuity of care.",
     category: "Country Comparison",
-    href: null,
-    status: "Coming soon",
+    href: "/spain-vs-greece-for-fertility-treatment",
+    status: "Published",
+    reviewed: "July 15, 2026",
   },
   {
     title: "IVF Abroad vs Canada",
     description:
-      "Assess the tradeoffs between pursuing treatment within Canada and considering an international fertility pathway.",
+      "Compare access, funding, donor pathways, treatment availability, costs, travel, documentation, and continuity of care when considering IVF abroad or in Canada.",
     category: "Country Comparison",
-    href: null,
-    status: "Coming soon",
+    href: "/ivf-abroad-vs-canada",
+    status: "Published",
+    reviewed: "July 15, 2026",
   },
   {
     title: "Fertility Treatment Travel Checklist",
     description:
-      "Organize medical records, medications, travel dates, accommodation, insurance, documentation, and continuity-of-care planning.",
+      "Organize medical records, medications, monitoring, travel dates, accommodation, insurance, documentation, emergency planning, and continuity of care.",
     category: "Travel Planning",
-    href: null,
-    status: "Coming soon",
+    href: "/fertility-treatment-travel-checklist",
+    status: "Published",
+    reviewed: "July 15, 2026",
   },
   {
     title: "Questions to Ask a Fertility Clinic",
     description:
-      "Use a structured question set to assess treatment protocols, laboratory practices, communication, pricing, cancellation policies, and follow-up care.",
+      "Use a structured question set to assess licensing, clinical leadership, laboratory governance, treatment protocols, success rates, communication, pricing, cancellation policies, donor pathways, and follow-up care.",
     category: "Clinic Selection",
-    href: null,
-    status: "Coming soon",
+    href: "/questions-to-ask-a-fertility-clinic",
+    status: "Published",
+    reviewed: "July 15, 2026",
   },
   {
     title: "IVF Costs in Spain",
@@ -146,16 +152,16 @@ const topics = [
   {
     title: "Costs and Financial Planning",
     description:
-      "Understand treatment-package limitations, medications, testing, donor costs, travel expenses, cancellation exposure, and repeat-cycle risk.",
-    href: null,
-    linkLabel: null,
+      "Understand treatment-package limitations, medications, testing, donor costs, travel expenses, cancellation exposure, storage, and repeat-cycle risk.",
+    href: "/hidden-costs-of-fertility-treatment-abroad",
+    linkLabel: "Read the Hidden Costs Guide",
   },
   {
     title: "Success Rates and Reporting",
     description:
-      "Interpret clinic outcome statistics carefully by identifying the denominator, patient population, treatment type, age group, and reported endpoint.",
-    href: null,
-    linkLabel: null,
+      "Interpret clinic outcome statistics carefully by identifying the denominator, patient population, treatment type, age group, donor use, and reported endpoint.",
+    href: "/understanding-fertility-clinic-success-rates",
+    linkLabel: "Read the Success Rates Guide",
   },
   {
     title: "Legal and Regulatory Planning",
@@ -167,9 +173,9 @@ const topics = [
   {
     title: "Treatment and Travel Planning",
     description:
-      "Prepare for timelines, medical-record transfers, medications, accommodation, appointment coordination, and post-treatment continuity.",
-    href: null,
-    linkLabel: null,
+      "Prepare for timelines, medical-record transfers, medications, monitoring, accommodation, appointment coordination, emergency planning, and post-treatment continuity.",
+    href: "/fertility-treatment-travel-checklist",
+    linkLabel: "Read the Travel Checklist",
   },
 ];
 
