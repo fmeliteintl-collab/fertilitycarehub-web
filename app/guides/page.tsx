@@ -102,10 +102,11 @@ const guides: Guide[] = [
   {
     title: "Questions to Ask a Fertility Clinic",
     description:
-      "Use a structured question set to assess treatment protocols, laboratory practices, communication, pricing, cancellation policies, and follow-up care.",
+      "Use a structured question set to assess licensing, clinical leadership, laboratory governance, treatment protocols, success rates, communication, pricing, cancellation policies, donor pathways, and follow-up care.",
     category: "Clinic Selection",
-    href: null,
-    status: "Coming soon",
+    href: "/questions-to-ask-a-fertility-clinic",
+    status: "Published",
+    reviewed: "July 15, 2026",
   },
   {
     title: "IVF Costs in Spain",
