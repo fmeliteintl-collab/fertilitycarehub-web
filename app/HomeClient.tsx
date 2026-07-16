@@ -14,23 +14,23 @@ const knowledgeGuides = [
   {
     title: "How to Choose a Fertility Clinic Abroad",
     description:
-      "Evaluate licensing, laboratory governance, treatment transparency, communication standards, total costs, and continuity of care.",
-    href: null,
-    status: "Coming soon",
+      "Evaluate licensing, laboratory governance, treatment transparency, communication standards, total costs, donor practices, and continuity of care.",
+    href: "/how-to-choose-a-fertility-clinic-abroad",
+    status: "Published",
   },
   {
     title: "Understanding Fertility Clinic Success Rates",
     description:
-      "Learn how to interpret pregnancy, ongoing-pregnancy, live-birth, cycle, transfer, and age-specific reporting measures.",
-    href: null,
-    status: "Coming soon",
+      "Learn how to interpret pregnancy, ongoing-pregnancy, live-birth, per-cycle, per-transfer, cumulative, age-specific, and donor-treatment reporting.",
+    href: "/understanding-fertility-clinic-success-rates",
+    status: "Published",
   },
   {
     title: "Hidden Costs of Fertility Treatment Abroad",
     description:
-      "Identify medication, testing, donor, storage, freezing, travel, accommodation, cancellation, and repeat-treatment costs.",
-    href: null,
-    status: "Coming soon",
+      "Identify medication, testing, donor, laboratory, storage, freezing, transfer, travel, accommodation, cancellation, and repeat-treatment expenses.",
+    href: "/hidden-costs-of-fertility-treatment-abroad",
+    status: "Published",
   },
 ];
 
