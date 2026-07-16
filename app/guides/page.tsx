@@ -94,10 +94,11 @@ const guides: Guide[] = [
   {
     title: "Fertility Treatment Travel Checklist",
     description:
-      "Organize medical records, medications, travel dates, accommodation, insurance, documentation, and continuity-of-care planning.",
+      "Organize medical records, medications, monitoring, travel dates, accommodation, insurance, documentation, emergency planning, and continuity of care.",
     category: "Travel Planning",
-    href: null,
-    status: "Coming soon",
+    href: "/fertility-treatment-travel-checklist",
+    status: "Published",
+    reviewed: "July 15, 2026",
   },
   {
     title: "Questions to Ask a Fertility Clinic",
@@ -172,9 +173,9 @@ const topics = [
   {
     title: "Treatment and Travel Planning",
     description:
-      "Prepare for timelines, medical-record transfers, medications, accommodation, appointment coordination, and post-treatment continuity.",
-    href: null,
-    linkLabel: null,
+      "Prepare for timelines, medical-record transfers, medications, monitoring, accommodation, appointment coordination, emergency planning, and post-treatment continuity.",
+    href: "/fertility-treatment-travel-checklist",
+    linkLabel: "Read the Travel Checklist",
   },
 ];
 
