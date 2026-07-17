@@ -3,11 +3,13 @@ import {
   buildNextActionWithContext,
   calculateAdvisoryReadiness,
   determineExecutionStage,
+  determinePathwayClassification,
   generateAdvisorySignals,
   getTimelineCounts,
   type AdvisorySignal,
   type ExecutionStageResult,
   type NextActionWithContext,
+  type PathwayClassificationResult,
   type ReadinessResult,
 } from "./plan-intelligence";
 
@@ -89,6 +91,7 @@ export interface PortalIntelligence {
   advisoryReadiness: ReadinessResult;
   executionStage: ExecutionStageResult;
   rawSignals: AdvisorySignal[];
+  pathwayClassification: PathwayClassificationResult;
   flags: {
     hasPathway: boolean;
     hasFamilyStructure: boolean;
@@ -131,6 +134,7 @@ export function getPortalIntelligence(
   const advisoryReadiness = calculateAdvisoryReadiness(plan, documentCount);
   const executionStage = determineExecutionStage(plan);
   const rawSignals = generateAdvisorySignals(plan);
+  const pathwayClassification = determinePathwayClassification(plan);
   const baseNextAction = buildNextActionWithContext(plan, documentCount);
 
   const planningReadiness = calculatePlanningReadinessScore(plan);
@@ -214,6 +218,7 @@ export function getPortalIntelligence(
     advisoryReadiness,
     executionStage,
     rawSignals,
+    pathwayClassification,
     flags: {
       hasPathway,
       hasFamilyStructure,
