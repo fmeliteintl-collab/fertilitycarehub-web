@@ -1495,7 +1495,7 @@ export function getGlobalNextActionWithContext(
 }
 
 export function getDecisionSummary(plan: PlanData, documentCount: number) {
-  const nextAction = buildNextActionWithContext(plan);
+  const nextAction = buildNextActionWithContext(plan, documentCount);
   const readiness = calculateAdvisoryReadiness(plan, documentCount);
   const stage = determineExecutionStage(plan);
   const signals = generateAdvisorySignals(plan);
