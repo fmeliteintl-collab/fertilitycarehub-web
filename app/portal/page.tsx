@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { getCurrentUserDocuments } from "@/lib/documents/user-documents";
 import { getCurrentUserPlan } from "@/lib/plans/user-plans";
 import {
   EMPTY_USER_PLAN_INPUT,
@@ -669,16 +670,22 @@ function SystemInsights({
 
 export default function PortalDashboardPage() {
   const [plan, setPlan] = useState<UserPlanInput>(EMPTY_USER_PLAN_INPUT);
+  const [documentCount, setDocumentCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
 
-    async function loadPlan() {
+    async function loadDashboardData() {
       try {
-        const existing = await getCurrentUserPlan();
+        const [existing, documents] = await Promise.all([
+          getCurrentUserPlan(),
+          getCurrentUserDocuments(),
+        ]);
+
         if (!isMounted) return;
+
         if (existing) {
           setPlan({
             pathway_type: existing.pathway_type,
@@ -699,7 +706,14 @@ export default function PortalDashboardPage() {
             budget_range: existing.budget_range,
             notes: existing.notes,
           });
+        } else {
+          setPlan(EMPTY_USER_PLAN_INPUT);
         }
+
+        setDocumentCount(
+          documents.filter((document) => Boolean(document.file_path)).length,
+        );
+        setIsError(false);
       } catch (error: unknown) {
         console.error(error);
         if (isMounted) setIsError(true);
@@ -708,11 +722,11 @@ export default function PortalDashboardPage() {
       }
     }
 
-    void loadPlan();
+    void loadDashboardData();
 
     // STEP 7: Refresh when window regains focus (user may have updated data in another tab/page)
     const handleFocus = () => {
-      if (isMounted) void loadPlan();
+      if (isMounted) void loadDashboardData();
     };
     window.addEventListener('focus', handleFocus);
 
@@ -723,7 +737,10 @@ export default function PortalDashboardPage() {
   }, []);
 
   // SINGLE SOURCE OF TRUTH - Portal Intelligence
-  const intelligence = useMemo(() => getPortalIntelligence(plan, 0), [plan]);
+  const intelligence = useMemo(
+    () => getPortalIntelligence(plan, documentCount),
+    [plan, documentCount],
+  );
 
   // Destructure for clean access
   const {
