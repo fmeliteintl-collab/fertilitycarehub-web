@@ -1272,7 +1272,10 @@ export function getCurrentAdvisoryStage(plan: PlanData): AdvisoryStage {
   return null;
 }
 
-export function getAdvisoryStageProgress(plan: PlanData): {
+export function getAdvisoryStageProgress(
+  plan: PlanData,
+  documentCount: number
+): {
   current: AdvisoryStage;
   next: AdvisoryStage;
   canAdvance: boolean;
@@ -1288,7 +1291,7 @@ export function getAdvisoryStageProgress(plan: PlanData): {
   const next = currentIndex < stages.length - 1 ? stages[currentIndex + 1] : null;
   
   // Can advance if readiness is sufficient
-  const readiness = calculateAdvisoryReadiness(plan, 0);
+  const readiness = calculateAdvisoryReadiness(plan, documentCount);
   const canAdvance = readiness.percentage >= 70;
   
   return { current, next, canAdvance };
