@@ -6,6 +6,7 @@ import {
   determinePathwayClassification,
   generateAdvisorySignals,
   getTimelineCounts,
+  isPathwayDefined,
   type AdvisorySignal,
   type ExecutionStageResult,
   type NextActionWithContext,
@@ -111,11 +112,11 @@ export function getPortalIntelligence(
   plan: PlanData,
   documentCount = 0,
 ): PortalIntelligence {
-  const hasPathway = Boolean(
-    plan?.pathway_type?.trim() && plan.pathway_type !== "Not sure yet",
-  );
-  const hasFamilyStructure = Boolean(plan?.family_structure);
-  const countryCount = plan?.shortlisted_countries?.length ?? 0;
+  const hasPathway = isPathwayDefined(plan?.pathway_type);
+  const hasFamilyStructure = Boolean(plan?.family_structure?.trim());
+  const countryCount = (plan?.shortlisted_countries ?? []).filter(
+    (country) => country.trim().length > 0,
+  ).length;
   const hasCountries = countryCount > 0;
 
   const timelineCounts = getTimelineCounts(plan?.timeline_items);
@@ -148,10 +149,16 @@ export function getPortalIntelligence(
     planning: planningReadiness,
     execution: executionReadiness,
     advisory: advisoryReadiness.percentage,
-    overall: Math.round(
-      planningReadiness * 0.3 +
-        executionReadiness * 0.4 +
-        advisoryReadiness.percentage * 0.3,
+    overall: Math.min(
+      100,
+      Math.max(
+        0,
+        Math.round(
+          planningReadiness * 0.3 +
+            executionReadiness * 0.4 +
+            advisoryReadiness.percentage * 0.3,
+        ),
+      ),
     ),
   };
 
@@ -239,12 +246,16 @@ export function getPortalIntelligence(
 function calculatePlanningReadinessScore(plan: PlanData): number {
   let score = 0;
 
-  if (plan?.pathway_type && plan.pathway_type !== "Not sure yet") score += 40;
-  if (plan?.family_structure) score += 30;
-  if ((plan?.priorities?.length ?? 0) > 0) score += 15;
-  if ((plan?.constraints?.length ?? 0) > 0) score += 15;
+  if (isPathwayDefined(plan?.pathway_type)) score += 40;
+  if (plan?.family_structure?.trim()) score += 30;
+  if ((plan?.priorities ?? []).some((item) => item.trim().length > 0)) {
+    score += 15;
+  }
+  if ((plan?.constraints ?? []).some((item) => item.trim().length > 0)) {
+    score += 15;
+  }
 
-  return score;
+  return Math.min(100, score);
 }
 
 function calculateExecutionReadinessScore(
@@ -253,7 +264,9 @@ function calculateExecutionReadinessScore(
   documentCount: number,
 ): number {
   let score = 0;
-  const countryCount = plan?.shortlisted_countries?.length ?? 0;
+  const countryCount = (plan?.shortlisted_countries ?? []).filter(
+    (country) => country.trim().length > 0,
+  ).length;
 
   if (countryCount >= 2 && countryCount <= 4) score += 40;
   else if (countryCount === 1) score += 25;
@@ -267,7 +280,7 @@ function calculateExecutionReadinessScore(
   if (documentCount >= 3) score += 20;
   else if (documentCount > 0) score += 10;
 
-  return score;
+  return Math.min(100, score);
 }
 
 function determinePrimaryBlocker(params: {
@@ -350,7 +363,7 @@ function buildUnifiedFlowSteps(params: FlowStepParams): UnifiedFlowStep[] {
       title: "Define Your Pathway",
       module: "my-plan",
       status: params.hasPathway ? "complete" : "active",
-      statusLabel: "REQUIRED NOW",
+      statusLabel: params.hasPathway ? "COMPLETE" : "REQUIRED NOW",
       directive: params.hasPathway
         ? "Pathway defined — foundation established"
         : "Define your treatment pathway to begin planning",
@@ -543,7 +556,7 @@ function buildUnifiedFlowSteps(params: FlowStepParams): UnifiedFlowStep[] {
         ? "Validate strategy with advisory before execution"
         : params.advisoryReady
           ? "Advisory available — validate your plan"
-          : "Complete timeline setup to unlock advisory",
+          : "Reach 70% advisory readiness or complete the timeline",
       whyMatters:
         "At this stage, incorrect decisions cost months and thousands.",
       systemInsight:
@@ -629,15 +642,15 @@ function buildEnhancedSignals(params: {
   const insights: EnhancedSignals["insights"] = [];
 
   if (params.primaryBlocker === "missing_pathway") {
-  blockers.push({
-    id: "missing_pathway",
-    message: "Your planning workspace is ready",
-    resolution:
-      "Start by defining your pathway in My Plan to activate country matching and timeline guidance",
-    href: "/portal/my-plan",
-    severity: "blocking",
-  });
-} else if (params.primaryBlocker === "missing_family_structure") {
+    blockers.push({
+      id: "missing_pathway",
+      message: "Your planning workspace is ready",
+      resolution:
+        "Start by defining your pathway in My Plan to activate country matching and timeline guidance",
+      href: "/portal/my-plan",
+      severity: "blocking",
+    });
+  } else if (params.primaryBlocker === "missing_family_structure") {
     blockers.push({
       id: "missing_family_structure",
       message: "Family structure not defined",
