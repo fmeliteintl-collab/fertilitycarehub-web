@@ -1,310 +1,712 @@
-import CountryWebPageSchema from "../../components/CountryWebPageSchema";
-import Breadcrumbs from "../../components/Breadcrumbs";
-import Link from "next/link";
 import type { Metadata } from "next";
+import Link from "next/link";
+import Breadcrumbs from "../../components/Breadcrumbs";
+import CountryWebPageSchema from "../../components/CountryWebPageSchema";
+import FAQSchema from "../../components/FAQSchema";
+
+const baseUrl = "https://fertilitycarehub.com";
+const pageUrl = `${baseUrl}/countries/portugal`;
 
 export const metadata: Metadata = {
-  title: "Portugal IVF Regulations & Fertility Law 2026 | FertilityCareHub",
+  title: "Portugal IVF Regulations & Fertility Strategy 2026 | FertilityCareHub",
   description:
-    "Structured analysis of IVF regulations, donor laws, surrogacy policy, and fertility access rules in Portugal. Updated regulatory insights for intended parents.",
+    "Structured analysis of fertility regulation, donor pathways, clinic standards, costs, travel planning, and cross-border treatment strategy in Portugal.",
   alternates: {
-    canonical: "https://fertilitycarehub.com/countries/portugal",
+    canonical: pageUrl,
   },
   openGraph: {
-    title: "Portugal IVF Regulations & Fertility Law 2026",
+    title: "Portugal IVF Regulations & Fertility Strategy 2026",
     description:
-      "In-depth fertility law analysis covering IVF, donor gametes, surrogacy, and access regulations in Portugal.",
-    url: "https://fertilitycarehub.com/countries/portugal",
+      "Strategic fertility-jurisdiction analysis covering regulation, donor pathways, clinic standards, costs, logistics, and cross-border planning in Portugal.",
+    url: pageUrl,
     siteName: "FertilityCareHub",
     type: "article",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Portugal IVF Regulations & Fertility Strategy 2026",
+    description:
+      "Structured fertility-jurisdiction analysis for cross-border treatment planning in Portugal.",
+  },
 };
-export default function PortugalPage() {
+
+const faqs = [
+  {
+    question:
+      "Why do international patients consider Portugal for fertility treatment?",
+    answer:
+      "Portugal is often considered for its structured regulatory environment, growing private fertility sector, European accessibility, and potential for coordinated cross-border care. Suitability depends on the patient’s medical profile, eligibility, donor requirements, budget, documentation, timeline, and travel constraints.",
+  },
+  {
+    question:
+      "Does FertilityCareHub recommend specific fertility clinics in Portugal?",
+    answer:
+      "FertilityCareHub does not publish public best-clinic rankings or paid promotional lists. Private advisory may include a curated shortlist based on licensing, laboratory governance, communication, treatment transparency, costs, donor practices, and continuity-of-care requirements.",
+  },
+  {
+    question:
+      "How should fertility-clinic success rates in Portugal be evaluated?",
+    answer:
+      "Success rates should be reviewed by treatment type, age group, donor use, patient population, denominator, reporting period, and outcome endpoint. Patients should distinguish pregnancy rates from live-birth rates and ask whether results are reported per cycle started, retrieval, transfer, or cumulative treatment pathway.",
+  },
+  {
+    question:
+      "What costs should be considered beyond a Portuguese clinic package price?",
+    answer:
+      "A complete estimate should include medication, preliminary testing, monitoring, donor services, laboratory procedures, freezing, storage, embryo transfer, additional consultations, travel, accommodation, local transportation, cancellation exposure, and possible repeat treatment.",
+  },
+  {
+    question:
+      "Can FertilityCareHub compare Portugal with Spain or other European destinations?",
+    answer:
+      "Yes. FertilityCareHub provides structured comparisons across regulation, eligibility, donor pathways, clinical infrastructure, costs, logistics, documentation, and execution risk. A published Spain-versus-Portugal comparison is available, alongside additional European jurisdiction briefs.",
+  },
+];
+
+const relatedGuides = [
+  {
+    title: "How to Compare Fertility Jurisdictions Strategically",
+    href: "/how-to-compare-fertility-jurisdictions",
+    description:
+      "Compare regulation, eligibility, donor pathways, governance, costs, logistics, and execution risk.",
+  },
+  {
+    title: "How to Choose a Fertility Clinic Abroad",
+    href: "/how-to-choose-a-fertility-clinic-abroad",
+    description:
+      "Evaluate licensing, laboratory governance, transparency, communication, costs, and continuity of care.",
+  },
+  {
+    title: "Understanding Fertility Clinic Success Rates",
+    href: "/understanding-fertility-clinic-success-rates",
+    description:
+      "Interpret pregnancy, live-birth, per-cycle, per-transfer, cumulative, age-specific, and donor-treatment reporting.",
+  },
+  {
+    title: "Hidden Costs of Fertility Treatment Abroad",
+    href: "/hidden-costs-of-fertility-treatment-abroad",
+    description:
+      "Identify medication, laboratory, donor, storage, travel, cancellation, and repeat-treatment expenses.",
+  },
+];
+
+const comparisons = [
+  {
+    title: "Spain vs Portugal IVF Regulations",
+    href: "/compare/spain-vs-portugal-ivf-regulations",
+    description:
+      "Compare donor frameworks, governance posture, treatment access, clinical infrastructure, and operational planning.",
+  },
+  {
+    title: "Browse All Jurisdiction Comparisons",
+    href: "/compare",
+    description:
+      "Review published comparison briefs across regulation, eligibility, donor pathways, costs, logistics, and execution risk.",
+  },
+];
+
+const relatedCountries = [
+  {
+    title: "Spain",
+    href: "/countries/spain",
+    description:
+      "A mature European fertility ecosystem with extensive international-patient experience and established donor pathways.",
+  },
+  {
+    title: "Greece",
+    href: "/countries/greece",
+    description:
+      "A widely considered European destination with distinct access, donor, cost, and travel-planning considerations.",
+  },
+  {
+    title: "United Kingdom",
+    href: "/countries/united-kingdom",
+    description:
+      "A governance-forward jurisdiction where oversight, documentation, and regulatory structure are central.",
+  },
+];
+
+export default function PortugalDossierPage() {
   return (
     <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
-      <Breadcrumbs
-  items={[
-    { name: "Home", href: "/" },
-    { name: "Countries", href: "/countries" },
-    { name: "Portugal", href: "/countries/portugal" },
-  ]}
-/>
-<CountryWebPageSchema
-  countryName="Portugal"
-  countrySlug="portugal"
-  title="Portugal: Fertility Jurisdiction Assessment"
-  description="Strategic jurisdiction assessment and regulatory clarity for cross-border fertility care in Portugal."
-/>
-      {/* Top utility bar */}
-      <div className="max-w-6xl mx-auto px-6 pt-10">
-        <div className="flex items-center justify-between">
+      <CountryWebPageSchema
+        countryName="Portugal"
+        countrySlug="portugal"
+        title="Portugal: Fertility Jurisdiction Assessment"
+        description="Strategic jurisdiction assessment covering fertility regulation, donor pathways, clinic standards, costs, logistics, and cross-border planning in Portugal."
+      />
+
+      <FAQSchema id="faq-portugal" items={faqs} />
+
+      <div className="mx-auto w-full max-w-6xl px-5 py-10 sm:px-6 sm:py-14 lg:px-8">
+        <Breadcrumbs
+          items={[
+            { name: "Home", href: "/" },
+            { name: "Countries", href: "/countries" },
+            { name: "Portugal", href: "/countries/portugal" },
+          ]}
+        />
+
+        <section className="flex flex-col gap-4 pt-8 sm:flex-row sm:items-center sm:justify-between">
           <Link
             href="/countries"
-            className="text-sm tracking-wide text-[#6A6256] hover:text-[#1A1A1A]"
+            className="text-sm tracking-wide text-[#6A6256] transition hover:text-[#1A1A1A]"
           >
             ← Back to countries
           </Link>
 
           <Link
             href="/consultation"
-            className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-5 py-2 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+            className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#B89B5E] px-5 py-3 text-sm font-medium tracking-wide text-[#1A1A1A] transition hover:bg-[#EEE5D2]"
           >
             Review Portugal Strategy Privately
           </Link>
-        </div>
-      </div>
+        </section>
 
-      {/* Hero */}
-      <section className="max-w-6xl mx-auto px-6 pt-14 pb-10">
-        <div className="text-center">
-          <div className="text-xs tracking-[0.28em] text-[#6A6256]">
-            STRATEGIC ADVISORY DOSSIER
-          </div>
+        <section className="border-b border-[#E5DDC8] pb-12 pt-14 text-center sm:pb-16 sm:pt-20">
+          <p className="text-xs font-medium uppercase tracking-[0.28em] text-[#7B6A3A]">
+            Strategic Advisory Dossier
+          </p>
 
-          <h1 className="mt-5 text-5xl md:text-6xl leading-tight font-medium">
-            Portugal
+          <h1 className="mx-auto mt-5 max-w-4xl text-4xl font-semibold leading-tight tracking-[-0.03em] sm:text-5xl lg:text-6xl">
+            Portugal Fertility Jurisdiction Assessment
           </h1>
 
-          <p className="mt-6 max-w-3xl mx-auto text-lg leading-relaxed text-[#2A2A2A]">
-            Portugal is a modern, regulation-forward European option with a growing clinic ecosystem.
-            The advantage is often “balanced execution”: a structured environment, improving maturity,
-            and a patient experience that can be excellent when you select the right clinic model.
-            This dossier outlines when Portugal is strategically strong — and when another country is
-            the cleaner choice.
+          <p className="mx-auto mt-6 max-w-3xl text-base leading-8 text-[#5F584D] sm:text-lg">
+            Portugal offers a structured European treatment environment with a
+            developing private fertility sector and strong potential for
+            coordinated cross-border care. Its strategic value depends on
+            matching the patient’s pathway to the right regulatory, clinical,
+            financial, and logistical framework.
           </p>
-        </div>
-      </section>
+        </section>
 
-      {/* Two-column decision block */}
-      <section className="max-w-6xl mx-auto px-6 pb-10">
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-            <h2 className="text-xl font-medium">When Portugal is the right choice</h2>
-            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>
-                You want a European option that feels <strong>modern and structured</strong>, with
-                improving clinic maturity.
-              </li>
-              <li>
-                You value a pathway where <strong>governance and documentation</strong> are handled clearly,
-                and you want fewer “grey areas.”
-              </li>
-              <li>
-                You want a strong <strong>patient experience</strong> and a clinic that communicates well and
-                plans proactively.
-              </li>
-              <li>
-                You want a market that can be <strong>strategically efficient</strong> when the clinic model is right
-                (good logistics, good planning cadence).
-              </li>
-              <li>
-                You prefer a curated shortlist over a broad database — and want the selection logic explained.
-              </li>
-            </ul>
-          </div>
-
-          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-            <h2 className="text-xl font-medium">When it’s not</h2>
-            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>
-                Your primary objective is the <strong>fastest possible timeline</strong> and you want maximum scheduling
-                flexibility regardless of clinic demand.
-              </li>
-              <li>
-                Your case is highly complex and you want the deepest possible multidisciplinary capability
-                (some clients prefer the US for this).
-              </li>
-              <li>
-                You are optimizing for the most permissive donor ecosystem as the top variable — another country may fit better.
-              </li>
-              <li>
-                You want a fully DIY process; Portugal performs best with structured planning and coordination.
-              </li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* Framework */}
-      <section className="max-w-6xl mx-auto px-6 pb-12">
-        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-          <h2 className="text-2xl font-medium">Advisor framework: how to evaluate Portugal</h2>
-
-          <div className="mt-6 grid md:grid-cols-3 gap-6">
-            <div>
-              <div className="text-xs tracking-[0.25em] text-[#6A6256]">CLINIC MATURITY</div>
-              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
-                Portugal’s advantage comes from choosing clinics with strong operational cadence:
-                consistent protocols, clean timelines, and good patient communication. We prioritize
-                <strong> repeatable execution</strong>, not marketing.
+        <section className="py-12 sm:py-16">
+          <div className="grid gap-6 md:grid-cols-2">
+            <article className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6 sm:p-8">
+              <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#7B6A3A]">
+                Strategic alignment
               </p>
-            </div>
 
-            <div>
-              <div className="text-xs tracking-[0.25em] text-[#6A6256]">PATHWAY FIT</div>
-              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
-                The right pathway is defined by your profile: timeline tolerance, donor needs, privacy,
-                and travel cadence. Portugal is strong when your plan benefits from a <strong>structured framework</strong>.
-              </p>
-            </div>
+              <h2 className="mt-3 text-2xl font-semibold">
+                When Portugal may be a strong fit
+              </h2>
 
-            <div>
-              <div className="text-xs tracking-[0.25em] text-[#6A6256]">TRANSPARENCY</div>
-              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
-                We require clarity: what’s included, what’s optional, and how add-ons are priced. Your
-                deliverable is a <strong>bounded cost map</strong> — not surprises.
+              <ul className="mt-5 space-y-3 pl-5 text-[15px] leading-7 text-[#5F584D] marker:text-[#B89B5E]">
+                <li>
+                  You want a European option with a structured regulatory and
+                  documentation environment.
+                </li>
+                <li>
+                  You value clear communication, organized coordination, and a
+                  defined treatment pathway.
+                </li>
+                <li>
+                  You prefer a growing clinic market that may offer a more
+                  measured experience than larger destination hubs.
+                </li>
+                <li>
+                  You want clinic selection based on governance, laboratory
+                  quality, transparency, and pathway fit.
+                </li>
+                <li>
+                  You can coordinate treatment, travel, monitoring, and
+                  follow-up before committing financially.
+                </li>
+              </ul>
+            </article>
+
+            <article className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6 sm:p-8">
+              <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#7B6A3A]">
+                Potential misalignment
               </p>
+
+              <h2 className="mt-3 text-2xl font-semibold">
+                When another jurisdiction may be more suitable
+              </h2>
+
+              <ul className="mt-5 space-y-3 pl-5 text-[15px] leading-7 text-[#5F584D] marker:text-[#B89B5E]">
+                <li>
+                  Your pathway requires eligibility or donor conditions that
+                  may be better aligned elsewhere.
+                </li>
+                <li>
+                  You are optimizing only for the lowest advertised package
+                  price or the fastest possible scheduling.
+                </li>
+                <li>
+                  Your case requires a very large clinic ecosystem or unusually
+                  deep multidisciplinary capacity.
+                </li>
+                <li>
+                  You cannot accommodate medication-response changes,
+                  monitoring requirements, or travel uncertainty.
+                </li>
+                <li>
+                  You have not confirmed how care will be coordinated before
+                  departure and after returning home.
+                </li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#EEE5D2] p-6 sm:p-8">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+              FertilityCareHub assessment framework
+            </p>
+
+            <h2 className="mt-4 text-3xl font-semibold">
+              How to evaluate Portugal as a treatment destination
+            </h2>
+
+            <div className="mt-8 grid gap-6 md:grid-cols-3">
+              <div>
+                <h3 className="text-lg font-semibold">Regulatory alignment</h3>
+                <p className="mt-3 text-sm leading-7 text-[#5F584D]">
+                  Confirm current eligibility, donor rules, consent
+                  requirements, documentation, storage policies, and any
+                  cross-border legal considerations.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold">Clinical maturity</h3>
+                <p className="mt-3 text-sm leading-7 text-[#5F584D]">
+                  Examine licensing, medical leadership, laboratory governance,
+                  embryology-team continuity, outcome reporting, and
+                  international-patient coordination.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold">Execution risk</h3>
+                <p className="mt-3 text-sm leading-7 text-[#5F584D]">
+                  Identify where costs, communication, scheduling, donor
+                  matching, travel, monitoring, or follow-up could create
+                  avoidable uncertainty.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Core sections */}
-      <section className="max-w-6xl mx-auto px-6 pb-12">
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-            <h3 className="text-xl font-medium">Clinic standards and patient experience</h3>
-            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>
-                Prefer clinics with a disciplined process map: monitoring cadence, retrieval/transfer scheduling,
-                and clear communication checkpoints.
-              </li>
-              <li>
-                Ask what is standardized vs customized — you want a plan that can adapt without becoming unpredictable.
-              </li>
-              <li>
-                Confirm how the clinic handles out-of-country coordination (records, remote consults, and travel compression).
-              </li>
-            </ul>
-          </div>
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="max-w-3xl">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+              Decision factors
+            </p>
 
-          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-            <h3 className="text-xl font-medium">Cost structure (strategic view)</h3>
-            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>
-                Portugal can be attractive when you want a clean private-pay pathway with a rational cost structure —
-                but always confirm inclusions.
-              </li>
-              <li>
-                Separate costs into: base cycle, lab add-ons, meds/monitoring, and travel cadence.
-              </li>
-              <li>
-                Your goal is a <strong>decision-grade range</strong> you can commit to, not a theoretical minimum.
-              </li>
-            </ul>
-            <p className="mt-5 text-sm text-[#6A6256]">
-              Note: we avoid publishing numbers unless verified and updated. In advisory, we provide a clear band
-              and the logic behind it.
+            <h2 className="mt-4 text-3xl font-semibold sm:text-4xl">
+              Evaluate the complete treatment pathway
+            </h2>
+
+            <p className="mt-5 leading-8 text-[#5F584D]">
+              Portugal should not be assessed only by reputation, clinic
+              branding, convenience, or package pricing. A workable plan must
+              align regulation, clinical quality, treatment access, costs,
+              documentation, travel, monitoring, and continuity of care.
             </p>
           </div>
 
-          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-            <h3 className="text-xl font-medium">Governance and eligibility</h3>
-            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>
-                Confirm eligibility and documentation early — Portugal is best when administration is handled upfront.
-              </li>
-              <li>
-                If privacy matters, structure coordination to minimize exposure and reduce unnecessary third-party handling.
-              </li>
-              <li>
-                Treat governance as part of your risk model: predictable rules are an advantage when your case has constraints.
-              </li>
-            </ul>
+          <div className="mt-10 grid gap-5 md:grid-cols-2">
+            <article className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6">
+              <h3 className="text-xl font-semibold">
+                Clinic governance and laboratory quality
+              </h3>
+
+              <ul className="mt-4 space-y-3 pl-5 text-sm leading-7 text-[#5F584D] marker:text-[#B89B5E]">
+                <li>Confirm licensing and responsible medical leadership.</li>
+                <li>
+                  Ask who directs the laboratory and how quality controls are
+                  maintained.
+                </li>
+                <li>
+                  Review embryology-team stability and treatment-volume
+                  relevance.
+                </li>
+                <li>
+                  Require transparency about add-ons, protocols, and evidence.
+                </li>
+              </ul>
+            </article>
+
+            <article className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6">
+              <h3 className="text-xl font-semibold">
+                Success-rate interpretation
+              </h3>
+
+              <ul className="mt-4 space-y-3 pl-5 text-sm leading-7 text-[#5F584D] marker:text-[#B89B5E]">
+                <li>
+                  Identify the reported endpoint: pregnancy, ongoing pregnancy,
+                  or live birth.
+                </li>
+                <li>
+                  Confirm whether the denominator is cycle started, retrieval,
+                  transfer, or cumulative treatment.
+                </li>
+                <li>
+                  Compare results within relevant age and treatment groups.
+                </li>
+                <li>
+                  Separate donor-treatment outcomes from own-egg outcomes.
+                </li>
+              </ul>
+            </article>
+
+            <article className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6">
+              <h3 className="text-xl font-semibold">
+                Donor pathway and documentation
+              </h3>
+
+              <ul className="mt-4 space-y-3 pl-5 text-sm leading-7 text-[#5F584D] marker:text-[#B89B5E]">
+                <li>
+                  Clarify donor matching, waiting periods, screening, and
+                  information disclosure.
+                </li>
+                <li>
+                  Confirm consent, identity, relationship, translation, and
+                  medical-record requirements.
+                </li>
+                <li>
+                  Ask how donor availability affects scheduling and total cost.
+                </li>
+                <li>
+                  Obtain professional guidance where parentage or recognition
+                  may be relevant.
+                </li>
+              </ul>
+            </article>
+
+            <article className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6">
+              <h3 className="text-xl font-semibold">
+                Cost structure and financial exposure
+              </h3>
+
+              <ul className="mt-4 space-y-3 pl-5 text-sm leading-7 text-[#5F584D] marker:text-[#B89B5E]">
+                <li>
+                  Separate base treatment from medication, testing, donor,
+                  laboratory, freezing, storage, and transfer costs.
+                </li>
+                <li>
+                  Confirm cancellation, low-response, and repeat-treatment
+                  policies.
+                </li>
+                <li>
+                  Add travel, accommodation, local transport, meals, and
+                  schedule-change exposure.
+                </li>
+                <li>
+                  Request a written estimate showing included and excluded
+                  services.
+                </li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+                Treatment travel planning
+              </p>
+
+              <h2 className="mt-4 text-3xl font-semibold">
+                Build travel around the treatment protocol
+              </h2>
+
+              <p className="mt-5 leading-8 text-[#5F584D]">
+                Treatment dates may change in response to test results,
+                medication response, donor coordination, laboratory scheduling,
+                or clinical decisions. Travel arrangements should support the
+                medical pathway rather than restrict it.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6 sm:p-8">
+              <ol className="space-y-6">
+                <li>
+                  <div className="text-xs font-medium uppercase tracking-[0.14em] text-[#7B6A3A]">
+                    Before treatment
+                  </div>
+                  <p className="mt-2 text-sm leading-7 text-[#5F584D]">
+                    Complete records, testing, consultations, medication
+                    planning, donor discussions, financial estimates, and
+                    documentation.
+                  </p>
+                </li>
+
+                <li>
+                  <div className="text-xs font-medium uppercase tracking-[0.14em] text-[#7B6A3A]">
+                    Before departure
+                  </div>
+                  <p className="mt-2 text-sm leading-7 text-[#5F584D]">
+                    Confirm arrival windows, appointment sequence,
+                    accommodation, transport, medication supply, and emergency
+                    contacts.
+                  </p>
+                </li>
+
+                <li>
+                  <div className="text-xs font-medium uppercase tracking-[0.14em] text-[#7B6A3A]">
+                    During treatment
+                  </div>
+                  <p className="mt-2 text-sm leading-7 text-[#5F584D]">
+                    Keep written instructions, receipts, medication records,
+                    laboratory reports, and a clear point of contact for
+                    changes.
+                  </p>
+                </li>
+
+                <li>
+                  <div className="text-xs font-medium uppercase tracking-[0.14em] text-[#7B6A3A]">
+                    After returning home
+                  </div>
+                  <p className="mt-2 text-sm leading-7 text-[#5F584D]">
+                    Confirm testing dates, medication instructions, transfer of
+                    records, emergency guidance, and responsibility for
+                    continuing care.
+                  </p>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="rounded-2xl border border-[#D8C89F] bg-[#EEE5D2] p-6 sm:p-8">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+              Independent decision support
+            </p>
+
+            <h2 className="mt-4 text-2xl font-semibold sm:text-3xl">
+              What FertilityCareHub deliberately does not provide
+            </h2>
+
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              <ul className="space-y-3 pl-5 text-sm leading-7 text-[#5F584D] marker:text-[#B89B5E]">
+                <li>Public best-clinic rankings or paid promotional lists</li>
+                <li>Guaranteed outcomes or success-rate promises</li>
+                <li>Package prices presented as complete treatment costs</li>
+              </ul>
+
+              <ul className="space-y-3 pl-5 text-sm leading-7 text-[#5F584D] marker:text-[#B89B5E]">
+                <li>Medical diagnosis or individualized treatment decisions</li>
+                <li>Legal conclusions about eligibility or parentage</li>
+                <li>One-size-fits-all country recommendations</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="max-w-3xl">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+              Published comparisons
+            </p>
+
+            <h2 className="mt-4 text-3xl font-semibold">
+              Compare Portugal with other fertility jurisdictions
+            </h2>
+
+            <p className="mt-5 leading-8 text-[#5F584D]">
+              Use the published comparison briefs to identify major structural
+              differences before evaluating individual clinics.
+            </p>
           </div>
 
-          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-            <h3 className="text-xl font-medium">Logistics and travel (including accommodation)</h3>
-            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>
-                Plan travel around monitoring cadence and transfer timing; Portugal can work well with compressed trips.
-              </li>
-              <li>
-                We include <strong>accommodation</strong> as part of the plan: 2–3 vetted options near clinic access,
-                chosen for comfort, predictability, and low friction.
-              </li>
-              <li>
-                We avoid hotel price tables. The objective is execution quality, not “deal hunting.”
-              </li>
-            </ul>
+          <div className="mt-8 grid gap-5 md:grid-cols-2">
+            {comparisons.map((comparison) => (
+              <Link
+                key={comparison.href}
+                href={comparison.href}
+                className="group rounded-2xl border border-[#E5DDC8] bg-white/60 p-6 transition hover:border-[#B89B5E] hover:bg-white"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#7B6A3A]">
+                      Jurisdiction comparison
+                    </p>
+
+                    <h3 className="mt-3 text-xl font-semibold">
+                      {comparison.title}
+                    </h3>
+                  </div>
+
+                  <span
+                    aria-hidden="true"
+                    className="text-xl text-[#8C7541] transition group-hover:translate-x-1"
+                  >
+                    →
+                  </span>
+                </div>
+
+                <p className="mt-4 text-sm leading-7 text-[#625A4C]">
+                  {comparison.description}
+                </p>
+              </Link>
+            ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* What we exclude */}
-      <section className="max-w-6xl mx-auto px-6 pb-12">
-        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-          <h3 className="text-xl font-medium">What we deliberately exclude (the private filter)</h3>
-          <div className="mt-5 grid md:grid-cols-2 gap-6">
-            <ul className="space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>Exhaustive clinic lists (we curate a shortlist, not a database).</li>
-              <li>DIY administrative/visa playbooks (we coordinate with trusted partners).</li>
-              <li>Overly broad treatment encyclopedias (we focus on strategic decisions).</li>
-            </ul>
-            <ul className="space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>Hotel price grids (we recommend 2–3 vetted options for smooth execution).</li>
-              <li>Unverified claims and static numbers (we prioritize accuracy and updates).</li>
-              <li>One-size-fits-all advice (pathway fit is the product).</li>
-            </ul>
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="max-w-3xl">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+              Related jurisdictions
+            </p>
+
+            <h2 className="mt-4 text-3xl font-semibold">
+              Continue evaluating European options
+            </h2>
           </div>
-        </div>
-      </section>
 
-      {/* CTA */}
-      <section className="max-w-6xl mx-auto px-6 pb-16">
-        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-10 text-center">
-          <h3 className="text-2xl font-medium">Private advisory, not a public database.</h3>
-          <p className="mt-4 max-w-2xl mx-auto text-[15px] leading-relaxed text-[#2A2A2A]">
-            If Portugal is on your shortlist, the decisive step is aligning your pathway to the right clinic model,
-            timelines, and governance constraints. We’ll structure the plan, curate the shortlist, and provide a clean
-            execution route.
-          </p>
+          <div className="mt-8 grid gap-5 md:grid-cols-3">
+            {relatedCountries.map((country) => (
+              <Link
+                key={country.href}
+                href={country.href}
+                className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6 transition hover:border-[#B89B5E] hover:bg-white"
+              >
+                <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#7B6A3A]">
+                  Country dossier
+                </p>
 
-          <div className="mt-7 flex items-center justify-center">
+                <h3 className="mt-3 text-xl font-semibold">{country.title}</h3>
+
+                <p className="mt-3 text-sm leading-7 text-[#625A4C]">
+                  {country.description}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="max-w-3xl">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+              Related planning resources
+            </p>
+
+            <h2 className="mt-4 text-3xl font-semibold">
+              Continue your research with structured guides
+            </h2>
+          </div>
+
+          <div className="mt-8 grid gap-5 md:grid-cols-2">
+            {relatedGuides.map((guide) => (
+              <Link
+                key={guide.href}
+                href={guide.href}
+                className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6 transition hover:border-[#B89B5E] hover:bg-white"
+              >
+                <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#7B6A3A]">
+                  FertilityCareHub guide
+                </p>
+
+                <h3 className="mt-3 text-xl font-semibold">{guide.title}</h3>
+
+                <p className="mt-3 text-sm leading-7 text-[#625A4C]">
+                  {guide.description}
+                </p>
+              </Link>
+            ))}
+          </div>
+
+          <div className="mt-6">
             <Link
-              href="/consultation"
-              className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+              href="/guides"
+              className="font-medium text-[#715F33] underline underline-offset-4"
             >
-              Request Private Advisory Review
+              Browse the complete Guides Library →
             </Link>
           </div>
+        </section>
 
-          <div className="mt-3 text-xs tracking-wide text-[#6A6256]">
-            Discreet, structured guidance aligned to your profile and jurisdictional constraints.
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="max-w-3xl">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+              Frequently asked questions
+            </p>
+
+            <h2 className="mt-4 text-3xl font-semibold">
+              Portugal fertility-planning FAQ
+            </h2>
           </div>
-        </div>
-      </section>
-      {/* Comparison guide CTA */}
-<section className="mt-10 border border-[#E5DDC8] bg-white/60 rounded-xl p-5">
-  <h3 className="text-lg font-medium">Compare destinations before choosing</h3>
-  <p className="mt-2 text-sm text-[#6A6256] leading-relaxed">
-    Use our structured framework to compare governance, donor pathway, eligibility friction,
-    timeline realism, and execution risk across countries.
-  </p>
-  <Link
-    href="/how-to-compare-fertility-jurisdictions"
-    className="inline-block mt-3 underline text-sm"
-  >
-    Read the comparison guide →
-  </Link>
-</section>
-      <section className="mt-16 border-t border-[#E5DDC8] pt-10">
-  <h2 className="text-2xl font-semibold mb-6">Compare Other Jurisdictions</h2>
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <Link href="/countries/spain" className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition">
-      <h3 className="text-lg font-medium">Spain</h3>
-      <p className="text-sm text-[#6A6256] mt-2">A mature ecosystem with predictable execution and donor depth.</p>
-    </Link>
-    <Link href="/countries/greece" className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition">
-      <h3 className="text-lg font-medium">Greece</h3>
-      <p className="text-sm text-[#6A6256] mt-2">Often considered for access flexibility and streamlined pathways.</p>
-    </Link>
-    <Link href="/countries/united-kingdom" className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition">
-      <h3 className="text-lg font-medium">United Kingdom</h3>
-      <p className="text-sm text-[#6A6256] mt-2">Highly regulated governance-first model when oversight is the priority.</p>
-    </Link>
-  </div>
-</section>
+
+          <div className="mt-8 space-y-4">
+            {faqs.map((faq) => (
+              <details
+                key={faq.question}
+                className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-5 sm:p-6"
+              >
+                <summary className="cursor-pointer pr-5 text-lg font-semibold">
+                  {faq.question}
+                </summary>
+
+                <p className="mt-4 max-w-4xl text-sm leading-7 text-[#625A4C]">
+                  {faq.answer}
+                </p>
+              </details>
+            ))}
+          </div>
+        </section>
+
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="rounded-2xl bg-[#1A1A1A] px-6 py-10 text-center text-white sm:px-10 sm:py-14">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#D4BE82]">
+              Private strategic advisory
+            </p>
+
+            <h2 className="mx-auto mt-4 max-w-3xl text-3xl font-semibold sm:text-4xl">
+              Evaluate Portugal against your actual pathway
+            </h2>
+
+            <p className="mx-auto mt-5 max-w-2xl leading-8 text-[#D4D0C8]">
+              FertilityCareHub helps structure jurisdiction, clinic, donor,
+              cost, travel, documentation, and execution decisions around your
+              priorities and constraints.
+            </p>
+
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Link
+                href="/advisory"
+                className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#B89B5E] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#A88B50]"
+              >
+                View Advisory Tiers
+              </Link>
+
+              <Link
+                href="/consultation"
+                className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#D4BE82] px-6 py-3 text-sm font-medium text-[#F2E4BC] transition hover:bg-[#2D2D2D]"
+              >
+                Request Client Intake
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t border-[#E5DDC8] py-10">
+          <p className="mx-auto max-w-4xl text-center text-sm leading-7 text-[#6A6256]">
+            FertilityCareHub provides general educational and strategic
+            planning information. It does not provide medical, legal,
+            financial, or regulatory advice. Eligibility requirements,
+            regulations, clinic policies, donor availability, costs, treatment
+            access, and clinical practices may change and should be independently
+            confirmed with appropriately licensed professionals.
+          </p>
+
+          <div className="mt-4 text-center">
+            <Link
+              href="/disclaimer"
+              className="font-medium text-[#715F33] underline underline-offset-4"
+            >
+              Read the full disclaimer
+            </Link>
+          </div>
+        </section>
+      </div>
     </main>
   );
 }

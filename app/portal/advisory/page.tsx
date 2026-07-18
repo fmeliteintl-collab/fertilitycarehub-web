@@ -6,6 +6,7 @@ import {
   getCurrentUserPlan,
   upsertCurrentUserPlan,
 } from "@/lib/plans/user-plans";
+import { getCurrentUserDocuments } from "@/lib/documents/user-documents";
 import {
   getUserAdvisoryTasks,
   createAdvisoryTask,
@@ -785,6 +786,7 @@ function ScenarioCard({ item }: { item: ScenarioCardItem }) {
 
 export default function PortalAdvisoryPage() {
   const [plan, setPlan] = useState<UserPlanInput>(EMPTY_USER_PLAN_INPUT);
+  const [documentCount, setDocumentCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -801,11 +803,18 @@ export default function PortalAdvisoryPage() {
   useEffect(() => {
     let isMounted = true;
 
-    async function loadPlan() {
+    async function loadAdvisoryWorkspace() {
       try {
-        const existing = await getCurrentUserPlan();
+        const [existing, documents] = await Promise.all([
+          getCurrentUserPlan(),
+          getCurrentUserDocuments(),
+        ]);
 
         if (!isMounted) return;
+
+        setDocumentCount(
+          documents.filter((document) => Boolean(document.file_path)).length
+        );
 
         if (existing) {
           setPlan({
@@ -843,7 +852,7 @@ export default function PortalAdvisoryPage() {
       }
     }
 
-    void loadPlan();
+    void loadAdvisoryWorkspace();
 
     return () => {
       isMounted = false;
@@ -992,8 +1001,8 @@ export default function PortalAdvisoryPage() {
   );
 
   const advisoryReadiness = useMemo(
-    () => calculateAdvisoryReadiness(plan, 0),
-    [plan]
+    () => calculateAdvisoryReadiness(plan, documentCount),
+    [plan, documentCount]
   );
 
   const advisorySignals = useMemo(

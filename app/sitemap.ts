@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 const baseUrl = "https://fertilitycarehub.com";
 
-const lastReviewed = new Date("2026-07-12");
+const lastReviewed = new Date("2026-07-17");
 
 const publicRoutes = [
   {
@@ -81,6 +81,15 @@ const countries = [
   "united-states",
 ];
 
+const comparisons = [
+  "spain-vs-greece-ivf-regulations",
+  "spain-vs-portugal-ivf-regulations",
+  "spain-vs-italy-ivf-regulations",
+  "spain-vs-czech-republic-ivf-regulations",
+  "spain-vs-north-cyprus-ivf-regulations",
+  "greece-vs-czech-republic-ivf-regulations",
+];
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes: MetadataRoute.Sitemap = publicRoutes.map((route) => ({
     url: `${baseUrl}${route.path}`,
@@ -96,5 +105,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticRoutes, ...countryRoutes];
+  const comparisonRoutes: MetadataRoute.Sitemap = comparisons.map(
+    (comparison) => ({
+      url: `${baseUrl}/compare/${comparison}`,
+      lastModified: lastReviewed,
+      changeFrequency: "monthly",
+      priority: 0.75,
+    }),
+  );
+
+  return [...staticRoutes, ...countryRoutes, ...comparisonRoutes];
 }

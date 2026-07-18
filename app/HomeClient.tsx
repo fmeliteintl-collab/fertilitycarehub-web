@@ -7,30 +7,50 @@ const knowledgeGuides = [
   {
     title: "How to Compare Fertility Jurisdictions Strategically",
     description:
-      "Use a structured framework to compare regulation, eligibility, donor pathways, clinic governance, costs, logistics, and execution risk.",
+      "Use a structured framework to compare regulation, eligibility, donor pathways, clinic governance, costs, logistics, and execution risk across countries.",
     href: "/how-to-compare-fertility-jurisdictions",
-    status: "Published",
   },
   {
     title: "How to Choose a Fertility Clinic Abroad",
     description:
       "Evaluate licensing, laboratory governance, treatment transparency, communication standards, total costs, donor practices, and continuity of care.",
     href: "/how-to-choose-a-fertility-clinic-abroad",
-    status: "Published",
   },
   {
     title: "Understanding Fertility Clinic Success Rates",
     description:
-      "Learn how to interpret pregnancy, ongoing-pregnancy, live-birth, per-cycle, per-transfer, cumulative, age-specific, and donor-treatment reporting.",
+      "Learn how pregnancy, ongoing-pregnancy, live-birth, per-cycle, per-transfer, cumulative, age-specific, and donor-treatment reporting measures differ.",
     href: "/understanding-fertility-clinic-success-rates",
-    status: "Published",
   },
   {
     title: "Hidden Costs of Fertility Treatment Abroad",
     description:
       "Identify medication, testing, donor, laboratory, storage, freezing, transfer, travel, accommodation, cancellation, and repeat-treatment expenses.",
     href: "/hidden-costs-of-fertility-treatment-abroad",
-    status: "Published",
+  },
+  {
+    title: "Spain vs Greece for Fertility Treatment",
+    description:
+      "Compare two established European fertility destinations across eligibility, donor pathways, clinical governance, costs, travel, documentation, and continuity of care.",
+    href: "/spain-vs-greece-for-fertility-treatment",
+  },
+  {
+    title: "IVF Abroad vs Canada",
+    description:
+      "Compare access, funding, donor pathways, treatment availability, costs, travel, documentation, and continuity of care when considering IVF abroad or in Canada.",
+    href: "/ivf-abroad-vs-canada",
+  },
+  {
+    title: "Fertility Treatment Travel Checklist",
+    description:
+      "Organize medical records, medications, monitoring, travel dates, accommodation, insurance, documentation, emergency planning, and continuity of care.",
+    href: "/fertility-treatment-travel-checklist",
+  },
+  {
+    title: "Questions to Ask a Fertility Clinic",
+    description:
+      "Use a structured question set to assess licensing, clinical leadership, laboratory governance, treatment protocols, success rates, communication, pricing, cancellation policies, donor pathways, and follow-up care.",
+    href: "/questions-to-ask-a-fertility-clinic",
   },
 ];
 
@@ -470,6 +490,116 @@ export default function Home() {
         </div>
       </section>
 
+      {/* PLATFORM AT A GLANCE */}
+      <section
+        style={{
+          padding: "72px 20px",
+          backgroundColor: "#2b2b2b",
+          color: "#ffffff",
+          borderBottom: "1px solid #3a3a3a",
+        }}
+      >
+        <div style={{ maxWidth: "1080px", margin: "0 auto" }}>
+          <div
+            style={{
+              maxWidth: 760,
+              margin: "0 auto 38px",
+              textAlign: "center",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 12,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "#c8b98f",
+                marginBottom: 12,
+              }}
+            >
+              Platform at a Glance
+            </div>
+
+            <h2 style={{ fontSize: "30px", marginBottom: 16 }}>
+              A Growing Global Fertility Intelligence Platform
+            </h2>
+
+            <p style={{ color: "#d4d4d4", margin: 0 }}>
+              FertilityCareHub brings together structured jurisdiction research,
+              independent planning guidance, and private strategic advisory in
+              one institutional platform.
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
+              gap: 18,
+            }}
+          >
+            {[
+              {
+                value: "11",
+                label: "Country Dossiers",
+                href: "/countries",
+              },
+              {
+                value: "8",
+                label: "Published Authority Guides",
+                href: "/guides",
+              },
+              {
+                value: "5",
+                label: "Jurisdiction Comparisons",
+                href: "/compare",
+              },
+              {
+                value: "30+",
+                label: "Jurisdictions Evaluated",
+                href: "/brief",
+              },
+            ].map((item) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                style={{
+                  display: "block",
+                  padding: "26px 22px",
+                  border: "1px solid #5a5548",
+                  borderRadius: 8,
+                  color: "#ffffff",
+                  textDecoration: "none",
+                  textAlign: "center",
+                  backgroundColor: "#323232",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 34,
+                    lineHeight: 1.1,
+                    color: "#c8b98f",
+                    marginBottom: 10,
+                  }}
+                >
+                  {item.value}
+                </div>
+
+                <div
+                  style={{
+                    fontSize: 13,
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                    color: "#e2e2e2",
+                  }}
+                >
+                  {item.label}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* KNOWLEDGE HUB */}
       <section
         style={{
@@ -517,118 +647,76 @@ export default function Home() {
               gap: 24,
             }}
           >
-            {knowledgeGuides.map((guide) => {
-              const cardContent = (
-                <>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      gap: 12,
-                      marginBottom: 18,
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontSize: 11,
-                        letterSpacing: "0.12em",
-                        textTransform: "uppercase",
-                        color:
-                          guide.status === "Published" ? "#6d5a2d" : "#8a8377",
-                      }}
-                    >
-                      {guide.status}
-                    </span>
-
-                    <span
-                      aria-hidden="true"
-                      style={{
-                        fontSize: 18,
-                        color:
-                          guide.status === "Published" ? "#8a7a55" : "#aaa398",
-                      }}
-                    >
-                      {guide.status === "Published" ? "→" : "○"}
-                    </span>
-                  </div>
-
-                  <h3
-                    style={{
-                      marginTop: 0,
-                      marginBottom: 14,
-                      fontSize: 20,
-                      lineHeight: 1.35,
-                    }}
-                  >
-                    {guide.title}
-                  </h3>
-
-                  <p
-                    style={{
-                      color: "#5d5850",
-                      marginBottom: 0,
-                      fontSize: 14,
-                      lineHeight: 1.75,
-                    }}
-                  >
-                    {guide.description}
-                  </p>
-                </>
-              );
-
-              if (guide.href) {
-                return (
-                  <Link
-                    key={guide.title}
-                    href={guide.href}
-                    aria-label={`Read ${guide.title}`}
-                    style={{
-                      display: "block",
-                      backgroundColor: "#ffffff",
-                      padding: 26,
-                      borderRadius: 8,
-                      border: "1px solid #d9cba8",
-                      color: "#2b2b2b",
-                      textDecoration: "none",
-                      boxShadow: "0 8px 24px rgba(43, 43, 43, 0.04)",
-                    }}
-                  >
-                    {cardContent}
-                  </Link>
-                );
-              }
-
-              return (
+            {knowledgeGuides.map((guide) => (
+              <Link
+                key={guide.title}
+                href={guide.href}
+                aria-label={`Read ${guide.title}`}
+                style={{
+                  display: "block",
+                  backgroundColor: "#ffffff",
+                  padding: 26,
+                  borderRadius: 8,
+                  border: "1px solid #d9cba8",
+                  color: "#2b2b2b",
+                  textDecoration: "none",
+                  boxShadow: "0 8px 24px rgba(43, 43, 43, 0.04)",
+                }}
+              >
                 <div
-                  key={guide.title}
-                  aria-label={`${guide.title} — coming soon`}
                   style={{
-                    backgroundColor: "#f3efe7",
-                    padding: 26,
-                    borderRadius: 8,
-                    border: "1px solid #e5ddc8",
-                    color: "#2b2b2b",
-                    opacity: 0.92,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 12,
+                    marginBottom: 18,
                   }}
                 >
-                  {cardContent}
-
-                  <p
+                  <span
                     style={{
-                      marginTop: 18,
-                      marginBottom: 0,
-                      fontSize: 12,
-                      letterSpacing: "0.08em",
+                      fontSize: 11,
+                      letterSpacing: "0.12em",
                       textTransform: "uppercase",
-                      color: "#8a8377",
+                      color: "#6d5a2d",
                     }}
                   >
-                    Available soon
-                  </p>
+                    Published
+                  </span>
+
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      fontSize: 18,
+                      color: "#8a7a55",
+                    }}
+                  >
+                    →
+                  </span>
                 </div>
-              );
-            })}
+
+                <h3
+                  style={{
+                    marginTop: 0,
+                    marginBottom: 14,
+                    fontSize: 20,
+                    lineHeight: 1.35,
+                  }}
+                >
+                  {guide.title}
+                </h3>
+
+                <p
+                  style={{
+                    color: "#5d5850",
+                    marginBottom: 0,
+                    fontSize: 14,
+                    lineHeight: 1.75,
+                  }}
+                >
+                  {guide.description}
+                </p>
+              </Link>
+            ))}
           </div>
 
           <div style={{ textAlign: "center", marginTop: 34 }}>
@@ -646,6 +734,164 @@ export default function Home() {
               Browse All Guides
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* WHY FERTILITYCAREHUB */}
+      <section
+        style={{
+          padding: "100px 20px",
+          backgroundColor: "#f3efe7",
+          borderBottom: "1px solid #ece3d1",
+        }}
+      >
+        <div style={{ maxWidth: "1080px", margin: "0 auto" }}>
+          <div
+            style={{
+              maxWidth: 760,
+              margin: "0 auto 48px",
+              textAlign: "center",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 12,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "#8a7a55",
+                marginBottom: 12,
+              }}
+            >
+              Why FertilityCareHub
+            </div>
+
+            <h2 style={{ fontSize: "30px", marginBottom: 18 }}>
+              Independent Intelligence for Complex Fertility Decisions
+            </h2>
+
+            <p style={{ color: "#555", margin: 0 }}>
+              The platform is designed for people who need more than clinic
+              listings, promotional content, or surface-level destination
+              comparisons.
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))",
+              gap: 24,
+            }}
+          >
+            {[
+              {
+                title: "Independent Analysis",
+                description:
+                  "Research and advisory are structured around client fit, regulatory alignment, and execution risk rather than referral incentives.",
+              },
+              {
+                title: "Structured Methodology",
+                description:
+                  "Jurisdictions are assessed through a documented framework covering legal, clinical, governance, logistical, and pathway considerations.",
+              },
+              {
+                title: "Global Jurisdiction Intelligence",
+                description:
+                  "Country dossiers and comparison briefs help families understand how fertility pathways differ across international systems.",
+              },
+              {
+                title: "Confidential Advisory",
+                description:
+                  "Private engagements are managed through structured intake and tailored strategic guidance for sensitive, high-stakes decisions.",
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                style={{
+                  backgroundColor: "#ffffff",
+                  padding: 26,
+                  borderRadius: 8,
+                  border: "1px solid #d9cba8",
+                  boxShadow: "0 8px 24px rgba(43, 43, 43, 0.04)",
+                }}
+              >
+                <h3
+                  style={{
+                    marginTop: 0,
+                    marginBottom: 14,
+                    fontSize: 20,
+                  }}
+                >
+                  {item.title}
+                </h3>
+
+                <p
+                  style={{
+                    color: "#5d5850",
+                    marginBottom: 0,
+                    fontSize: 14,
+                    lineHeight: 1.75,
+                  }}
+                >
+                  {item.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* TRUSTED ADVISORY PRINCIPLES */}
+      <section
+        style={{
+          padding: "44px 20px",
+          backgroundColor: "#ffffff",
+          borderBottom: "1px solid #ece3d1",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: "1080px",
+            margin: "0 auto",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 12,
+            flexWrap: "wrap",
+          }}
+        >
+          <span
+            style={{
+              fontSize: 12,
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              color: "#8a7a55",
+              marginRight: 6,
+            }}
+          >
+            Advisory Principles
+          </span>
+
+          {[
+            "Independent Platform",
+            "No Clinic Rankings",
+            "No Referral Commissions",
+            "Evidence-Informed Methodology",
+            "Confidential Strategic Advisory",
+          ].map((principle) => (
+            <span
+              key={principle}
+              style={{
+                padding: "8px 12px",
+                border: "1px solid #e5ddc8",
+                borderRadius: 999,
+                color: "#5d5850",
+                fontSize: 12,
+              }}
+            >
+              {principle}
+            </span>
+          ))}
         </div>
       </section>
 

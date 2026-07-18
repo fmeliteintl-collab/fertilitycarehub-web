@@ -58,6 +58,12 @@ const comparisons = [
     description:
       "Compare regulatory predictability, donor governance, institutional oversight, and operational risk.",
   },
+  {
+    title: "Greece vs Czech Republic IVF Regulations",
+    href: "/compare/greece-vs-czech-republic-ivf-regulations",
+    description:
+      "Compare donor-pathway potential, clinic operations, cost structure, logistics, documentation, and execution risk.",
+  },
 ];
 
 const comparisonFactors = [
@@ -128,14 +134,8 @@ export default function CompareIndexPage() {
       />
 
       <div className="mx-auto w-full max-w-6xl px-5 py-10 sm:px-6 sm:py-14 lg:px-8">
-        <nav
-          aria-label="Breadcrumb"
-          className="text-sm text-[#6A6256]"
-        >
-          <Link
-            href="/"
-            className="underline underline-offset-4"
-          >
+        <nav aria-label="Breadcrumb" className="text-sm text-[#6A6256]">
+          <Link href="/" className="underline underline-offset-4">
             Home
           </Link>
 

@@ -3,11 +3,13 @@ import {
   buildNextActionWithContext,
   calculateAdvisoryReadiness,
   determineExecutionStage,
+  determinePathwayClassification,
   generateAdvisorySignals,
   getTimelineCounts,
   type AdvisorySignal,
   type ExecutionStageResult,
   type NextActionWithContext,
+  type PathwayClassificationResult,
   type ReadinessResult,
 } from "./plan-intelligence";
 
@@ -89,6 +91,7 @@ export interface PortalIntelligence {
   advisoryReadiness: ReadinessResult;
   executionStage: ExecutionStageResult;
   rawSignals: AdvisorySignal[];
+  pathwayClassification: PathwayClassificationResult;
   flags: {
     hasPathway: boolean;
     hasFamilyStructure: boolean;
@@ -131,6 +134,7 @@ export function getPortalIntelligence(
   const advisoryReadiness = calculateAdvisoryReadiness(plan, documentCount);
   const executionStage = determineExecutionStage(plan);
   const rawSignals = generateAdvisorySignals(plan);
+  const pathwayClassification = determinePathwayClassification(plan);
   const baseNextAction = buildNextActionWithContext(plan, documentCount);
 
   const planningReadiness = calculatePlanningReadinessScore(plan);
@@ -180,6 +184,7 @@ export function getPortalIntelligence(
     hasCountries,
     countryCount,
     hasTimeline,
+    hasDocuments,
     timelineComplete,
     timelineProgress,
     advisoryReady: advisoryReadiness.percentage >= 70,
@@ -213,6 +218,7 @@ export function getPortalIntelligence(
     advisoryReadiness,
     executionStage,
     rawSignals,
+    pathwayClassification,
     flags: {
       hasPathway,
       hasFamilyStructure,
@@ -326,6 +332,7 @@ interface FlowStepParams {
   hasCountries: boolean;
   countryCount: number;
   hasTimeline: boolean;
+  hasDocuments: boolean;
   timelineComplete: boolean;
   timelineProgress: number;
   advisoryReady: boolean;
@@ -476,37 +483,44 @@ function buildUnifiedFlowSteps(params: FlowStepParams): UnifiedFlowStep[] {
       number: 4,
       title: "Prepare Documentation",
       module: "documents",
-      status: params.timelineComplete
-        ? "active"
+      status: params.hasDocuments
+        ? "complete"
         : params.hasTimeline
           ? "active"
           : "locked",
-      statusLabel: params.timelineComplete
-        ? "READY"
+      statusLabel: params.hasDocuments
+        ? "COMPLETE"
         : params.hasTimeline
-          ? "AVAILABLE"
+          ? "REQUIRED NOW"
           : "LOCKED",
-      directive: params.timelineComplete
-        ? "Document preparation ready — requirements generated"
+      directive: params.hasDocuments
+        ? "Documents added — preparation is underway"
         : params.hasTimeline
-          ? "Complete timeline to unlock full document requirements"
-          : "Timeline must be initiated before document requirements are generated",
+          ? "Add your first document to begin preparation"
+          : "Timeline must be initiated before document preparation begins",
       whyMatters:
         "Document requirements vary by jurisdiction and pathway.",
-      systemInsight:
-        "Document requirements dynamically generated based on selected countries and pathway.",
-      riskIfDelayed:
-        "Arriving at clinics unprepared delays treatment cycles.",
-      cta: params.timelineComplete
-        ? {
-            label: "Prepare Documents",
-            href: "/portal/documents",
-            variant: "primary",
-          }
-        : undefined,
-      unlocks: params.timelineComplete
+      systemInsight: params.hasDocuments
+        ? "Your document workspace is active and contributing to execution readiness."
+        : params.hasTimeline
+          ? "Your timeline is active. Add documents now to reduce clinic, legal, and travel delays."
+          : "Document preparation becomes available after the execution timeline is initiated.",
+      riskIfDelayed: params.hasDocuments
+        ? undefined
+        : "Arriving at clinics unprepared delays treatment cycles.",
+      cta:
+        params.hasTimeline && !params.hasDocuments
+          ? {
+              label: "Add Documents",
+              href: "/portal/documents",
+              variant: "primary",
+            }
+          : undefined,
+      unlocks: params.hasDocuments
         ? ["Clinic application readiness", "Legal process initiation"]
-        : undefined,
+        : params.hasTimeline
+          ? ["Clinic application readiness", "Legal process initiation"]
+          : undefined,
       isLocked: !params.hasTimeline,
       lockReason: !params.hasTimeline ? "Generate timeline first" : undefined,
     },

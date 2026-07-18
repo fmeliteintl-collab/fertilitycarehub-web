@@ -13,7 +13,6 @@ import {
   type PortalIntelligence,
 } from "@/lib/intelligence/portal-intelligence";
 import {
-  determinePathwayClassification,
   getPathwayClassificationBadgeTone,
   type PathwayClassificationResult,
 } from "@/lib/intelligence/plan-intelligence";
@@ -753,15 +752,11 @@ export default function PortalDashboardPage() {
     signals,
     advisoryReadiness,
     executionStage,
+    pathwayClassification,
     flags,
   } = intelligence;
 
   const readinessTotal = readiness.overall;
-  const pathwayClassification = useMemo(
-    () => determinePathwayClassification(plan),
-    [plan]
-  );
-
 
   if (loading) return <DashboardSkeleton />;
   if (isError) {
