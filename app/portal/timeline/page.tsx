@@ -18,6 +18,7 @@ import {
   calculateTimelineReadiness,
   determineExecutionStage,
   getDisplayValue,
+  isPathwayDefined,
 } from "@/lib/intelligence/plan-intelligence";
 
 export const runtime = "edge";
@@ -223,6 +224,12 @@ function normalizeExecutionStageValue(stage: unknown): string {
   return stage.trim().toLowerCase();
 }
 
+function getMeaningfulCountries(plan: UserPlanInput): string[] {
+  return (plan.shortlisted_countries ?? [])
+    .map((country) => country.trim())
+    .filter((country) => country.length > 0);
+}
+
 // === PREMIUM: Phase Completion Calculation ===
 function calculatePhaseCompletion(items: TimelineItem[]): number {
   if (items.length === 0) return 0;
@@ -290,7 +297,7 @@ function checkPhaseLock(
   const previousCompletion = calculatePhaseCompletion(previousItems);
 
   if (phase === "preparation") {
-    const hasCountries = (plan.shortlisted_countries || []).length > 0;
+    const hasCountries = getMeaningfulCountries(plan).length > 0;
     if (!hasCountries) {
       return {
         isLocked: true,
@@ -319,8 +326,9 @@ function checkPhaseLock(
 // === PREMIUM: Generate Timeline Items ===
 function generatePhaseBasedTimeline(plan: UserPlanInput): TimelineItem[] {
   const items: TimelineItem[] = [];
-  const countries = plan.shortlisted_countries || [];
+  const countries = getMeaningfulCountries(plan);
   const hasCountries = countries.length > 0;
+  const hasPathway = isPathwayDefined(plan.pathway_type);
   const donor = plan.donor_needed;
   const surrogate = plan.surrogate_needed;
 
@@ -329,9 +337,9 @@ function generatePhaseBasedTimeline(plan: UserPlanInput): TimelineItem[] {
     id: "p1-1",
     title: "Define pathway structure",
     category: "Planning",
-    status: plan.pathway_type ? "Completed" : "In Progress",
+    status: hasPathway ? "Completed" : "In Progress",
     description: `Confirm your treatment direction: ${
-      plan.pathway_type || "IVF pathway to be defined"
+      hasPathway ? plan.pathway_type : "IVF pathway to be defined"
     }`,
     phase: "planning",
     priority: "high",
@@ -353,8 +361,8 @@ function generatePhaseBasedTimeline(plan: UserPlanInput): TimelineItem[] {
     phase: "planning",
     priority: "high",
     dependencies: ["p1-1"],
-    isLocked: !plan.pathway_type,
-    lockReason: plan.pathway_type
+    isLocked: !hasPathway,
+    lockReason: hasPathway
       ? undefined
       : "Complete pathway definition first",
   });
@@ -641,6 +649,14 @@ function buildPhaseMeta(items: TimelineItem[], plan: UserPlanInput): PhaseMeta[]
     const phaseItems = phaseMap.get(phase) || [];
     const lockStatus = checkPhaseLock(phase, phaseMap, plan);
     const completionPercentage = calculatePhaseCompletion(phaseItems);
+    const effectiveItems =
+      phase === "planning"
+        ? phaseItems
+        : phaseItems.map((item) => ({
+            ...item,
+            isLocked: lockStatus.isLocked,
+            lockReason: lockStatus.isLocked ? lockStatus.reason : undefined,
+          }));
 
     return {
       id: phase,
@@ -651,7 +667,7 @@ function buildPhaseMeta(items: TimelineItem[], plan: UserPlanInput): PhaseMeta[]
       lockReason: lockStatus.reason,
       unlocksDescription: unlocksDesc[phase],
       completionPercentage,
-      items: phaseItems,
+      items: effectiveItems,
       skippedImpact: skippedImpact[phase],
     };
   });
@@ -721,8 +737,8 @@ function getTimelineHealth(
 ): TimelineHealth {
   const allItems = phases.flatMap((phase) => phase.items);
   const activity = getTimelineActivityState(allItems);
-  const shortlistCount = (plan.shortlisted_countries || []).length;
-  const hasPathway = Boolean(plan.pathway_type?.trim());
+  const shortlistCount = getMeaningfulCountries(plan).length;
+  const hasPathway = isPathwayDefined(plan.pathway_type);
   const activeCompletion = calculateActiveCompletion(allItems);
   const strengths: string[] = [];
   const gaps: string[] = [];
@@ -812,8 +828,8 @@ function getExecutionGuidance(
     context: string;
   }
 ): ExecutionGuidance {
-  const shortlistCount = (plan.shortlisted_countries || []).length;
-  const hasPathway = Boolean(plan.pathway_type?.trim());
+  const shortlistCount = getMeaningfulCountries(plan).length;
+  const hasPathway = isPathwayDefined(plan.pathway_type);
   const allItems = phases.flatMap((phase) => phase.items);
   const activity = getTimelineActivityState(allItems);
   const normalizedStage = normalizeExecutionStageValue(executionStageResult.stage);
@@ -905,7 +921,7 @@ function getCrossModuleSignals(
   plan: UserPlanInput,
   executionStageResult: ExecutionStageResult
 ): CrossModuleSignals {
-  const shortlistCount = (plan.shortlisted_countries || []).length;
+  const shortlistCount = getMeaningfulCountries(plan).length;
   const hasAdvisory =
     Boolean(plan.advisory_status) ||
     Boolean(plan.advisory_stage) ||
@@ -959,9 +975,9 @@ function getGroupedSignals(
     ready: [],
   };
 
-  const hasPathway = !!plan.pathway_type?.trim();
-  const hasCountries = (plan.shortlisted_countries || []).length > 0;
-  const shortlistCount = (plan.shortlisted_countries || []).length;
+  const hasPathway = isPathwayDefined(plan.pathway_type);
+  const shortlistCount = getMeaningfulCountries(plan).length;
+  const hasCountries = shortlistCount > 0;
   const allItems = phases.flatMap((p) => p.items);
   const hasInProgress = allItems.some((i) => i.status === "In Progress");
   const hasBlocked = allItems.some((i) => i.status === "Blocked");
@@ -1223,8 +1239,8 @@ export default function PortalTimelinePage() {
     () => ({
       pathwayType: getDisplayValue(plan.pathway_type, "Not specified"),
       shortlistedCountries:
-        (plan.shortlisted_countries || []).length > 0
-          ? plan.shortlisted_countries.join(", ")
+        getMeaningfulCountries(plan).length > 0
+          ? getMeaningfulCountries(plan).join(", ")
           : "None selected",
       targetTimeline: getDisplayValue(plan.target_timeline, "Not defined"),
       budgetRange: getDisplayValue(plan.budget_range, "Not defined"),
@@ -1837,7 +1853,7 @@ export default function PortalTimelinePage() {
             <span className="text-xs font-medium text-stone-500">
               Countries:
             </span>
-            <span className="text-sm font-semibold text-stone-900 truncate max-w-[200px]">
+            <span className="text-sm font-semibold text-stone-900 truncate max-w-50">
               {planningContext.shortlistedCountries}
             </span>
           </div>
