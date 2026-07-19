@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
@@ -48,11 +49,21 @@ export default function LoginPage() {
           FertilityCareHub
         </p>
 
-        <h1 className="mt-3 text-2xl font-semibold text-stone-900">Login</h1>
+        <h1 className="mt-3 text-2xl font-semibold text-stone-900">
+          Client Sign In
+        </h1>
 
         <p className="mt-2 text-sm leading-6 text-stone-600">
-          Sign in to access your private fertility planning workspace.
+          Sign in to access your private FertilityCareHub client workspace.
         </p>
+
+        <div className="mt-4 rounded-xl border border-stone-200 bg-stone-50 px-4 py-4">
+          <p className="text-sm leading-6 text-stone-700">
+            Client workspace access is reserved for approved advisory clients and
+            is issued directly during onboarding. This is not a public account
+            registration system.
+          </p>
+        </div>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-5">
           <div>
@@ -75,12 +86,22 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-stone-800"
-            >
-              Password
-            </label>
+            <div className="flex items-center justify-between gap-4">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-stone-800"
+              >
+                Password
+              </label>
+
+              <Link
+                href="/auth/forgot-password"
+                className="text-sm font-medium text-stone-700 underline underline-offset-4 transition hover:text-stone-900"
+              >
+                Forgot password?
+              </Link>
+            </div>
+
             <input
               id="password"
               type="password"
@@ -105,6 +126,26 @@ export default function LoginPage() {
         {message ? (
           <p className="mt-4 text-sm text-red-600">{message}</p>
         ) : null}
+
+        <div className="mt-6 border-t border-stone-200 pt-6">
+          <p className="text-sm leading-6 text-stone-600">
+            Need client access?{" "}
+            <Link
+              href="/consultation"
+              className="font-medium text-stone-900 underline"
+            >
+              Request intake
+            </Link>{" "}
+            or{" "}
+            <Link
+              href="/advisory"
+              className="font-medium text-stone-900 underline"
+            >
+              view advisory tiers
+            </Link>
+            .
+          </p>
+        </div>
       </div>
     </div>
   );

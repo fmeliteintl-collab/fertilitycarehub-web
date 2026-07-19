@@ -1,341 +1,700 @@
-import CountryWebPageSchema from "../../components/CountryWebPageSchema";
-import Breadcrumbs from "../../components/Breadcrumbs";
-import Link from "next/link";
 import type { Metadata } from "next";
+import Link from "next/link";
+import Breadcrumbs from "../../components/Breadcrumbs";
+import CountryWebPageSchema from "../../components/CountryWebPageSchema";
+import FAQSchema from "../../components/FAQSchema";
+
+const baseUrl = "https://fertilitycarehub.com";
+const pageUrl = `${baseUrl}/countries/china`;
 
 export const metadata: Metadata = {
-  title: "China IVF Regulations & Fertility Law 2026 | FertilityCareHub",
+  title: "China IVF Regulations & Fertility Strategy 2026 | FertilityCareHub",
   description:
-    "Structured analysis of IVF regulations, donor laws, surrogacy policy, and fertility access rules in China. Updated regulatory insights for intended parents.",
+    "Structured analysis of fertility regulation, eligibility, clinic access, costs, documentation, travel, and treatment planning in China.",
   alternates: {
-    canonical: "https://fertilitycarehub.com/countries/china",
+    canonical: pageUrl,
   },
   openGraph: {
-    title: "China IVF Regulations & Fertility Law 2026",
+    title: "China IVF Regulations & Fertility Strategy 2026",
     description:
-      "In-depth fertility law analysis covering IVF, donor gametes, surrogacy, and access regulations in China.",
-    url: "https://fertilitycarehub.com/countries/china",
+      "Strategic fertility-jurisdiction analysis covering eligibility, clinic access, governance, costs, documentation, travel, and treatment planning in China.",
+    url: pageUrl,
     siteName: "FertilityCareHub",
     type: "article",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "China IVF Regulations & Fertility Strategy 2026",
+    description:
+      "Structured fertility-jurisdiction analysis for treatment planning in China.",
+  },
 };
-export default function ChinaPage() {
+
+const faqs = [
+  {
+    question: "Why do patients consider fertility treatment in China?",
+    answer:
+      "China may be considered for its large hospital systems, specialist depth, major urban medical centres, and established reproductive-medicine capacity. Practical suitability depends on current eligibility rules, institutional access, documentation, language support, treatment availability, and continuity-of-care planning.",
+  },
+  {
+    question:
+      "Can international patients access all fertility treatments in China?",
+    answer:
+      "No. Access may be limited by current national rules, institutional policy, residency or identity requirements, marital-status documentation, treatment type, and clinic eligibility. The proposed pathway should be confirmed directly before payments, medication orders, or travel.",
+  },
+  {
+    question: "Are donor treatment and surrogacy available in China?",
+    answer:
+      "Donor treatment and surrogacy are subject to significant legal and policy restrictions. Availability, eligibility, documentation, and lawful alternatives should be confirmed with appropriately licensed medical and legal professionals.",
+  },
+  {
+    question:
+      "Does FertilityCareHub recommend specific fertility clinics in China?",
+    answer:
+      "FertilityCareHub does not publish public best-clinic rankings or paid promotional lists. Private advisory may include a carefully screened institutional shortlist based on eligibility, medical leadership, laboratory governance, communication, documentation, cost transparency, and pathway feasibility.",
+  },
+  {
+    question:
+      "What should international patients verify before planning treatment in China?",
+    answer:
+      "Patients should verify eligibility, required documents, treatment availability, responsible institution, consultation process, language support, monitoring requirements, medication access, cost estimates, visa and travel logistics, payment methods, records transfer, and follow-up responsibility.",
+  },
+];
+
+const relatedGuides = [
+  {
+    title: "How to Compare Fertility Jurisdictions Strategically",
+    href: "/how-to-compare-fertility-jurisdictions",
+    description:
+      "Compare regulation, eligibility, governance, costs, logistics, documentation, and execution risk.",
+  },
+  {
+    title: "How to Choose a Fertility Clinic Abroad",
+    href: "/how-to-choose-a-fertility-clinic-abroad",
+    description:
+      "Evaluate licensing, laboratory governance, transparency, communication, costs, and continuity of care.",
+  },
+  {
+    title: "Questions to Ask a Fertility Clinic",
+    href: "/questions-to-ask-a-fertility-clinic",
+    description:
+      "Use a structured checklist to verify access, protocols, costs, laboratory standards, communication, and follow-up.",
+  },
+  {
+    title: "Fertility Treatment Travel Checklist",
+    href: "/fertility-treatment-travel-checklist",
+    description:
+      "Plan medical records, medication, appointments, accommodation, transport, contingency time, and post-treatment care.",
+  },
+];
+
+const relatedCountries = [
+  {
+    title: "United States",
+    href: "/countries/united-states",
+    description:
+      "A large and highly varied fertility market with broad specialist depth, higher costs, and important state-level considerations.",
+  },
+  {
+    title: "Canada",
+    href: "/countries/canada",
+    description:
+      "A regulated, ethics-forward system where provincial access, clinic capacity, funding, and continuity of care shape the pathway.",
+  },
+  {
+    title: "Spain",
+    href: "/countries/spain",
+    description:
+      "A mature European destination with established international-patient pathways and significant donor-treatment experience.",
+  },
+];
+
+export default function ChinaDossierPage() {
   return (
     <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
-      <Breadcrumbs
-  items={[
-    { name: "Home", href: "/" },
-    { name: "Countries", href: "/countries" },
-    { name: "China", href: "/countries/china" },
-  ]}
-/>
-<CountryWebPageSchema
-  countryName="China"
-  countrySlug="china"
-  title="China: Fertility Jurisdiction Assessment"
-  description="Strategic jurisdiction assessment and regulatory clarity for fertility care within China's regulatory framework."
-/>
-      {/* Top utility bar */}
-      <div className="max-w-6xl mx-auto px-6 pt-10">
-        <div className="flex items-center justify-between">
+      <CountryWebPageSchema
+        countryName="China"
+        countrySlug="china"
+        title="China: Fertility Jurisdiction Assessment"
+        description="Strategic jurisdiction assessment covering fertility regulation, eligibility, clinic access, governance, costs, documentation, travel, and treatment planning in China."
+      />
+
+      <FAQSchema id="faq-china" items={faqs} />
+
+      <div className="mx-auto w-full max-w-6xl px-5 py-10 sm:px-6 sm:py-14 lg:px-8">
+        <Breadcrumbs
+          items={[
+            { name: "Home", href: "/" },
+            { name: "Countries", href: "/countries" },
+            { name: "China", href: "/countries/china" },
+          ]}
+        />
+
+        <section className="flex flex-col gap-4 pt-8 sm:flex-row sm:items-center sm:justify-between">
           <Link
             href="/countries"
-            className="text-sm tracking-wide text-[#6A6256] hover:text-[#1A1A1A]"
+            className="text-sm tracking-wide text-[#6A6256] transition hover:text-[#1A1A1A]"
           >
             ← Back to countries
           </Link>
 
           <Link
             href="/consultation"
-            className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-5 py-2 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+            className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#B89B5E] px-5 py-3 text-sm font-medium tracking-wide text-[#1A1A1A] transition hover:bg-[#EEE5D2]"
           >
             Review China Strategy Privately
           </Link>
-        </div>
-      </div>
+        </section>
 
-      {/* Hero */}
-      <section className="max-w-6xl mx-auto px-6 pt-14 pb-10">
-        <div className="text-center">
-          <div className="text-xs tracking-[0.28em] text-[#6A6256]">
-            STRATEGIC ADVISORY DOSSIER
-          </div>
+        <section className="border-b border-[#E5DDC8] pb-12 pt-14 text-center sm:pb-16 sm:pt-20">
+          <p className="text-xs font-medium uppercase tracking-[0.28em] text-[#7B6A3A]">
+            Strategic Advisory Dossier
+          </p>
 
-          <h1 className="mt-5 text-5xl md:text-6xl leading-tight font-medium">
-            China
+          <h1 className="mx-auto mt-5 max-w-4xl text-4xl font-semibold leading-tight tracking-[-0.03em] sm:text-5xl lg:text-6xl">
+            China Fertility Jurisdiction Assessment
           </h1>
 
-          <p className="mt-6 max-w-3xl mx-auto text-lg leading-relaxed text-[#2A2A2A]">
-            China is a highly regulated fertility market where access, eligibility, and approved
-            pathways require careful navigation. The strategic advantage can be strong clinical
-            capacity inside major centers, but international pathways are not “medical tourism by default.”
-            This dossier focuses on governance and execution: when China is appropriate, when it isn’t,
-            and how to approach it with precision if it is on your shortlist.
+          <p className="mx-auto mt-6 max-w-3xl text-base leading-8 text-[#5F584D] sm:text-lg">
+            China has substantial reproductive-medicine capacity within major
+            hospital systems, but access is shaped by a tightly controlled
+            regulatory and institutional framework. Suitability depends first
+            on eligibility, lawful treatment scope, documentation, institutional
+            access, communication, travel feasibility, and continuity of care.
           </p>
-        </div>
-      </section>
+        </section>
 
-      {/* Two-column decision block */}
-      <section className="max-w-6xl mx-auto px-6 pb-10">
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-            <h2 className="text-xl font-medium">When China is the right choice</h2>
-            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>
-                You are eligible within the local regulatory model and can meet documentation requirements.
-              </li>
-              <li>
-                You are prioritizing care inside a tightly governed system rather than a medical tourism marketplace.
-              </li>
-              <li>
-                You value large-center capability and institutional structure.
-              </li>
-              <li>
-                Your planning includes structured coordination and clearly defined treatment scope.
-              </li>
-              <li>
-                You prefer a conservative pathway that aligns with local approvals.
-              </li>
-            </ul>
+        <section className="py-12 sm:py-16">
+          <div className="grid gap-6 md:grid-cols-2">
+            <article className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6 sm:p-8">
+              <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#7B6A3A]">
+                Strategic alignment
+              </p>
+
+              <h2 className="mt-3 text-2xl font-semibold">
+                When China may be a viable fit
+              </h2>
+
+              <ul className="mt-5 space-y-3 pl-5 text-[15px] leading-7 text-[#5F584D] marker:text-[#B89B5E]">
+                <li>
+                  Your proposed treatment is clearly available under current
+                  rules and institutional policy.
+                </li>
+                <li>
+                  You can satisfy all identity, relationship-status, medical,
+                  and documentation requirements.
+                </li>
+                <li>
+                  You have access to a suitable hospital or authorized
+                  reproductive-medicine centre.
+                </li>
+                <li>
+                  You are prepared for structured communication, scheduling,
+                  translation, and local coordination.
+                </li>
+                <li>
+                  You have a clear plan for monitoring, records transfer, and
+                  follow-up after treatment.
+                </li>
+              </ul>
+            </article>
+
+            <article className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6 sm:p-8">
+              <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#7B6A3A]">
+                Potential misalignment
+              </p>
+
+              <h2 className="mt-3 text-2xl font-semibold">
+                When another jurisdiction may be more suitable
+              </h2>
+
+              <ul className="mt-5 space-y-3 pl-5 text-[15px] leading-7 text-[#5F584D] marker:text-[#B89B5E]">
+                <li>
+                  Your required pathway is restricted, unavailable, or cannot
+                  be confirmed in writing.
+                </li>
+                <li>
+                  You want an open international medical-tourism marketplace
+                  with broad clinic choice.
+                </li>
+                <li>
+                  Donor, surrogacy, family-status, or documentation constraints
+                  conflict with your needs.
+                </li>
+                <li>
+                  You require simple remote onboarding with minimal
+                  administrative friction.
+                </li>
+                <li>
+                  You cannot establish reliable language, payment, travel, or
+                  follow-up support.
+                </li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#EEE5D2] p-6 sm:p-8">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+              FertilityCareHub assessment framework
+            </p>
+
+            <h2 className="mt-4 text-3xl font-semibold">
+              How to evaluate China as a treatment jurisdiction
+            </h2>
+
+            <div className="mt-8 grid gap-6 md:grid-cols-3">
+              <div>
+                <h3 className="text-lg font-semibold">Eligibility first</h3>
+                <p className="mt-3 text-sm leading-7 text-[#5F584D]">
+                  Confirm the lawful pathway, patient eligibility, required
+                  documents, institutional policy, and treatment access before
+                  comparing costs or scheduling travel.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold">
+                  Institutional suitability
+                </h3>
+                <p className="mt-3 text-sm leading-7 text-[#5F584D]">
+                  Evaluate the responsible hospital or centre, medical
+                  leadership, laboratory governance, treatment scope,
+                  communication, and international-patient coordination.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold">Execution feasibility</h3>
+                <p className="mt-3 text-sm leading-7 text-[#5F584D]">
+                  Map consultation, monitoring, medication, payment, travel,
+                  language support, procedures, records, and follow-up into one
+                  workable plan.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="max-w-3xl">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+              Decision factors
+            </p>
+
+            <h2 className="mt-4 text-3xl font-semibold sm:text-4xl">
+              Establish feasibility before selecting a provider
+            </h2>
+
+            <p className="mt-5 leading-8 text-[#5F584D]">
+              China should not be approached as a broad clinic-shopping market.
+              The central questions are whether the pathway is lawful, whether
+              the patient is eligible, whether the institution can accept the
+              case, and whether the complete treatment process can be executed
+              safely and predictably.
+            </p>
           </div>
 
-          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-            <h2 className="text-xl font-medium">When it’s not</h2>
-            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>
-                You want an open-access international medical tourism model.
-              </li>
-              <li>
-                Your pathway requires frameworks that are restricted or not supported locally.
-              </li>
-              <li>
-                You need maximum flexibility in family structure pathways.
-              </li>
-              <li>
-                You want minimal documentation and fast cross-border logistics.
-              </li>
-            </ul>
+          <div className="mt-10 grid gap-5 md:grid-cols-2">
+            <article className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6">
+              <h3 className="text-xl font-semibold">
+                Eligibility and legal scope
+              </h3>
+
+              <ul className="mt-4 space-y-3 pl-5 text-sm leading-7 text-[#5F584D] marker:text-[#B89B5E]">
+                <li>
+                  Confirm the treatment is permitted for the patient’s profile.
+                </li>
+                <li>
+                  Clarify marital-status, identity, medical-indication, and
+                  document requirements.
+                </li>
+                <li>
+                  Verify restrictions affecting donor treatment, surrogacy, or
+                  other specialized pathways.
+                </li>
+                <li>
+                  Obtain professional guidance when legal interpretation is
+                  required.
+                </li>
+              </ul>
+            </article>
+
+            <article className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6">
+              <h3 className="text-xl font-semibold">
+                Institution and laboratory governance
+              </h3>
+
+              <ul className="mt-4 space-y-3 pl-5 text-sm leading-7 text-[#5F584D] marker:text-[#B89B5E]">
+                <li>
+                  Confirm that the institution is authorized for the proposed
+                  treatment.
+                </li>
+                <li>
+                  Identify responsible medical and laboratory leadership.
+                </li>
+                <li>
+                  Ask how quality controls, embryology continuity, and case
+                  escalation are managed.
+                </li>
+                <li>
+                  Require written clarity on protocols, exclusions, and
+                  responsibility.
+                </li>
+              </ul>
+            </article>
+
+            <article className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6">
+              <h3 className="text-xl font-semibold">
+                Documentation and communication
+              </h3>
+
+              <ul className="mt-4 space-y-3 pl-5 text-sm leading-7 text-[#5F584D] marker:text-[#B89B5E]">
+                <li>
+                  Confirm which documents must be original, certified,
+                  translated, or recently issued.
+                </li>
+                <li>
+                  Establish the working language for consultations and written
+                  instructions.
+                </li>
+                <li>
+                  Identify a reliable coordination contact and expected
+                  response times.
+                </li>
+                <li>
+                  Confirm how records, consent forms, results, and treatment
+                  plans will be shared.
+                </li>
+              </ul>
+            </article>
+
+            <article className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6">
+              <h3 className="text-xl font-semibold">
+                Cost structure and payment exposure
+              </h3>
+
+              <ul className="mt-4 space-y-3 pl-5 text-sm leading-7 text-[#5F584D] marker:text-[#B89B5E]">
+                <li>
+                  Request a written estimate only after treatment access is
+                  confirmed.
+                </li>
+                <li>
+                  Separate consultation, testing, medication, monitoring,
+                  procedures, laboratory services, freezing, and storage.
+                </li>
+                <li>
+                  Confirm payment methods, deposits, cancellation, refunds,
+                  and currency-conversion exposure.
+                </li>
+                <li>
+                  Add translation, local support, travel, accommodation, and
+                  schedule-change costs.
+                </li>
+              </ul>
+            </article>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Framework */}
-      <section className="max-w-6xl mx-auto px-6 pb-12">
-        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-          <h2 className="text-2xl font-medium">Advisor framework: how to evaluate China</h2>
-
-          <div className="mt-6 grid md:grid-cols-3 gap-6">
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
             <div>
-              <div className="text-xs tracking-[0.25em] text-[#6A6256]">ELIGIBILITY</div>
-              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
-                Strategy starts with eligibility. We confirm what is permitted, what is restricted, and what
-                documentation is required before any clinical planning.
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+                Treatment travel planning
+              </p>
+
+              <h2 className="mt-4 text-3xl font-semibold">
+                Build the medical and travel plan together
+              </h2>
+
+              <p className="mt-5 leading-8 text-[#5F584D]">
+                Treatment in China may require more than booking appointments
+                and accommodation. Visa requirements, institutional onboarding,
+                payment access, translation, medication, monitoring, local
+                transport, digital communication, and post-treatment records
+                should be resolved before departure.
               </p>
             </div>
 
+            <div className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6 sm:p-8">
+              <ol className="space-y-6">
+                <li>
+                  <div className="text-xs font-medium uppercase tracking-[0.14em] text-[#7B6A3A]">
+                    Before commitment
+                  </div>
+                  <p className="mt-2 text-sm leading-7 text-[#5F584D]">
+                    Confirm eligibility, institution acceptance, treatment
+                    scope, documentation, communication, and estimated costs.
+                  </p>
+                </li>
+
+                <li>
+                  <div className="text-xs font-medium uppercase tracking-[0.14em] text-[#7B6A3A]">
+                    Before departure
+                  </div>
+                  <p className="mt-2 text-sm leading-7 text-[#5F584D]">
+                    Confirm visa, appointments, payment methods, medication,
+                    accommodation, transport, translation, and contingency time.
+                  </p>
+                </li>
+
+                <li>
+                  <div className="text-xs font-medium uppercase tracking-[0.14em] text-[#7B6A3A]">
+                    During treatment
+                  </div>
+                  <p className="mt-2 text-sm leading-7 text-[#5F584D]">
+                    Keep written instructions, receipts, medication records,
+                    laboratory reports, and an escalation contact.
+                  </p>
+                </li>
+
+                <li>
+                  <div className="text-xs font-medium uppercase tracking-[0.14em] text-[#7B6A3A]">
+                    After returning home
+                  </div>
+                  <p className="mt-2 text-sm leading-7 text-[#5F584D]">
+                    Confirm testing, medication, records transfer, emergency
+                    guidance, and responsibility for continuing care.
+                  </p>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="rounded-2xl border border-[#D8C89F] bg-[#EEE5D2] p-6 sm:p-8">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+              Independent decision support
+            </p>
+
+            <h2 className="mt-4 text-2xl font-semibold sm:text-3xl">
+              What FertilityCareHub deliberately does not provide
+            </h2>
+
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              <ul className="space-y-3 pl-5 text-sm leading-7 text-[#5F584D] marker:text-[#B89B5E]">
+                <li>Public best-clinic rankings or paid promotional lists</li>
+                <li>Guaranteed access, eligibility, or treatment outcomes</li>
+                <li>Unverified package prices presented as complete costs</li>
+              </ul>
+
+              <ul className="space-y-3 pl-5 text-sm leading-7 text-[#5F584D] marker:text-[#B89B5E]">
+                <li>Medical diagnosis or individualized treatment decisions</li>
+                <li>Legal conclusions about restricted treatment pathways</li>
+                <li>One-size-fits-all institution recommendations</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
             <div>
-              <div className="text-xs tracking-[0.25em] text-[#6A6256]">INSTITUTION MODEL</div>
-              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
-                China is not “clinic shopping.” The right question is which institutional model
-                matches your needs — and whether access is feasible.
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+                Jurisdiction comparison
+              </p>
+
+              <h2 className="mt-4 text-3xl font-semibold">
+                Compare China before planning treatment
+              </h2>
+
+              <p className="mt-5 leading-8 text-[#5F584D]">
+                Compare lawful access, eligibility, institution type,
+                documentation, donor restrictions, costs, communication,
+                travel, and continuity of care before deciding whether China is
+                the strongest jurisdiction for your pathway.
               </p>
             </div>
 
-            <div>
-              <div className="text-xs tracking-[0.25em] text-[#6A6256]">EXECUTION</div>
-              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
-                Execution requires disciplined coordination: record readiness, scheduling, local follow-up,
-                and clarity on what must occur on-site versus remotely.
+            <div className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6 sm:p-8">
+              <h3 className="text-xl font-semibold">
+                Use the comparison framework
+              </h3>
+
+              <p className="mt-4 text-sm leading-7 text-[#625A4C]">
+                Begin with the structured jurisdiction guide, then review the
+                complete comparison library to understand how China differs
+                from more open international-treatment markets.
               </p>
+
+              <div className="mt-6 flex flex-col items-start gap-3">
+                <Link
+                  href="/how-to-compare-fertility-jurisdictions"
+                  className="font-medium text-[#715F33] underline underline-offset-4"
+                >
+                  Read the jurisdiction comparison guide →
+                </Link>
+
+                <Link
+                  href="/compare"
+                  className="font-medium text-[#715F33] underline underline-offset-4"
+                >
+                  Browse all comparison briefs →
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Core sections */}
-      <section className="max-w-6xl mx-auto px-6 pb-12">
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-            <h3 className="text-xl font-medium">Governance and constraints</h3>
-            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>
-                China operates with tight governance; pathway scope must align with local approvals.
-              </li>
-              <li>
-                Documentation, marital/eligibility rules, and clinic access norms should be clarified early.
-              </li>
-              <li>
-                We identify what can be done outside the country versus what must be executed on-site.
-              </li>
-            </ul>
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="max-w-3xl">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+              Related jurisdictions
+            </p>
+
+            <h2 className="mt-4 text-3xl font-semibold">
+              Continue evaluating international options
+            </h2>
           </div>
 
-          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-            <h3 className="text-xl font-medium">Clinic selection approach</h3>
-            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>
-                We shortlist selectively (typically 4–5), focusing on institutional stability and planning discipline.
-              </li>
-              <li>
-                We prioritize written planning, clear scheduling, and consistent patient communication cadence.
-              </li>
-              <li>
-                We avoid “directory browsing” and structure selection around eligibility and execution.
-              </li>
-            </ul>
+          <div className="mt-8 grid gap-5 md:grid-cols-3">
+            {relatedCountries.map((country) => (
+              <Link
+                key={country.href}
+                href={country.href}
+                className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6 transition hover:border-[#B89B5E] hover:bg-white"
+              >
+                <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#7B6A3A]">
+                  Country dossier
+                </p>
+
+                <h3 className="mt-3 text-xl font-semibold">{country.title}</h3>
+
+                <p className="mt-3 text-sm leading-7 text-[#625A4C]">
+                  {country.description}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="max-w-3xl">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+              Related planning resources
+            </p>
+
+            <h2 className="mt-4 text-3xl font-semibold">
+              Continue your research with structured guides
+            </h2>
           </div>
 
-          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-            <h3 className="text-xl font-medium">Cost structure (strategic view)</h3>
-            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>
-                Cost is not the primary variable — access and pathway eligibility often are.
-              </li>
-              <li>
-                We model total cost only after feasibility is confirmed: clinical + monitoring + travel + time.
-              </li>
-              <li>
-                We avoid publishing static pricing without verification and context.
-              </li>
-            </ul>
+          <div className="mt-8 grid gap-5 md:grid-cols-2">
+            {relatedGuides.map((guide) => (
+              <Link
+                key={guide.href}
+                href={guide.href}
+                className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6 transition hover:border-[#B89B5E] hover:bg-white"
+              >
+                <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#7B6A3A]">
+                  FertilityCareHub guide
+                </p>
+
+                <h3 className="mt-3 text-xl font-semibold">{guide.title}</h3>
+
+                <p className="mt-3 text-sm leading-7 text-[#625A4C]">
+                  {guide.description}
+                </p>
+              </Link>
+            ))}
           </div>
 
-          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-            <h3 className="text-xl font-medium">Logistics and travel (including accommodation)</h3>
-            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>
-                China is not optimized for casual medical tourism; travel planning must be structured.
-              </li>
-              <li>
-                We include <strong>accommodation</strong> as execution support: calm, proximity-based options chosen for stability.
-              </li>
-              <li>
-                The priority is minimizing friction during monitoring and procedure windows.
-              </li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* What we exclude */}
-      <section className="max-w-6xl mx-auto px-6 pb-12">
-        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-          <h3 className="text-xl font-medium">What we deliberately exclude (the private filter)</h3>
-          <div className="mt-5 grid md:grid-cols-2 gap-6">
-            <ul className="space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>Exhaustive clinic directories.</li>
-              <li>DIY bureaucracy playbooks.</li>
-              <li>Generic “best clinic” rankings without feasibility analysis.</li>
-            </ul>
-            <ul className="space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>Hotel price comparison tables.</li>
-              <li>Static pricing without verification.</li>
-              <li>One-size-fits-all pathway templates.</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="max-w-6xl mx-auto px-6 pb-16">
-        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-10 text-center">
-          <h3 className="text-2xl font-medium">Private advisory, not a public database.</h3>
-          <p className="mt-4 max-w-2xl mx-auto text-[15px] leading-relaxed text-[#2A2A2A]">
-            If China is on your shortlist, the decisive step is confirming eligibility and feasibility before planning.
-            We structure the pathway around governance, access, and execution — not marketing claims.
-          </p>
-
-          <div className="mt-7 flex items-center justify-center">
+          <div className="mt-6">
             <Link
-              href="/consultation"
-              className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+              href="/guides"
+              className="font-medium text-[#715F33] underline underline-offset-4"
             >
-              Request Private Advisory Review
+              Browse the complete Guides Library →
             </Link>
           </div>
+        </section>
 
-          <div className="mt-3 text-xs tracking-wide text-[#6A6256]">
-            Discreet, structured guidance aligned to your profile and jurisdictional constraints.
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="max-w-3xl">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+              Frequently asked questions
+            </p>
+
+            <h2 className="mt-4 text-3xl font-semibold">
+              China fertility-planning FAQ
+            </h2>
           </div>
-        </div>
-      </section>
-      {/* FAQ */}
-<section className="mt-16 border-t border-[#E5DDC8] pt-10">
-  <h2 className="text-2xl font-semibold mb-6">FAQ</h2>
 
-  <div className="space-y-4">
-    <details className="rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
-      <summary className="cursor-pointer text-lg font-medium">
-        Is FertilityCareHub providing medical or legal advice?
-      </summary>
-      <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
-        No. We provide structured, strategic advisory support only. Medical and legal decisions must
-        be made with licensed professionals. Our role is clarity, feasibility, and planning structure.
-      </p>
-    </details>
+          <div className="mt-8 space-y-4">
+            {faqs.map((faq) => (
+              <details
+                key={faq.question}
+                className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-5 sm:p-6"
+              >
+                <summary className="cursor-pointer pr-5 text-lg font-semibold">
+                  {faq.question}
+                </summary>
 
-    <details className="rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
-      <summary className="cursor-pointer text-lg font-medium">
-        Do you recommend specific clinics in China?
-      </summary>
-      <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
-        We do not publish public “best clinic” lists. If you engage advisory services, we can provide
-        a curated shortlist aligned to feasibility, access constraints, and execution priorities.
-      </p>
-    </details>
+                <p className="mt-4 max-w-4xl text-sm leading-7 text-[#625A4C]">
+                  {faq.answer}
+                </p>
+              </details>
+            ))}
+          </div>
+        </section>
 
-    <details className="rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
-      <summary className="cursor-pointer text-lg font-medium">
-        What should I prepare before requesting advisory?
-      </summary>
-      <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
-        Helpful inputs include your target timeline, prior treatment history (if any), your constraints
-        (budget, travel cadence, donor pathway), and any eligibility or documentation considerations.
-      </p>
-    </details>
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="rounded-2xl bg-[#1A1A1A] px-6 py-10 text-center text-white sm:px-10 sm:py-14">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#D4BE82]">
+              Private strategic advisory
+            </p>
 
-    <details className="rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
-      <summary className="cursor-pointer text-lg font-medium">
-        Can advisory help compare China with other destinations?
-      </summary>
-      <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
-        Yes. We structure comparisons across a small set of relevant jurisdictions using decision factors
-        like governance, eligibility friction, donor pathway constraints, timeline realism, and execution risk.
-      </p>
-    </details>
-  </div>
-</section>
-      {/* Comparison guide CTA */}
-<section className="mt-10 border border-[#E5DDC8] bg-white/60 rounded-xl p-5">
-  <h3 className="text-lg font-medium">Compare destinations before choosing</h3>
-  <p className="mt-2 text-sm text-[#6A6256] leading-relaxed">
-    Use our structured framework to compare governance, donor pathway, eligibility friction,
-    timeline realism, and execution risk across countries.
-  </p>
-  <Link
-    href="/how-to-compare-fertility-jurisdictions"
-    className="inline-block mt-3 underline text-sm"
-  >
-    Read the comparison guide →
-  </Link>
-</section>
-      <section className="mt-16 border-t border-[#E5DDC8] pt-10">
-  <h2 className="text-2xl font-semibold mb-6">Compare Other Jurisdictions</h2>
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <Link href="/countries/united-states" className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition">
-      <h3 className="text-lg font-medium">United States</h3>
-      <p className="text-sm text-[#6A6256] mt-2">Broad capability for complex planning where cross-border access is viable.</p>
-    </Link>
-    <Link href="/countries/canada" className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition">
-      <h3 className="text-lg font-medium">Canada</h3>
-      <p className="text-sm text-[#6A6256] mt-2">Governance-forward environment with tight ethical boundaries.</p>
-    </Link>
-    <Link href="/countries/spain" className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition">
-      <h3 className="text-lg font-medium">Spain</h3>
-      <p className="text-sm text-[#6A6256] mt-2">EU alternative with mature donor pathways and clinic ecosystem depth.</p>
-    </Link>
-  </div>
-</section>
+            <h2 className="mx-auto mt-4 max-w-3xl text-3xl font-semibold sm:text-4xl">
+              Evaluate China against your actual pathway
+            </h2>
+
+            <p className="mx-auto mt-5 max-w-2xl leading-8 text-[#D4D0C8]">
+              FertilityCareHub helps structure eligibility, institutional
+              access, documentation, clinic, cost, language, travel, and
+              continuity-of-care decisions around your priorities and
+              constraints.
+            </p>
+
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Link
+                href="/advisory"
+                className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#B89B5E] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#A88B50]"
+              >
+                View Advisory Tiers
+              </Link>
+
+              <Link
+                href="/consultation"
+                className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#D4BE82] px-6 py-3 text-sm font-medium text-[#F2E4BC] transition hover:bg-[#2D2D2D]"
+              >
+                Request Client Intake
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t border-[#E5DDC8] py-10">
+          <p className="mx-auto max-w-4xl text-center text-sm leading-7 text-[#6A6256]">
+            FertilityCareHub provides general educational and strategic
+            planning information. It does not provide medical, legal,
+            financial, immigration, or regulatory advice. Eligibility,
+            regulations, institutional policies, treatment access, costs,
+            documentation, and clinical practices may change and should be
+            independently confirmed with appropriately licensed professionals.
+          </p>
+
+          <div className="mt-4 text-center">
+            <Link
+              href="/disclaimer"
+              className="font-medium text-[#715F33] underline underline-offset-4"
+            >
+              Read the full disclaimer
+            </Link>
+          </div>
+        </section>
+      </div>
     </main>
   );
 }

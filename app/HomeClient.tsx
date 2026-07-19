@@ -1,6 +1,58 @@
 "use client";
+
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
+
+const knowledgeGuides = [
+  {
+    title: "How to Compare Fertility Jurisdictions Strategically",
+    description:
+      "Use a structured framework to compare regulation, eligibility, donor pathways, clinic governance, costs, logistics, and execution risk across countries.",
+    href: "/how-to-compare-fertility-jurisdictions",
+  },
+  {
+    title: "How to Choose a Fertility Clinic Abroad",
+    description:
+      "Evaluate licensing, laboratory governance, treatment transparency, communication standards, total costs, donor practices, and continuity of care.",
+    href: "/how-to-choose-a-fertility-clinic-abroad",
+  },
+  {
+    title: "Understanding Fertility Clinic Success Rates",
+    description:
+      "Learn how pregnancy, ongoing-pregnancy, live-birth, per-cycle, per-transfer, cumulative, age-specific, and donor-treatment reporting measures differ.",
+    href: "/understanding-fertility-clinic-success-rates",
+  },
+  {
+    title: "Hidden Costs of Fertility Treatment Abroad",
+    description:
+      "Identify medication, testing, donor, laboratory, storage, freezing, transfer, travel, accommodation, cancellation, and repeat-treatment expenses.",
+    href: "/hidden-costs-of-fertility-treatment-abroad",
+  },
+  {
+    title: "Spain vs Greece for Fertility Treatment",
+    description:
+      "Compare two established European fertility destinations across eligibility, donor pathways, clinical governance, costs, travel, documentation, and continuity of care.",
+    href: "/spain-vs-greece-for-fertility-treatment",
+  },
+  {
+    title: "IVF Abroad vs Canada",
+    description:
+      "Compare access, funding, donor pathways, treatment availability, costs, travel, documentation, and continuity of care when considering IVF abroad or in Canada.",
+    href: "/ivf-abroad-vs-canada",
+  },
+  {
+    title: "Fertility Treatment Travel Checklist",
+    description:
+      "Organize medical records, medications, monitoring, travel dates, accommodation, insurance, documentation, emergency planning, and continuity of care.",
+    href: "/fertility-treatment-travel-checklist",
+  },
+  {
+    title: "Questions to Ask a Fertility Clinic",
+    description:
+      "Use a structured question set to assess licensing, clinical leadership, laboratory governance, treatment protocols, success rates, communication, pricing, cancellation policies, donor pathways, and follow-up care.",
+    href: "/questions-to-ask-a-fertility-clinic",
+  },
+];
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -8,7 +60,7 @@ export default function Home() {
     "idle"
   );
 
-  // Deep-link context: /?from=country  (example: /?from=spain)
+  // Deep-link context: /?from=country
   const [from, setFrom] = useState("");
 
   useEffect(() => {
@@ -16,45 +68,58 @@ export default function Home() {
       const params = new URLSearchParams(window.location.search);
       const raw = (params.get("from") || "").trim().toLowerCase();
 
-      // Allow only slugs like "spain" or "united-states"
+      // Allow only slugs such as "spain" or "united-states".
       const safe = /^[a-z-]+$/.test(raw) ? raw : "";
       setFrom(safe);
     };
 
-    // Defer to next tick to avoid synchronous setState
     const timeoutId = setTimeout(handleRouteChange, 0);
 
     return () => clearTimeout(timeoutId);
   }, []);
 
   const countryLink = useMemo(() => {
-    if (!from) return null;
+    if (!from) {
+      return null;
+    }
+
     return `/countries/${encodeURIComponent(from)}`;
   }, [from]);
 
   const countryLabel = useMemo(() => {
-    if (!from) return "";
-    // simple label formatting: "united-states" -> "United States"
+    if (!from) {
+      return "";
+    }
+
     return from
       .split("-")
-      .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : ""))
+      .map((word) =>
+        word ? `${word[0].toUpperCase()}${word.slice(1)}` : ""
+      )
       .join(" ");
   }, [from]);
 
-  async function onJoinList(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function onJoinList(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     setStatus("loading");
 
-    const res = await fetch("/api/subscribe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
+    try {
+      const response = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
 
-    if (res.ok) {
-      setEmail("");
-      setStatus("ok");
-    } else {
+      if (response.ok) {
+        setEmail("");
+        setStatus("ok");
+        return;
+      }
+
+      setStatus("error");
+    } catch {
       setStatus("error");
     }
   }
@@ -86,18 +151,35 @@ export default function Home() {
           }}
         >
           Private Global Fertility Strategy Advisory
-          <br />
-          Discretion. Clarity. Cross-Border Direction.
         </h1>
 
-        <p style={{ fontSize: "18px", color: "#5a5a5a" }}>
-          Strategic jurisdiction assessment and clinical alignment for
-          individuals and families navigating cross-border reproductive care.
+        <p
+          style={{
+            fontSize: "18px",
+            color: "#5a5a5a",
+            maxWidth: 760,
+            margin: "0 auto",
+          }}
+        >
+          Independent strategic guidance for individuals and families planning
+          fertility treatment across international jurisdictions.
+        </p>
+
+        <p
+          style={{
+            fontSize: 16,
+            color: "#6a6256",
+            marginTop: 14,
+            marginBottom: 0,
+            letterSpacing: "0.04em",
+          }}
+        >
+          Discretion. Clarity. Cross-Border Direction.
         </p>
 
         <p style={{ fontSize: 14, color: "#6a6256", marginTop: 14 }}>
           Powered by the{" "}
-          <strong>FCH Global Fertility Intelligence Framework™️</strong> — a
+          <strong>FCH Global Fertility Intelligence Framework(TM)</strong> — a
           structured model that evaluates jurisdictions across regulatory
           alignment, donor pathway constraints, clinical infrastructure, and
           execution risk.
@@ -111,7 +193,6 @@ export default function Home() {
             flexWrap: "wrap",
           }}
         >
-          {/* PRIMARY CTA -> /advisory (tier selection) */}
           <Link
             href="/advisory"
             style={{
@@ -126,7 +207,6 @@ export default function Home() {
             View Advisory Tiers (US$500 / US$2,500)
           </Link>
 
-          {/* SECONDARY CTA */}
           <Link
             href="/countries"
             style={{
@@ -151,7 +231,6 @@ export default function Home() {
             </Link>
           </div>
 
-          {/* Deep-link CTA (only appears when ?from=xxx is present and valid) */}
           {countryLink ? (
             <Link
               href={countryLink}
@@ -181,45 +260,25 @@ export default function Home() {
             color: "#6a6256",
           }}
         >
-          <span
-            style={{
-              padding: "6px 10px",
-              border: "1px solid #e5ddc8",
-              borderRadius: 999,
-            }}
-          >
-            Regulatory Alignment
-          </span>
-          <span
-            style={{
-              padding: "6px 10px",
-              border: "1px solid #e5ddc8",
-              borderRadius: 999,
-            }}
-          >
-            Donor Pathway Constraints
-          </span>
-          <span
-            style={{
-              padding: "6px 10px",
-              border: "1px solid #e5ddc8",
-              borderRadius: 999,
-            }}
-          >
-            Clinical Infrastructure
-          </span>
-          <span
-            style={{
-              padding: "6px 10px",
-              border: "1px solid #e5ddc8",
-              borderRadius: 999,
-            }}
-          >
-            Execution Risk
-          </span>
+          {[
+            "Regulatory Alignment",
+            "Donor Pathway Constraints",
+            "Clinical Infrastructure",
+            "Execution Risk",
+          ].map((label) => (
+            <span
+              key={label}
+              style={{
+                padding: "6px 10px",
+                border: "1px solid #e5ddc8",
+                borderRadius: 999,
+              }}
+            >
+              {label}
+            </span>
+          ))}
         </div>
 
-        {/* Optional helper link */}
         <div style={{ marginTop: 12 }}>
           <Link
             href="/consultation"
@@ -234,7 +293,6 @@ export default function Home() {
           </Link>
         </div>
 
-        {/* Credibility strip */}
         <div
           style={{
             marginTop: "36px",
@@ -244,8 +302,596 @@ export default function Home() {
             color: "#7a7a7a",
           }}
         >
-          Structured Analysis Across 30+ Jurisdictions • Legal &amp; Clinical
+          Structured Analysis Across 30+ Jurisdictions • Legal and Clinical
           Intelligence • Cross-Border Strategic Advisory
+        </div>
+      </section>
+
+      {/* START YOUR JOURNEY */}
+      <section
+        style={{
+          padding: "90px 20px",
+          backgroundColor: "#f3efe7",
+          textAlign: "center",
+          borderTop: "1px solid #ece3d1",
+          borderBottom: "1px solid #ece3d1",
+        }}
+      >
+        <div style={{ maxWidth: "980px", margin: "0 auto" }}>
+          <h2 style={{ fontSize: "28px", marginBottom: 18 }}>
+            Start Your Fertility Planning Journey
+          </h2>
+
+          <p
+            style={{
+              color: "#555",
+              marginBottom: 44,
+              maxWidth: 760,
+              marginLeft: "auto",
+              marginRight: "auto",
+            }}
+          >
+            FertilityCareHub follows a structured three-step advisory process:
+            first understand the framework, then choose the advisory path that
+            fits your situation, and then receive private client workspace access
+            as part of eligible engagement and onboarding.
+          </p>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+              gap: "28px",
+              textAlign: "left",
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: "#ffffff",
+                padding: 28,
+                borderRadius: 6,
+                border: "1px solid #e5ddc8",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 12,
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+                  color: "#8a7a55",
+                  marginBottom: 10,
+                }}
+              >
+                Step 1
+              </div>
+
+              <h3 style={{ marginTop: 0, marginBottom: 12 }}>
+                Understand the Framework
+              </h3>
+
+              <p style={{ color: "#555", marginBottom: 18 }}>
+                Begin with the FertilityCareHub planning framework to understand
+                how cross-border fertility decisions should be evaluated across
+                regulatory, clinical, financial, and execution dimensions.
+              </p>
+
+              <p style={{ color: "#555", marginBottom: 18, fontSize: 14 }}>
+                This is the strategic foundation behind the system, not generic
+                fertility content or promotional ranking logic.
+              </p>
+
+              <Link
+                href="/brief"
+                style={{
+                  color: "#8a7a55",
+                  textDecoration: "underline",
+                  textUnderlineOffset: 4,
+                }}
+              >
+                Review the Planning Framework
+              </Link>
+            </div>
+
+            <div
+              style={{
+                backgroundColor: "#ffffff",
+                padding: 28,
+                borderRadius: 6,
+                border: "1px solid #e5ddc8",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 12,
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+                  color: "#8a7a55",
+                  marginBottom: 10,
+                }}
+              >
+                Step 2
+              </div>
+
+              <h3 style={{ marginTop: 0, marginBottom: 12 }}>
+                Choose Your Advisory Path
+              </h3>
+
+              <p style={{ color: "#555", marginBottom: 18 }}>
+                Review the appropriate advisory pathway for your fertility goals,
+                jurisdictional complexity, donor or surrogacy exposure, and level
+                of strategic support required.
+              </p>
+
+              <p style={{ color: "#555", marginBottom: 18, fontSize: 14 }}>
+                This is where public research transitions into structured client
+                engagement and guided strategic decision-making.
+              </p>
+
+              <Link
+                href="/advisory"
+                style={{
+                  color: "#8a7a55",
+                  textDecoration: "underline",
+                  textUnderlineOffset: 4,
+                }}
+              >
+                View Advisory Tiers
+              </Link>
+            </div>
+
+            <div
+              style={{
+                backgroundColor: "#ffffff",
+                padding: 28,
+                borderRadius: 6,
+                border: "1px solid #e5ddc8",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 12,
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+                  color: "#8a7a55",
+                  marginBottom: 10,
+                }}
+              >
+                Step 3
+              </div>
+
+              <h3 style={{ marginTop: 0, marginBottom: 12 }}>
+                Receive Private Client Workspace Access
+              </h3>
+
+              <p style={{ color: "#555", marginBottom: 18 }}>
+                Eligible advisory clients receive access to a private planning
+                workspace used to organize pathway decisions, shortlisted
+                jurisdictions, timeline milestones, and key documents throughout
+                the engagement.
+              </p>
+
+              <p style={{ color: "#555", marginBottom: 18, fontSize: 14 }}>
+                Workspace access is issued selectively as part of structured
+                advisory onboarding. It is not a public sign-up portal.
+              </p>
+
+              <Link
+                href="/consultation"
+                style={{
+                  color: "#8a7a55",
+                  textDecoration: "underline",
+                  textUnderlineOffset: 4,
+                }}
+              >
+                Request Client Intake
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* PLATFORM AT A GLANCE */}
+      <section
+        style={{
+          padding: "72px 20px",
+          backgroundColor: "#2b2b2b",
+          color: "#ffffff",
+          borderBottom: "1px solid #3a3a3a",
+        }}
+      >
+        <div style={{ maxWidth: "1080px", margin: "0 auto" }}>
+          <div
+            style={{
+              maxWidth: 760,
+              margin: "0 auto 38px",
+              textAlign: "center",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 12,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "#c8b98f",
+                marginBottom: 12,
+              }}
+            >
+              Platform at a Glance
+            </div>
+
+            <h2 style={{ fontSize: "30px", marginBottom: 16 }}>
+              A Growing Global Fertility Intelligence Platform
+            </h2>
+
+            <p style={{ color: "#d4d4d4", margin: 0 }}>
+              FertilityCareHub brings together structured jurisdiction research,
+              independent planning guidance, and private strategic advisory in
+              one institutional platform.
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
+              gap: 18,
+            }}
+          >
+            {[
+              {
+                value: "11",
+                label: "Country Dossiers",
+                href: "/countries",
+              },
+              {
+                value: "8",
+                label: "Published Authority Guides",
+                href: "/guides",
+              },
+              {
+                value: "5",
+                label: "Jurisdiction Comparisons",
+                href: "/compare",
+              },
+              {
+                value: "30+",
+                label: "Jurisdictions Evaluated",
+                href: "/brief",
+              },
+            ].map((item) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                style={{
+                  display: "block",
+                  padding: "26px 22px",
+                  border: "1px solid #5a5548",
+                  borderRadius: 8,
+                  color: "#ffffff",
+                  textDecoration: "none",
+                  textAlign: "center",
+                  backgroundColor: "#323232",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 34,
+                    lineHeight: 1.1,
+                    color: "#c8b98f",
+                    marginBottom: 10,
+                  }}
+                >
+                  {item.value}
+                </div>
+
+                <div
+                  style={{
+                    fontSize: 13,
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                    color: "#e2e2e2",
+                  }}
+                >
+                  {item.label}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* KNOWLEDGE HUB */}
+      <section
+        style={{
+          padding: "100px 20px",
+          backgroundColor: "#f8f6f2",
+          borderBottom: "1px solid #ece3d1",
+        }}
+      >
+        <div style={{ maxWidth: "1080px", margin: "0 auto" }}>
+          <div
+            style={{
+              maxWidth: 760,
+              margin: "0 auto 50px",
+              textAlign: "center",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 12,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "#8a7a55",
+                marginBottom: 12,
+              }}
+            >
+              FertilityCareHub Knowledge Hub
+            </div>
+
+            <h2 style={{ fontSize: "30px", marginBottom: 18 }}>
+              Structured Guidance for Cross-Border Fertility Decisions
+            </h2>
+
+            <p style={{ color: "#555", margin: 0 }}>
+              Explore independent planning guides designed to help individuals
+              and families evaluate jurisdictions, clinics, costs, reporting
+              standards, and execution risks before making high-stakes fertility
+              decisions.
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+              gap: 24,
+            }}
+          >
+            {knowledgeGuides.map((guide) => (
+              <Link
+                key={guide.title}
+                href={guide.href}
+                aria-label={`Read ${guide.title}`}
+                style={{
+                  display: "block",
+                  backgroundColor: "#ffffff",
+                  padding: 26,
+                  borderRadius: 8,
+                  border: "1px solid #d9cba8",
+                  color: "#2b2b2b",
+                  textDecoration: "none",
+                  boxShadow: "0 8px 24px rgba(43, 43, 43, 0.04)",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 12,
+                    marginBottom: 18,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 11,
+                      letterSpacing: "0.12em",
+                      textTransform: "uppercase",
+                      color: "#6d5a2d",
+                    }}
+                  >
+                    Published
+                  </span>
+
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      fontSize: 18,
+                      color: "#8a7a55",
+                    }}
+                  >
+                    →
+                  </span>
+                </div>
+
+                <h3
+                  style={{
+                    marginTop: 0,
+                    marginBottom: 14,
+                    fontSize: 20,
+                    lineHeight: 1.35,
+                  }}
+                >
+                  {guide.title}
+                </h3>
+
+                <p
+                  style={{
+                    color: "#5d5850",
+                    marginBottom: 0,
+                    fontSize: 14,
+                    lineHeight: 1.75,
+                  }}
+                >
+                  {guide.description}
+                </p>
+              </Link>
+            ))}
+          </div>
+
+          <div style={{ textAlign: "center", marginTop: 34 }}>
+            <Link
+              href="/guides"
+              style={{
+                display: "inline-block",
+                padding: "12px 22px",
+                border: "1px solid #b8a77a",
+                borderRadius: 4,
+                color: "#78683f",
+                textDecoration: "none",
+              }}
+            >
+              Browse All Guides
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* WHY FERTILITYCAREHUB */}
+      <section
+        style={{
+          padding: "100px 20px",
+          backgroundColor: "#f3efe7",
+          borderBottom: "1px solid #ece3d1",
+        }}
+      >
+        <div style={{ maxWidth: "1080px", margin: "0 auto" }}>
+          <div
+            style={{
+              maxWidth: 760,
+              margin: "0 auto 48px",
+              textAlign: "center",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 12,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "#8a7a55",
+                marginBottom: 12,
+              }}
+            >
+              Why FertilityCareHub
+            </div>
+
+            <h2 style={{ fontSize: "30px", marginBottom: 18 }}>
+              Independent Intelligence for Complex Fertility Decisions
+            </h2>
+
+            <p style={{ color: "#555", margin: 0 }}>
+              The platform is designed for people who need more than clinic
+              listings, promotional content, or surface-level destination
+              comparisons.
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))",
+              gap: 24,
+            }}
+          >
+            {[
+              {
+                title: "Independent Analysis",
+                description:
+                  "Research and advisory are structured around client fit, regulatory alignment, and execution risk rather than referral incentives.",
+              },
+              {
+                title: "Structured Methodology",
+                description:
+                  "Jurisdictions are assessed through a documented framework covering legal, clinical, governance, logistical, and pathway considerations.",
+              },
+              {
+                title: "Global Jurisdiction Intelligence",
+                description:
+                  "Country dossiers and comparison briefs help families understand how fertility pathways differ across international systems.",
+              },
+              {
+                title: "Confidential Advisory",
+                description:
+                  "Private engagements are managed through structured intake and tailored strategic guidance for sensitive, high-stakes decisions.",
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                style={{
+                  backgroundColor: "#ffffff",
+                  padding: 26,
+                  borderRadius: 8,
+                  border: "1px solid #d9cba8",
+                  boxShadow: "0 8px 24px rgba(43, 43, 43, 0.04)",
+                }}
+              >
+                <h3
+                  style={{
+                    marginTop: 0,
+                    marginBottom: 14,
+                    fontSize: 20,
+                  }}
+                >
+                  {item.title}
+                </h3>
+
+                <p
+                  style={{
+                    color: "#5d5850",
+                    marginBottom: 0,
+                    fontSize: 14,
+                    lineHeight: 1.75,
+                  }}
+                >
+                  {item.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* TRUSTED ADVISORY PRINCIPLES */}
+      <section
+        style={{
+          padding: "44px 20px",
+          backgroundColor: "#ffffff",
+          borderBottom: "1px solid #ece3d1",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: "1080px",
+            margin: "0 auto",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 12,
+            flexWrap: "wrap",
+          }}
+        >
+          <span
+            style={{
+              fontSize: 12,
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              color: "#8a7a55",
+              marginRight: 6,
+            }}
+          >
+            Advisory Principles
+          </span>
+
+          {[
+            "Independent Platform",
+            "No Clinic Rankings",
+            "No Referral Commissions",
+            "Evidence-Informed Methodology",
+            "Confidential Strategic Advisory",
+          ].map((principle) => (
+            <span
+              key={principle}
+              style={{
+                padding: "8px 12px",
+                border: "1px solid #e5ddc8",
+                borderRadius: 999,
+                color: "#5d5850",
+                fontSize: 12,
+              }}
+            >
+              {principle}
+            </span>
+          ))}
         </div>
       </section>
 
@@ -264,7 +910,7 @@ export default function Home() {
 
           <p style={{ color: "#555", marginBottom: 16 }}>
             FertilityCareHub operates under the{" "}
-            <strong>FCH Global Fertility Intelligence Framework™️</strong> — a
+            <strong>FCH Global Fertility Intelligence Framework(TM)</strong> — a
             documented, version-controlled jurisdiction evaluation model.
           </p>
 
@@ -293,42 +939,23 @@ export default function Home() {
               marginBottom: 18,
             }}
           >
-            <span
-              style={{
-                padding: "6px 10px",
-                border: "1px solid #e5ddc8",
-                borderRadius: 999,
-              }}
-            >
-              Weighted Regulatory Analysis
-            </span>
-            <span
-              style={{
-                padding: "6px 10px",
-                border: "1px solid #e5ddc8",
-                borderRadius: 999,
-              }}
-            >
-              Clinical Infrastructure Assessment
-            </span>
-            <span
-              style={{
-                padding: "6px 10px",
-                border: "1px solid #e5ddc8",
-                borderRadius: 999,
-              }}
-            >
-              Adaptive Donor Governance Weighting
-            </span>
-            <span
-              style={{
-                padding: "6px 10px",
-                border: "1px solid #e5ddc8",
-                borderRadius: 999,
-              }}
-            >
-              Execution Complexity Mapping
-            </span>
+            {[
+              "Weighted Regulatory Analysis",
+              "Clinical Infrastructure Assessment",
+              "Adaptive Donor Governance Weighting",
+              "Execution Complexity Mapping",
+            ].map((label) => (
+              <span
+                key={label}
+                style={{
+                  padding: "6px 10px",
+                  border: "1px solid #e5ddc8",
+                  borderRadius: 999,
+                }}
+              >
+                {label}
+              </span>
+            ))}
           </div>
 
           <p style={{ color: "#555", marginBottom: 0 }}>
@@ -365,7 +992,7 @@ export default function Home() {
             framework designed to evaluate regulatory alignment, governance
             structure, clinical infrastructure depth, and execution complexity.
             Advisory outputs are derived from structured internal scoring
-            discipline and qualitative risk translation — not promotional ranking
+            discipline and qualitative risk translation, not promotional ranking
             models.
           </p>
         </div>
@@ -375,7 +1002,7 @@ export default function Home() {
       <section style={{ padding: "100px 20px", textAlign: "center" }}>
         <div style={{ maxWidth: "1050px", margin: "0 auto" }}>
           <h2 style={{ fontSize: "28px", marginBottom: "18px" }}>
-            The FCH Global Fertility Intelligence Framework™️
+            The FCH Global Fertility Intelligence Framework(TM)
           </h2>
 
           <p
@@ -420,7 +1047,7 @@ export default function Home() {
 
             <div style={{ background: "#ffffff", padding: 26, borderRadius: 6 }}>
               <h3 style={{ marginTop: 0 }}>
-                Governance &amp; Donor Policy Structure
+                Governance and Donor Policy Structure
               </h3>
               <p style={{ color: "#555", marginBottom: 0 }}>
                 Anonymity frameworks, disclosure requirements, donor eligibility
@@ -471,7 +1098,7 @@ export default function Home() {
             intermediaries, FertilityCareHub operates as an independent
             analytical advisory platform. Jurisdictional comparisons are
             produced under structured elimination protocols and weighted
-            framework modeling — not referral incentives.
+            framework modeling, not referral incentives.
           </p>
 
           <p style={{ color: "#555", marginBottom: 0 }}>
@@ -504,7 +1131,6 @@ export default function Home() {
             preserve analytical rigor.
           </p>
 
-          {/* CTA -> /advisory */}
           <Link
             href="/advisory"
             style={{
@@ -559,9 +1185,10 @@ export default function Home() {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(event) => setEmail(event.target.value)}
               required
               placeholder="Enter your email"
+              aria-label="Email address"
               style={{
                 padding: "12px 14px",
                 minWidth: "260px",
@@ -573,32 +1200,36 @@ export default function Home() {
 
             <button
               type="submit"
+              disabled={status === "loading"}
               style={{
                 padding: "12px 20px",
                 backgroundColor: "#b8a77a",
                 color: "#ffffff",
                 borderRadius: 4,
                 border: "none",
-                cursor: "pointer",
+                cursor: status === "loading" ? "not-allowed" : "pointer",
                 fontWeight: 500,
+                opacity: status === "loading" ? 0.75 : 1,
               }}
             >
               {status === "loading" ? "Joining..." : "Join the List"}
             </button>
           </form>
 
-          {status === "ok" && (
-            <p style={{ marginTop: 18, color: "#2d6a4f" }}>You are on the list.</p>
-          )}
+          {status === "ok" ? (
+            <p style={{ marginTop: 18, color: "#2d6a4f" }}>
+              You are on the list.
+            </p>
+          ) : null}
 
-          {status === "error" && (
+          {status === "error" ? (
             <p style={{ marginTop: 18, color: "#c1121f" }}>
               Something went wrong. Please try again.
             </p>
-          )}
+          ) : null}
 
           <p style={{ marginTop: 14, fontSize: 12, color: "#777" }}>
-            (We will reach out when consultation scheduling becomes available.)
+            We will reach out when consultation scheduling becomes available.
           </p>
         </div>
       </section>
@@ -606,7 +1237,14 @@ export default function Home() {
       {/* FOOTER */}
       <footer style={{ padding: "34px 20px", textAlign: "center", color: "#777" }}>
         <div style={{ fontSize: 12 }}>
-          ©️ {new Date().getFullYear()} FertilityCareHub •{" "}
+          Copyright {new Date().getFullYear()} FertilityCareHub •{" "}
+          <Link
+            href="/guides"
+            style={{ textDecoration: "underline" }}
+          >
+            Guides
+          </Link>{" "}
+          •{" "}
           <Link href="/privacy" style={{ textDecoration: "underline" }}>
             Privacy
           </Link>{" "}

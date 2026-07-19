@@ -1,392 +1,705 @@
-import CountryWebPageSchema from "../../components/CountryWebPageSchema";
-import Breadcrumbs from "../../components/Breadcrumbs";
-import Link from "next/link";
 import type { Metadata } from "next";
+import Link from "next/link";
+import Breadcrumbs from "../../components/Breadcrumbs";
+import CountryWebPageSchema from "../../components/CountryWebPageSchema";
 import FAQSchema from "../../components/FAQSchema";
 
+const baseUrl = "https://fertilitycarehub.com";
+const pageUrl = `${baseUrl}/countries/canada`;
+
 export const metadata: Metadata = {
-  title: "Canada IVF Regulations & Fertility Law 2026 | FertilityCareHub",
+  title: "Canada IVF Regulations & Fertility Strategy 2026 | FertilityCareHub",
   description:
-    "Structured analysis of IVF regulations, donor laws, surrogacy policy, and fertility access rules in Canada. Updated regulatory insights for intended parents.",
+    "Structured analysis of fertility regulation, provincial access, clinic standards, costs, donor pathways, surrogacy, and treatment planning in Canada.",
   alternates: {
-    canonical: "https://fertilitycarehub.com/countries/canada",
+    canonical: pageUrl,
   },
   openGraph: {
-    title: "Canada IVF Regulations & Fertility Law 2026",
+    title: "Canada IVF Regulations & Fertility Strategy 2026",
     description:
-      "In-depth fertility law analysis covering IVF, donor gametes, surrogacy, and access regulations in Canada.",
-    url: "https://fertilitycarehub.com/countries/canada",
+      "Strategic fertility-jurisdiction analysis covering regulation, provincial access, clinic standards, costs, donor pathways, surrogacy, and planning in Canada.",
+    url: pageUrl,
     siteName: "FertilityCareHub",
     type: "article",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Canada IVF Regulations & Fertility Strategy 2026",
+    description:
+      "Structured fertility-jurisdiction analysis for treatment planning in Canada.",
+  },
 };
 
-export default function CanadaPage() {
+const faqs = [
+  {
+    question: "Why do patients consider fertility treatment in Canada?",
+    answer:
+      "Canada is often considered for its regulated healthcare environment, established fertility clinics, ethical safeguards, and continuity of care. Suitability depends on province, clinic capacity, treatment eligibility, wait times, funding rules, total costs, and the patient’s required pathway.",
+  },
+  {
+    question: "Is fertility treatment publicly funded across Canada?",
+    answer:
+      "Coverage and funding differ by province and may be limited by eligibility rules, treatment type, clinic participation, medication coverage, age criteria, and available program capacity. Patients should confirm current provincial and clinic-specific requirements directly.",
+  },
+  {
+    question: "Are egg and sperm donation permitted in Canada?",
+    answer:
+      "Donor-assisted reproduction is available within a regulated framework, but compensation, reimbursement, sourcing, screening, consent, and clinic practices are subject to legal and professional requirements. Availability and timelines may differ between clinics.",
+  },
+  {
+    question: "Is surrogacy legal in Canada?",
+    answer:
+      "Altruistic surrogacy is permitted within a regulated framework, while commercial payment is prohibited. Reimbursement, parentage, independent legal advice, provincial law, and medical eligibility require careful professional guidance.",
+  },
+  {
+    question:
+      "Does FertilityCareHub recommend specific fertility clinics in Canada?",
+    answer:
+      "FertilityCareHub does not publish public best-clinic rankings or paid promotional lists. Private advisory may include a curated shortlist based on licensing, medical leadership, laboratory governance, communication, transparency, access, costs, and pathway fit.",
+  },
+];
+
+const relatedGuides = [
+  {
+    title: "How to Compare Fertility Jurisdictions Strategically",
+    href: "/how-to-compare-fertility-jurisdictions",
+    description:
+      "Compare regulation, eligibility, governance, costs, logistics, documentation, and execution risk.",
+  },
+  {
+    title: "How to Choose a Fertility Clinic Abroad",
+    href: "/how-to-choose-a-fertility-clinic-abroad",
+    description:
+      "Evaluate licensing, laboratory governance, transparency, communication, costs, and continuity of care.",
+  },
+  {
+    title: "Understanding Fertility Clinic Success Rates",
+    href: "/understanding-fertility-clinic-success-rates",
+    description:
+      "Interpret pregnancy, live-birth, per-cycle, per-transfer, cumulative, age-specific, and donor-treatment reporting.",
+  },
+  {
+    title: "IVF Abroad vs Canada",
+    href: "/ivf-abroad-vs-canada",
+    description:
+      "Compare domestic treatment with international pathways across access, timelines, costs, travel, and continuity of care.",
+  },
+];
+
+const relatedCountries = [
+  {
+    title: "United States",
+    href: "/countries/united-states",
+    description:
+      "A large and highly varied fertility market with substantial specialist depth, higher costs, and important state-level considerations.",
+  },
+  {
+    title: "United Kingdom",
+    href: "/countries/united-kingdom",
+    description:
+      "A governance-focused system with centralized oversight, clinic reporting, and clearly structured treatment regulation.",
+  },
+  {
+    title: "Spain",
+    href: "/countries/spain",
+    description:
+      "A mature European destination with established international-patient pathways and significant donor-treatment experience.",
+  },
+];
+
+export default function CanadaDossierPage() {
   return (
     <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
-      <Breadcrumbs
-        items={[
-          { name: "Home", href: "/" },
-          { name: "Countries", href: "/countries" },
-          { name: "Canada", href: "/countries/canada" },
-        ]}
-      />
-
       <CountryWebPageSchema
         countryName="Canada"
         countrySlug="canada"
         title="Canada: Fertility Jurisdiction Assessment"
-        description="Strategic jurisdiction assessment and regulatory clarity for fertility care pathways within Canada."
+        description="Strategic jurisdiction assessment covering fertility regulation, provincial access, clinic standards, costs, donor pathways, surrogacy, and treatment planning in Canada."
       />
 
-      {/* Top utility bar */}
-      <div className="max-w-6xl mx-auto px-6 pt-10">
-        <div className="flex items-center justify-between">
+      <FAQSchema id="faq-canada" items={faqs} />
+
+      <div className="mx-auto w-full max-w-6xl px-5 py-10 sm:px-6 sm:py-14 lg:px-8">
+        <Breadcrumbs
+          items={[
+            { name: "Home", href: "/" },
+            { name: "Countries", href: "/countries" },
+            { name: "Canada", href: "/countries/canada" },
+          ]}
+        />
+
+        <section className="flex flex-col gap-4 pt-8 sm:flex-row sm:items-center sm:justify-between">
           <Link
             href="/countries"
-            className="text-sm tracking-wide text-[#6A6256] hover:text-[#1A1A1A]"
+            className="text-sm tracking-wide text-[#6A6256] transition hover:text-[#1A1A1A]"
           >
             ← Back to countries
           </Link>
 
           <Link
             href="/consultation"
-            className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-5 py-2 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+            className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#B89B5E] px-5 py-3 text-sm font-medium tracking-wide text-[#1A1A1A] transition hover:bg-[#EEE5D2]"
           >
             Review Canada Strategy Privately
           </Link>
-        </div>
-      </div>
+        </section>
 
-      {/* Hero */}
-      <section className="max-w-6xl mx-auto px-6 pt-14 pb-10">
-        <div className="text-center">
-          <div className="text-xs tracking-[0.28em] text-[#6A6256]">
-            STRATEGIC ADVISORY DOSSIER
-          </div>
+        <section className="border-b border-[#E5DDC8] pb-12 pt-14 text-center sm:pb-16 sm:pt-20">
+          <p className="text-xs font-medium uppercase tracking-[0.28em] text-[#7B6A3A]">
+            Strategic Advisory Dossier
+          </p>
 
-          <h1 className="mt-5 text-5xl md:text-6xl leading-tight font-medium">
-            Canada
+          <h1 className="mx-auto mt-5 max-w-4xl text-4xl font-semibold leading-tight tracking-[-0.03em] sm:text-5xl lg:text-6xl">
+            Canada Fertility Jurisdiction Assessment
           </h1>
 
-          <p className="mt-6 max-w-3xl mx-auto text-lg leading-relaxed text-[#2A2A2A]">
-            Canada is a governance-forward fertility market inside a clearly bounded ethical and
-            regulatory environment. The strategic advantage is trust — strict constraints, strong
-            clinical standards, and a predictable care culture. The tradeoff is that certain pathways
-            are deliberately limited by law and policy. This dossier outlines when Canada is the right
-            strategic fit and how to approach it with precision.
+          <p className="mx-auto mt-6 max-w-3xl text-base leading-8 text-[#5F584D] sm:text-lg">
+            Canada offers a regulated, ethics-forward fertility environment
+            with established clinical infrastructure and strong continuity of
+            care. Its practical fit depends on provincial access, clinic
+            capacity, treatment eligibility, funding rules, donor or surrogacy
+            requirements, timelines, and the complete cost of the pathway.
           </p>
-        </div>
-      </section>
+        </section>
 
-      {/* Two-column decision block */}
-      <section className="max-w-6xl mx-auto px-6 pb-10">
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-            <h2 className="text-xl font-medium">When Canada is the right choice</h2>
-            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>
-                You want a <strong>high-trust</strong> market with a conservative ethical framework.
-              </li>
-              <li>
-                Governance and transparency matter more than maximum pathway flexibility.
-              </li>
-              <li>
-                You prefer a structured process, clear patient communication, and stable clinical operations.
-              </li>
-              <li>
-                You value predictable post-treatment follow-up and continuity of care.
-              </li>
-              <li>
-                You want an “inside-the-system” approach with low reputational and regulatory risk.
-              </li>
-            </ul>
-          </div>
-
-          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-            <h2 className="text-xl font-medium">When it’s not</h2>
-            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>
-                You require pathways that are restricted by Canada’s intentionally bounded framework.
-              </li>
-              <li>
-                You want the fastest timelines without variability (wait times can differ by province and clinic).
-              </li>
-              <li>
-                You are optimizing purely for lowest cost (Canada is not a low-cost medical tourism market).
-              </li>
-              <li>
-                You want a highly commercial marketplace model; Canada is deliberately not that.
-              </li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* Framework */}
-      <section className="max-w-6xl mx-auto px-6 pb-12">
-        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-          <h2 className="text-2xl font-medium">Advisor framework: how to evaluate Canada</h2>
-
-          <div className="mt-6 grid md:grid-cols-3 gap-6">
-            <div>
-              <div className="text-xs tracking-[0.25em] text-[#6A6256]">GOVERNANCE</div>
-              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
-                Canada’s strength is a bounded, ethics-forward system. The strategic question is
-                whether those constraints align with your pathway needs.
+        <section className="py-12 sm:py-16">
+          <div className="grid gap-6 md:grid-cols-2">
+            <article className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6 sm:p-8">
+              <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#7B6A3A]">
+                Strategic alignment
               </p>
-            </div>
 
-            <div>
-              <div className="text-xs tracking-[0.25em] text-[#6A6256]">CLINIC MODEL</div>
-              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
-                We evaluate operations: lab stability, monitoring cadence, written planning, and how
-                the clinic handles complexity — not just brand recognition.
-              </p>
-            </div>
+              <h2 className="mt-3 text-2xl font-semibold">
+                When Canada may be a strong fit
+              </h2>
 
-            <div>
-              <div className="text-xs tracking-[0.25em] text-[#6A6256]">EXECUTION</div>
-              <p className="mt-3 text-[15px] leading-relaxed text-[#2A2A2A]">
-                Canada works best when you treat your pathway like a structured plan: documentation,
-                timing, travel cadence (if any), and follow-up mapped in advance.
+              <ul className="mt-5 space-y-3 pl-5 text-[15px] leading-7 text-[#5F584D] marker:text-[#B89B5E]">
+                <li>
+                  You value a regulated clinical environment with clearly
+                  defined ethical safeguards.
+                </li>
+                <li>
+                  Continuity with Canadian physicians, laboratories, and
+                  follow-up care is important.
+                </li>
+                <li>
+                  Your required treatment pathway is available within current
+                  federal, provincial, and clinic rules.
+                </li>
+                <li>
+                  You are prepared to compare provincial access, wait times,
+                  funding, and private costs.
+                </li>
+                <li>
+                  You prefer domestic treatment over the additional complexity
+                  of cross-border care.
+                </li>
+              </ul>
+            </article>
+
+            <article className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6 sm:p-8">
+              <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#7B6A3A]">
+                Potential misalignment
               </p>
+
+              <h2 className="mt-3 text-2xl font-semibold">
+                When another jurisdiction may be more suitable
+              </h2>
+
+              <ul className="mt-5 space-y-3 pl-5 text-[15px] leading-7 text-[#5F584D] marker:text-[#B89B5E]">
+                <li>
+                  Your required pathway is restricted, unavailable, or
+                  difficult to access under Canadian rules.
+                </li>
+                <li>
+                  Provincial or clinic wait times conflict with your medical
+                  or personal timeline.
+                </li>
+                <li>
+                  You are seeking a substantially lower total treatment cost.
+                </li>
+                <li>
+                  Donor availability or another pathway constraint creates
+                  material delay.
+                </li>
+                <li>
+                  You need a highly specialized option that is more accessible
+                  elsewhere.
+                </li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="rounded-2xl border border-[#E5DDC8] bg-[#EEE5D2] p-6 sm:p-8">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+              FertilityCareHub assessment framework
+            </p>
+
+            <h2 className="mt-4 text-3xl font-semibold">
+              How to evaluate Canada as a treatment jurisdiction
+            </h2>
+
+            <div className="mt-8 grid gap-6 md:grid-cols-3">
+              <div>
+                <h3 className="text-lg font-semibold">Provincial access</h3>
+                <p className="mt-3 text-sm leading-7 text-[#5F584D]">
+                  Compare funding, eligibility, referral requirements, wait
+                  times, medication coverage, and clinic participation within
+                  the relevant province.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold">
+                  Clinic and laboratory quality
+                </h3>
+                <p className="mt-3 text-sm leading-7 text-[#5F584D]">
+                  Examine medical leadership, laboratory governance,
+                  embryology continuity, treatment protocols, communication,
+                  and success-rate reporting.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold">Pathway feasibility</h3>
+                <p className="mt-3 text-sm leading-7 text-[#5F584D]">
+                  Confirm treatment access, donor availability, surrogacy
+                  requirements, documentation, costs, timing, and follow-up
+                  before committing.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Core sections */}
-      <section className="max-w-6xl mx-auto px-6 pb-12">
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-            <h3 className="text-xl font-medium">Ethical boundaries (strategic implication)</h3>
-            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>
-                Canada’s system is designed to reduce commercial exploitation and protect patient interests.
-              </li>
-              <li>
-                Some pathways are constrained by design; clarity is a feature, not a bug.
-              </li>
-              <li>
-                We map what the framework permits, what it restricts, and what your alternatives are.
-              </li>
-            </ul>
-            <p className="mt-5 text-sm text-[#6A6256]">
-              Note: the right market is the one that aligns with your pathway and risk profile.
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="max-w-3xl">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+              Decision factors
+            </p>
+
+            <h2 className="mt-4 text-3xl font-semibold sm:text-4xl">
+              Evaluate the complete Canadian treatment pathway
+            </h2>
+
+            <p className="mt-5 leading-8 text-[#5F584D]">
+              Canada should not be assessed as a single uniform market.
+              Provincial programs, clinic capacity, eligibility, funding,
+              medication coverage, donor access, wait times, and costs can
+              differ substantially. The correct decision depends on the
+              complete pathway rather than national reputation alone.
             </p>
           </div>
 
-          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-            <h3 className="text-xl font-medium">Cost structure (strategic view)</h3>
-            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>
-                Canada is typically a mid-to-premium market; it is not chosen primarily for low cost.
-              </li>
-              <li>
-                The correct evaluation is total cost: cycle + lab add-ons + meds/monitoring + storage + logistics.
-              </li>
-              <li>
-                We avoid public price tables; advisory provides bounded ranges and decision logic.
-              </li>
-            </ul>
+          <div className="mt-10 grid gap-5 md:grid-cols-2">
+            <article className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6">
+              <h3 className="text-xl font-semibold">
+                Regulation and ethical boundaries
+              </h3>
+
+              <ul className="mt-4 space-y-3 pl-5 text-sm leading-7 text-[#5F584D] marker:text-[#B89B5E]">
+                <li>
+                  Confirm how federal law, provincial law, and clinic policy
+                  apply to the proposed pathway.
+                </li>
+                <li>
+                  Review donor compensation, reimbursement, consent, screening,
+                  and record requirements.
+                </li>
+                <li>
+                  Obtain independent legal guidance for surrogacy and parentage
+                  matters.
+                </li>
+                <li>
+                  Resolve uncertainty before deposits, medication, or treatment
+                  scheduling.
+                </li>
+              </ul>
+            </article>
+
+            <article className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6">
+              <h3 className="text-xl font-semibold">
+                Provincial funding and wait times
+              </h3>
+
+              <ul className="mt-4 space-y-3 pl-5 text-sm leading-7 text-[#5F584D] marker:text-[#B89B5E]">
+                <li>
+                  Confirm current funding eligibility and whether the clinic
+                  participates.
+                </li>
+                <li>
+                  Separate publicly funded services from medication and
+                  uncovered costs.
+                </li>
+                <li>
+                  Ask about consultation, funded-cycle, donor, and procedure
+                  wait times.
+                </li>
+                <li>
+                  Compare the value of waiting with privately funded or
+                  international alternatives.
+                </li>
+              </ul>
+            </article>
+
+            <article className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6">
+              <h3 className="text-xl font-semibold">
+                Clinic governance and success rates
+              </h3>
+
+              <ul className="mt-4 space-y-3 pl-5 text-sm leading-7 text-[#5F584D] marker:text-[#B89B5E]">
+                <li>
+                  Confirm licensing, responsible medical leadership, and
+                  laboratory oversight.
+                </li>
+                <li>
+                  Interpret outcomes by age, treatment type, donor use,
+                  denominator, and endpoint.
+                </li>
+                <li>
+                  Distinguish pregnancy rates from live-birth and cumulative
+                  outcomes.
+                </li>
+                <li>
+                  Ask how the clinic manages communication, cancellations, and
+                  urgent questions.
+                </li>
+              </ul>
+            </article>
+
+            <article className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6">
+              <h3 className="text-xl font-semibold">
+                Cost structure and financial exposure
+              </h3>
+
+              <ul className="mt-4 space-y-3 pl-5 text-sm leading-7 text-[#5F584D] marker:text-[#B89B5E]">
+                <li>
+                  Separate consultation, testing, medication, monitoring,
+                  procedures, laboratory services, freezing, and storage.
+                </li>
+                <li>
+                  Confirm donor, legal, counselling, shipping, and coordination
+                  costs where applicable.
+                </li>
+                <li>
+                  Review cancellation, low-response, repeat-cycle, and refund
+                  policies.
+                </li>
+                <li>
+                  Request a written estimate showing included and excluded
+                  services.
+                </li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+                Domestic treatment planning
+              </p>
+
+              <h2 className="mt-4 text-3xl font-semibold">
+                Reduce friction across province, clinic, and care team
+              </h2>
+
+              <p className="mt-5 leading-8 text-[#5F584D]">
+                Domestic treatment may simplify continuity of care, but travel,
+                monitoring, work leave, accommodation, referrals, and clinic
+                scheduling can still create meaningful complexity. These
+                responsibilities should be mapped before treatment begins.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6 sm:p-8">
+              <ol className="space-y-6">
+                <li>
+                  <div className="text-xs font-medium uppercase tracking-[0.14em] text-[#7B6A3A]">
+                    Before clinic selection
+                  </div>
+                  <p className="mt-2 text-sm leading-7 text-[#5F584D]">
+                    Compare access, wait times, funding, treatment scope,
+                    laboratory quality, communication, and total costs.
+                  </p>
+                </li>
+
+                <li>
+                  <div className="text-xs font-medium uppercase tracking-[0.14em] text-[#7B6A3A]">
+                    Before treatment
+                  </div>
+                  <p className="mt-2 text-sm leading-7 text-[#5F584D]">
+                    Complete referrals, records, testing, medication planning,
+                    consent, financial estimates, and scheduling.
+                  </p>
+                </li>
+
+                <li>
+                  <div className="text-xs font-medium uppercase tracking-[0.14em] text-[#7B6A3A]">
+                    During treatment
+                  </div>
+                  <p className="mt-2 text-sm leading-7 text-[#5F584D]">
+                    Keep written instructions, medication records, results,
+                    receipts, and a clear escalation contact.
+                  </p>
+                </li>
+
+                <li>
+                  <div className="text-xs font-medium uppercase tracking-[0.14em] text-[#7B6A3A]">
+                    After treatment
+                  </div>
+                  <p className="mt-2 text-sm leading-7 text-[#5F584D]">
+                    Confirm testing, medication, records transfer, pregnancy
+                    care, emergency guidance, and future embryo or storage
+                    decisions.
+                  </p>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="rounded-2xl border border-[#D8C89F] bg-[#EEE5D2] p-6 sm:p-8">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+              Independent decision support
+            </p>
+
+            <h2 className="mt-4 text-2xl font-semibold sm:text-3xl">
+              What FertilityCareHub deliberately does not provide
+            </h2>
+
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              <ul className="space-y-3 pl-5 text-sm leading-7 text-[#5F584D] marker:text-[#B89B5E]">
+                <li>Public best-clinic rankings or paid promotional lists</li>
+                <li>Guaranteed outcomes or success-rate promises</li>
+                <li>Outdated funding or pricing presented as universal</li>
+              </ul>
+
+              <ul className="space-y-3 pl-5 text-sm leading-7 text-[#5F584D] marker:text-[#B89B5E]">
+                <li>Medical diagnosis or individualized treatment decisions</li>
+                <li>Legal conclusions about donor, surrogacy, or parentage matters</li>
+                <li>One-size-fits-all province or clinic recommendations</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+                Jurisdiction comparison
+              </p>
+
+              <h2 className="mt-4 text-3xl font-semibold">
+                Compare Canada with international alternatives
+              </h2>
+
+              <p className="mt-5 leading-8 text-[#5F584D]">
+                Compare access, regulation, clinic capacity, donor pathways,
+                total costs, timelines, travel, and continuity of care before
+                deciding whether domestic treatment or an international
+                pathway is stronger.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6 sm:p-8">
+              <h3 className="text-xl font-semibold">
+                Use the comparison framework
+              </h3>
+
+              <p className="mt-4 text-sm leading-7 text-[#625A4C]">
+                Start with the Canada-versus-abroad guide, then use the
+                jurisdiction framework and comparison library to evaluate
+                realistic alternatives.
+              </p>
+
+              <div className="mt-6 flex flex-col items-start gap-3">
+                <Link
+                  href="/ivf-abroad-vs-canada"
+                  className="font-medium text-[#715F33] underline underline-offset-4"
+                >
+                  Read IVF Abroad vs Canada →
+                </Link>
+
+                <Link
+                  href="/how-to-compare-fertility-jurisdictions"
+                  className="font-medium text-[#715F33] underline underline-offset-4"
+                >
+                  Read the jurisdiction comparison guide →
+                </Link>
+
+                <Link
+                  href="/compare"
+                  className="font-medium text-[#715F33] underline underline-offset-4"
+                >
+                  Browse all comparison briefs →
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="max-w-3xl">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+              Related jurisdictions
+            </p>
+
+            <h2 className="mt-4 text-3xl font-semibold">
+              Continue evaluating treatment options
+            </h2>
           </div>
 
-          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-            <h3 className="text-xl font-medium">Logistics and travel (including accommodation)</h3>
-            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>Many clients prefer Canada for continuity and calm logistics.</li>
-              <li>
-                If travel is required, we include <strong>accommodation</strong> as part of execution:
-                2–3 vetted options chosen for comfort and predictability.
-              </li>
-              <li>
-                The priority is reducing friction during treatment — not optimizing for “cheap stays.”
-              </li>
-            </ul>
+          <div className="mt-8 grid gap-5 md:grid-cols-3">
+            {relatedCountries.map((country) => (
+              <Link
+                key={country.href}
+                href={country.href}
+                className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6 transition hover:border-[#B89B5E] hover:bg-white"
+              >
+                <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#7B6A3A]">
+                  Country dossier
+                </p>
+
+                <h3 className="mt-3 text-xl font-semibold">{country.title}</h3>
+
+                <p className="mt-3 text-sm leading-7 text-[#625A4C]">
+                  {country.description}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="max-w-3xl">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+              Related planning resources
+            </p>
+
+            <h2 className="mt-4 text-3xl font-semibold">
+              Continue your research with structured guides
+            </h2>
           </div>
 
-          <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-            <h3 className="text-xl font-medium">Clinic selection approach</h3>
-            <ul className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>We shortlist selectively (typically 4–5), not exhaustively.</li>
-              <li>We prioritize lab stability, protocol clarity, and predictable communication cadence.</li>
-              <li>We structure the decision around your constraints, not generic “rankings.”</li>
-            </ul>
+          <div className="mt-8 grid gap-5 md:grid-cols-2">
+            {relatedGuides.map((guide) => (
+              <Link
+                key={guide.href}
+                href={guide.href}
+                className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6 transition hover:border-[#B89B5E] hover:bg-white"
+              >
+                <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#7B6A3A]">
+                  FertilityCareHub guide
+                </p>
+
+                <h3 className="mt-3 text-xl font-semibold">{guide.title}</h3>
+
+                <p className="mt-3 text-sm leading-7 text-[#625A4C]">
+                  {guide.description}
+                </p>
+              </Link>
+            ))}
           </div>
-        </div>
-      </section>
 
-      {/* What we exclude */}
-      <section className="max-w-6xl mx-auto px-6 pb-12">
-        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-8">
-          <h3 className="text-xl font-medium">What we deliberately exclude (the private filter)</h3>
-          <div className="mt-5 grid md:grid-cols-2 gap-6">
-            <ul className="space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>Exhaustive clinic directories.</li>
-              <li>Hotel price comparison grids.</li>
-              <li>Generic claims without pathway fit analysis.</li>
-            </ul>
-            <ul className="space-y-3 text-[15px] leading-relaxed text-[#2A2A2A] list-disc pl-5">
-              <li>Static pricing tables without verification.</li>
-              <li>DIY bureaucracy playbooks (we coordinate with trusted partners).</li>
-              <li>One-size-fits-all templates.</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="max-w-6xl mx-auto px-6 pb-16">
-        <div className="rounded-2xl border border-[#E5DDC8] bg-[#FAF7F1] p-10 text-center">
-          <h3 className="text-2xl font-medium">Private advisory, not a public database.</h3>
-          <p className="mt-4 max-w-2xl mx-auto text-[15px] leading-relaxed text-[#2A2A2A]">
-            If Canada is on your shortlist, the decisive step is aligning your pathway to the right clinic model
-            inside a bounded ethical framework — then mapping execution into a calm, predictable plan.
-          </p>
-
-          <div className="mt-7 flex items-center justify-center">
+          <div className="mt-6">
             <Link
-              href="/consultation"
-              className="inline-flex items-center justify-center rounded-full border border-[#B89B5E] px-6 py-3 text-sm tracking-wide text-[#1A1A1A] hover:bg-[#F0E7D6]"
+              href="/guides"
+              className="font-medium text-[#715F33] underline underline-offset-4"
             >
-              Request Private Advisory Review
+              Browse the complete Guides Library →
             </Link>
           </div>
+        </section>
 
-          <div className="mt-3 text-xs tracking-wide text-[#6A6256]">
-            Discreet, structured guidance aligned to your profile and jurisdictional constraints.
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="max-w-3xl">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B6A3A]">
+              Frequently asked questions
+            </p>
+
+            <h2 className="mt-4 text-3xl font-semibold">
+              Canada fertility-planning FAQ
+            </h2>
           </div>
-        </div>
-      </section>
 
-      {/* FAQ */}
-      <section className="mt-16 border-t border-[#E5DDC8] pt-10">
-        <h2 className="text-2xl font-semibold mb-6">FAQ</h2>
+          <div className="mt-8 space-y-4">
+            {faqs.map((faq) => (
+              <details
+                key={faq.question}
+                className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-5 sm:p-6"
+              >
+                <summary className="cursor-pointer pr-5 text-lg font-semibold">
+                  {faq.question}
+                </summary>
 
-        <FAQSchema
-  id="canada-faq"
-  items={[
-    {
-      question: "Is FertilityCareHub providing medical advice?",
-      answer:
-        "No. We provide structured, strategic advisory support only. Any medical decisions should be made with licensed clinicians. Our work focuses on clarity, jurisdiction fit, and planning.",
-    },
-    {
-      question: "Do you recommend specific clinics in Canada?",
-      answer:
-        "We don’t publish public “best clinic” lists or endorsements. If you engage advisory services, we can provide a curated shortlist aligned to your constraints and planning priorities.",
-    },
-    {
-      question: "What information should I prepare before requesting advisory?",
-      answer:
-        "Useful inputs include your target timeline, prior treatment history (if any), key constraints (budget, travel cadence, donor pathway), and any legal/eligibility considerations.",
-    },
-    {
-      question: "Can advisory help compare Canada with other destinations?",
-      answer:
-        "Yes. We help structure a comparison across a small set of relevant jurisdictions, focusing on governance, access, donor pathway, and execution risk.",
-    },
-  ]}
-/>
+                <p className="mt-4 max-w-4xl text-sm leading-7 text-[#625A4C]">
+                  {faq.answer}
+                </p>
+              </details>
+            ))}
+          </div>
+        </section>
 
-        <div className="space-y-4">
-          <details className="rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
-            <summary className="cursor-pointer text-lg font-medium">
-              Is FertilityCareHub providing medical advice?
-            </summary>
-            <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
-              No. We provide structured, strategic advisory support only. Any medical decisions should be
-              made with licensed clinicians. Our work focuses on clarity, jurisdiction fit, and planning.
+        <section className="border-t border-[#E5DDC8] py-12 sm:py-16">
+          <div className="rounded-2xl bg-[#1A1A1A] px-6 py-10 text-center text-white sm:px-10 sm:py-14">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#D4BE82]">
+              Private strategic advisory
             </p>
-          </details>
 
-          <details className="rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
-            <summary className="cursor-pointer text-lg font-medium">
-              Do you recommend specific clinics in Canada?
-            </summary>
-            <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
-              We don’t publish public “best clinic” lists or endorsements. If you engage advisory services,
-              we can provide a curated shortlist aligned to your constraints and planning priorities.
+            <h2 className="mx-auto mt-4 max-w-3xl text-3xl font-semibold sm:text-4xl">
+              Evaluate Canada against your actual pathway
+            </h2>
+
+            <p className="mx-auto mt-5 max-w-2xl leading-8 text-[#D4D0C8]">
+              FertilityCareHub helps structure province, clinic, access,
+              funding, cost, donor, surrogacy, timeline, and continuity-of-care
+              decisions around your priorities and constraints.
             </p>
-          </details>
 
-          <details className="rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
-            <summary className="cursor-pointer text-lg font-medium">
-              What information should I prepare before requesting advisory?
-            </summary>
-            <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
-              Useful inputs include your target timeline, prior treatment history (if any), key constraints
-              (budget, travel cadence, donor pathway), and any legal/eligibility considerations.
-            </p>
-          </details>
-
-          <details className="rounded-xl border border-[#E5DDC8] bg-white/60 p-5">
-            <summary className="cursor-pointer text-lg font-medium">
-              Can advisory help compare Canada with other destinations?
-            </summary>
-            <p className="mt-3 text-sm text-[#6A6256] leading-relaxed">
-              Yes. We help structure a comparison across a small set of relevant jurisdictions, focusing on
-              decision factors like governance, access, donor pathway, and execution risk. For a structured
-              framework, see our{" "}
-              <Link href="/how-to-compare-fertility-jurisdictions" className="underline">
-                jurisdiction comparison guide
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Link
+                href="/advisory"
+                className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#B89B5E] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#A88B50]"
+              >
+                View Advisory Tiers
               </Link>
-              .
-            </p>
-          </details>
-        </div>
-      </section>
 
-      {/* Comparison guide CTA */}
-      <section className="mt-10 border border-[#E5DDC8] bg-white/60 rounded-xl p-5">
-        <h3 className="text-lg font-medium">Compare destinations before choosing</h3>
-        <p className="mt-2 text-sm text-[#6A6256] leading-relaxed">
-          Use our structured framework to compare governance, donor pathway, eligibility friction,
-          timeline realism, and execution risk across countries.
-        </p>
-        <Link
-          href="/how-to-compare-fertility-jurisdictions"
-          className="inline-block mt-3 underline text-sm"
-        >
-          Read the comparison guide →
-        </Link>
-      </section>
+              <Link
+                href="/consultation"
+                className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#D4BE82] px-6 py-3 text-sm font-medium text-[#F2E4BC] transition hover:bg-[#2D2D2D]"
+              >
+                Request Client Intake
+              </Link>
+            </div>
+          </div>
+        </section>
 
-      <section className="mt-16 border-t border-[#E5DDC8] pt-10">
-        <h2 className="text-2xl font-semibold mb-6">Compare Other Jurisdictions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Link
-            href="/countries/united-states"
-            className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition"
-          >
-            <h3 className="text-lg font-medium">United States</h3>
-            <p className="text-sm text-[#6A6256] mt-2">
-              Premium capability and breadth for complex planning scenarios.
-            </p>
-          </Link>
+        <section className="border-t border-[#E5DDC8] py-10">
+          <p className="mx-auto max-w-4xl text-center text-sm leading-7 text-[#6A6256]">
+            FertilityCareHub provides general educational and strategic
+            planning information. It does not provide medical, legal,
+            financial, or regulatory advice. Funding programs, eligibility,
+            regulations, clinic policies, costs, treatment access, and clinical
+            practices may change and should be independently confirmed with
+            appropriately licensed professionals.
+          </p>
 
-          <Link
-            href="/countries/united-kingdom"
-            className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition"
-          >
-            <h3 className="text-lg font-medium">United Kingdom</h3>
-            <p className="text-sm text-[#6A6256] mt-2">
-              Governance-first HFEA environment when oversight is key.
-            </p>
-          </Link>
-
-          <Link
-            href="/countries/spain"
-            className="border border-[#E5DDC8] p-6 rounded-xl hover:border-[#B89B5E] transition"
-          >
-            <h3 className="text-lg font-medium">Spain</h3>
-            <p className="text-sm text-[#6A6256] mt-2">
-              EU option with mature execution and strong donor pathway depth.
-            </p>
-          </Link>
-        </div>
-      </section>
+          <div className="mt-4 text-center">
+            <Link
+              href="/disclaimer"
+              className="font-medium text-[#715F33] underline underline-offset-4"
+            >
+              Read the full disclaimer
+            </Link>
+          </div>
+        </section>
+      </div>
     </main>
   );
 }

@@ -5,17 +5,23 @@ export const metadata: Metadata = {
   title:
     "Private Advisory — Institutional Cross-Border Fertility Strategy | FertilityCareHub",
   description:
-    "Institutional cross-border fertility strategy advisory. Engage the Strategic Alignment Snapshot™️ (US$500) or the Global Fertility Intelligence Brief™️ (US$2,500).",
+    "Institutional cross-border fertility strategy advisory. Engage the Strategic Alignment Snapshot™ (US$500) or the Global Fertility Intelligence Brief™ (US$2,500).",
   alternates: {
     canonical: "https://fertilitycarehub.com/advisory",
   },
   openGraph: {
     title: "Private Advisory — Institutional Cross-Border Fertility Strategy",
     description:
-      "Institutional cross-border fertility strategy advisory using the FCH Global Fertility Intelligence Framework™️.",
+      "Institutional cross-border fertility strategy advisory using the FCH Global Fertility Intelligence Framework™.",
     url: "https://fertilitycarehub.com/advisory",
     siteName: "FertilityCareHub",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Private Advisory — Cross-Border Fertility Strategy",
+    description:
+      "Structured fertility-jurisdiction advisory for individuals and families navigating complex international treatment decisions.",
   },
 };
 
@@ -63,11 +69,11 @@ export default function AdvisoryPage() {
       },
       {
         "@type": "Question",
-        name: "What is included in the Strategic Alignment Snapshot™️?",
+        name: "What is included in the Strategic Alignment Snapshot™?",
         acceptedAnswer: {
           "@type": "Answer",
           text:
-            "The Strategic Alignment Snapshot™️ is a structured diagnostic engagement applying the FCH Global Fertility Intelligence Framework™️ to identify viable jurisdictions, primary regulatory risks, and directional strategy.",
+            "The Strategic Alignment Snapshot™ is a structured diagnostic engagement applying the FCH Global Fertility Intelligence Framework™ to identify viable jurisdictions, primary regulatory risks, and directional strategy.",
         },
       },
       {
@@ -77,6 +83,24 @@ export default function AdvisoryPage() {
           "@type": "Answer",
           text:
             "Tier 1 provides directional clarity across shortlisted jurisdictions. Tier 2 applies the full framework with adaptive comparative modeling, deeper regulatory analysis, and structured execution roadmap design.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Does private client portal access come with an advisory engagement?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text:
+            "Yes. Approved advisory engagements include access to a private planning workspace as part of structured onboarding. FertilityCareHub is not an open public sign-up platform.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Do I create a public account immediately after payment?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text:
+            "No. FertilityCareHub follows a selective onboarding model. After payment or engagement confirmation, your case enters onboarding review and private portal access is issued directly as part of approved engagement setup.",
         },
       },
       {
@@ -91,6 +115,38 @@ export default function AdvisoryPage() {
     ],
   };
 
+  const serviceJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: "FertilityCareHub Cross-Border Fertility Strategy Advisory",
+    description:
+      "Private strategic advisory for evaluating fertility jurisdictions, donor pathways, regulatory constraints, clinical infrastructure, costs, documentation, and execution risk.",
+    provider: {
+      "@type": "Organization",
+      name: "FertilityCareHub",
+      url: "https://fertilitycarehub.com",
+    },
+    areaServed: "Worldwide",
+    serviceType: "Cross-border fertility strategy advisory",
+    offers: [
+      {
+        "@type": "Offer",
+        name: "Strategic Alignment Snapshot™",
+        price: "500",
+        priceCurrency: "USD",
+        url: STRIPE_TIER1_URL,
+      },
+      {
+        "@type": "Offer",
+        name: "Global Fertility Intelligence Brief™",
+        price: "2500",
+        priceCurrency: "USD",
+        url: STRIPE_TIER2_URL,
+      },
+    ],
+  };
+
+
   return (
     <main className="min-h-screen bg-[#F5F1E8] text-[#1A1A1A]">
       <script
@@ -100,6 +156,10 @@ export default function AdvisoryPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
       />
 
       <div className="mx-auto max-w-6xl px-6 pt-10">
@@ -132,7 +192,7 @@ export default function AdvisoryPage() {
           FertilityCareHub is an institutional, process-driven cross-border
           fertility strategy advisory — not a clinic and not a broker. Our work
           is delivered through the{" "}
-          <strong>FCH Global Fertility Intelligence Framework™️</strong>, a
+          <strong>FCH Global Fertility Intelligence Framework™</strong>, a
           structured model that evaluates jurisdictions across regulatory
           alignment, donor pathway constraints, clinical infrastructure, and
           execution risk so clients can make high-stakes decisions with greater
@@ -170,10 +230,146 @@ export default function AdvisoryPage() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-6xl px-6 pb-12">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-6 sm:p-8">
+          <div className="max-w-3xl">
+            <div className="text-xs tracking-[0.24em] text-[#8A7652]">
+              BEFORE YOU ENGAGE
+            </div>
+
+            <h2 className="mt-3 text-2xl font-medium">
+              Use the public intelligence library to clarify your starting point
+            </h2>
+
+            <p className="mt-4 text-sm leading-relaxed text-[#5F584C]">
+              Review the guides, country dossiers, and jurisdiction comparisons
+              before selecting an advisory tier. This helps you identify your
+              shortlist, key questions, and the level of support your pathway may
+              require.
+            </p>
+          </div>
+
+          <div className="mt-6 grid gap-5 md:grid-cols-3">
+            <Link
+              href="/guides"
+              className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-5 transition hover:border-[#B89B5E]"
+            >
+              <div className="text-xs tracking-[0.18em] text-[#6A6256]">
+                GUIDES
+              </div>
+              <div className="mt-2 font-medium">Build your planning foundation</div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Review structured resources covering clinic selection, costs,
+                success rates, donor pathways, and travel planning.
+              </p>
+            </Link>
+
+            <Link
+              href="/countries"
+              className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-5 transition hover:border-[#B89B5E]"
+            >
+              <div className="text-xs tracking-[0.18em] text-[#6A6256]">
+                COUNTRIES
+              </div>
+              <div className="mt-2 font-medium">Explore jurisdiction dossiers</div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Review country-level considerations before narrowing your
+                shortlist.
+              </p>
+            </Link>
+
+            <Link
+              href="/compare"
+              className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-5 transition hover:border-[#B89B5E]"
+            >
+              <div className="text-xs tracking-[0.18em] text-[#6A6256]">
+                COMPARE
+              </div>
+              <div className="mt-2 font-medium">Evaluate structural differences</div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Compare regulation, donor governance, infrastructure, costs, and
+                execution risk across countries.
+              </p>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 pb-12">
+        <div className="rounded-2xl border border-[#DCCFB3] bg-[#FFF8EC] p-8">
+          <div className="max-w-4xl">
+            <div className="text-xs tracking-[0.24em] text-[#8A7652]">
+              CLIENT ACCESS MODEL
+            </div>
+
+            <h2 className="mt-3 text-2xl font-medium">
+              Private portal access is included as part of approved advisory
+              onboarding
+            </h2>
+
+            <p className="mt-4 text-sm leading-relaxed text-[#5F584C]">
+              FertilityCareHub is not an open public sign-up platform. Advisory
+              clients engage through structured purchase and onboarding, and
+              private planning workspace access is then issued directly as part
+              of approved client setup.
+            </p>
+
+            <p className="mt-4 text-sm leading-relaxed text-[#5F584C]">
+              This means the value of your engagement includes not only
+              structured strategic analysis, but also a private client-facing
+              planning environment where approved clients can later sign in,
+              review planning materials, and work through their advisory process
+              in a more organized way.
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
+            <div className="rounded-xl border border-[#E5DDC8] bg-white/80 p-6">
+              <div className="text-xs tracking-[0.22em] text-[#6A6256]">
+                INCLUDED
+              </div>
+              <div className="mt-2 font-medium">
+                Private planning workspace access
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Approved advisory clients receive private portal access as part
+                of structured onboarding and client activation.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-[#E5DDC8] bg-white/80 p-6">
+              <div className="text-xs tracking-[0.22em] text-[#6A6256]">
+                IMPORTANT
+              </div>
+              <div className="mt-2 font-medium">
+                This is not a public self-registration system
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Payment does not open a public account creation flow. Workspace
+                access is issued selectively as part of advisory onboarding.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-[#E5DDC8] bg-white/80 p-6">
+              <div className="text-xs tracking-[0.22em] text-[#6A6256]">
+                CLIENT LOGIN
+              </div>
+              <div className="mt-2 font-medium">
+                Approved clients later sign in through the portal login page
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Once access is activated, clients use the FertilityCareHub login
+                page to enter their private planning workspace.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-6xl px-6 pb-16">
         <div className="rounded-2xl border border-[#E5DDC8] bg-white/70 p-8">
           <h2 className="text-2xl font-medium">
-            The FCH Global Fertility Intelligence Framework™️
+            The FCH Global Fertility Intelligence Framework™
           </h2>
 
           <div className="mt-6 grid gap-6 text-sm leading-relaxed text-[#2A2A2A] md:grid-cols-2">
@@ -270,7 +466,7 @@ export default function AdvisoryPage() {
           <h2 className="text-2xl font-medium">Select the correct engagement</h2>
           <p className="mt-4 max-w-4xl text-sm leading-relaxed text-[#6A6256]">
             This is a structured advisory funnel. If you are still determining
-            jurisdiction fit, begin with Snapshot™️. If your pathway is more
+            jurisdiction fit, begin with Snapshot™. If your pathway is more
             complex, time-sensitive, or requires a documented execution roadmap,
             engage Tier 2.
           </p>
@@ -308,7 +504,7 @@ export default function AdvisoryPage() {
               </div>
               <div className="mt-2 font-medium">Compressed decision timelines</div>
               <p className="mt-2 text-[#6A6256]">
-                Use Snapshot™️ as a screening layer when you need directional
+                Use Snapshot™ as a screening layer when you need directional
                 clarity quickly before deeper planning.
               </p>
             </div>
@@ -316,7 +512,7 @@ export default function AdvisoryPage() {
 
           <div className="mt-7 flex flex-wrap gap-3">
             <Link href="/snapshot" className={CTA_SECONDARY}>
-              View Strategic Alignment Snapshot™️
+              View Strategic Alignment Snapshot™
             </Link>
 
             <a
@@ -329,7 +525,7 @@ export default function AdvisoryPage() {
             </a>
 
             <Link href="/brief" className={CTA_SECONDARY}>
-              View Global Fertility Intelligence Brief™️
+              View Global Fertility Intelligence Brief™
             </Link>
 
             <a
@@ -352,7 +548,7 @@ export default function AdvisoryPage() {
             </div>
 
             <h2 className="mt-3 text-2xl font-medium">
-              Strategic Alignment Snapshot™️ — US$500
+              Strategic Alignment Snapshot™ — US$500
             </h2>
 
             <p className="mt-4 text-sm leading-relaxed text-[#2A2A2A]">
@@ -363,7 +559,7 @@ export default function AdvisoryPage() {
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/snapshot" className={CTA_SECONDARY}>
-                View Strategic Alignment Snapshot™️
+                View Strategic Alignment Snapshot™
               </Link>
 
               <a
@@ -384,6 +580,8 @@ export default function AdvisoryPage() {
               <li>Pillar-level qualitative risk bands</li>
               <li>Primary regulatory friction flags</li>
               <li>Strategic direction with rationale</li>
+              <li>Structured onboarding into the advisory process</li>
+              <li>Private client workspace access included upon approved setup</li>
             </ul>
 
             <p className="mt-6 text-xs leading-relaxed text-[#6A6256]">
@@ -404,19 +602,19 @@ export default function AdvisoryPage() {
             </div>
 
             <h2 className="mt-3 text-2xl font-medium">
-              Global Fertility Intelligence Brief™️ — US$2,500
+              Global Fertility Intelligence Brief™ — US$2,500
             </h2>
 
             <p className="mt-4 text-sm leading-relaxed text-[#2A2A2A]">
               A full institutional application of the FCH Global Fertility
-              Intelligence Framework™️, incorporating jurisdiction elimination
+              Intelligence Framework™, incorporating jurisdiction elimination
               logic, pillar-based comparative analysis, structural risk mapping,
               and a formal execution roadmap tailored to your pathway complexity.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/brief" className={CTA_SECONDARY}>
-                View Global Fertility Intelligence Brief™️
+                View Global Fertility Intelligence Brief™
               </Link>
 
               <a
@@ -436,6 +634,8 @@ export default function AdvisoryPage() {
               <li>Regulatory risk briefing</li>
               <li>Conditional scenario modeling</li>
               <li>Execution roadmap &amp; readiness checklist</li>
+              <li>Structured onboarding into the advisory process</li>
+              <li>Private client workspace access included upon approved setup</li>
             </ul>
 
             <p className="mt-6 text-xs leading-relaxed text-[#6A6256]">
@@ -443,6 +643,89 @@ export default function AdvisoryPage() {
               requirements, regulatory sensitivity, or cases requiring a
               documented execution roadmap.
             </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 pb-16">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-8">
+          <h2 className="text-2xl font-medium">
+            What happens immediately after purchase
+          </h2>
+
+          <p className="mt-4 max-w-4xl text-sm leading-relaxed text-[#6A6256]">
+            Once your advisory engagement is submitted, your case moves into a
+            structured onboarding and review process. This is a private,
+            selective advisory model — not an open public software signup flow.
+          </p>
+
+          <div className="mt-6 grid gap-6 md:grid-cols-4">
+            <div className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-5">
+              <div className="text-xs tracking-[0.22em] text-[#6A6256]">
+                STEP 1
+              </div>
+              <div className="mt-2 font-medium">Your engagement is received</div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Your advisory purchase and engagement details are captured and
+                prepared for onboarding review.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-5">
+              <div className="text-xs tracking-[0.22em] text-[#6A6256]">
+                STEP 2
+              </div>
+              <div className="mt-2 font-medium">Onboarding review begins</div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                FertilityCareHub reviews your engagement context, advisory fit,
+                and client setup requirements before portal activation.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-5">
+              <div className="text-xs tracking-[0.22em] text-[#6A6256]">
+                STEP 3
+              </div>
+              <div className="mt-2 font-medium">
+                Private workspace access is issued
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Approved clients are issued access to a private planning
+                workspace as part of the advisory engagement.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-5">
+              <div className="text-xs tracking-[0.22em] text-[#6A6256]">
+                STEP 4
+              </div>
+              <div className="mt-2 font-medium">
+                You sign in through the client login page
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Once your access is active, you use the FertilityCareHub login
+                page to enter your private portal workspace.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-8 rounded-xl border border-[#DCCFB3] bg-[#FFF8EC] p-6">
+            <p className="text-sm leading-relaxed text-[#5F584C]">
+              <span className="font-medium text-[#1A1A1A]">Important:</span>{" "}
+              You do not need to create a public account immediately after
+              payment. FertilityCareHub client workspace access is issued
+              directly as part of approved advisory onboarding.
+            </p>
+          </div>
+
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link href="/auth/login" className={CTA_SECONDARY}>
+              Client Login
+            </Link>
+
+            <Link href="/consultation#request" className={CTA_PRIMARY}>
+              Request Advisory Consultation
+            </Link>
           </div>
         </div>
       </section>
@@ -489,6 +772,57 @@ export default function AdvisoryPage() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-6xl px-6 pb-16">
+        <div className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-8">
+          <h2 className="text-2xl font-medium">
+            What approved clients can expect from portal access
+          </h2>
+
+          <p className="mt-4 max-w-4xl text-sm leading-relaxed text-[#6A6256]">
+            Private portal access is designed to support a more structured
+            client experience after advisory onboarding. It is part of the
+            engagement environment — not a public product subscription.
+          </p>
+
+          <div className="mt-6 grid gap-6 md:grid-cols-2">
+            <div className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-6">
+              <div className="text-sm font-medium">Planning structure</div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Approved clients can work within a dedicated planning space that
+                supports cross-border fertility strategy, jurisdiction review,
+                execution planning, and advisory continuity.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-6">
+              <div className="text-sm font-medium">Client-specific access</div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Access is issued only to approved clients whose advisory
+                engagement has been reviewed and activated through FertilityCareHub.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-6">
+              <div className="text-sm font-medium">Protected environment</div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Portal access is controlled separately from the public website so
+                clients receive a more private and structured workspace
+                experience.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-[#E5DDC8] bg-[#FAF7F1] p-6">
+              <div className="text-sm font-medium">Login after activation</div>
+              <p className="mt-2 text-sm leading-relaxed text-[#6A6256]">
+                Once access is issued, approved clients use the client login page
+                to enter the workspace. Access is not available through open
+                public self-registration.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-6xl px-6 pb-20 text-center">
         <div className="rounded-2xl border border-[#E5DDC8] bg-white/60 p-8">
           <h2 className="text-2xl font-medium">Advisory Capacity</h2>
@@ -496,7 +830,7 @@ export default function AdvisoryPage() {
             To preserve analytical rigor and framework integrity, advisory
             engagements are accepted in controlled intake cycles. Each case
             undergoes structured internal review before acceptance. Where
-            timelines are compressed, the Strategic Alignment Snapshot™️ may be
+            timelines are compressed, the Strategic Alignment Snapshot™ may be
             used as an initial screening layer.
           </p>
 
@@ -504,6 +838,11 @@ export default function AdvisoryPage() {
             FertilityCareHub does not provide medical treatment, legal advice,
             or outcome guarantees. The platform provides structured strategic
             planning support for cross-border fertility decision-making.
+          </p>
+
+          <p className="mx-auto mt-4 max-w-3xl text-xs leading-relaxed text-[#6A6256]">
+            Private workspace access is issued selectively as part of approved
+            advisory onboarding and client activation.
           </p>
         </div>
       </section>

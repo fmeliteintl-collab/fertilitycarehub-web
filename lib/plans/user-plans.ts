@@ -16,10 +16,25 @@ function normalizeTimelineItems(value: unknown): TimelineItem[] {
       if (
         item.status === "Completed" ||
         item.status === "In Progress" ||
-        item.status === "Upcoming"
+        item.status === "Upcoming" ||
+        item.status === "Blocked"
       ) {
         status = item.status;
       }
+
+      const phase = (item.phase as TimelineItem["phase"]) || "planning";
+      const priority = (item.priority as TimelineItem["priority"]) || "medium";
+      const dependencies = Array.isArray(item.dependencies)
+        ? item.dependencies.filter((d): d is string => typeof d === "string")
+        : [];
+      const isLocked =
+        typeof item.isLocked === "boolean" ? item.isLocked : false;
+      const lockReason =
+        typeof item.lockReason === "string" ? item.lockReason : undefined;
+      const estimatedDuration =
+        typeof item.estimatedDuration === "string"
+          ? item.estimatedDuration
+          : undefined;
 
       return {
         id:
@@ -27,9 +42,17 @@ function normalizeTimelineItems(value: unknown): TimelineItem[] {
             ? item.id
             : `timeline-${index + 1}`,
         title: typeof item.title === "string" ? item.title : "",
-        category: typeof item.category === "string" ? item.category : "Planning",
+        category:
+          typeof item.category === "string" ? item.category : "Planning",
         status,
-        description: typeof item.description === "string" ? item.description : "",
+        description:
+          typeof item.description === "string" ? item.description : "",
+        phase,
+        priority,
+        dependencies,
+        isLocked,
+        lockReason,
+        estimatedDuration,
       };
     })
     .filter((item) => item.title.length > 0);
@@ -43,6 +66,7 @@ function normalizeUserPlan(row: UserPlan): UserPlan {
     shortlisted_countries: Array.isArray(row.shortlisted_countries)
       ? row.shortlisted_countries
       : [],
+    
     timeline_items: normalizeTimelineItems(row.timeline_items),
     advisory_status:
       typeof row.advisory_status === "string" ? row.advisory_status : null,
@@ -51,7 +75,16 @@ function normalizeUserPlan(row: UserPlan): UserPlan {
     advisory_notes:
       typeof row.advisory_notes === "string" ? row.advisory_notes : null,
     advisory_next_step:
-      typeof row.advisory_next_step === "string" ? row.advisory_next_step : null,
+      typeof row.advisory_next_step === "string"
+        ? row.advisory_next_step
+        : null,
+    advisory_stage:
+      row.advisory_stage === "intake" ||
+      row.advisory_stage === "strategy" ||
+      row.advisory_stage === "decision" ||
+      row.advisory_stage === "execution"
+        ? row.advisory_stage
+        : null,
   };
 }
 
@@ -68,9 +101,9 @@ async function getAuthenticatedUser() {
 
   try {
     const {
-      data: { user },
+      data: { session },
       error,
-    } = await supabase.auth.getUser();
+    } = await supabase.auth.getSession();
 
     if (error) {
       if (isMissingSessionError(error)) {
@@ -80,7 +113,7 @@ async function getAuthenticatedUser() {
       throw error;
     }
 
-    return { supabase, user: user ?? null };
+    return { supabase, user: session?.user ?? null };
   } catch (error) {
     if (isMissingSessionError(error)) {
       return { supabase, user: null };
@@ -111,7 +144,7 @@ export async function getCurrentUserPlan(): Promise<UserPlan | null> {
 }
 
 export async function upsertCurrentUserPlan(
-  input: UserPlanInput
+  input: UserPlanInput,
 ): Promise<UserPlan> {
   const { supabase, user } = await getAuthenticatedUser();
 
@@ -129,11 +162,13 @@ export async function upsertCurrentUserPlan(
     priorities: input.priorities,
     constraints: input.constraints,
     shortlisted_countries: input.shortlisted_countries,
+    
     timeline_items: input.timeline_items,
     advisory_status: input.advisory_status,
     advisory_pathway: input.advisory_pathway,
     advisory_notes: input.advisory_notes,
     advisory_next_step: input.advisory_next_step,
+    advisory_stage: input.advisory_stage,
     target_timeline: input.target_timeline,
     budget_range: input.budget_range,
     notes: input.notes,

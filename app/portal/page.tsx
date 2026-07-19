@@ -1,476 +1,1012 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { getCurrentUserDocuments } from "@/lib/documents/user-documents";
+import { getCurrentUserPlan } from "@/lib/plans/user-plans";
+import {
+  EMPTY_USER_PLAN_INPUT,
+  type UserPlanInput,
+} from "@/types/plan";
+import {
+  getPortalIntelligence,
+  type PortalIntelligence,
+} from "@/lib/intelligence/portal-intelligence";
+import {
+  getPathwayClassificationBadgeTone,
+  type PathwayClassificationResult,
+} from "@/lib/intelligence/plan-intelligence";
+import { DashboardSkeleton } from "@/app/components/skeletons";
+
 export const runtime = "edge";
 
-import Link from "next/link";
-import { getCurrentUserPlan } from "@/lib/plans/user-plans";
-import { getCurrentUserDocuments } from "@/lib/documents/user-documents";
+// === TYPES ===
 
-const dashboardCards = [
-  {
-    title: "My Plan",
-    description:
-      "Capture fertility pathway priorities, constraints, timeline goals, and planning notes.",
-    href: "/portal/my-plan",
-    cta: "Open My Plan",
-  },
-  {
-    title: "Countries",
-    description:
-      "Review your shortlist, compare jurisdiction fit, and organize country-level planning notes.",
-    href: "/portal/countries",
-    cta: "View Countries",
-  },
-  {
-    title: "Timeline",
-    description:
-      "Track the planning journey from research and advisory steps to logistics and execution.",
-    href: "/portal/timeline",
-    cta: "View Timeline",
-  },
-  {
-    title: "Documents",
-    description:
-      "Prepare your document vault for identity records, medical summaries, and advisory notes.",
-    href: "/portal/documents",
-    cta: "Open Documents",
-  },
-  {
-    title: "Advisory",
-    description:
-      "Review available advisory pathways and prepare for structured support and decision guidance.",
-    href: "/portal/advisory",
-    cta: "Open Advisory",
-  },
-  {
-    title: "Settings",
-    description:
-      "Manage your account area and prepare for future profile and portal preferences.",
-    href: "/portal/settings",
-    cta: "Open Settings",
-  },
-];
+type StepStatus = "complete" | "active" | "locked";
 
-function getNextAction(plan: Awaited<ReturnType<typeof getCurrentUserPlan>>) {
-  if (!plan) {
-    return {
-      title: "Start your planning workspace",
-      body: "Complete My Plan first so the portal can begin reflecting your priorities, timing, and pathway direction.",
-      href: "/portal/my-plan",
-      cta: "Start My Plan",
-    };
-  }
+type PriorityLevel = "critical" | "high" | "medium" | "low";
 
-  if ((plan.shortlisted_countries ?? []).length === 0) {
-    return {
-      title: "Build your country shortlist",
-      body: "Add your first shortlisted jurisdictions so your planning workspace can reflect real comparison options.",
-      href: "/portal/countries",
-      cta: "Open Countries",
-    };
-  }
+// === UTILITY COMPONENTS ===
 
-  if ((plan.timeline_items ?? []).length === 0) {
-    return {
-      title: "Create your planning timeline",
-      body: "Add your first milestones so your portal starts tracking execution, not just research.",
-      href: "/portal/timeline",
-      cta: "Open Timeline",
-    };
-  }
-
-  return {
-    title: "Strengthen your document vault",
-    body: "Upload or log your essential planning documents so your workspace becomes a complete command center.",
-    href: "/portal/documents",
-    cta: "Open Documents",
+function StageBadge({ stage }: { stage: string }) {
+  const stageNum: Record<string, string> = {
+    foundation: "01",
+    shortlist: "02",
+    sequencing: "03",
+    "advisory-active": "04",
+    completion: "05",
   };
-}
-
-function calculateProgress(
-  plan: Awaited<ReturnType<typeof getCurrentUserPlan>>,
-  documentCount: number
-) {
-  let score = 0;
-  const completed: string[] = [];
-  const remaining: string[] = [];
-
-  const hasMyPlanBasics = Boolean(
-    plan?.pathway_type?.trim() ||
-      plan?.treatment_goal?.trim() ||
-      plan?.notes?.trim()
-  );
-
-  if (hasMyPlanBasics) {
-    score += 25;
-    completed.push("My Plan started");
-  } else {
-    remaining.push("Complete My Plan");
-  }
-
-  if ((plan?.shortlisted_countries ?? []).length > 0) {
-    score += 20;
-    completed.push("Countries shortlisted");
-  } else {
-    remaining.push("Add shortlisted countries");
-  }
-
-  if ((plan?.timeline_items ?? []).length > 0) {
-    score += 20;
-    completed.push("Timeline created");
-  } else {
-    remaining.push("Create timeline");
-  }
-
-  if (documentCount > 0) {
-    score += 20;
-    completed.push("Documents added");
-  } else {
-    remaining.push("Add documents");
-  }
-
-  if (plan?.advisory_status?.trim()) {
-    score += 15;
-    completed.push("Advisory status saved");
-  } else {
-    remaining.push("Set advisory status");
-  }
-
-  return {
-    score,
-    completed,
-    remaining,
-  };
-}
-
-function buildOnboardingChecklist(
-  plan: Awaited<ReturnType<typeof getCurrentUserPlan>>,
-  documentCount: number
-) {
-  return [
-    {
-      label: "Complete My Plan",
-      done: Boolean(
-        plan?.pathway_type?.trim() ||
-          plan?.treatment_goal?.trim() ||
-          plan?.notes?.trim()
-      ),
-      href: "/portal/my-plan",
-    },
-    {
-      label: "Add shortlisted countries",
-      done: (plan?.shortlisted_countries ?? []).length > 0,
-      href: "/portal/countries",
-    },
-    {
-      label: "Generate or create timeline",
-      done: (plan?.timeline_items ?? []).length > 0,
-      href: "/portal/timeline",
-    },
-    {
-      label: "Add at least one document",
-      done: documentCount > 0,
-      href: "/portal/documents",
-    },
-    {
-      label: "Save advisory status",
-      done: Boolean(plan?.advisory_status?.trim()),
-      href: "/portal/advisory",
-    },
-  ];
-}
-
-export default async function PortalDashboardPage() {
-  const [plan, documents] = await Promise.all([
-    getCurrentUserPlan(),
-    getCurrentUserDocuments(),
-  ]);
-
-  const shortlistedCountriesCount = plan?.shortlisted_countries?.length ?? 0;
-  const timelineItems = plan?.timeline_items ?? [];
-
-  const completedCount = timelineItems.filter(
-    (item) => item.status === "Completed"
-  ).length;
-  const inProgressCount = timelineItems.filter(
-    (item) => item.status === "In Progress"
-  ).length;
-  const upcomingCount = timelineItems.filter(
-    (item) => item.status === "Upcoming"
-  ).length;
-
-  const documentCount = documents.length;
-  const pathwayType = plan?.pathway_type?.trim() || "Not set yet";
-  const planningNotes =
-    plan?.notes?.trim() ||
-    "No planning notes saved yet. Add your priorities and case context in My Plan.";
-  const nextAction = getNextAction(plan);
-  const progress = calculateProgress(plan, documentCount);
-  const onboardingChecklist = buildOnboardingChecklist(plan, documentCount);
-
-  const completedChecklistCount = onboardingChecklist.filter(
-    (item) => item.done
-  ).length;
-
-  const quickStats = [
-    {
-      label: "Pathway Type",
-      value: pathwayType,
-    },
-    {
-      label: "Shortlisted Countries",
-      value: String(shortlistedCountriesCount),
-    },
-    {
-      label: "Documents",
-      value: String(documentCount),
-    },
-  ];
 
   return (
-    <div className="space-y-8">
-      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-        <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
-          Dashboard
-        </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-stone-900">
-          Planning Workspace Overview
-        </h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-stone-600">
-          This portal is now structured as your private fertility planning
-          workspace. Use it to organize your planning profile, shortlist
-          countries, track milestones, prepare documents, and manage advisory
-          next steps.
-        </p>
-      </section>
+    <span className="inline-flex items-center justify-center rounded-lg bg-stone-200 px-3 py-1.5 text-xs font-semibold tracking-wider text-stone-700">
+      STAGE {stageNum[stage] ?? "01"}
+    </span>
+  );
+}
 
-      <section className="grid gap-6 lg:grid-cols-3">
-        {quickStats.map((stat) => (
-          <div
-            key={stat.label}
-            className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm"
-          >
-            <p className="text-sm font-medium text-stone-500">{stat.label}</p>
-            <p className="mt-2 text-3xl font-semibold text-stone-900">
-              {stat.value}
+function PriorityBadge({ priority }: { priority: PriorityLevel }) {
+  const styles: Record<PriorityLevel, string> = {
+    critical: "bg-[#c4a7a7] text-[#5c3a3a] border border-[#b39393]",
+    high: "bg-[#d4c4a8] text-[#5c4a3a] border border-[#c4b498]",
+    medium: "bg-[#e8e0d0] text-[#6a5a4a] border border-[#d8d0c0]",
+    low: "bg-stone-200 text-stone-600",
+  };
+
+  return (
+    <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider ${styles[priority]}`}>
+      {priority} Priority
+    </span>
+  );
+}
+
+function StatusDot({ status }: { status: "complete" | "active" | "pending" | "blocked" }) {
+  const styles = {
+    complete: "bg-[#6a7a6a]",
+    active: "bg-[#3a3a3a] animate-pulse",
+    pending: "bg-stone-300",
+    blocked: "bg-[#c4a7a7]",
+  };
+
+  return <div className={`h-2 w-2 rounded-full ${styles[status]}`} />;
+}
+
+
+function getPrimaryBlockerLabel(
+  primaryBlocker: PortalIntelligence["primaryBlocker"],
+): string {
+  if (primaryBlocker === "missing_pathway") {
+    return "Define your fertility pathway to activate country matching and timeline guidance";
+  }
+
+  if (primaryBlocker === "missing_family_structure") {
+    return "Confirm family structure to refine eligibility and jurisdiction fit";
+  }
+
+  if (primaryBlocker === "missing_country_selection") {
+    return "Select your initial country shortlist to unlock comparison guidance";
+  }
+
+  if (primaryBlocker === "timeline_not_started") {
+    return "Generate your execution timeline to structure next steps";
+  }
+
+  if (primaryBlocker === "timeline_incomplete") {
+    return "Complete timeline milestones to improve advisory readiness";
+  }
+
+  return primaryBlocker?.replace(/_/g, " ") ?? "";
+}
+
+function PathwayClassificationBadge({
+  type,
+  tone,
+}: {
+  type: PathwayClassificationResult["label"];
+  tone: ReturnType<typeof getPathwayClassificationBadgeTone>;
+}) {
+  const styles: Record<ReturnType<typeof getPathwayClassificationBadgeTone>, string> = {
+    emerald: "border-emerald-200 bg-emerald-50 text-emerald-800",
+    amber: "border-amber-200 bg-amber-50 text-amber-800",
+    rose: "border-rose-200 bg-rose-50 text-rose-800",
+  };
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-full border px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] ${styles[tone]}`}
+    >
+      {type}
+    </span>
+  );
+}
+
+function PathwayClassificationCard({
+  classification,
+  readinessTotal,
+}: {
+  classification: PathwayClassificationResult;
+  readinessTotal: number;
+}) {
+  const tone = getPathwayClassificationBadgeTone(classification);
+
+  const styles: Record<ReturnType<typeof getPathwayClassificationBadgeTone>, {
+    wrapper: string;
+    title: string;
+    body: string;
+    bullet: string;
+    panel: string;
+    accent: string;
+  }> = {
+    emerald: {
+      wrapper: "border-emerald-200 bg-gradient-to-br from-emerald-50 to-white",
+      title: "text-emerald-900",
+      body: "text-emerald-800/80",
+      bullet: "bg-emerald-500",
+      panel: "border-emerald-100 bg-white/80",
+      accent: "text-emerald-700",
+    },
+    amber: {
+      wrapper: "border-amber-200 bg-gradient-to-br from-amber-50 to-white",
+      title: "text-amber-900",
+      body: "text-amber-800/80",
+      bullet: "bg-amber-500",
+      panel: "border-amber-100 bg-white/80",
+      accent: "text-amber-700",
+    },
+    rose: {
+      wrapper: "border-rose-200 bg-gradient-to-br from-rose-50 to-white",
+      title: "text-rose-900",
+      body: "text-rose-800/80",
+      bullet: "bg-rose-500",
+      panel: "border-rose-100 bg-white/80",
+      accent: "text-rose-700",
+    },
+  };
+
+  const currentStyles = styles[tone];
+
+  return (
+    <section className={`rounded-2xl border p-6 shadow-sm ${currentStyles.wrapper}`}>
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+        <div className="max-w-3xl">
+          <p className="text-xs font-semibold uppercase tracking-wider text-stone-500">
+            Shared Pathway Classification
+          </p>
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <PathwayClassificationBadge type={classification.label} tone={tone} />
+            <h2 className={`text-xl font-semibold ${currentStyles.title}`}>
+              {classification.title}
+            </h2>
+          </div>
+          <p className={`mt-2 text-sm font-medium ${currentStyles.accent}`}>
+            {classification.label}
+          </p>
+          <p className={`mt-4 text-sm leading-6 ${currentStyles.body}`}>
+            {classification.summary}
+          </p>
+          <p className={`mt-3 text-sm leading-6 ${currentStyles.body}`}>
+            {classification.advisoryFit}
+          </p>
+        </div>
+
+        <div className={`rounded-2xl border p-5 lg:w-[280px] ${currentStyles.panel}`}>
+          <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-stone-400">
+            Current interpretation
+          </p>
+          <p className="mt-2 text-3xl font-light text-stone-900">
+            {readinessTotal}%
+          </p>
+          <p className="mt-1 text-xs text-stone-500">
+            Readiness aligned to your current case type
+          </p>
+
+          <div className="mt-4 space-y-2">
+            {classification.nextFocus.split(/\.\s+/).filter(Boolean).map((item: string) => (
+              <div key={item} className="flex items-start gap-2.5">
+                <span className={`mt-2 h-1.5 w-1.5 shrink-0 rounded-full ${currentStyles.bullet}`} />
+                <p className="text-sm leading-6 text-stone-700">{item}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-3 lg:grid-cols-3">
+        {classification.indicators.map((reason: string) => (
+          <div key={reason} className={`rounded-2xl border p-4 ${currentStyles.panel}`}>
+            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-stone-400">
+              Why this classification
             </p>
+            <p className="mt-2 text-sm leading-6 text-stone-700">{reason}</p>
           </div>
         ))}
-      </section>
+      </div>
+    </section>
+  );
+}
 
-      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+// === PREMIUM: EXECUTIVE SUMMARY COMPONENT ===
+
+function ExecutiveSummary({
+  stage,
+  primaryBlocker,
+  readinessTotal,
+  flags,
+}: {
+  stage: PortalIntelligence["stage"];
+  primaryBlocker: PortalIntelligence["primaryBlocker"];
+  readinessTotal: number;
+  flags: PortalIntelligence["flags"];
+}) {
+  // PREMIUM: Audit-aligned strategic interpretation
+  const getStrategicInterpretation = () => {
+    if (stage === "planning" && !flags.hasPathway) {
+      return "Your planning workspace is active. Start by defining your pathway to unlock country matching and timeline guidance.";
+    }
+    if (stage === "planning" && flags.hasPathway && !flags.hasCountries) {
+      return "Pathway defined. Your planning foundation is strong, but country selection is required to proceed with execution planning.";
+    }
+    if (stage === "decision" && flags.hasCountries) {
+      return "You are in shortlist validation. Your planning foundation is strong, but country commitment is needed to unlock execution.";
+    }
+    if (stage === "decision" && !flags.hasTimeline) {
+      return "Generate your execution timeline to transition from planning to active execution.";
+    }
+    if (stage === "execution" && flags.hasTimeline && !flags.timelineComplete) {
+      return "Active execution phase. Maintain milestone momentum and validate key decisions with advisory as needed.";
+    }
+    if (stage === "execution" && flags.timelineComplete) {
+      return "Execution infrastructure complete. Focus shifts to decision quality, clinic coordination, and advisory validation.";
+    }
+    if (stage === "completion") {
+      return "Planning complete. Monitor execution progress and maintain advisory alignment.";
+    }
+    return "Complete required steps to unlock execution, reduce delays, and move toward treatment with precision.";
+  };
+
+  const getStageTitle = () => {
+    if (stage === "planning") return "Foundation Building";
+    if (stage === "decision") return "Decision & Commitment";
+    if (stage === "execution") return "Active Execution";
+    return "Execution Complete";
+  };
+
+  const getPrimaryAction = () => {
+    if (!flags.hasPathway) {
+      return { label: "Define Pathway", href: "/portal/my-plan", enabled: true };
+    }
+    if (!flags.hasCountries) {
+      return { label: "Select Countries", href: "/portal/countries", enabled: true };
+    }
+    if (!flags.hasTimeline) {
+      return { label: "Generate Timeline", href: "/portal/timeline", enabled: true };
+    }
+    if (flags.advisoryReady) {
+      return { label: "Validate Strategy", href: "/portal/advisory", enabled: true };
+    }
+    return { label: "Review Progress", href: "/portal/timeline", enabled: true };
+  };
+
+  const primaryAction = getPrimaryAction();
+
+  return (
+    <div className="rounded-2xl bg-[#2a2a2a] p-8 text-white shadow-2xl">
+      <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
+        {/* Left: Case Status */}
+        <div className="flex-1 space-y-6">
           <div>
-            <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
-              Planning Progress
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-stone-400">
+              Case Status
             </p>
-            <h2 className="mt-2 text-3xl font-semibold text-stone-900">
-              {progress.score}%
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-stone-600">
-              Your workspace completion score based on planning data already
-              saved across the portal.
-            </p>
-          </div>
-
-          <div className="max-w-xl text-sm text-stone-600">
-            {progress.remaining.length > 0
-              ? `Still to complete: ${progress.remaining.join(", ")}.`
-              : "Your core planning workspace is fully established."}
-          </div>
-        </div>
-
-        <div className="mt-5 h-3 w-full overflow-hidden rounded-full bg-stone-200">
-          <div
-            className="h-full rounded-full bg-stone-900 transition-all"
-            style={{ width: `${progress.score}%` }}
-          />
-        </div>
-
-        <div className="mt-5 grid gap-4 lg:grid-cols-2">
-          <div className="rounded-xl bg-stone-50 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-              Completed
-            </p>
-            <p className="mt-2 text-sm leading-6 text-stone-700">
-              {progress.completed.length > 0
-                ? progress.completed.join(", ")
-                : "Nothing completed yet."}
+            <h1 className="mt-2 text-3xl font-light tracking-tight text-white">
+              {getStageTitle()}
+            </h1>
+            <p className="mt-3 max-w-2xl text-base leading-relaxed text-stone-300">
+              {getStrategicInterpretation()}
             </p>
           </div>
 
-          <div className="rounded-xl bg-stone-50 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-              Missing
-            </p>
-            <p className="mt-2 text-sm leading-6 text-stone-700">
-              {progress.remaining.length > 0
-                ? progress.remaining.join(", ")
-                : "No major gaps detected in the core workflow."}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone-500">
-              First-Run Guidance
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold text-stone-900">
-              Onboarding Checklist
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-stone-600">
-              Complete the core setup steps to turn this workspace into a fully
-              functioning planning environment.
-            </p>
-          </div>
-
-          <div className="text-sm text-stone-600">
-            {completedChecklistCount} of {onboardingChecklist.length} completed
-          </div>
-        </div>
-
-        <div className="mt-6 grid gap-4">
-          {onboardingChecklist.map((item) => (
-            <div
-              key={item.label}
-              className="flex flex-col gap-3 rounded-xl border border-stone-200 p-4 lg:flex-row lg:items-center lg:justify-between"
-            >
-              <div className="flex items-center gap-3">
-                <span
-                  className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${
-                    item.done
-                      ? "bg-stone-900 text-white"
-                      : "border border-stone-300 bg-white text-stone-700"
-                  }`}
-                >
-                  {item.done ? "✓" : ""}
-                </span>
-                <p className="text-sm font-medium text-stone-900">
-                  {item.label}
-                </p>
+          {/* PREMIUM: Key Blockers */}
+          {primaryBlocker && (
+            <div className="rounded-xl bg-[#3a2a2a] border border-[#5c3a3a] p-4">
+              <div className="flex items-center gap-2 text-[#c4a7a7]">
+                <span className="text-lg">⚠</span>
+                <span className="text-sm font-semibold uppercase tracking-wider">Required Next Step</span>
               </div>
-
-              <Link
-                href={item.href}
-                className="inline-flex rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
-              >
-                {item.done ? "Review" : "Complete"}
-              </Link>
+              <p className="mt-1 text-stone-200">
+                {getPrimaryBlockerLabel(primaryBlocker)}
+              </p>
             </div>
+          )}
+
+          {/* PREMIUM: Quick Stats */}
+          <div className="flex flex-wrap gap-6 text-sm">
+            <div className="flex items-center gap-2">
+              <StatusDot status={flags.hasPathway ? "complete" : "blocked"} />
+              <span className={flags.hasPathway ? "text-stone-300" : "text-stone-500"}>
+                Pathway {flags.hasPathway ? "defined" : "required"}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <StatusDot status={flags.hasCountries ? "active" : "blocked"} />
+              <span className={
+                flags.hasCountries ? "text-[#d4c4a8]" : "text-stone-500"
+              }>
+                {flags.hasCountries 
+                  ? `${flags.countryCount} shortlisted` 
+                  : "Countries required"}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <StatusDot status={flags.hasTimeline ? "complete" : flags.hasCountries ? "active" : "pending"} />
+              <span className={flags.hasTimeline ? "text-stone-300" : "text-stone-500"}>
+                Timeline {flags.hasTimeline ? `${flags.timelineProgress}%` : flags.hasCountries ? "ready" : "locked"}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right: Readiness & Primary Action */}
+        <div className="lg:w-72 lg:border-l lg:border-stone-700 lg:pl-8 space-y-6">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-stone-400">
+              Advisory Readiness
+            </p>
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className="text-5xl font-light text-white">{Math.round(readinessTotal)}</span>
+              <span className="text-xl text-stone-500">%</span>
+            </div>
+            <div className="mt-3 h-1.5 w-full rounded-full bg-stone-700">
+              <div 
+                className="h-1.5 rounded-full bg-[#6a7a6a] transition-all duration-700"
+                style={{ width: `${readinessTotal}%` }}
+              />
+            </div>
+            <p className="mt-2 text-xs text-stone-500">
+              {readinessTotal >= 70 ? "Optimal for advisory" : `${70 - Math.round(readinessTotal)}% to optimal threshold`}
+            </p>
+          </div>
+
+          <Link
+            href={primaryAction.href}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-[#2a2a2a] transition hover:bg-stone-100"
+          >
+            {primaryAction.label} →
+          </Link>
+
+          {readinessTotal < 70 && (
+            <p className="text-xs text-stone-500 leading-relaxed">
+              Complete foundation steps to unlock full advisory capabilities.
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// === PREMIUM: PRIMARY ACTION CARD ===
+
+function PrimaryActionCard({
+  title,
+  body,
+  explanation,
+  stakes,
+  unlocks,
+  href,
+  cta,
+  priority,
+  label,
+}: {
+  title: string;
+  body: string;
+  explanation: string;
+  stakes: string;
+  unlocks: string[];
+  href: string;
+  cta: string;
+  priority: PriorityLevel;
+  label: string;
+}) {
+  return (
+    <section className="rounded-2xl border-2 border-[#c4a7a7] bg-white p-8 shadow-lg relative overflow-hidden">
+      <div className="absolute top-0 left-0 w-1 h-full bg-[#c4a7a7]" />
+      
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-3">
+              <PriorityBadge priority={priority} />
+              <span className="text-xs font-bold text-[#c4a7a7] uppercase tracking-wider">
+                {label}
+              </span>
+            </div>
+            <h2 className="text-xl font-semibold text-stone-900">
+              {title}
+            </h2>
+            <p className="mt-2 text-base text-stone-600 leading-relaxed">
+              {body}
+            </p>
+          </div>
+          <Link
+            href={href}
+            className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#3a3a3a] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#2a2a2a] lg:mt-0"
+          >
+            {cta} →
+          </Link>
+        </div>
+
+        <div className="grid gap-6 border-t border-stone-100 pt-6 lg:grid-cols-3">
+          <div>
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-stone-400 mb-2">
+              Why This Matters
+            </h3>
+            <p className="text-sm text-stone-600 leading-relaxed">
+              {explanation}
+            </p>
+          </div>
+          <div className="rounded-lg bg-[#faf6f6] p-4">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-[#8a6a6a] mb-2">
+              If Delayed
+            </h3>
+            <p className="text-sm text-[#6a4a4a] leading-relaxed">
+              {stakes}
+            </p>
+          </div>
+          <div>
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-[#4a5a4a] mb-2">
+              Unlocks
+            </h3>
+            <ul className="space-y-1.5">
+              {unlocks.map((unlock, idx) => (
+                <li key={idx} className="flex items-start gap-2 text-sm text-stone-700">
+                  <span className="mt-0.5 text-[#6a7a6a]">✓</span>
+                  <span>{unlock}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// === PREMIUM: GUIDED FLOW STEP ===
+
+function GuidedFlowStep({
+  step,
+  isLast,
+}: {
+  step: PortalIntelligence["flowSteps"][number];
+  isLast: boolean;
+}) {
+  const getStatusStyles = (status: StepStatus) => {
+    const styles = {
+      complete: {
+        circle: "bg-[#6a7a6a] text-white",
+        line: "bg-[#6a7a6a]",
+        title: "text-stone-500",
+        subtitle: "text-stone-400",
+        bg: "bg-stone-50",
+        border: "border-stone-200",
+        opacity: "opacity-70",
+      },
+      active: {
+        circle: "bg-[#3a3a3a] text-white ring-4 ring-[#3a3a3a]/10",
+        line: "bg-stone-200",
+        title: "text-stone-900",
+        subtitle: "text-stone-700",
+        bg: "bg-white",
+        border: "border-2 border-[#3a3a3a]",
+        opacity: "opacity-100",
+      },
+      locked: {
+        circle: "bg-stone-200 text-stone-400",
+        line: "bg-stone-200",
+        title: "text-stone-400",
+        subtitle: "text-stone-400",
+        bg: "bg-stone-50",
+        border: "border-stone-200 border-dashed",
+        opacity: "opacity-50",
+      },
+    };
+    return styles[status];
+  };
+
+  const style = getStatusStyles(step.status);
+
+  return (
+    <div className={`flex gap-4 ${style.opacity}`}>
+      <div className="flex flex-col items-center">
+        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold ${style.circle}`}>
+          {step.status === "complete" ? "✓" : step.number}
+        </div>
+        {!isLast && <div className={`mt-2 w-0.5 flex-1 ${style.line}`} />}
+      </div>
+
+      <div className={`mb-6 flex-1 rounded-xl border p-5 ${style.bg} ${style.border}`}>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-2">
+              <h3 className={`text-base font-semibold ${style.title}`}>
+                {step.title}
+              </h3>
+              {step.status === "active" && (
+                <span className="rounded-full bg-[#3a3a3a] px-2.5 py-0.5 text-xs font-medium text-white">
+                  Current
+                </span>
+              )}
+              {step.status === "locked" && (
+                <span className="rounded-full bg-stone-200 px-2.5 py-0.5 text-xs font-medium text-stone-500">
+                  Locked
+                </span>
+              )}
+            </div>
+
+            <p className={`text-sm font-medium ${style.subtitle}`}>
+              {step.directive}
+            </p>
+
+            {/* PREMIUM: Only show insights for active step to reduce noise */}
+            {step.status === "active" && step.systemInsight && (
+              <div className="mt-3 rounded-lg bg-stone-50 border border-stone-100 p-3">
+                <p className="text-xs font-medium text-stone-500 mb-1">
+                  System Insight
+                </p>
+                <p className="text-sm text-stone-600">{step.systemInsight}</p>
+              </div>
+            )}
+
+            {step.status === "active" && step.riskIfDelayed && (
+              <div className="mt-3 rounded-lg bg-[#faf6f6] border border-[#e8d8d8] px-3 py-2">
+                <p className="text-xs font-semibold text-[#8a6a6a] uppercase tracking-wider">
+                  Risk if delayed
+                </p>
+                <p className="text-sm text-[#6a4a4a] mt-1">{step.riskIfDelayed}</p>
+              </div>
+            )}
+
+            {step.status === "active" && step.unlocks && step.unlocks.length > 0 && (
+              <div className="mt-4">
+                <p className="text-xs font-semibold uppercase tracking-wider text-[#4a5a4a] mb-2">
+                  Unlocks
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {step.unlocks.map((unlock, idx) => (
+                    <span key={idx} className="inline-flex items-center rounded-md bg-[#f0f4f0] px-2.5 py-1 text-xs font-medium text-[#4a5a4a]">
+                      {unlock}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {step.cta && step.status !== "complete" && (
+            <Link
+              href={step.cta.href}
+              className={`mt-4 inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition lg:mt-0 ${
+                step.cta.variant === "primary"
+                  ? "bg-[#3a3a3a] text-white hover:bg-[#2a2a2a]"
+                  : "border border-stone-300 text-stone-600 hover:border-stone-400 hover:bg-stone-50"
+              } ${step.status === "locked" ? "opacity-50 pointer-events-none" : ""}`}
+            >
+              {step.cta.label} →
+            </Link>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// === PREMIUM: SYSTEM INTELLIGENCE ===
+
+function SystemInsights({
+  signals,
+  executionStatus,
+  stage,
+}: {
+  signals: PortalIntelligence["signals"];
+  executionStatus: PortalIntelligence["executionStatus"];
+  stage: PortalIntelligence["stage"];
+}) {
+  const hasContent = signals.blockers.length > 0 || signals.risks.length > 0 || signals.insights.length > 0;
+  if (!hasContent) return null;
+
+  return (
+    <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+      <h2 className="text-sm font-semibold uppercase tracking-wider text-stone-500 mb-4">
+        System Intelligence
+      </h2>
+      
+      <div className="space-y-3">
+        {signals.blockers.map((signal) => (
+          <div key={signal.id} className="flex gap-3 items-start rounded-lg bg-[#faf6f6] p-3 border border-[#e8d8d8]">
+            <span className="text-[#c4a7a7] font-bold shrink-0">⚠</span>
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-stone-900 text-sm">{signal.message}</p>
+              <p className="text-sm text-stone-600 mt-1">→ {signal.resolution}</p>
+            </div>
+            <Link 
+              href={signal.href} 
+              className="text-sm font-semibold text-[#5c3a3a] hover:text-[#3a2a2a] shrink-0 underline underline-offset-2"
+            >
+              Resolve
+            </Link>
+          </div>
+        ))}
+        
+        {signals.risks.map((risk) => (
+          <div key={risk.id} className="flex gap-3 items-start rounded-lg bg-[#faf8f0] p-3 border border-[#e8e0d0]">
+            <span className="text-[#d4c4a8] font-bold shrink-0">⚠</span>
+            <div>
+              <p className="font-medium text-stone-900 text-sm">{risk.message}</p>
+              <p className="text-sm text-stone-600 mt-1">→ Mitigation: {risk.mitigation}</p>
+            </div>
+          </div>
+        ))}
+        
+        {signals.insights.map((insight) => (
+          <div key={insight.id} className="flex gap-3 items-start rounded-lg bg-[#f4f6f4] p-3 border border-[#e0e8e0]">
+            <span className="text-[#6a7a6a] font-bold shrink-0">✓</span>
+            <p className="font-medium text-stone-900 text-sm">{insight.message}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-4 pt-4 border-t border-stone-100">
+        <p className="text-xs text-stone-500">
+          System: <span className="font-medium text-stone-700 capitalize">{stage}</span> | 
+          Status: <span className={executionStatus === "blocked" ? "font-medium text-[#c4a7a7]" : "font-medium text-[#6a7a6a]"}>{executionStatus}</span>
+        </p>
+      </div>
+    </section>
+  );
+}
+
+// === MAIN DASHBOARD ===
+
+export default function PortalDashboardPage() {
+  const [plan, setPlan] = useState<UserPlanInput>(EMPTY_USER_PLAN_INPUT);
+  const [documentCount, setDocumentCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadDashboardData() {
+      try {
+        const [existing, documents] = await Promise.all([
+          getCurrentUserPlan(),
+          getCurrentUserDocuments(),
+        ]);
+
+        if (!isMounted) return;
+
+        if (existing) {
+          setPlan({
+            pathway_type: existing.pathway_type,
+            family_structure: existing.family_structure,
+            treatment_goal: existing.treatment_goal,
+            donor_needed: existing.donor_needed,
+            surrogate_needed: existing.surrogate_needed,
+            priorities: existing.priorities ?? [],
+            constraints: existing.constraints ?? [],
+            shortlisted_countries: existing.shortlisted_countries ?? [],
+            timeline_items: existing.timeline_items ?? [],
+            advisory_status: existing.advisory_status ?? null,
+            advisory_pathway: existing.advisory_pathway ?? null,
+            advisory_notes: existing.advisory_notes ?? null,
+            advisory_next_step: existing.advisory_next_step ?? null,
+            advisory_stage: existing.advisory_stage ?? null,
+            target_timeline: existing.target_timeline,
+            budget_range: existing.budget_range,
+            notes: existing.notes,
+          });
+        } else {
+          setPlan(EMPTY_USER_PLAN_INPUT);
+        }
+
+        setDocumentCount(
+          documents.filter((document) => Boolean(document.file_path)).length,
+        );
+        setIsError(false);
+      } catch (error: unknown) {
+        console.error(error);
+        if (isMounted) setIsError(true);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+
+    void loadDashboardData();
+
+    // STEP 7: Refresh when window regains focus (user may have updated data in another tab/page)
+    const handleFocus = () => {
+      if (isMounted) void loadDashboardData();
+    };
+    window.addEventListener('focus', handleFocus);
+
+    return () => { 
+      isMounted = false;
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
+
+  // SINGLE SOURCE OF TRUTH - Portal Intelligence
+  const intelligence = useMemo(
+    () => getPortalIntelligence(plan, documentCount),
+    [plan, documentCount],
+  );
+
+  // Destructure for clean access
+  const {
+    stage,
+    executionStatus,
+    primaryBlocker,
+    flowSteps,
+    nextAction,
+    readiness,
+    signals,
+    advisoryReadiness,
+    executionStage,
+    pathwayClassification,
+    flags,
+  } = intelligence;
+
+  const readinessTotal = readiness.overall;
+
+  if (loading) return <DashboardSkeleton />;
+  if (isError) {
+    return (
+      <div className="rounded-2xl border border-red-200 bg-red-50 p-6">
+        <p className="text-red-800">Failed to load dashboard. Please refresh.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6 max-w-6xl mx-auto pb-12">
+      
+      {/* === 1. PREMIUM: EXECUTIVE SUMMARY === */}
+      <ExecutiveSummary
+        stage={stage}
+        primaryBlocker={primaryBlocker}
+        readinessTotal={readinessTotal}
+        flags={flags}
+      />
+
+      {/* === 2. PREMIUM: PRIMARY ACTION === */}
+      <PrimaryActionCard
+        title={nextAction.title}
+        body={nextAction.body}
+        explanation={nextAction.explanation}
+        stakes={nextAction.stakes}
+        unlocks={nextAction.unlocks}
+        href={nextAction.href}
+        cta={nextAction.cta}
+        priority={nextAction.type as PriorityLevel}
+        label={nextAction.label}
+      />
+
+      {/* === 3. EXECUTION PATH === */}
+      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+        <div className="mb-6">
+          <p className="text-xs font-semibold uppercase tracking-wider text-stone-500">
+            Execution Path
+          </p>
+          <h2 className="mt-1 text-lg font-semibold text-stone-900">
+            Step-by-Step Progression
+          </h2>
+          {primaryBlocker && (
+            <p className="mt-2 text-sm text-[#c4a7a7]">
+              Required next step: {getPrimaryBlockerLabel(primaryBlocker)}
+            </p>
+          )}
+        </div>
+        <div className="space-y-2">
+          {flowSteps.map((step, idx) => (
+            <GuidedFlowStep 
+              key={step.id} 
+              step={step} 
+              isLast={idx === flowSteps.length - 1} 
+            />
           ))}
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-3">
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">Timeline Completed</p>
-          <p className="mt-2 text-3xl font-semibold text-stone-900">
-            {completedCount}
-          </p>
-          <p className="mt-2 text-sm leading-6 text-stone-600">
-            Milestones already completed in your planning workflow.
-          </p>
-        </div>
+      {/* === 4. PATHWAY CLASSIFICATION === */}
+      <PathwayClassificationCard
+        classification={pathwayClassification}
+        readinessTotal={readinessTotal}
+      />
 
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">In Progress</p>
-          <p className="mt-2 text-3xl font-semibold text-stone-900">
-            {inProgressCount}
-          </p>
-          <p className="mt-2 text-sm leading-6 text-stone-600">
-            Active planning items currently being worked through.
-          </p>
-        </div>
+      {/* === 5. SYSTEM INTELLIGENCE === */}
+      <SystemInsights
+        signals={signals}
+        executionStatus={executionStatus}
+        stage={stage}
+      />
 
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-stone-500">Upcoming</p>
-          <p className="mt-2 text-3xl font-semibold text-stone-900">
-            {upcomingCount}
-          </p>
-          <p className="mt-2 text-sm leading-6 text-stone-600">
-            Next-phase timeline items waiting to be executed.
-          </p>
-        </div>
-      </section>
-
-      <section className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-stone-900">
-            Planning Summary
-          </h2>
-          <p className="mt-3 text-sm leading-6 text-stone-600">
-            {planningNotes}
-          </p>
-
-          <div className="mt-5 flex flex-wrap gap-3">
-            <Link
-              href="/portal/my-plan"
-              className="inline-flex rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
-            >
-              Update My Plan
-            </Link>
-            <Link
-              href="/portal/timeline"
-              className="inline-flex rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
-            >
-              Review Timeline
-            </Link>
+      {/* === 6. READINESS BREAKDOWN === */}
+      <section className="rounded-2xl border border-stone-200 bg-stone-50 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-stone-500">
+              Planning Readiness
+            </p>
+            <p className="text-sm text-stone-600 mt-1">
+              {readinessTotal >= 70 
+                ? "Optimal for advisory engagement" 
+                : `${70 - readinessTotal}% to advisory threshold`}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="text-right">
+              <p className={`text-3xl font-light ${readinessTotal >= 70 ? "text-[#4a5a4a]" : "text-stone-900"}`}>
+                {readinessTotal}%
+              </p>
+            </div>
+            <div className={`flex h-12 w-12 items-center justify-center rounded-full border-2 ${
+              readinessTotal >= 70 ? "border-[#6a7a6a]" : "border-stone-300"
+            }`}>
+              <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${
+                advisoryReadiness.stage === "optimal" ? "bg-[#8a9a8a] text-white" :
+                advisoryReadiness.stage === "ready" ? "bg-[#6a7a6a] text-white" :
+                advisoryReadiness.stage === "developing" ? "bg-[#d4c4a8] text-[#5c4a3a]" :
+                "bg-stone-300 text-stone-600"
+              }`}>
+                {advisoryReadiness.score}
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-stone-900">Next Action</h2>
-          <p className="mt-3 text-lg font-semibold text-stone-900">
-            {nextAction.title}
-          </p>
-          <p className="mt-3 text-sm leading-6 text-stone-600">
-            {nextAction.body}
-          </p>
+        <div className="h-2 w-full rounded-full bg-stone-200">
+          <div className={`h-2 rounded-full transition-all ${
+            advisoryReadiness.stage === "optimal" ? "bg-[#8a9a8a]" :
+            advisoryReadiness.stage === "ready" ? "bg-[#6a7a6a]" :
+            advisoryReadiness.stage === "developing" ? "bg-[#d4c4a8]" :
+            "bg-stone-400"
+          }`} style={{ width: `${readinessTotal}%` }} />
+        </div>
 
+        {/* Collapsible details - only show if user needs to know what's missing */}
+        {readinessTotal < 70 && (
+          <div className="mt-4 pt-4 border-t border-stone-200">
+            <p className="text-xs text-stone-500 mb-2">Readiness breakdown:</p>
+            <div className="grid grid-cols-3 gap-4 text-xs">
+              <div>
+                <span className={readiness.planning >= 70 ? "text-[#6a7a6a]" : "text-stone-400"}>
+                  Planning: {readiness.planning}%
+                </span>
+              </div>
+              <div>
+                <span className={readiness.execution >= 70 ? "text-[#6a7a6a]" : "text-stone-400"}>
+                  Execution: {readiness.execution}%
+                </span>
+              </div>
+              <div>
+                <span className={readiness.advisory >= 70 ? "text-[#6a7a6a]" : "text-stone-400"}>
+                  Advisory: {readiness.advisory}%
+                </span>
+              </div>
+            </div>
+            {primaryBlocker && (
+              <p className="mt-3 text-xs text-[#8a6a6a]">
+                Next: {getPrimaryBlockerLabel(primaryBlocker)}
+              </p>
+            )}
+          </div>
+        )}
+      </section>
+
+      {/* === 7. METRICS === */}
+      <section className="grid gap-6 lg:grid-cols-3">
+        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+          <p className="text-sm font-bold text-stone-500 uppercase tracking-wider">Execution Progress</p>
+          <div className="mt-4">
+            <p className="text-4xl font-bold text-stone-900">{flags.timelineProgress}%</p>
+          </div>
+          <p className="mt-3 text-sm text-stone-600">
+            {flags.hasTimeline ? (
+              <span>{advisoryReadiness.ready.length} ready • {advisoryReadiness.missing.length} pending</span>
+            ) : (
+              <span className="text-[#8a6a6a] font-medium">Not initiated</span>
+            )}
+          </p>
+          {!flags.hasTimeline && (
+            <p className="mt-2 text-xs text-[#8a6a6a]">Blocking: All execution phases</p>
+          )}
+        </div>
+
+        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+          <p className="text-sm font-bold text-stone-500 uppercase tracking-wider">System Stage</p>
+          <p className="mt-3 text-lg font-bold text-stone-900 capitalize">
+            {stage}
+          </p>
+          <p className="mt-2 text-xs text-stone-500">
+            {executionStatus === "blocked" ? "Resolve blockers to proceed" : 
+             executionStatus === "ready" ? "Ready to begin execution" :
+             executionStatus === "active" ? "Execution in progress" : "Complete"}
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+          <p className="text-sm font-bold text-stone-500 uppercase tracking-wider">Country Status</p>
+          <p className="mt-3 text-lg font-bold text-stone-900">
+            {flags.hasCountries 
+              ? `${flags.countryCount} shortlisted` 
+              : "None"}
+          </p>
+          {flags.hasCountries ? (
+            <p className="mt-2 text-xs text-[#d4c4a8]">Selection needed to unlock timeline</p>
+          ) : (
+            <p className="mt-2 text-xs text-stone-400">Start with country research</p>
+          )}
+        </div>
+      </section>
+
+      {/* === 8. STAGE STATUS === */}
+      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+        <div className="flex items-start gap-4">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-stone-100">
+            <StageBadge stage={executionStage.stage} />
+          </div>
+          <div className="flex-1">
+            <h2 className="text-lg font-bold text-stone-900">
+              {stage === "planning" ? "Stage 01 — Foundation Building" :
+               stage === "decision" ? "Stage 02 — Decision & Commitment" :
+               stage === "execution" ? "Stage 03 — Active Execution" :
+               "Stage 04 — Completion"}
+            </h2>
+            <p className="mt-1 text-sm text-stone-600">
+              <span className="font-medium">Current focus:</span> {
+                stage === "planning" ? "Define pathway and explore options" :
+                stage === "decision" ? "Commit to primary jurisdiction and generate timeline" :
+                stage === "execution" ? "Progress through timeline and validate with advisory" :
+                "Maintain execution momentum and track milestones"
+              }
+            </p>
+            <p className="mt-2 text-sm text-stone-600">
+              <span className="font-medium">Execution status:</span> <span className={executionStatus === "blocked" ? "text-[#c4a7a7] font-medium" : "text-[#6a7a6a] font-medium"}>{executionStatus}</span>
+              {primaryBlocker && <span className="text-stone-500"> — {getPrimaryBlockerLabel(primaryBlocker)}</span>}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* === 9. ADVISORY CTA === */}
+      <section className="rounded-2xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-sm font-bold text-stone-500 uppercase tracking-wider">Advisory Status</p>
+            <p className="mt-1 text-lg font-bold text-stone-900">
+              {flags.advisoryReady ? "Ready for validation" : flags.timelineComplete ? "Ready for validation" : "Complete timeline first"}
+            </p>
+            <p className="mt-1 text-sm text-stone-600">
+              {flags.advisoryReady 
+                ? "Ensure jurisdiction, legal pathway, and clinic strategy are correct before execution."
+                : primaryBlocker
+                  ? `Next step: ${getPrimaryBlockerLabel(primaryBlocker)}`
+                  : `Complete ${70 - readinessTotal}% more to unlock advisory eligibility`}
+            </p>
+          </div>
           <Link
-            href={nextAction.href}
-            className="mt-5 inline-flex rounded-xl bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-800"
+            href="/portal/advisory"
+            className={`inline-flex shrink-0 rounded-xl px-4 py-2 text-sm font-bold transition ${
+              flags.advisoryReady || flags.timelineComplete
+                ? "bg-[#3a3a3a] text-white hover:bg-[#2a2a2a]"
+                : "border-2 border-stone-300 text-stone-400 cursor-not-allowed"
+            }`}
           >
-            {nextAction.cta}
+            {flags.advisoryReady || flags.timelineComplete ? "Validate Your Strategy →" : "Locked"}
           </Link>
         </div>
       </section>
 
-      <section className="space-y-4">
-        <div>
-          <h2 className="text-xl font-semibold text-stone-900">
-            Portal Modules
-          </h2>
-          <p className="mt-1 text-sm text-stone-600">
-            Your core planning modules are now connected to real user data and
-            can be used as an active private workspace.
-          </p>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {dashboardCards.map((card) => (
-            <article
-              key={card.title}
-              className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm"
-            >
-              <h3 className="text-lg font-semibold text-stone-900">
-                {card.title}
-              </h3>
-              <p className="mt-3 text-sm leading-6 text-stone-600">
-                {card.description}
-              </p>
-
-              <Link
-                href={card.href}
-                className="mt-5 inline-flex rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
-              >
-                {card.cta}
-              </Link>
-            </article>
-          ))}
-        </div>
-      </section>
     </div>
   );
 }
