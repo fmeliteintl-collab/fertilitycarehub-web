@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import Link from "next/link";
 
 type ConsultationRow = {
@@ -29,20 +29,21 @@ function formatDate(s?: string) {
   }
 }
 
+function getStoredAdminToken(): string {
+  if (typeof window === "undefined") {
+    return "";
+  }
+
+  return window.localStorage.getItem("FCH_ADMIN_TOKEN") || "";
+}
+
 export default function AdminConsultationsPage() {
-  const [token, setToken] = useState("");
-  const [savedToken, setSavedToken] = useState<string>("");
+  const [token, setToken] = useState(getStoredAdminToken);
+  const [savedToken, setSavedToken] = useState<string>(getStoredAdminToken);
   const [rows, setRows] = useState<ConsultationRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string>("");
   const [query, setQuery] = useState("");
-
-  // Load token from localStorage on first render
-  useEffect(() => {
-    const t = window.localStorage.getItem("FCH_ADMIN_TOKEN") || "";
-    setSavedToken(t);
-    setToken(t);
-  }, []);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

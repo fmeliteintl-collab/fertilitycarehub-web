@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export const runtime = "edge";
@@ -181,13 +181,9 @@ export default function PortalSettingsPage() {
     }
   }
 
-  const accountCreatedLabel = useMemo(() => {
-    if (!profile?.created_at) {
-      return "Not available yet";
-    }
-
-    return new Date(profile.created_at).toLocaleString();
-  }, [profile?.created_at]);
+  const accountCreatedLabel = profile?.created_at
+    ? new Date(profile.created_at).toLocaleString()
+    : "Not available yet";
 
   const accountState = profile ? "Active" : "Loading";
 
