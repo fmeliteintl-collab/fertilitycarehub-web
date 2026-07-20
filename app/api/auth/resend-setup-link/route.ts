@@ -16,6 +16,19 @@ type Profile = {
   portal_access: boolean | null;
 };
 
+type RateLimitClaim = {
+  allowed: boolean;
+  retry_after_seconds: number;
+};
+
+type CreatedSetupToken = {
+  token: string;
+  createdAt: string;
+};
+
+const GENERIC_SUCCESS_MESSAGE =
+  "If this email is connected to advisory access, a secure setup link will be sent shortly.";
+
 function getEnv(): ResendSetupEnv {
   try {
     const context = getRequestContext();
@@ -37,12 +50,8 @@ function getSupabaseHeaders(serviceRoleKey: string): HeadersInit {
   };
 }
 
-function getErrorMessage(err: unknown): string {
-  if (err instanceof Error) {
-    return err.message;
-  }
-
-  return "Unknown error";
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : "Unknown error";
 }
 
 function createSecurePortalSetupToken(): string {
@@ -68,6 +77,15 @@ function normalizeEmail(email: unknown): string | null {
   return normalized;
 }
 
+async function createRateLimitKey(email: string): Promise<string> {
+  const encodedEmail = new TextEncoder().encode(email);
+  const digest = await crypto.subtle.digest("SHA-256", encodedEmail);
+
+  return Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+}
+
 async function logOnboardingEvent(params: {
   email: string | null;
   eventType: string;
@@ -77,25 +95,67 @@ async function logOnboardingEvent(params: {
   supabaseUrl: string;
   supabaseServiceRoleKey: string;
 }): Promise<void> {
-  const response = await fetch(`${params.supabaseUrl}/rest/v1/onboarding_events`, {
-    method: "POST",
-    headers: {
-      ...getSupabaseHeaders(params.supabaseServiceRoleKey),
-      Prefer: "return=minimal",
-    },
-    body: JSON.stringify({
-      email: params.email,
-      event_type: params.eventType,
-      event_source: params.eventSource,
-      status: params.status ?? "completed",
-      metadata: params.metadata ?? {},
-    }),
-  });
+  try {
+    const response = await fetch(
+      `${params.supabaseUrl}/rest/v1/onboarding_events`,
+      {
+        method: "POST",
+        headers: {
+          ...getSupabaseHeaders(params.supabaseServiceRoleKey),
+          Prefer: "return=minimal",
+        },
+        body: JSON.stringify({
+          email: params.email,
+          event_type: params.eventType,
+          event_source: params.eventSource,
+          status: params.status ?? "completed",
+          metadata: params.metadata ?? {},
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Onboarding event logging failed: ${errorText}`);
+    }
+  } catch (error: unknown) {
+    console.error(
+      "Onboarding event logging exception:",
+      getErrorMessage(error)
+    );
+  }
+}
+
+async function claimResendRateLimit(params: {
+  rateKey: string;
+  supabaseUrl: string;
+  supabaseServiceRoleKey: string;
+}): Promise<RateLimitClaim> {
+  const response = await fetch(
+    `${params.supabaseUrl}/rest/v1/rpc/claim_portal_setup_resend`,
+    {
+      method: "POST",
+      headers: getSupabaseHeaders(params.supabaseServiceRoleKey),
+      body: JSON.stringify({
+        p_rate_key: params.rateKey,
+        p_window_seconds: 900,
+        p_max_requests: 3,
+      }),
+    }
+  );
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error(`Onboarding event logging failed: ${errorText}`);
+    throw new Error(`Resend rate-limit claim failed: ${errorText}`);
   }
+
+  const rows = (await response.json()) as RateLimitClaim[];
+
+  if (rows.length !== 1) {
+    throw new Error("Resend rate-limit claim returned an unexpected result.");
+  }
+
+  return rows[0];
 }
 
 async function getPaidProfile(params: {
@@ -105,7 +165,7 @@ async function getPaidProfile(params: {
 }): Promise<Profile | null> {
   const lookupUrl = `${params.supabaseUrl}/rest/v1/profiles?email=eq.${encodeURIComponent(
     params.email
-  )}&select=id,email,full_name,portal_access`;
+  )}&select=id,email,full_name,portal_access&limit=1`;
 
   const response = await fetch(lookupUrl, {
     method: "GET",
@@ -119,27 +179,69 @@ async function getPaidProfile(params: {
 
   const profiles = (await response.json()) as Profile[];
 
-  if (profiles.length === 0) {
+  if (profiles.length === 0 || profiles[0].portal_access !== true) {
     return null;
   }
 
-  const profile = profiles[0];
-
-  if (profile.portal_access !== true) {
-    return null;
-  }
-
-  return profile;
+  return profiles[0];
 }
 
-async function expireExistingUnusedTokens(params: {
+async function createPortalSetupToken(params: {
   email: string;
+  supabaseUrl: string;
+  supabaseServiceRoleKey: string;
+}): Promise<CreatedSetupToken> {
+  const token = createSecurePortalSetupToken();
+
+  const response = await fetch(
+    `${params.supabaseUrl}/rest/v1/portal_setup_tokens?select=token,created_at`,
+    {
+      method: "POST",
+      headers: {
+        ...getSupabaseHeaders(params.supabaseServiceRoleKey),
+        Prefer: "return=representation",
+      },
+      body: JSON.stringify({
+        email: params.email,
+        token,
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Portal setup token creation failed: ${errorText}`);
+  }
+
+  const rows = (await response.json()) as Array<{
+    token?: unknown;
+    created_at?: unknown;
+  }>;
+
+  const createdToken = rows[0];
+
+  if (
+    rows.length !== 1 ||
+    typeof createdToken?.token !== "string" ||
+    typeof createdToken.created_at !== "string"
+  ) {
+    throw new Error("Portal setup token creation returned an invalid result.");
+  }
+
+  return {
+    token: createdToken.token,
+    createdAt: createdToken.created_at,
+  };
+}
+
+async function markTokenUsed(params: {
+  token: string;
   supabaseUrl: string;
   supabaseServiceRoleKey: string;
 }): Promise<void> {
   const response = await fetch(
-    `${params.supabaseUrl}/rest/v1/portal_setup_tokens?email=eq.${encodeURIComponent(
-      params.email
+    `${params.supabaseUrl}/rest/v1/portal_setup_tokens?token=eq.${encodeURIComponent(
+      params.token
     )}&used=eq.false`,
     {
       method: "PATCH",
@@ -155,38 +257,36 @@ async function expireExistingUnusedTokens(params: {
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Existing token expiry failed: ${errorText}`);
+    throw new Error(`Portal setup token invalidation failed: ${errorText}`);
   }
 }
 
-async function createPortalSetupToken(params: {
+async function expireOlderUnusedTokens(params: {
   email: string;
+  createdAt: string;
   supabaseUrl: string;
   supabaseServiceRoleKey: string;
-}): Promise<string> {
-  const token = createSecurePortalSetupToken();
-
+}): Promise<void> {
   const response = await fetch(
-    `${params.supabaseUrl}/rest/v1/portal_setup_tokens`,
+    `${params.supabaseUrl}/rest/v1/portal_setup_tokens?email=eq.${encodeURIComponent(
+      params.email
+    )}&used=eq.false&created_at=lt.${encodeURIComponent(params.createdAt)}`,
     {
-      method: "POST",
+      method: "PATCH",
       headers: {
         ...getSupabaseHeaders(params.supabaseServiceRoleKey),
         Prefer: "return=minimal",
       },
       body: JSON.stringify({
-        email: params.email,
-        token,
+        used: true,
       }),
     }
   );
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Portal setup token creation failed: ${errorText}`);
+    throw new Error(`Older token expiry failed: ${errorText}`);
   }
-
-  return token;
 }
 
 async function sendSetupEmail(params: {
@@ -305,6 +405,7 @@ export async function POST(req: Request) {
   }
 
   let email: string | null = null;
+  let createdToken: CreatedSetupToken | null = null;
 
   try {
     const body = (await req.json()) as { email?: unknown };
@@ -330,6 +431,34 @@ export async function POST(req: Request) {
       );
     }
 
+    const rateKey = await createRateLimitKey(email);
+    const rateLimit = await claimResendRateLimit({
+      rateKey,
+      supabaseUrl,
+      supabaseServiceRoleKey,
+    });
+
+    if (!rateLimit.allowed) {
+      await logOnboardingEvent({
+        email,
+        eventType: "setup_link_resend_rate_limited",
+        eventSource: "resend_setup_link",
+        status: "not_sent",
+        metadata: {
+          retry_after_seconds: rateLimit.retry_after_seconds,
+          rate_limit_window_seconds: 900,
+          rate_limit_max_requests: 3,
+        },
+        supabaseUrl,
+        supabaseServiceRoleKey,
+      });
+
+      return NextResponse.json({
+        ok: true,
+        message: GENERIC_SUCCESS_MESSAGE,
+      });
+    }
+
     const profile = await getPaidProfile({
       email,
       supabaseUrl,
@@ -351,29 +480,66 @@ export async function POST(req: Request) {
 
       return NextResponse.json({
         ok: true,
-        message:
-          "If this email is connected to advisory access, a secure setup link will be sent shortly.",
+        message: GENERIC_SUCCESS_MESSAGE,
       });
     }
 
-    await expireExistingUnusedTokens({
+    createdToken = await createPortalSetupToken({
       email,
       supabaseUrl,
       supabaseServiceRoleKey,
     });
 
-    const token = await createPortalSetupToken({
-      email,
-      supabaseUrl,
-      supabaseServiceRoleKey,
-    });
+    try {
+      await sendSetupEmail({
+        email,
+        fullName: profile.full_name,
+        token: createdToken.token,
+        resendApiKey,
+      });
+    } catch (deliveryError: unknown) {
+      try {
+        await markTokenUsed({
+          token: createdToken.token,
+          supabaseUrl,
+          supabaseServiceRoleKey,
+        });
+      } catch (invalidationError: unknown) {
+        console.error(
+          "Failed to invalidate undelivered setup token:",
+          getErrorMessage(invalidationError)
+        );
+      }
 
-    await sendSetupEmail({
-      email,
-      fullName: profile.full_name,
-      token,
-      resendApiKey,
-    });
+      throw deliveryError;
+    }
+
+    try {
+      await expireOlderUnusedTokens({
+        email,
+        createdAt: createdToken.createdAt,
+        supabaseUrl,
+        supabaseServiceRoleKey,
+      });
+    } catch (cleanupError: unknown) {
+      console.error(
+        "Setup email was delivered, but older-token cleanup failed:",
+        getErrorMessage(cleanupError)
+      );
+
+      await logOnboardingEvent({
+        email,
+        eventType: "setup_link_old_token_cleanup_failed",
+        eventSource: "resend_setup_link",
+        status: "warning",
+        metadata: {
+          profile_id: profile.id,
+          error: getErrorMessage(cleanupError),
+        },
+        supabaseUrl,
+        supabaseServiceRoleKey,
+      });
+    }
 
     await logOnboardingEvent({
       email,
@@ -383,7 +549,8 @@ export async function POST(req: Request) {
       metadata: {
         profile_id: profile.id,
         delivery_provider: "resend",
-        previous_unused_tokens_expired: true,
+        older_unused_tokens_expired_after_delivery: true,
+        delivery_safe_rotation: true,
       },
       supabaseUrl,
       supabaseServiceRoleKey,
@@ -391,11 +558,10 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       ok: true,
-      message:
-        "If this email is connected to advisory access, a secure setup link will be sent shortly.",
+      message: GENERIC_SUCCESS_MESSAGE,
     });
-  } catch (err: unknown) {
-    console.error("Resend setup link failed:", getErrorMessage(err));
+  } catch (error: unknown) {
+    console.error("Resend setup link failed:", getErrorMessage(error));
 
     await logOnboardingEvent({
       email,
@@ -404,7 +570,8 @@ export async function POST(req: Request) {
       status: "failed",
       metadata: {
         reason: "unexpected_error",
-        error: getErrorMessage(err),
+        error: getErrorMessage(error),
+        generated_token_invalidated_after_failure: createdToken !== null,
       },
       supabaseUrl,
       supabaseServiceRoleKey,

@@ -6,6 +6,7 @@ import {
   upsertCurrentUserPlan,
 } from "@/lib/plans/user-plans";
 import { EMPTY_USER_PLAN_INPUT, type UserPlanInput } from "@/types/plan";
+import { isPathwayDefined } from "@/lib/intelligence/plan-intelligence";
 
 // === PREMIUM: Option Types ===
 type Option = { value: string; label: string; description?: string };
@@ -260,50 +261,65 @@ function TagInput({
 // === PREMIUM: Live Planning Summary ===
 function PlanningSummary({ plan }: { plan: UserPlanInput }) {
   const indicators = useMemo(() => {
-    const items: { label: string; value: string; status: "complete" | "partial" | "empty" }[] = [];
+    const items: {
+      label: string;
+      value: string;
+      status: "complete" | "partial" | "empty";
+    }[] = [];
+
+    const pathwayDefined = isPathwayDefined(plan.pathway_type);
+    const pathwaySelected = Boolean(plan.pathway_type?.trim());
 
     items.push({
       label: "Pathway",
-      value: plan.pathway_type || "Not selected",
-      status: plan.pathway_type ? "complete" : "empty",
+      value: plan.pathway_type?.trim() || "Not selected",
+      status: pathwayDefined
+        ? "complete"
+        : pathwaySelected
+          ? "partial"
+          : "empty",
     });
 
     items.push({
       label: "Family",
-      value: plan.family_structure || "Not defined",
-      status: plan.family_structure ? "complete" : "empty",
+      value: plan.family_structure?.trim() || "Not defined",
+      status: plan.family_structure?.trim() ? "complete" : "empty",
     });
 
     items.push({
       label: "Timeline",
-      value: plan.target_timeline || "Not set",
-      status: plan.target_timeline ? "complete" : "empty",
+      value: plan.target_timeline?.trim() || "Not set",
+      status: plan.target_timeline?.trim() ? "complete" : "empty",
     });
 
     items.push({
       label: "Budget",
-      value: plan.budget_range || "Not defined",
-      status: plan.budget_range ? "complete" : "empty",
+      value: plan.budget_range?.trim() || "Not defined",
+      status: plan.budget_range?.trim() ? "complete" : "empty",
     });
 
     const hasDonor = plan.donor_needed;
     const hasSurrogate = plan.surrogate_needed;
     items.push({
       label: "Specialized",
-      value: hasDonor && hasSurrogate 
-        ? "Donor + Surrogate" 
-        : hasDonor 
-          ? "Donor required" 
-          : hasSurrogate 
-            ? "Surrogate required" 
+      value: hasDonor && hasSurrogate
+        ? "Donor + Surrogate"
+        : hasDonor
+          ? "Donor required"
+          : hasSurrogate
+            ? "Surrogate required"
             : "Standard pathway",
-      status: hasDonor || hasSurrogate ? "partial" : "complete",
+      status: "complete",
     });
 
     return items;
   }, [plan]);
 
-  const completionScore = indicators.filter(i => i.status === "complete").length;
+  const completionScore = indicators.reduce((score, item) => {
+    if (item.status === "complete") return score + 1;
+    if (item.status === "partial") return score + 0.5;
+    return score;
+  }, 0);
   const totalScore = indicators.length;
   const percentage = Math.round((completionScore / totalScore) * 100);
 
@@ -545,7 +561,10 @@ export default function MyPlanPage() {
               allowClear
             />
 
-            {(plan.pathway_type?.includes("Donor") || plan.pathway_type?.includes("Surrogacy")) && (
+            {(plan.pathway_type?.includes("Donor") ||
+              plan.pathway_type?.includes("Surrogacy") ||
+              plan.donor_needed ||
+              plan.surrogate_needed) && (
               <div className="rounded-lg bg-[#faf8f3] border border-[#d4c4a8] p-3">
                 <p className="text-sm text-[#6a5a4a]">
                   <span className="font-medium">Note:</span> Your selected pathway involves third-party reproduction. 
@@ -662,7 +681,7 @@ export default function MyPlanPage() {
           isActive={false}
         >
           <textarea
-            className="w-full rounded-lg border border-stone-300 p-3 text-sm focus:border-[#3a3a3a] focus:outline-none min-h-[80px]"
+            className="w-full rounded-lg border border-stone-300 p-3 text-sm focus:border-[#3a3a3a] focus:outline-none min-h-20"
             value={plan.treatment_goal ?? ""}
             onChange={(e) => updatePlanField("treatment_goal", e.target.value)}
             placeholder="e.g., Single live birth, genetic connection to both partners..."
@@ -676,7 +695,7 @@ export default function MyPlanPage() {
           isActive={false}
         >
           <textarea
-            className="w-full rounded-lg border border-stone-300 p-3 text-sm focus:border-[#3a3a3a] focus:outline-none min-h-[120px]"
+            className="w-full rounded-lg border border-stone-300 p-3 text-sm focus:border-[#3a3a3a] focus:outline-none min-h-30"
             value={plan.notes ?? ""}
             onChange={(e) => updatePlanField("notes", e.target.value)}
             placeholder="Clinic questions, country considerations, timing constraints, or any other relevant details..."

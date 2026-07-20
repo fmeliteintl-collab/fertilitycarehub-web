@@ -68,7 +68,9 @@ export type SystemSignal = {
 
 // ==================== HELPER FUNCTIONS ====================
 
-export function getTimelineCounts(timelineItems: TimelineItem[] | undefined | null): TimelineCounts {
+export function getTimelineCounts(
+  timelineItems: TimelineItem[] | undefined | null
+): TimelineCounts {
   const items = timelineItems ?? [];
   return {
     total: items.length,
@@ -158,7 +160,7 @@ export function calculateAdvisoryReadiness(
   const timelineCounts = getTimelineCounts(plan?.timeline_items);
   const shortlistCount = plan?.shortlisted_countries?.length ?? 0;
 
-  const hasPathway = Boolean(plan?.pathway_type?.trim());
+  const hasPathway = isPathwayDefined(plan?.pathway_type);
   const hasTreatmentGoal = Boolean(plan?.treatment_goal?.trim());
   const hasNotes = Boolean(plan?.notes?.trim());
   const hasMyPlanBasics = hasPathway || hasTreatmentGoal || hasNotes;
@@ -266,13 +268,16 @@ export function calculateAdvisoryReadiness(
     missing.push("Define priorities");
   }
 
-  const maxScore = 100;
-  const percentage = Math.round((score / maxScore) * 100);
+  const maxScore = 110;
+  const percentage = Math.min(
+    100,
+    Math.round((score / maxScore) * 100)
+  );
 
   let stage: "insufficient" | "developing" | "ready" | "optimal";
-  if (score < 30) stage = "insufficient";
-  else if (score < 60) stage = "developing";
-  else if (score < 85) stage = "ready";
+  if (percentage < 30) stage = "insufficient";
+  else if (percentage < 60) stage = "developing";
+  else if (percentage < 85) stage = "ready";
   else stage = "optimal";
 
   return { score, maxScore, percentage, stage, ready, missing };
@@ -290,7 +295,7 @@ export function calculateTimelineReadiness(
   const missing: string[] = [];
 
   // Foundation (40 points)
-  if (plan?.pathway_type && plan.pathway_type !== "Not sure yet") {
+  if (isPathwayDefined(plan?.pathway_type)) {
     score += 15;
     ready.push("Pathway defined");
   } else {
@@ -384,7 +389,7 @@ export function getGlobalNextAction(
   const shortlistCount = plan?.shortlisted_countries?.length ?? 0;
   const timelineCounts = getTimelineCounts(plan?.timeline_items);
 
-  const hasPathway = Boolean(plan?.pathway_type?.trim());
+  const hasPathway = isPathwayDefined(plan?.pathway_type);
 
   const hasAdvisoryStatus = Boolean(plan?.advisory_status?.trim());
   const hasAdvisoryNextStep = Boolean(plan?.advisory_next_step?.trim());
@@ -517,6 +522,19 @@ export function determineExecutionStage(
   const shortlistCount = plan?.shortlisted_countries?.length ?? 0;
   const timelineCounts = getTimelineCounts(plan?.timeline_items);
   const status = plan?.advisory_status ?? "Not Started";
+
+  if (!isPathwayDefined(plan?.pathway_type)) {
+    return {
+      stage: "foundation",
+      description:
+        "Early planning phase. Define a clear fertility pathway before country selection and execution sequencing.",
+      nextActions: [
+        "Define pathway type",
+        "Confirm family structure",
+        "Set treatment goals",
+      ],
+    };
+  }
 
   if (status === "Completed") {
     return {
@@ -1063,6 +1081,12 @@ function normalizeLower(value: string | null | undefined): string {
   return value?.trim().toLowerCase() ?? "";
 }
 
+export function isPathwayDefined(
+  value: string | null | undefined
+): boolean {
+  return Boolean(value?.trim()) && normalizeLower(value) !== "not sure yet";
+}
+
 function countMeaningfulItems(items: string[] | null | undefined): number {
   return (items ?? []).filter((item) => item.trim().length > 0).length;
 }
@@ -1094,7 +1118,7 @@ function getPathwayComplexitySignals(plan: PlanData): {
 
   return {
     shortlistCount,
-    hasPathway: hasMeaningfulText(plan?.pathway_type) && pathwayValue !== "not sure yet",
+    hasPathway: isPathwayDefined(plan?.pathway_type),
     hasTreatmentGoal: hasMeaningfulText(plan?.treatment_goal),
     hasFamilyStructure: hasMeaningfulText(plan?.family_structure),
     hasDonorNeed: Boolean(plan?.donor_needed),
@@ -1346,7 +1370,7 @@ export function buildNextActionWithContext(plan: PlanData, documentCount = 0): N
   const shortlistCount = plan?.shortlisted_countries?.length ?? 0;
   const timelineCounts = getTimelineCounts(plan?.timeline_items);
 
-  const hasPathway = Boolean(plan?.pathway_type?.trim());
+  const hasPathway = isPathwayDefined(plan?.pathway_type);
   const hasCountries = shortlistCount > 0;
   const hasTimeline = timelineCounts.total > 0;
 
@@ -1532,7 +1556,7 @@ export function getPrimaryGuidance(
 ): PrimaryGuidance {
   const shortlistCount = plan?.shortlisted_countries?.length ?? 0;
   const hasTimeline = (plan?.timeline_items ?? []).length > 0;
-  const hasPathway = Boolean(plan?.pathway_type?.trim());
+  const hasPathway = isPathwayDefined(plan?.pathway_type);
 
   // INTAKE STAGE
   if (currentStage === "intake" || !currentStage) {
@@ -1683,7 +1707,7 @@ export interface ReadinessBreakdownResult {
 }
 
 export function getReadinessBreakdown(plan: PlanData): ReadinessBreakdownResult {
-  const hasPathway = Boolean(plan?.pathway_type?.trim());
+  const hasPathway = isPathwayDefined(plan?.pathway_type);
   const hasCountries = (plan?.shortlisted_countries ?? []).length > 0;
   const hasTimeline = (plan?.timeline_items ?? []).length > 0;
   

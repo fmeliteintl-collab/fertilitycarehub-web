@@ -1,48 +1,128 @@
+import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 export const runtime = "edge";
 
-type PortalSetupToken = {
-  email: string;
-  used: boolean | null;
-  expires_at: string;
+type AuthSetupEnv = {
+  SUPABASE_URL?: string;
+  SUPABASE_SERVICE_ROLE_KEY?: string;
 };
 
-const supabaseAdmin = createClient(
-  process.env.SUPABASE_URL ?? "",
-  process.env.SUPABASE_SERVICE_ROLE_KEY ?? ""
-);
+type ConsumedSetupToken = {
+  email: string;
+  profile_id: string;
+};
+
+function getEnv(): AuthSetupEnv {
+  try {
+    const context = getRequestContext();
+    return context.env as AuthSetupEnv;
+  } catch {
+    return {
+      SUPABASE_URL: process.env.SUPABASE_URL,
+      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    };
+  }
+}
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : "Unknown error";
+}
 
 async function logOnboardingEvent(params: {
+  supabaseAdmin: SupabaseClient;
   email: string | null;
   eventType: string;
   status?: string;
   metadata?: Record<string, unknown>;
-}) {
-  await supabaseAdmin.from("onboarding_events").insert({
-    email: params.email,
-    event_type: params.eventType,
-    event_source: "auth_setup",
-    status: params.status ?? "completed",
-    metadata: params.metadata ?? {},
-  });
+}): Promise<void> {
+  try {
+    const { error } = await params.supabaseAdmin
+      .from("onboarding_events")
+      .insert({
+        email: params.email,
+        event_type: params.eventType,
+        event_source: "auth_setup",
+        status: params.status ?? "completed",
+        metadata: params.metadata ?? {},
+      });
+
+    if (error) {
+      console.error("Onboarding event logging failed:", error.message);
+    }
+  } catch (error: unknown) {
+    console.error(
+      "Onboarding event logging exception:",
+      getErrorMessage(error)
+    );
+  }
+}
+
+function getConsumedTokenRow(data: unknown): ConsumedSetupToken | null {
+  if (!Array.isArray(data) || data.length !== 1) {
+    return null;
+  }
+
+  const row = data[0] as Partial<ConsumedSetupToken>;
+
+  if (
+    typeof row.email !== "string" ||
+    row.email.length === 0 ||
+    typeof row.profile_id !== "string" ||
+    row.profile_id.length === 0
+  ) {
+    return null;
+  }
+
+  return {
+    email: row.email,
+    profile_id: row.profile_id,
+  };
 }
 
 export async function POST(request: NextRequest) {
+  const env = getEnv();
+  const supabaseUrl = env.SUPABASE_URL;
+  const supabaseServiceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl) {
+    return NextResponse.json(
+      { error: "Portal setup is temporarily unavailable." },
+      { status: 500 }
+    );
+  }
+
+  if (!supabaseServiceRoleKey) {
+    return NextResponse.json(
+      { error: "Portal setup is temporarily unavailable." },
+      { status: 500 }
+    );
+  }
+
+  const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+
   let normalizedEmail: string | null = null;
 
   try {
     const body = (await request.json()) as {
-      token?: string;
-      password?: string;
+      token?: unknown;
+      password?: unknown;
     };
 
-    const token = body.token?.trim();
-    const password = body.password?.trim();
+    const token =
+      typeof body.token === "string" ? body.token.trim() : "";
+    const password =
+      typeof body.password === "string" ? body.password : "";
 
     if (!token || !password) {
       await logOnboardingEvent({
+        supabaseAdmin,
         email: null,
         eventType: "setup_failed",
         status: "failed",
@@ -57,6 +137,7 @@ export async function POST(request: NextRequest) {
 
     if (password.length < 8) {
       await logOnboardingEvent({
+        supabaseAdmin,
         email: null,
         eventType: "setup_failed",
         status: "failed",
@@ -69,157 +150,102 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data: tokenRow, error: tokenError } = await supabaseAdmin
-      .from("portal_setup_tokens")
-      .select("email, used, expires_at")
-      .eq("token", token)
-      .single<PortalSetupToken>();
+    const { data: consumedTokenData, error: consumeError } =
+      await supabaseAdmin.rpc("consume_portal_setup_token", {
+        p_token: token,
+      });
 
-    if (tokenError || !tokenRow) {
+    if (consumeError) {
+      console.error(
+        "Portal setup token consumption failed:",
+        consumeError.message
+      );
+
       await logOnboardingEvent({
+        supabaseAdmin,
         email: null,
         eventType: "setup_failed",
         status: "failed",
-        metadata: { reason: "invalid_token" },
+        metadata: { reason: "token_consumption_failed" },
       });
 
       return NextResponse.json(
-        { error: "This setup link is invalid." },
+        {
+          error:
+            "This setup link is invalid, expired, already used, or no longer eligible.",
+        },
         { status: 400 }
       );
     }
 
-    normalizedEmail = tokenRow.email.trim().toLowerCase();
+    const consumedToken = getConsumedTokenRow(consumedTokenData);
 
-    if (tokenRow.used) {
+    if (!consumedToken) {
       await logOnboardingEvent({
-        email: normalizedEmail,
+        supabaseAdmin,
+        email: null,
         eventType: "setup_failed",
         status: "failed",
-        metadata: { reason: "token_already_used" },
+        metadata: {
+          reason: "token_invalid_expired_used_or_ineligible",
+        },
       });
 
       return NextResponse.json(
-        { error: "This setup link has already been used." },
+        {
+          error:
+            "This setup link is invalid, expired, already used, or no longer eligible.",
+        },
         { status: 400 }
       );
     }
 
-    if (new Date(tokenRow.expires_at).getTime() < Date.now()) {
-      await logOnboardingEvent({
-        email: normalizedEmail,
-        eventType: "setup_failed",
-        status: "failed",
-        metadata: { reason: "token_expired" },
-      });
+    normalizedEmail = consumedToken.email.trim().toLowerCase();
 
-      return NextResponse.json(
-        { error: "This setup link has expired." },
-        { status: 400 }
+    const { error: updateError } =
+      await supabaseAdmin.auth.admin.updateUserById(
+        consumedToken.profile_id,
+        {
+          password,
+          email_confirm: true,
+        }
       );
-    }
 
-    const { data: profile, error: profileError } = await supabaseAdmin
-      .from("profiles")
-      .select("portal_access")
-      .eq("email", normalizedEmail)
-      .single<{ portal_access: boolean | null }>();
-
-    if (profileError || !profile?.portal_access) {
-      await logOnboardingEvent({
-        email: normalizedEmail,
-        eventType: "setup_failed",
-        status: "failed",
-        metadata: { reason: "portal_access_not_active" },
-      });
-
-      return NextResponse.json(
-        { error: "Portal access has not been activated for this email." },
-        { status: 403 }
+    if (updateError) {
+      console.error(
+        "Portal Auth user password update failed:",
+        updateError.message
       );
-    }
 
-    const { data: usersList, error: usersError } =
-      await supabaseAdmin.auth.admin.listUsers();
-
-    if (usersError) {
       await logOnboardingEvent({
+        supabaseAdmin,
         email: normalizedEmail,
         eventType: "setup_failed",
         status: "failed",
-        metadata: { reason: "user_lookup_failed" },
+        metadata: {
+          reason: "auth_user_update_failed",
+          profile_id: consumedToken.profile_id,
+        },
       });
 
       return NextResponse.json(
-        { error: "Unable to verify portal user." },
+        {
+          error:
+            "We could not complete portal setup. Please request a new setup link or contact the advisory team.",
+        },
         { status: 500 }
       );
     }
 
-    const existingUser = usersList.users.find(
-      (user) => user.email?.toLowerCase() === normalizedEmail
-    );
-
-    if (existingUser) {
-      const { error: updateError } =
-        await supabaseAdmin.auth.admin.updateUserById(existingUser.id, {
-          password,
-          email_confirm: true,
-        });
-
-      if (updateError) {
-        await logOnboardingEvent({
-          email: normalizedEmail,
-          eventType: "setup_failed",
-          status: "failed",
-          metadata: {
-            reason: "existing_user_update_failed",
-            error: updateError.message,
-          },
-        });
-
-        return NextResponse.json(
-          { error: updateError.message },
-          { status: 400 }
-        );
-      }
-    } else {
-      const { error: createError } =
-        await supabaseAdmin.auth.admin.createUser({
-          email: normalizedEmail,
-          password,
-          email_confirm: true,
-        });
-
-      if (createError) {
-        await logOnboardingEvent({
-          email: normalizedEmail,
-          eventType: "setup_failed",
-          status: "failed",
-          metadata: {
-            reason: "new_user_create_failed",
-            error: createError.message,
-          },
-        });
-
-        return NextResponse.json(
-          { error: createError.message },
-          { status: 400 }
-        );
-      }
-    }
-
-    await supabaseAdmin
-      .from("portal_setup_tokens")
-      .update({ used: true })
-      .eq("token", token);
-
     await logOnboardingEvent({
+      supabaseAdmin,
       email: normalizedEmail,
       eventType: "setup_completed",
       status: "completed",
       metadata: {
-        user_status: existingUser ? "existing_user_updated" : "new_user_created",
+        user_status: "existing_auth_user_updated",
+        profile_id: consumedToken.profile_id,
+        token_consumption: "atomic",
       },
     });
 
@@ -227,8 +253,11 @@ export async function POST(request: NextRequest) {
       success: true,
       email: normalizedEmail,
     });
-  } catch {
+  } catch (error: unknown) {
+    console.error("Portal setup failed:", getErrorMessage(error));
+
     await logOnboardingEvent({
+      supabaseAdmin,
       email: normalizedEmail,
       eventType: "setup_failed",
       status: "failed",

@@ -51,6 +51,49 @@ type PortalAuthDetails = {
 
 type WebhookEventStatus = "processing" | "completed" | "failed" | "skipped";
 
+type AdvisoryTier = "tier1" | "tier2";
+
+type ApprovedAdvisoryPurchase = {
+  tier: AdvisoryTier;
+  productId: string;
+  priceId: string;
+  amountTotal: number;
+  currency: "usd";
+};
+
+type ValidatedAdvisoryPurchase = ApprovedAdvisoryPurchase & {
+  checkoutSessionId: string;
+  paymentIntentId: string | null;
+  customerId: string | null;
+};
+
+type PurchaseValidationResult =
+  | {
+      approved: true;
+      purchase: ValidatedAdvisoryPurchase;
+    }
+  | {
+      approved: false;
+      reason: string;
+    };
+
+const APPROVED_ADVISORY_PURCHASES: readonly ApprovedAdvisoryPurchase[] = [
+  {
+    tier: "tier1",
+    productId: "prod_U3ZhWOJuzTs6Sm",
+    priceId: "price_1T5SXxA8ncZPVIM9oqOdoY7I",
+    amountTotal: 50_000,
+    currency: "usd",
+  },
+  {
+    tier: "tier2",
+    productId: "prod_U3Zi1MRwBrP3qC",
+    priceId: "price_1T5SZGA8ncZPVIM9mdhjVpVT",
+    amountTotal: 250_000,
+    currency: "usd",
+  },
+] as const;
+
 type WebhookEventLog = {
   id: string;
   event_type: string;
@@ -72,6 +115,139 @@ type WebhookEventUpdate = {
   errorMessage?: string | null;
   processedAt?: string | null;
 };
+
+
+function getStripeReferenceId(
+  value: string | { id: string } | null
+): string | null {
+  if (typeof value === "string") {
+    return value;
+  }
+
+  return value?.id ?? null;
+}
+
+function getStripeProductId(
+  product: string | Stripe.Product | Stripe.DeletedProduct | null
+): string | null {
+  if (typeof product === "string") {
+    return product;
+  }
+
+  return product?.id ?? null;
+}
+
+async function validateApprovedAdvisoryPurchase(params: {
+  stripe: Stripe;
+  session: Stripe.Checkout.Session;
+}): Promise<PurchaseValidationResult> {
+  const { stripe, session } = params;
+
+  if (session.mode !== "payment") {
+    return {
+      approved: false,
+      reason: `unsupported_checkout_mode:${session.mode ?? "unknown"}`,
+    };
+  }
+
+  if (session.payment_status !== "paid") {
+    return {
+      approved: false,
+      reason: `payment_not_paid:${session.payment_status ?? "unknown"}`,
+    };
+  }
+
+  if (session.amount_total === null) {
+    return {
+      approved: false,
+      reason: "missing_amount_total",
+    };
+  }
+
+  if (!session.currency) {
+    return {
+      approved: false,
+      reason: "missing_currency",
+    };
+  }
+
+  const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
+    limit: 10,
+    expand: ["data.price.product"],
+  });
+
+  if (lineItems.data.length !== 1) {
+    return {
+      approved: false,
+      reason: `unexpected_line_item_count:${lineItems.data.length}`,
+    };
+  }
+
+  const lineItem = lineItems.data[0];
+  const priceId = lineItem.price?.id ?? null;
+  const productId = lineItem.price
+    ? getStripeProductId(lineItem.price.product)
+    : null;
+
+  if (!priceId) {
+    return {
+      approved: false,
+      reason: "missing_price_id",
+    };
+  }
+
+  if (!productId) {
+    return {
+      approved: false,
+      reason: "missing_product_id",
+    };
+  }
+
+  if (lineItem.quantity !== 1) {
+    return {
+      approved: false,
+      reason: `unexpected_quantity:${lineItem.quantity ?? "unknown"}`,
+    };
+  }
+
+  const approvedPurchase = APPROVED_ADVISORY_PURCHASES.find(
+    (purchase) =>
+      purchase.priceId === priceId &&
+      purchase.productId === productId &&
+      purchase.amountTotal === session.amount_total &&
+      purchase.currency === session.currency?.toLowerCase()
+  );
+
+  if (!approvedPurchase) {
+    return {
+      approved: false,
+      reason: [
+        "unapproved_purchase",
+        `product=${productId}`,
+        `price=${priceId}`,
+        `amount=${session.amount_total}`,
+        `currency=${session.currency.toLowerCase()}`,
+      ].join(":"),
+    };
+  }
+
+  if (lineItem.amount_total !== approvedPurchase.amountTotal) {
+    return {
+      approved: false,
+      reason: `line_item_amount_mismatch:${lineItem.amount_total}`,
+    };
+  }
+
+  return {
+    approved: true,
+    purchase: {
+      ...approvedPurchase,
+      checkoutSessionId: session.id,
+      paymentIntentId: getStripeReferenceId(session.payment_intent),
+      customerId: getStripeReferenceId(session.customer),
+    },
+  };
+}
 
 function getEnv(): WebhookEnv {
   try {
@@ -828,6 +1004,83 @@ export async function POST(req: Request) {
     });
   }
 
+  let purchaseValidation: PurchaseValidationResult;
+
+  try {
+    purchaseValidation = await validateApprovedAdvisoryPurchase({
+      stripe,
+      session,
+    });
+  } catch (err: unknown) {
+    const errorMessage = getErrorMessage(err);
+    console.error("Stripe purchase validation failed:", errorMessage);
+
+    try {
+      await updateWebhookEventLog({
+        eventId: event.id,
+        supabaseUrl,
+        supabaseServiceRoleKey,
+        update: {
+          status: "failed",
+          email: customerEmail,
+          portalAccessResult: "purchase_validation_failed",
+          emailResult: "not_sent",
+          errorMessage,
+          processedAt: new Date().toISOString(),
+        },
+      });
+    } catch (logErr: unknown) {
+      console.error(
+        "Failed to update purchase validation failure log:",
+        getErrorMessage(logErr)
+      );
+    }
+
+    return new NextResponse("Stripe purchase validation failed", {
+      status: 500,
+    });
+  }
+
+  if (!purchaseValidation.approved) {
+    await updateWebhookEventLog({
+      eventId: event.id,
+      supabaseUrl,
+      supabaseServiceRoleKey,
+      update: {
+        status: "skipped",
+        email: customerEmail,
+        portalAccessResult: "unapproved_purchase",
+        emailResult: "skipped",
+        errorMessage: purchaseValidation.reason,
+        processedAt: new Date().toISOString(),
+      },
+    });
+
+    await logOnboardingEvent({
+      email: customerEmail,
+      eventType: "webhook_skipped",
+      eventSource: "stripe_webhook",
+      status: "skipped",
+      metadata: {
+        stripe_event_id: event.id,
+        stripe_session_id: session.id,
+        reason: purchaseValidation.reason,
+      },
+      supabaseUrl,
+      supabaseServiceRoleKey,
+    });
+
+    return NextResponse.json({
+      received: true,
+      eventId: event.id,
+      portalAccess: "unapproved_purchase",
+      emailSent: "skipped",
+      reason: purchaseValidation.reason,
+    });
+  }
+
+  const validatedPurchase = purchaseValidation.purchase;
+
   if (!customerEmail) {
     await updateWebhookEventLog({
       eventId: event.id,
@@ -903,6 +1156,13 @@ export async function POST(req: Request) {
       metadata: {
         stripe_event_id: event.id,
         stripe_session_id: session.id,
+        stripe_payment_intent_id: validatedPurchase.paymentIntentId,
+        stripe_customer_id: validatedPurchase.customerId,
+        tier: validatedPurchase.tier,
+        product_id: validatedPurchase.productId,
+        price_id: validatedPurchase.priceId,
+        amount_total: validatedPurchase.amountTotal,
+        currency: validatedPurchase.currency,
         portal_access_result: portalResult.status,
       },
       supabaseUrl,
@@ -917,6 +1177,9 @@ export async function POST(req: Request) {
       metadata: {
         stripe_event_id: event.id,
         stripe_session_id: session.id,
+        tier: validatedPurchase.tier,
+        product_id: validatedPurchase.productId,
+        price_id: validatedPurchase.priceId,
         email_result: emailResult.status,
         delivery_provider: "resend",
       },
@@ -929,6 +1192,7 @@ export async function POST(req: Request) {
       eventId: event.id,
       portalAccess: portalResult.status,
       email: portalResult.email,
+      tier: validatedPurchase.tier,
       emailSent: emailResult.status,
     });
   } catch (err: unknown) {
